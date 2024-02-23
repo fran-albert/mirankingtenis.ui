@@ -81,8 +81,9 @@ ColumnDef<User>[] => {
             <EditButton id={row.original.id} path="usuarios/pacientes" />
             {/* <ViewButton id={row.original.id} text="Ver Paciente" /> */}
             <DeletePlayerDialog
-            // idPatient={row.original.id}
-            // onPatientDeleted={fetchPatients}
+              idCategory={row.original.id}
+              // idPatient={row.original.id}
+              // onPatientDeleted={fetchPatients}
             />
           </>
           {/* )} */}
