@@ -39,8 +39,6 @@ function LoginForm() {
       email,
       password,
     });
-    console.log(email, password);
-    console.log(result);
 
     setIsLoading(false);
 
