@@ -1,13 +1,10 @@
 import axiosInstance from "@/services/axiosConfig";
 import { User } from "../domain/User";
 import { UserRepository } from "../domain/UserRepository";
-import axios from "axios";
 
-export function createApiUserRepositroy(): UserRepository {
+export function createApiUserRepository(): UserRepository {
   async function getUser(id: number): Promise<User | undefined> {
-    const response = await axios.get(
-      `https://ecommerce-net.azurewebsites.net/api/Account/user?id=${id}`
-    );
+    const response = await axiosInstance.get(`users/${id}`);
     const user = response.data as User;
     return user;
   }
