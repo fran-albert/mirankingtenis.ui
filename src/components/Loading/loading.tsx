@@ -29,7 +29,7 @@ function Loading({ isLoading: isLoading }: { isLoading: boolean }) {
   return (
     <div className="sweet-loading" style={loaderContainerStyle}>
       <RingLoader
-        color="#36d7b7"
+        color="#1e293b"
         loading={isLoading}
         cssOverride={override}
         size={150}
