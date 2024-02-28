@@ -9,7 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { goBack } from "@/lib/utils";
 import { createUser } from "@/modules/users/application/create/createUser";
 import { User } from "@/modules/users/domain/User";
-import { createApiUserRepositroy } from "@/modules/users/infra/ApiUserRepository";
+import { createApiUserRepository } from "@/modules/users/infra/ApiUserRepository";
 import axios from "axios";
 import React, { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -27,7 +27,7 @@ function CreatePlayerForm() {
   const [selectedState, setSelectedState] = useState("");
   const [selectedCity, setSelectedCity] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
-  const userRepository = createApiUserRepositroy();
+  const userRepository = createApiUserRepository();
   const createUserFn = createUser(userRepository);
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
@@ -60,110 +60,92 @@ function CreatePlayerForm() {
 
   return (
     <>
-      <div className="flex items-center justify-center bg-gray-50 border shadow-2xl rounded-lg p-4 w-1/2">
-        <div className="relative p-8 rounded-xl w-full max-w-2xl">
-          <div className="flex justify-between items-center mb-4">
-            <div className="flex-grow">
-              <p className="text-xl font-bold text-center">Agregar Jugador</p>
-            </div>
+      <div className="flex flex-wrap items-center justify-center bg-gray-50 border shadow-2xl rounded-lg p-4 w-full sm:w-1/2">
+        <div className="w-full p-4">
+          <p className="text-xl font-bold text-center">Agregar Jugador</p>
+          <div className="my-4">
+            <hr />
           </div>
-          <Separator />
-          <hr />
           <form onSubmit={handleSubmit(onSubmit)}>
-            <div className="flex flex-row mt-2">
-              <div className="flex-1 pr-1">
-                <div className="mb-2 block ">
-                  <Label htmlFor="name">Nombre</Label>
-                  <Input
-                    {...register("name", { required: true })}
-                    className="bg-gray-200 border-gray-300 text-gray-800"
-                  />
-                </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="name">Nombre</Label>
+                <Input
+                  {...register("name", { required: true })}
+                  className="w-full bg-gray-200 border-gray-300 text-gray-800"
+                />
               </div>
-              <div className="flex-1 pl-1">
-                <div className="mb-2 block">
-                  <Label htmlFor="lastname">Apellido</Label>
-                  <Input
-                    {...register("lastname", { required: true })}
-                    className="bg-gray-200 border-gray-300 text-gray-800"
-                  />
-                </div>
+              <div>
+                <Label htmlFor="lastname">Apellido</Label>
+                <Input
+                  {...register("lastname", { required: true })}
+                  className="w-full bg-gray-200 border-gray-300 text-gray-800"
+                />
               </div>
-            </div>
-            <div className="flex flex-row">
-              <div className="flex-1 pr-1">
-                <div className="mb-2 block">
-                  <Label htmlFor="phone">Teléfono</Label>
-                  <Input
-                    {...register("phone", { required: true })}
-                    className="bg-gray-200 border-gray-300 text-gray-800"
-                  />
-                </div>
+              <div>
+                <Label htmlFor="phone">Teléfono</Label>
+                <Input
+                  {...register("phone", { required: true })}
+                  className="w-full bg-gray-200 border-gray-300 text-gray-800"
+                />
               </div>
-              <div className="flex-1 pl-1">
-                <div className="mb-2 block">
-                  <Label htmlFor="healthInsurance">Imagen</Label>
-                  <Input
-                    {...register("photo")}
-                    className="bg-gray-200 border-gray-300 text-gray-800"
-                    type=""
-                  />
-                </div>
+              <div>
+                <Label htmlFor="healthInsurance">Imagen</Label>
+                <Input
+                  {...register("photo")}
+                  className="w-full bg-gray-200 border-gray-300 text-gray-800"
+                />
               </div>
-            </div>
-            <div className="flex flex-row">
-              <div className="flex-1 pr-1">
-                <div className="mb-2 block">
-                  <Label htmlFor="userName">Correo Electronico</Label>
-                  <Input
-                    id="email"
-                    className="bg-gray-200 border-gray-300 text-gray-800"
-                    {...register("email")}
-                  />
-                </div>
+              <div>
+                <Label htmlFor="userName">Correo Electrónico</Label>
+                <Input
+                  id="email"
+                  className="w-full bg-gray-200 border-gray-300 text-gray-800"
+                  {...register("email")}
+                />
               </div>
-              <div className="flex-1 pl-1">
-                <div className="mb-2 block">
-                  <Label htmlFor="birthdate">Categoría</Label>
-                  <CategorySelect
-                    selected={selectedCategory}
-                    onCategory={(value) => {
-                      setSelectedCategory(value);
-                      setValue("idCategory", parseInt(value, 10));
-                    }}
-                  />
-                </div>
+              <div>
+                <Label htmlFor="birthdate">Categoría</Label>
+                <CategorySelect
+                  selected={selectedCategory}
+                  onCategory={(value) => {
+                    setSelectedCategory(value);
+                    setValue("idCategory", parseInt(value, 10));
+                  }}
+                />
               </div>
-            </div>
-            <div className="flex flex-row">
-              <div className="flex-1 pr-1">
-                <div className="mb-2 block">
-                  <Label htmlFor="state">Provincia</Label>
-                  <StateSelect
-                    selected={selectedState}
-                    onStateChange={setSelectedState}
-                  />
-                </div>
+              <div>
+                <Label htmlFor="state">Provincia</Label>
+                <StateSelect
+                  selected={selectedState}
+                  onStateChange={setSelectedState}
+                />
               </div>
-              <div className="flex-1 pl-1">
-                <div className="mb-2 block">
-                  <Label htmlFor="city">Localidad</Label>
-                  <CitySelect
-                    idState={selectedState}
-                    selected={selectedCity}
-                    onCityChange={(value) => {
-                      setSelectedCity(value);
-                      setValue("idCity", parseInt(value, 10));
-                    }}
-                  />
-                </div>
+              <div>
+                <Label htmlFor="city">Localidad</Label>
+                <CitySelect
+                  idState={selectedState}
+                  selected={selectedCity}
+                  onCityChange={(value) => {
+                    setSelectedCity(value);
+                    setValue("idCity", parseInt(value, 10));
+                  }}
+                />
               </div>
             </div>
-            <div className="flex justify-center">
-              <Button className="mt-10 m-2" variant="destructive" onClick={goBack}>
+            <div className="flex flex-col sm:flex-row justify-center gap-4 mt-10">
+              <Button
+                className="w-full sm:w-auto"
+                variant="destructive"
+                onClick={goBack}
+              >
                 Cancelar
               </Button>
-              <Button className="mt-10 m-2" variant="default" type="submit">
+              <Button
+                className="w-full sm:w-auto"
+                variant="default"
+                type="submit"
+              >
                 Agregar
               </Button>
             </div>
