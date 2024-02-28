@@ -6,7 +6,7 @@ import { FaPencilAlt } from "react-icons/fa";
 export const EditButton = ({ id, path }: { id: number; path: string }) => {
   const router = useRouter();
   const handleEdit = () => {
-    router.push(`/${path}/${id}/editar`);
+    router.push(`/${path}/${id}`);
   };
 
   return (
