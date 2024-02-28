@@ -16,13 +16,13 @@ import { FaRegTrashAlt } from "react-icons/fa";
 import axios from "axios";
 import { toast } from "sonner";
 
-interface DeleteCategoryDialogProps {
-  idCategory: number;
+interface DeletePlayerDialogProps {
+  idPlayer: number;
 }
 
 export default function DeletePlayerDialog({
-  idCategory,
-}: DeleteCategoryDialogProps) {
+  idPlayer,
+}: DeletePlayerDialogProps) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const toggleDialog = () => setIsOpen(!isOpen);
@@ -30,7 +30,7 @@ export default function DeletePlayerDialog({
   const handleConfirmDelete = async () => {
     try {
       await axios.delete(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/category/${idCategory}`
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/category/${idPlayer}`
       );
       toast.success("Categoría eliminada correctamente");
     } catch (error) {
@@ -54,19 +54,16 @@ export default function DeletePlayerDialog({
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Eliminar Categoría</DialogTitle>
+          <DialogTitle>Eliminar Jugador</DialogTitle>
         </DialogHeader>
         <DialogDescription>
-          ¿Estás seguro de que quieres eliminar la categoría? Esta acción es
-          irreversible.
+          ¿Estás seguro de que quieres eliminar este jugador?
         </DialogDescription>
         <DialogFooter>
           <Button variant="outline" onClick={toggleDialog}>
             Cancelar
           </Button>
-          <Button onClick={handleConfirmDelete}>
-            Confirmar
-          </Button>
+          <Button onClick={handleConfirmDelete}>Confirmar</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
