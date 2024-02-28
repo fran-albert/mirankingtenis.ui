@@ -7,16 +7,21 @@ import Loading from "@/components/Loading/loading";
 import { DataTable } from "@/components/Table/dataTable";
 import { getColumns } from "./columns";
 import { User } from "@/modules/users/domain/User";
-import { createApiUserRepositroy } from "@/modules/users/infra/ApiUserRepository";
+import { createApiUserRepository } from "@/modules/users/infra/ApiUserRepository";
 import { getAllUsers } from "@/modules/users/application/get-all/getAllUsers";
 import useRoles from "@/hooks/useRoles";
+import { useCustomSession } from "@/context/SessionAuthProviders";
 
 export const PlayersTable = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [players, setPlayers] = useState<User[]>([]);
-  const userRepository = createApiUserRepositroy();
+  const userRepository = createApiUserRepository();
   const loadAllPlayers = getAllUsers(userRepository);
   const { isPlayer, isAdmin } = useRoles();
+
+  const { session } = useCustomSession();
+
+  const canAddUser = !!session && isAdmin;
 
   const fetchUsers = async () => {
     try {
@@ -29,17 +34,16 @@ export const PlayersTable = () => {
       setIsLoading(false);
     }
   };
-  //   const patientColumns = getColumns(fetchUsers, { isSecretary, isDoctor });
 
-  const playersColumns = getColumns(fetchUsers);
+  const playersColumns = getColumns(fetchUsers, { isAdmin });
 
   useEffect(() => {
     fetchUsers();
   }, []);
 
-  //   if (isLoading) {
-  //     return <Loading isLoading />;
-  //   }
+  if (isLoading) {
+    return <Loading isLoading />;
+  }
 
   return (
     <>
@@ -52,9 +56,9 @@ export const PlayersTable = () => {
         searchPlaceholder="Buscar jugadores..."
         showSearch={true}
         addLinkPath="jugadores/agregar"
-        searchColumn="firstName"
+        searchColumn="name"
         addLinkText="Agregar Jugador"
-        canAddUser={isAdmin}
+        canAddUser={canAddUser}
       />
     </>
   );
