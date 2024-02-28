@@ -4,27 +4,13 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { EditButton } from "@/components/Button/Edit/button";
 import DeletePlayerDialog from "@/components/Button/Delete/button";
-// import AddLabDialog from "@/components/Button/Add/Lab/button";
-// import { formatDni } from "@/common/helpers/helpers";
-// import { User } from "@/modules/users/domain/User";
-// import { FaRegEye } from "react-icons/fa";
-// import DeletePatientDialog from "../delete/DeletePatientDialog";
-// import { Button } from "@/components/ui/button";
-// import { ViewButton } from "@/components/Button/View/button";
-
-interface User {
-  id: number;
-  name: string;
-  lastname: string;
-  email: string;
-  phone: string;
-}
+import { User } from "@/modules/users/domain/User";
+import { Button } from "@/components/ui/button";
 
 export const getColumns = (
-  fetchUsers: () => void
-): //
-//   roles: { isSecretary: boolean; isDoctor: boolean }
-ColumnDef<User>[] => {
+  fetchUsers: () => void,
+  roles: { isAdmin: boolean | undefined }
+): ColumnDef<User>[] => {
   const columns: ColumnDef<User>[] = [
     {
       accessorKey: "#",
@@ -35,24 +21,22 @@ ColumnDef<User>[] => {
       },
     },
     {
-      accessorKey: "firstName",
+      accessorKey: "name",
       header: "Jugador",
       cell: ({ row }) => (
         <div className="flex items-center">
           <Avatar>
             <AvatarImage
-              // src={
-              //   row.original.photo
-              //     ? `https://incor-ranking.s3.us-east-1.amazonaws.com/storage/avatar/${row.original.photo}`
-              //     : "https://incor-ranking.s3.us-east-1.amazonaws.com/storage/avatar/default.png"
-              // }
               src={
-                "https://www.atptour.com/-/media/tennis/players/head-shot/2020/02/26/11/55/federer_head_ao20.png?sc=0&hash=7A17A4E9C10DF90A2C987081C7EEE1E8"
+                row.original.photo
+                  ? `https://incor-ranking.s3.us-east-1.amazonaws.com/storage/avatar/${row.original.photo}`
+                  : "https://www.atptour.com/-/media/tennis/players/head-shot/2020/02/26/11/55/federer_head_ao20.png?sc=0&hash=7A17A4E9C10DF90A2C987081C7EEE1E8"
               }
               alt="@avatar"
             />
             <AvatarFallback>
-              {`${row.original.name}${row.original.lastname}`}
+              {row.original.name.charAt(0)}
+              {row.original.lastname.charAt(0)}
             </AvatarFallback>
           </Avatar>
           <div className="flex flex-col ml-2">
@@ -75,18 +59,15 @@ ColumnDef<User>[] => {
       header: " ",
       cell: ({ row }) => (
         <div className="flex items-center justify-end">
-          {/* {roles.isSecretary && ( */}
-          <>
-            {/* <AddLabDialog idPatient={row.original.id} /> */}
-            <EditButton id={row.original.id} path="usuarios/pacientes" />
-            {/* <ViewButton id={row.original.id} text="Ver Paciente" /> */}
-            <DeletePlayerDialog
-              idCategory={row.original.id}
-              // idPatient={row.original.id}
-              // onPatientDeleted={fetchPatients}
-            />
-          </>
-          {/* )} */}
+          {roles.isAdmin && (
+            <>
+              <EditButton id={row.original.id} path="jugadores" />
+              <DeletePlayerDialog
+                idPlayer={row.original.id}
+                // onPatientDeleted={fetchPatients}
+              />
+            </>
+          )}
         </div>
       ),
     },
