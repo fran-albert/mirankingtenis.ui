@@ -67,15 +67,15 @@ function ProfilePlayer() {
           <div className="mb-4">
             <div className="flex justify-between">
               <span className="font-semibold">Edad</span>
-              <span>25 (1998.08.13)</span>
+              <span>25 1998.08.13</span>
             </div>
             <div className="flex justify-between">
               <span className="font-semibold">Peso</span>
-              <span>176 lbs (80kg)</span>
+              <span>176 lbs 80kg</span>
             </div>
             <div className="flex justify-between">
               <span className="font-semibold">Estatura</span>
-              <span>6'1" (185cm)</span>
+              <span> 185cm</span>
             </div>
           </div>
           <div className="mb-4">
