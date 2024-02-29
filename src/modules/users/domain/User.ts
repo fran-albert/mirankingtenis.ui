@@ -15,4 +15,5 @@ export interface User {
   category: Category;
   idCategory: number;
   idCity: number;
+  position?: number;
 }
