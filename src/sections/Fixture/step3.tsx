@@ -33,8 +33,7 @@ export const Step3 = ({
     Array(8).fill({ idUser1: null, idUser2: null })
   );
 
-
-  const updateMatch = (matchIndex, playerPosition, playerId) => {
+  const updateMatch = (matchIndex: any, playerPosition: any, playerId: any) => {
     const newPlayerId = playerId !== "" ? playerId : null;
     const newPosition = playerPosition === "player1" ? "idUser1" : "idUser2";
     const newMatches = matches.map((match, index) =>
@@ -43,7 +42,7 @@ export const Step3 = ({
     setMatches(newMatches);
   };
 
-  const isPlayerSelectedElsewhere = (playerId, currentMatchIndex) => {
+  const isPlayerSelectedElsewhere = (playerId: any, currentMatchIndex: any) => {
     return matches.some((match, index) => {
       if (index !== currentMatchIndex) {
         return match.player1 === playerId || match.player2 === playerId;

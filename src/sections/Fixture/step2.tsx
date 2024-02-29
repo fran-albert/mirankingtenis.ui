@@ -7,8 +7,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-export const Step2 = ({ onNext, onBack, onJornadaSelect }) => {
-  const selectJornada = (value) => {
+export const Step2 = ({
+  onNext,
+  onBack,
+  onJornadaSelect,
+}: {
+  onNext: any;
+  onBack: any;
+  onJornadaSelect: any;
+}) => {
+  const selectJornada = (value: any) => {
     onJornadaSelect(value);
   };
 
