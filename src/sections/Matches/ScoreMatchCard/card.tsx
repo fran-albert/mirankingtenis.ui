@@ -1,3 +1,4 @@
+import React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Card,
@@ -7,101 +8,97 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import React from "react";
+import { User } from "@/modules/users/domain/User";
+import Link from "next/link";
 
 export const ScoreMatchCard = ({
   player1,
   player2,
-  round,
-  court,
 }: {
-  player1: any;
-  player2: any;
-  round: any;
-  court: any;
+  player1: User;
+  player2: User;
 }) => {
   return (
-    <>
-      <Card className="w-full transition duration-300 ease-in-out transform hover:scale-105 shadow-lg rounded-lg">
-        <CardHeader>
-          <CardTitle>
-            <div className="text-xs font-bold text-gray-900">Final</div>
-          </CardTitle>
-          <CardDescription>Descripción</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form>
-            <div className="grid w-full items-center gap-4">
+    <Card className="w-full transition duration-300 ease-in-out transform hover:scale-105 shadow-lg rounded-lg">
+      <CardHeader>
+        <CardTitle>
+          <div className="text-xs font-bold text-gray-900">Pendiente</div>
+        </CardTitle>
+        <CardDescription></CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form>
+          <div className="grid w-full items-center gap-4">
+            <div className="flex flex-col space-y-1.5">
+              <div className="flex justify-between">
+                <div className="flex items-center space-x-2">
+                  <div className="text-red-500 font-bold">
+                    <Avatar>
+                      <AvatarImage
+                        src={
+                          player1.photo
+                            ? `https://incor-ranking.s3.us-east-1.amazonaws.com/storage/avatar/${player1.photo}`
+                            : "https://www.atptour.com/-/media/tennis/players/head-shot/2020/02/26/11/55/federer_head_ao20.png?sc=0&hash=7A17A4E9C10DF90A2C987081C7EEE1E8"
+                        }
+                        alt="@avatar"
+                      />
+                    </Avatar>
+                  </div>
+                  <div className="text-xs font-bold text-gray-500">
+                    {player1.ranking ? player1.ranking.position : "-"}
+                  </div>
+                  <Link
+                    href={`/jugadores/${player1.id}`}
+                    className="font-medium text-gray-900 hover:text-blue-500"
+                  >
+                    {player1.lastname}, {player1.name}
+                  </Link>
+                </div>
+                <div className="flex items-center space-x-1">
+                  <div className="font-bold">-</div>
+                  <div className="font-bold">-</div>
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-col space-y-1.5">
               <div className="flex flex-col space-y-1.5">
                 <div className="flex justify-between">
                   <div className="flex items-center space-x-2">
                     <div className="text-red-500 font-bold">
                       <Avatar>
                         <AvatarImage
-                          // src={
-                          //   row.original.photo
-                          //     ? `https://incor-ranking.s3.us-east-1.amazonaws.com/storage/avatar/${row.original.photo}`
-                          //     : "https://incor-ranking.s3.us-east-1.amazonaws.com/storage/avatar/default.png"
-                          // }
                           src={
-                            "https://www.atptour.com/-/media/tennis/players/head-shot/2020/02/26/11/55/federer_head_ao20.png?sc=0&hash=7A17A4E9C10DF90A2C987081C7EEE1E8"
+                            player2.photo
+                              ? `https://incor-ranking.s3.us-east-1.amazonaws.com/storage/avatar/${player2.photo}`
+                              : "https://www.atptour.com/-/media/tennis/players/head-shot/2020/02/26/11/55/federer_head_ao20.png?sc=0&hash=7A17A4E9C10DF90A2C987081C7EEE1E8"
                           }
                           alt="@avatar"
                         />
-                        <AvatarFallback>probando</AvatarFallback>
                       </Avatar>
                     </div>
-                    <div className="text-xs font-bold text-gray-500">3</div>
-                    <div className="font-medium">FRANCISCO</div>
+                    <div className="text-xs font-bold text-gray-500">
+                      {player2.ranking ? player2.ranking.position : "-"}
+                    </div>
+                    <a
+                      href="/perfil/francisco"
+                      className="font-medium text-gray-900 hover:text-blue-500"
+                    >
+                      {player2.lastname}, {player2.name}
+                    </a>
                   </div>
                   <div className="flex items-center space-x-1">
-                    <div className="font-bold">6</div>
-                    <div className="font-bold">6</div>
-                  </div>
-                </div>
-              </div>
-              <div className="flex flex-col space-y-1.5">
-                <div className="flex flex-col space-y-1.5">
-                  <div className="flex justify-between">
-                    <div className="flex items-center space-x-2">
-                      <div className="text-red-500 font-bold">
-                        <Avatar>
-                          <AvatarImage
-                            // src={
-                            //   row.original.photo
-                            //     ? `https://incor-ranking.s3.us-east-1.amazonaws.com/storage/avatar/${row.original.photo}`
-                            //     : "https://incor-ranking.s3.us-east-1.amazonaws.com/storage/avatar/default.png"
-                            // }
-                            src={
-                              "https://www.atptour.com/-/media/tennis/players/head-shot/2020/02/26/11/55/federer_head_ao20.png?sc=0&hash=7A17A4E9C10DF90A2C987081C7EEE1E8"
-                            }
-                            alt="@avatar"
-                          />
-                          <AvatarFallback>probando</AvatarFallback>
-                        </Avatar>
-                      </div>
-                      <div className="text-xs font-bold text-gray-500">3</div>
-                      <a
-                        href="/perfil/francisco"
-                        className="font-medium text-gray-900 hover:text-blue-500"
-                      >
-                        FRANCISCO
-                      </a>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <div className="">4</div>
-                      <div className="">4</div>
-                    </div>
+                    <div className="">-</div>
+                    <div className="">-</div>
                   </div>
                 </div>
               </div>
             </div>
-          </form>
-        </CardContent>
-        <CardFooter className="flex justify-between">
-          <div className="text-sm text-gray-500">26 02 - Cancha 1</div>
-        </CardFooter>
-      </Card>
-    </>
+          </div>
+        </form>
+      </CardContent>
+      <CardFooter className="flex justify-between">
+        <div className="text-sm text-gray-500">Día - Cancha</div>
+      </CardFooter>
+    </Card>
   );
 };
