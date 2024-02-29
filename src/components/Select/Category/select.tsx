@@ -13,11 +13,13 @@ import { useEffect, useState } from "react";
 interface CategorySelectProps {
   selected?: string;
   onCategory?: (value: string) => void;
+  className?: string;
 }
 
 export const CategorySelect = ({
   selected,
   onCategory,
+  className,
 }: CategorySelectProps) => {
   const [category, setCategories] = useState<Category[]>([]);
   const categoryRepository: CategoryRepository = createApiCategoryRepository();
@@ -37,7 +39,7 @@ export const CategorySelect = ({
 
   return (
     <Select value={selected} onValueChange={onCategory}>
-      <SelectTrigger className="w-full bg-gray-200 border-gray-300 text-gray-800">
+      <SelectTrigger className={`w-full ${className ? className : 'bg-gray-200 border-gray-300 text-gray-800'}`}>
         <SelectValue placeholder="Seleccione la categoría..." />
       </SelectTrigger>
       <SelectContent>
