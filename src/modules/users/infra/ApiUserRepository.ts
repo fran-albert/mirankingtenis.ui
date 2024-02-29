@@ -15,6 +15,12 @@ export function createApiUserRepository(): UserRepository {
     return users;
   }
 
+  async function getUsersByCategory(idCategory: number): Promise<User[]> {
+    const response = await axiosInstance.get(`users/by-category/${idCategory}`);
+    const users = response.data as User[];
+    return users;
+  }
+
   async function getTotalUsers(): Promise<number> {
     const response = await axiosInstance.get(`account/all`, {});
     const user = response.data as User[];
@@ -32,6 +38,7 @@ export function createApiUserRepository(): UserRepository {
     getUser,
     createUser,
     getTotalUsers,
+    getUsersByCategory,
     getAllUsers,
   };
 }
