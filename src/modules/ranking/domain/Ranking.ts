@@ -4,6 +4,7 @@ export interface Ranking {
   wonMatches: number;
   lostMatches: number;
   playedMatches: number;
+  position: number;
   user: {
     name: string;
     lastname: string;
