@@ -8,6 +8,7 @@ import Link from "next/link";
 import { signOut } from "next-auth/react";
 import { useCustomSession } from "@/context/SessionAuthProviders";
 import { usePathname, useRouter } from "next/navigation";
+import useRoles from "@/hooks/useRoles";
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
@@ -15,7 +16,7 @@ function classNames(...classes: string[]) {
 
 export default function Navbar() {
   const { session } = useCustomSession();
-
+  const { isAdmin } = useRoles();
   const pathname = usePathname();
 
   const [navigation, setNavigation] = useState([
@@ -26,13 +27,21 @@ export default function Navbar() {
   ]);
 
   useEffect(() => {
-    setNavigation((nav) =>
-      nav.map((item) => ({
-        ...item,
-        current: pathname === item.href,
-      }))
-    );
-  }, [pathname]);
+    const updatedNavigation = [
+      { name: "Jugadores", href: "/jugadores", current: false },
+      { name: "Ranking", href: "/ranking", current: false },
+      { name: "Partidos", href: "/partidos", current: false },
+      { name: "Turnos", href: "/turnos", current: false },
+      ...(isAdmin
+        ? [{ name: "Fixture", href: "/fixture", current: false }]
+        : []),
+    ].map((item) => ({
+      ...item,
+      current: pathname === item.href,
+    }));
+
+    setNavigation(updatedNavigation);
+  }, [pathname, isAdmin]);
 
   return (
     <Disclosure as="nav" className="bg-slate-700">
@@ -100,7 +109,7 @@ export default function Navbar() {
                           <span className="sr-only">Open user menu</span>
                           <img
                             className="h-8 w-8 rounded-full"
-                            src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                            src="https://www.atptour.com/-/media/tennis/players/head-shot/2020/02/26/11/55/federer_head_ao20.png?sc=0&hash=7A17A4E9C10DF90A2C987081C7EEE1E8"
                             alt=""
                           />
                         </Menu.Button>
