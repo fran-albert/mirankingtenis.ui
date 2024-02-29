@@ -4,9 +4,9 @@ import React from "react";
 
 function PlayerDetailsPage() {
   return (
-    <>
+    <div className="flex justify-center">
       <ProfilePlayer />
-    </>
+    </div>
   );
 }
 
