@@ -34,11 +34,18 @@ export function createApiUserRepository(): UserRepository {
     return user;
   }
 
+  async function deleteUser(idUser: number): Promise<User>{
+    const response = await axiosInstance.delete(`users/${idUser}`);
+    const user = response.data as User;
+    return user;
+  }
+
   return {
     getUser,
     createUser,
     getTotalUsers,
     getUsersByCategory,
+    deleteUser,
     getAllUsers,
   };
 }
