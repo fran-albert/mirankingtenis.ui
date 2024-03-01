@@ -10,14 +10,27 @@ import {
 } from "@/components/ui/card";
 import { User } from "@/modules/users/domain/User";
 import Link from "next/link";
+import { FaPencilAlt, FaTrashAlt } from "react-icons/fa";
+import useRoles from "@/hooks/useRoles";
+import DeleteMatchDialog from "../Delete/button";
 
 export const ScoreMatchCard = ({
   player1,
   player2,
+  match,
+  onDeleteMatch,
 }: {
   player1: User;
   player2: User;
+  match: number;
+  onDeleteMatch: () => void;
 }) => {
+  const { isAdmin } = useRoles();
+  const handleEdit = (idPlayer: number) => {
+    console.log(`Editar partido con ID: ${match}`);
+    // Aquí puedes añadir la lógica para editar el partido
+  };
+
   return (
     <Card className="w-full transition duration-300 ease-in-out transform hover:scale-105 shadow-lg rounded-lg">
       <CardHeader>
@@ -79,12 +92,12 @@ export const ScoreMatchCard = ({
                     <div className="text-xs font-bold text-gray-500">
                       {player2.ranking ? player2.ranking.position : "-"}
                     </div>
-                    <a
-                      href="/perfil/francisco"
+                    <Link
+                      href={`/jugadores/${player2.id}`}
                       className="font-medium text-gray-900 hover:text-blue-500"
                     >
                       {player2.lastname}, {player2.name}
-                    </a>
+                    </Link>
                   </div>
                   <div className="flex items-center space-x-1">
                     <div className="">-</div>
@@ -98,6 +111,14 @@ export const ScoreMatchCard = ({
       </CardContent>
       <CardFooter className="flex justify-between">
         <div className="text-sm text-gray-500">Día - Cancha</div>
+        {isAdmin && (
+          <div className="flex items-center space-x-2">
+            <button onClick={() => handleEdit(player1.id)} className="p-2">
+              <FaPencilAlt className="text-slate-500 hover:text-slate-800" />
+            </button>
+            <DeleteMatchDialog onDeleteMatch={onDeleteMatch} />
+          </div>
+        )}
       </CardFooter>
     </Card>
   );
