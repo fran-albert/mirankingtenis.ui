@@ -20,8 +20,6 @@ export default function Navbar() {
   const { isAdmin } = useRoles();
   const pathname = usePathname();
 
-  console.log(session);
-
   const [navigation, setNavigation] = useState([
     { name: "Jugadores", href: "/jugadores", current: false },
     { name: "Ranking", href: "/ranking", current: false },
