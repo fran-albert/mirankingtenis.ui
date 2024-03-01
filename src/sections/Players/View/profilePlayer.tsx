@@ -24,13 +24,13 @@ function ProfilePlayer() {
       }
     };
     fetchUser();
-  }, []);
+  }, [Number(id)]);
 
   return (
     <>
       <div className="bg-slate-800 m-8 p-6 rounded-xl shadow-2xl text-white flex flex-col items-center space-y-4">
         <div className="rounded-full overflow-hidden border-8 border-gray-400 shadow-xl">
-          <img
+          <Image
             src={`https://incor-ranking.s3.us-east-1.amazonaws.com/storage/avatar/${player?.photo}`}
             alt="Player"
             className="w-32 h-32 md:w-48 md:h-48 object-cover"
