@@ -6,4 +6,5 @@ export interface UserRepository {
 	getTotalUsers: () => Promise<number>;
 	createUser: (newUser: User) => Promise<User | undefined>;
 	getUsersByCategory: (idCategory: number) => Promise<User[]>;
+	deleteUser: (id: number) => Promise<User>;
 }
