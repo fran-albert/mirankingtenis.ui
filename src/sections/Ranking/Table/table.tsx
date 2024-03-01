@@ -4,18 +4,22 @@ import { DataTable } from "@/components/Table/dataTable";
 import { getColumns } from "./columns";
 import { Ranking } from "@/modules/ranking/domain/Ranking";
 import { createApiRankingRepositroy } from "@/modules/ranking/infra/ApiRankingRepository";
-import { get } from "@/modules/ranking/application/get/getRanking";
+import { getRankingByCategory } from "@/modules/ranking/application/get-by-category/getRankingByCategory";
 
-export const RankingTable = () => {
+export const RankingTable = ({
+  selectedCategory,
+}: {
+  selectedCategory: number;
+}) => {
   const [isLoading, setIsLoading] = useState(true);
   const [ranking, setRanking] = useState<Ranking[]>([]);
   const rankingRepository = createApiRankingRepositroy();
-  const loadRanking = get(rankingRepository);
+  const loadRanking = getRankingByCategory(rankingRepository);
 
-  const fetchRanking = async () => {
+  const fetchRanking = async (idCategory: number) => {
     try {
       setIsLoading(true);
-      const rankingData = await loadRanking();
+      const rankingData = await loadRanking(idCategory);
       setRanking(rankingData);
     } catch (error) {
       console.log(error);
@@ -23,11 +27,11 @@ export const RankingTable = () => {
       setIsLoading(false);
     }
   };
-  const rankingColumns = getColumns(fetchRanking);
 
   useEffect(() => {
-    fetchRanking();
-  }, []);
+    fetchRanking(selectedCategory);
+  }, [selectedCategory]);
+  const rankingColumns = getColumns();
 
   if (isLoading) {
     return <Loading isLoading={true} />;
@@ -35,7 +39,6 @@ export const RankingTable = () => {
 
   return (
     <>
-      <h1 className="text-2xl text-center font-medium mb-4">Ranking</h1>
       <DataTable columns={rankingColumns} data={ranking} />
     </>
   );
