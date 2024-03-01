@@ -36,6 +36,7 @@ const handler = NextAuth({
           token: user.token,
           id: decoded.id,
           roles: decoded.roles,
+          photo: user.photo,
         };
       },
     }),
