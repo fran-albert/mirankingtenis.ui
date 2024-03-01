@@ -10,7 +10,7 @@ export interface Match {
   shift: string;
   round: number;
   fixture: {
-    id: number, 
-    jornada: number
-  }
+    id: number;
+    jornada: number;
+  };
 }
