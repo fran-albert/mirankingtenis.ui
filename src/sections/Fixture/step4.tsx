@@ -1,6 +1,10 @@
 import { Button } from "@/components/ui/button";
+import { createFixture } from "@/modules/fixture/application/create/createFixture";
 import { createApiFixtureRepository } from "@/modules/fixture/infra/ApiFixtureRepository";
 import { User } from "@/modules/users/domain/User";
+import axios from "axios";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 interface Step4Props {
   onBack: () => void;
@@ -20,6 +24,8 @@ export const Step4 = ({
   players,
 }: Step4Props) => {
   const fixtureRepository = createApiFixtureRepository();
+  const createFixtureFn = createFixture(fixtureRepository);
+  const router = useRouter();
 
   const handleSubmit = async () => {
     const payload = {
@@ -32,10 +38,25 @@ export const Step4 = ({
     };
 
     try {
-      fixtureRepository.createFixture(payload);
+      const fixtureCreationPromise = createFixtureFn(payload);
       console.log("Enviando datos a la API:", payload);
+      toast.promise(fixtureCreationPromise, {
+        loading: "Creando fixture...",
+        success: "Fixture creado con éxito!",
+        duration: 3000,
+      });
+      await fixtureCreationPromise;
+      router.push("/partidos");
     } catch (error) {
-      console.error("Error al enviar los datos:", error);
+      if (axios.isAxiosError(error)) {
+        const errorMessage =
+          error.response?.data?.message ||
+          "Error desconocido al crear el fixture";
+        toast.error(`Error al crear el fixture: ${errorMessage}`, {
+          duration: 3000,
+        });
+        console.error("Error al enviar los datos:", errorMessage);
+      }
     }
   };
 
