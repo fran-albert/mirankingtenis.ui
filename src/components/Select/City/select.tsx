@@ -42,7 +42,7 @@ export const CitySelect = ({
     } else {
       setCities([]);
     }
-  }, [idState]);
+  }, [cityRepository, idState]);
 
   const handleChange = (value: string) => {
     if (onCityChange) {
