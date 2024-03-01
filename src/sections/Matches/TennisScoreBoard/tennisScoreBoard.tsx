@@ -3,24 +3,38 @@ import { ScoreMatchCard } from "@/sections/Matches/ScoreMatchCard/card";
 import { Match } from "@/modules/match/domain/Match";
 import { createApiMatchRepository } from "@/modules/match/infra/ApiMatchRepository";
 
-export const TennisScoreboard = ({ jornada }: { jornada: any }) => {
+export const TennisScoreboard = ({
+  jornada,
+  idCategory,
+}: {
+  jornada: number;
+  idCategory: number;
+}) => {
   const [matches, setMatches] = useState<Match[]>([]);
-
   const matchRepository = createApiMatchRepository();
+  const deleteMatch = matchRepository.deleteMatch;
+
+  const handleDeleteMatch = async (id: number) => {
+    await deleteMatch(id);
+    // Actualizar la lista de partidos tras borrar uno.
+    const updatedMatches = await matchRepository.getByCategoryAndMatchday(idCategory, jornada);
+    setMatches(updatedMatches);
+  };
+
 
   useEffect(() => {
     const fetchMatches = async () => {
-      const matches = await matchRepository.getAllMatches();
-      const filteredMatches = matches.filter(
-        (match) => match.fixture.jornada === jornada
+      const matches = await matchRepository.getByCategoryAndMatchday(
+        idCategory,
+        jornada
       );
-      setMatches(filteredMatches);
+      setMatches(matches);
     };
 
     fetchMatches();
-  }, [matchRepository, jornada]);
+  }, [jornada, idCategory]);
 
-  console.log(matches);
+  console.log(matches.map((match) => match.id));
 
   return (
     <div className="container mx-auto">
@@ -30,6 +44,8 @@ export const TennisScoreboard = ({ jornada }: { jornada: any }) => {
             key={index}
             player1={match.user1}
             player2={match.user2}
+            match={match.id}
+            onDeleteMatch={() => handleDeleteMatch(match.id)} 
           />
         ))}
       </div>
