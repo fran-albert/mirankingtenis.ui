@@ -22,7 +22,7 @@ export const CategorySelect = ({
   className,
 }: CategorySelectProps) => {
   const [category, setCategories] = useState<Category[]>([]);
-  const categoryRepository: CategoryRepository = createApiCategoryRepository();
+  const categoryRepository = createApiCategoryRepository();
 
   useEffect(() => {
     const loadCategories = async () => {
@@ -35,7 +35,7 @@ export const CategorySelect = ({
     };
 
     loadCategories();
-  }, []);
+  }, [categoryRepository]);
 
   return (
     <Select value={selected} onValueChange={onCategory}>
