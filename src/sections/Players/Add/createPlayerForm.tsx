@@ -90,30 +90,16 @@ function CreatePlayerForm() {
                 />
               </div>
               <div>
-                <Label htmlFor="healthInsurance">Imagen</Label>
-                <Input
-                  {...register("photo")}
-                  className="w-full bg-gray-200 border-gray-300 text-gray-800"
-                />
-              </div>
-              <div>
-                <Label htmlFor="userName">Correo Electrónico</Label>
-                <Input
-                  id="email"
-                  className="w-full bg-gray-200 border-gray-300 text-gray-800"
-                  {...register("email")}
-                />
-              </div>
-              <div>
-                <Label htmlFor="birthdate">Categoría</Label>
+                <Label htmlFor="category">Categoría</Label>
                 <CategorySelect
                   selected={selectedCategory}
                   onCategory={(value) => {
                     setSelectedCategory(value);
-                    setValue("idCategory", parseInt(value, 10));
+                    setValue("idCategory", (value));
                   }}
                 />
               </div>
+
               <div>
                 <Label htmlFor="state">Provincia</Label>
                 <StateSelect
@@ -128,10 +114,18 @@ function CreatePlayerForm() {
                   selected={selectedCity}
                   onCityChange={(value) => {
                     setSelectedCity(value);
-                    setValue("idCity", parseInt(value, 10));
+                    setValue("idCity", (value));
                   }}
                 />
               </div>
+            </div>
+            <div className="mt-4">
+              <Label htmlFor="userName">Correo Electrónico</Label>
+              <Input
+                id="email"
+                className="w-full bg-gray-200 border-gray-300 text-gray-800"
+                {...register("email")}
+              />
             </div>
             <div className="flex flex-col sm:flex-row justify-center gap-4 mt-10">
               <Button
