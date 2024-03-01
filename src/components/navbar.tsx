@@ -9,6 +9,7 @@ import { signOut } from "next-auth/react";
 import { useCustomSession } from "@/context/SessionAuthProviders";
 import { usePathname, useRouter } from "next/navigation";
 import useRoles from "@/hooks/useRoles";
+import Image from "next/image";
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
@@ -63,11 +64,13 @@ export default function Navbar() {
               </div>
               <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
                 <div className="flex flex-shrink-0 items-center">
-                  <img
-                    className="h-10 w-auto"
-                    src="https://mirankingtenis.com.ar/wp-content/uploads/2023/05/cropped-cropped-LOGOTENIS-171x172.png"
-                    alt="Your Company"
-                  />
+                  <Link href="https://www.mirankingtenis.com.ar">
+                    <Image
+                      className="h-10 w-auto"
+                      src="https://mirankingtenis.com.ar/wp-content/uploads/2023/05/cropped-cropped-LOGOTENIS-171x172.png"
+                      alt="Your Company"
+                    />
+                  </Link>
                 </div>
                 <div className="hidden sm:ml-6 sm:block">
                   <div className="flex space-x-4">
