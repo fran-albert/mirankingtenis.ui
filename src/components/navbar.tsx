@@ -66,9 +66,11 @@ export default function Navbar() {
                 <div className="flex flex-shrink-0 items-center">
                   <Link href="https://www.mirankingtenis.com.ar">
                     <Image
-                      className="h-10 w-auto"
+                      width={171}
+                      height={172} 
                       src="https://mirankingtenis.com.ar/wp-content/uploads/2023/05/cropped-cropped-LOGOTENIS-171x172.png"
                       alt="Your Company"
+                      className="h-10 w-auto" 
                     />
                   </Link>
                 </div>
