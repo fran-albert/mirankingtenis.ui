@@ -27,11 +27,7 @@ export const getColumns = (
         <div className="flex items-center">
           <Avatar>
             <AvatarImage
-              src={
-                row.original.photo
-                  ? `https://incor-ranking.s3.us-east-1.amazonaws.com/storage/avatar/${row.original.photo}`
-                  : "https://www.atptour.com/-/media/tennis/players/head-shot/2020/02/26/11/55/federer_head_ao20.png?sc=0&hash=7A17A4E9C10DF90A2C987081C7EEE1E8"
-              }
+              src={`https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${row.original.photo}`}
               alt="@avatar"
             />
             <AvatarFallback>
