@@ -10,7 +10,16 @@ export function createApiRankingRepositroy(): RankingRepository {
     return ranking;
   }
 
+  async function getRankingByCategory(idCategory: number): Promise<Ranking[]> {
+    const response = await axiosInstance.get(
+      `ranking/by-category/${idCategory}`
+    );
+    const ranking = response.data as Ranking[];
+    return ranking;
+  }
+
   return {
     get,
+    getRankingByCategory,
   };
 }
