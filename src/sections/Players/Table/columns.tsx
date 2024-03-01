@@ -3,12 +3,12 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { EditButton } from "@/components/Button/Edit/button";
-import DeletePlayerDialog from "@/components/Button/Delete/button";
 import { User } from "@/modules/users/domain/User";
 import { Button } from "@/components/ui/button";
+import DeletePlayerDialog from "../Delete/button";
 
 export const getColumns = (
-  fetchUsers: () => void,
+  handlePlayerDeleted: (idPlayer: number) => void,
   roles: { isAdmin: boolean | undefined }
 ): ColumnDef<User>[] => {
   const columns: ColumnDef<User>[] = [
@@ -60,7 +60,7 @@ export const getColumns = (
               <EditButton id={row.original.id} path="jugadores" />
               <DeletePlayerDialog
                 idPlayer={row.original.id}
-                // onPatientDeleted={fetchPatients}
+                handlePlayerDeleted={handlePlayerDeleted}
               />
             </>
           )}
