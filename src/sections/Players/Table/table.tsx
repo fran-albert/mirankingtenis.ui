@@ -1,8 +1,4 @@
-// import { getColumns } from "./columns";
 import { useEffect, useState } from "react";
-// import { createApiPatientRepository } from "@/modules/patients/infra/ApiPatientRepository";
-// import { getAllPatients } from "@/modules/patients/application/get-all/getAllPatients";
-// import { Patient } from "@/modules/patients/domain/Patient";
 import Loading from "@/components/Loading/loading";
 import { DataTable } from "@/components/Table/dataTable";
 import { getColumns } from "./columns";
@@ -17,10 +13,8 @@ export const PlayersTable = () => {
   const [players, setPlayers] = useState<User[]>([]);
   const userRepository = createApiUserRepository();
   const loadAllPlayers = getAllUsers(userRepository);
-  const { isPlayer, isAdmin } = useRoles();
-
+  const { isAdmin } = useRoles();
   const { session } = useCustomSession();
-
   const canAddUser = !!session && isAdmin;
 
   const fetchUsers = async () => {
@@ -35,7 +29,13 @@ export const PlayersTable = () => {
     }
   };
 
-  const playersColumns = getColumns(fetchUsers, { isAdmin });
+  const handlePlayerDeleted = (idPlayer: number) => {
+    setPlayers((currentPlayers) =>
+      currentPlayers.filter((player) => player.id !== idPlayer)
+    );
+  };
+
+  const playersColumns = getColumns(handlePlayerDeleted, { isAdmin });
 
   useEffect(() => {
     fetchUsers();
