@@ -13,7 +13,7 @@ export interface User {
   ranking: Ranking;
   role: string;
   category: Category;
-  idCategory: number;
-  idCity: number;
+  idCategory: string | number;
+  idCity: string | number;
   position?: number;
 }
