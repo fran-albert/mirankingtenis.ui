@@ -2,17 +2,9 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { EditButton } from "@/components/Button/Edit/button";
-import DeletePlayerDialog from "@/components/Button/Delete/button";
-import { User } from "@/modules/users/domain/User";
 import { Ranking } from "@/modules/ranking/domain/Ranking";
-// import { formatDni } from "@/common/helpers/helpers";
-// import { FaRegEye } from "react-icons/fa";
-// import { Button } from "@/components/ui/button";
-// import { ViewButton } from "@/components/Button/View/button";
 
 export const getColumns = (): //
-//   roles: { isSecretary: boolean; isDoctor: boolean }
 ColumnDef<Ranking>[] => {
   const columns: ColumnDef<Ranking>[] = [
     {
