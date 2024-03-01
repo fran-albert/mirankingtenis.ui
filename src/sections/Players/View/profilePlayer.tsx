@@ -33,6 +33,8 @@ function ProfilePlayer() {
           <Image
             src={`https://incor-ranking.s3.us-east-1.amazonaws.com/storage/avatar/${player?.photo}`}
             alt="Player"
+            width={132}
+            height={132}
             className="w-32 h-32 md:w-48 md:h-48 object-cover"
           />
         </div>
