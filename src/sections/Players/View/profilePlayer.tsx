@@ -31,7 +31,7 @@ function ProfilePlayer() {
       <div className="bg-slate-800 m-8 p-6 rounded-xl shadow-2xl text-white flex flex-col items-center space-y-4">
         <div className="rounded-full overflow-hidden border-8 border-gray-400 shadow-xl">
           <Image
-            src={`https://incor-ranking.s3.us-east-1.amazonaws.com/storage/avatar/${player?.photo}`}
+            src={`https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${player?.photo}.jpeg`}
             alt="Player"
             width={132}
             height={132}
