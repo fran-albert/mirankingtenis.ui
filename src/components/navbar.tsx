@@ -20,6 +20,8 @@ export default function Navbar() {
   const { isAdmin } = useRoles();
   const pathname = usePathname();
 
+  console.log(session);
+
   const [navigation, setNavigation] = useState([
     { name: "Jugadores", href: "/jugadores", current: false },
     { name: "Ranking", href: "/ranking", current: false },
@@ -67,10 +69,10 @@ export default function Navbar() {
                   <Link href="https://www.mirankingtenis.com.ar">
                     <Image
                       width={171}
-                      height={172} 
+                      height={172}
                       src="https://mirankingtenis.com.ar/wp-content/uploads/2023/05/cropped-cropped-LOGOTENIS-171x172.png"
                       alt="Your Company"
-                      className="h-10 w-auto" 
+                      className="h-10 w-auto"
                     />
                   </Link>
                 </div>
@@ -112,10 +114,12 @@ export default function Navbar() {
                         <Menu.Button className="relative flex rounded-full bg-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                           <span className="absolute -inset-1.5" />
                           <span className="sr-only">Open user menu</span>
-                          <img
+                          <Image
                             className="h-8 w-8 rounded-full"
-                            src="https://www.atptour.com/-/media/tennis/players/head-shot/2020/02/26/11/55/federer_head_ao20.png?sc=0&hash=7A17A4E9C10DF90A2C987081C7EEE1E8"
+                            src={`https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${session?.user.photo}.jpeg`}
                             alt=""
+                            height={20}
+                            width={20}
                           />
                         </Menu.Button>
                       </div>
