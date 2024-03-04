@@ -45,6 +45,8 @@ export default function EditMatchDialog({
   const setRepository = createApiSetsRepository();
   const createSetFn = createSets(setRepository);
 
+  console.log("match", match)
+
   const onSubmit = async (formData: any) => {
     const dataToSend: any = {
       idMatch: match.id,
@@ -54,6 +56,7 @@ export default function EditMatchDialog({
         setNumber: parseInt(set.setNumber, 10),
       })),
     };
+    console.log("dataToSend", dataToSend)
     try {
       const setCreationPromise = createSetFn(dataToSend);
       toast.promise(setCreationPromise, {
@@ -114,7 +117,9 @@ export default function EditMatchDialog({
                 <tbody>
                   {/* Jugador 1 */}
                   <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                    <td className="py-4 px-6">Yo</td>
+                    <td className="py-4 px-6">
+                      {match.user1Name}
+                    </td>
                     {/* Primer set */}
                     <td className="py-4 px-6">
                       <Input
@@ -168,7 +173,7 @@ export default function EditMatchDialog({
                   </tr>
                   {/* Jugador 2 */}
                   <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                    <td className="py-4 px-6">{match.rivalName}</td>
+                    <td className="py-4 px-6">{match.user2Name}</td>
                     {/* Primer set */}
                     <td className="py-4 px-6">
                       <Input

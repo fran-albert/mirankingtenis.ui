@@ -12,6 +12,8 @@ export interface Match {
   sets: Sets[];
   status: string;
   round: number;
+  user1Name: string;
+  user2Name: string;
   finalResult: string;
   fixture: {
     id: number;
