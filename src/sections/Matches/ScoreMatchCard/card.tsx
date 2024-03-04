@@ -13,6 +13,7 @@ import Link from "next/link";
 import { FaPencilAlt, FaTrashAlt } from "react-icons/fa";
 import useRoles from "@/hooks/useRoles";
 import DeleteMatchDialog from "../Delete/button";
+import { Match } from "@/modules/match/domain/Match";
 
 export const ScoreMatchCard = ({
   player1,
@@ -22,7 +23,7 @@ export const ScoreMatchCard = ({
 }: {
   player1: User;
   player2: User;
-  match: number;
+  match: Match;
   onDeleteMatch: () => void;
 }) => {
   const { isAdmin } = useRoles();
@@ -31,11 +32,15 @@ export const ScoreMatchCard = ({
     // Aquí puedes añadir la lógica para editar el partido
   };
 
+  console.log("Match", match);
+
   return (
-    <Card className="w-full transition duration-300 ease-in-out transform hover:scale-105 shadow-lg rounded-lg">
+    <Card className="w-full transition duration-300 ease-in-out transform hover:scale-105 shadow-lg rounded-lg ">
       <CardHeader>
         <CardTitle>
-          <div className="text-xs font-bold text-gray-900">Pendiente</div>
+          <div className="text-xs font-bold text-gray-900">
+            {match.status === "played" ? "Final" : "Pendiente"}
+          </div>
         </CardTitle>
         <CardDescription></CardDescription>
       </CardHeader>
@@ -45,16 +50,16 @@ export const ScoreMatchCard = ({
             <div className="flex flex-col space-y-1.5">
               <div className="flex justify-between">
                 <div className="flex items-center space-x-2">
-                  <div className="text-red-500 font-bold">
+                  <div className="text-slate-700 font-bold">
                     <Avatar>
                       <AvatarImage
-                        src={
-                          player1.photo
-                            ? `https://incor-ranking.s3.us-east-1.amazonaws.com/storage/avatar/${player1.photo}`
-                            : "https://www.atptour.com/-/media/tennis/players/head-shot/2020/02/26/11/55/federer_head_ao20.png?sc=0&hash=7A17A4E9C10DF90A2C987081C7EEE1E8"
-                        }
+                        src={`https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${player1.photo}.jpeg`}
                         alt="@avatar"
                       />
+                      <AvatarFallback>
+                        {player1.name.charAt(0)}
+                        {player1.lastname.charAt(0)}
+                      </AvatarFallback>
                     </Avatar>
                   </div>
                   <div className="text-xs font-bold text-gray-500">
@@ -62,14 +67,20 @@ export const ScoreMatchCard = ({
                   </div>
                   <Link
                     href={`/jugadores/${player1.id}`}
-                    className="font-medium text-gray-900 hover:text-blue-500"
+                    className="font-medium text-xl text-gray-900 hover:text-sky-800"
                   >
                     {player1.lastname}, {player1.name}
                   </Link>
                 </div>
                 <div className="flex items-center space-x-1">
-                  <div className="font-bold">-</div>
-                  <div className="font-bold">-</div>
+                  {match.sets.map((set, index) => (
+                    <div
+                      key={index}
+                      className="text-xl font-bold text-gray-800"
+                    >
+                      {set.pointsPlayer1}
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
@@ -77,16 +88,16 @@ export const ScoreMatchCard = ({
               <div className="flex flex-col space-y-1.5">
                 <div className="flex justify-between">
                   <div className="flex items-center space-x-2">
-                    <div className="text-red-500 font-bold">
+                    <div className="text-slate-700 font-bold">
                       <Avatar>
                         <AvatarImage
-                          src={
-                            player2.photo
-                              ? `https://incor-ranking.s3.us-east-1.amazonaws.com/storage/avatar/${player2.photo}`
-                              : "https://www.atptour.com/-/media/tennis/players/head-shot/2020/02/26/11/55/federer_head_ao20.png?sc=0&hash=7A17A4E9C10DF90A2C987081C7EEE1E8"
-                          }
+                          src={`https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${player2.photo}.jpeg`}
                           alt="@avatar"
                         />
+                        <AvatarFallback>
+                          {player2.name.charAt(0)}
+                          {player2.lastname.charAt(0)}
+                        </AvatarFallback>
                       </Avatar>
                     </div>
                     <div className="text-xs font-bold text-gray-500">
@@ -94,14 +105,20 @@ export const ScoreMatchCard = ({
                     </div>
                     <Link
                       href={`/jugadores/${player2.id}`}
-                      className="font-medium text-gray-900 hover:text-blue-500"
+                      className="font-medium text-xl text-gray-900 hover:text-sky-800"
                     >
                       {player2.lastname}, {player2.name}
                     </Link>
                   </div>
                   <div className="flex items-center space-x-1">
-                    <div className="">-</div>
-                    <div className="">-</div>
+                    {match.sets.map((set, index) => (
+                      <div
+                        key={index}
+                        className="text-xl font-bold text-gray-800"
+                      >
+                        {set.pointsPlayer2}
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>

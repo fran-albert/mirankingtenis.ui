@@ -5,13 +5,30 @@ import { createApiUserRepository } from "@/modules/users/infra/ApiUserRepository
 import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
 import { FaPencilAlt } from "react-icons/fa";
+import MatchesIndex from "./Matches";
+import { Match } from "@/modules/match/domain/Match";
+import { createApiMatchRepository } from "@/modules/match/infra/ApiMatchRepository";
+import { getMatchesByUser } from "@/modules/match/application/get-by-user/getMatchesByUser";
+import Loading from "@/components/Loading/loading";
 
-function Profile({ idUser }: { idUser: number }) {
+function Profile() {
+  const { session } = useCustomSession();
+  const idUser = session?.user.id as number;
   const [user, setUser] = useState<User>();
   const userRepository = createApiUserRepository();
+  const [matches, setMatches] = useState<Match[]>([]);
+  const matchRepository = createApiMatchRepository();
+  const loadMatches = getMatchesByUser(matchRepository);
   const loadUser = getUser(userRepository);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState("MisDatos");
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  // Función para cambiar la pestaña activa
+  const changeTab = (tab: any) => {
+    setActiveTab(tab);
+  };
 
   const handleEditPictureClick = () => {
     if (fileInputRef.current) {
@@ -20,16 +37,26 @@ function Profile({ idUser }: { idUser: number }) {
   };
 
   useEffect(() => {
-    const fetchUser = async () => {
+    setIsLoading(true);
+    const fetchUserAndMatches = async () => {
       try {
-        const userData = await loadUser(Number(idUser));
+        const userData = await loadUser(idUser);
         setUser(userData);
+        const userMatches = await loadMatches(idUser);
+        setMatches(userMatches);
+        setIsLoading(false);
       } catch (error) {
         console.error(error);
       }
     };
-    fetchUser();
+    fetchUserAndMatches();
   }, [idUser]);
+
+  console.log(matches, idUser);
+
+  if (isLoading) {
+    return <Loading isLoading />;
+  }
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -95,45 +122,54 @@ function Profile({ idUser }: { idUser: number }) {
             <h3 className="text-xl font-medium">
               {user?.name} {user?.lastname}
             </h3>
-            <p className="text-gray-600">{user?.role}</p>
+            <p className="text-gray-600">
+              {user?.role ? user.role.join(" - ") : "No Roles"}
+            </p>
           </div>
 
           {/* Stats */}
-          <div className="flex justify-center space-x-10 py-6">
-            <div className="text-center">
-              <div className="text-2xl font-normal">
-                Categoría {user?.category.name}
-              </div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-normal">
-                {user?.ranking.position}°
-              </div>
-            </div>
+          <div className="flex justify-center space-x-4">
+            <p className="text-gray-600 text-xl font-medium mb-4">
+              {user?.ranking.position}° - Categoría {user?.category.name}
+            </p>
           </div>
 
           {/* Profile Navigation */}
           <div className="flex justify-around text-sm font-medium text-gray-600 border-t border-b py-3">
-            <a href="#" className="hover:text-blue-600">
+            <a
+              onClick={() => changeTab("MisDatos")}
+              className={`hover:text-blue-600 cursor-pointer ${
+                activeTab === "MisDatos" ? "text-blue-600" : ""
+              }`}
+            >
               Mis Datos
             </a>
-            <a href="#" className="hover:text-blue-600">
+            <a
+              onClick={() => changeTab("MisPartidos")}
+              className={`hover:text-blue-600 cursor-pointer ${
+                activeTab === "MisPartidos" ? "text-blue-600" : ""
+              }`}
+            >
               Mis Partidos
             </a>
-            <a href="#" className="hover:text-blue-600">
+            <a
+              onClick={() => changeTab("MisEstadisticas")}
+              className={`hover:text-blue-600 cursor-pointer ${
+                activeTab === "MisEstadisticas" ? "text-blue-600" : ""
+              }`}
+            >
               Mis Estadísticas
             </a>
           </div>
 
           {/* About Me & Social Links */}
-          <div className="flex flex-col lg:flex-row justify-between items-center lg:items-start py-6">
-            <div className="lg:w-1/2 lg:pr-10">
-              <h3 className="text-lg font-medium leading-tight mb-3">
-                About Me
-              </h3>
-              <p className="text-gray-600 text-sm">{user?.name}</p>
-            </div>
-          </div>
+          {activeTab === "MisDatos" && (
+            <div>{/* Contenido de Mis Datos */}</div>
+          )}
+          {activeTab === "MisPartidos" && <MatchesIndex match={matches} />}
+          {activeTab === "MisEstadisticas" && (
+            <div>{/* Contenido de Mis Estadísticas */}</div>
+          )}
         </div>
       </div>
     </div>

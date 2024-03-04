@@ -36,8 +36,6 @@ export const TennisScoreboard = ({
     fetchMatches();
   }, [jornada, idCategory]);
 
-  console.log(matches.map((match) => match.id));
-
   return (
     <div className="container mx-auto">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
@@ -46,7 +44,7 @@ export const TennisScoreboard = ({
             key={index}
             player1={match.user1}
             player2={match.user2}
-            match={match.id}
+            match={match}
             onDeleteMatch={() => handleDeleteMatch(match.id)}
           />
         ))}
