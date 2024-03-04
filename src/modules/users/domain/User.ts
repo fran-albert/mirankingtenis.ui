@@ -1,4 +1,5 @@
 import { Category } from "@/modules/category/domain/Category";
+import { City } from "@/modules/city/domain/City";
 import { Ranking } from "@/modules/ranking/domain/Ranking";
 
 export interface User {
@@ -9,9 +10,11 @@ export interface User {
   phone: string;
   photo: string;
   password: string;
-  gender: string;
+  city: City;
   ranking: Ranking;
-  role: string;
+  role: Array<{
+    role: string;
+  }>;
   category: Category;
   idCategory: string | number;
   idCity: string | number;

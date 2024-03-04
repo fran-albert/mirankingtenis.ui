@@ -1,4 +1,5 @@
 import { Fixture } from "@/modules/fixture/domain/Fixture";
+import { Sets } from "@/modules/sets/domain/Sets";
 import { User } from "@/modules/users/domain/User";
 export interface Match {
   id: number;
@@ -8,9 +9,13 @@ export interface Match {
   user1: User;
   user2: User;
   shift: string;
+  sets: Sets[];
+  status: string;
   round: number;
+  finalResult: string;
   fixture: {
     id: number;
     jornada: number;
   };
+  rivalName: string;
 }

@@ -27,7 +27,7 @@ export const getColumns = (
         <div className="flex items-center">
           <Avatar>
             <AvatarImage
-              src={`https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${row.original.photo}`}
+              src={`https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${row.original.photo}.jpeg`}
               alt="@avatar"
             />
             <AvatarFallback>

@@ -8,11 +8,9 @@ export const getColumns = (): //
 ColumnDef<Ranking>[] => {
   const columns: ColumnDef<Ranking>[] = [
     {
-      accessorKey: "#",
-      header: "#",
+      accessorKey: "POS",
       cell: ({ row }) => {
-        const index = row.index;
-        return <div>{index + 1}</div>;
+        return <div>{row.original.position}</div>;
       },
     },
     {
@@ -22,7 +20,7 @@ ColumnDef<Ranking>[] => {
         <div className="flex items-center">
           <Avatar>
             <AvatarImage
-              src={`https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${row.original.user.photo}`}
+              src={`https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${row.original.user.photo}.jpeg`}
               alt="@avatar"
             />
             <AvatarFallback>

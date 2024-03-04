@@ -20,6 +20,16 @@ export function createApiMatchRepository(): MatchRepository {
     return matches;
   }
 
+  async function getMatchesByUser(
+    idUser: number,
+  ): Promise<Match[]> {
+    const response = await axiosInstance.get(
+      `matches/by-user?idUser=${idUser}`
+    );
+    const matches = response.data as Match[];
+    return matches;
+  }
+
   async function deleteMatch(id: number): Promise<void> {
     const response = await axiosInstance.delete(`matches/${id}`);
     return response.data;
@@ -28,6 +38,7 @@ export function createApiMatchRepository(): MatchRepository {
   return {
     getAllMatches,
     getByCategoryAndMatchday,
+    getMatchesByUser,
     deleteMatch,
   };
 }
