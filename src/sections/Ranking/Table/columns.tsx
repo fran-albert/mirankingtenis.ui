@@ -19,8 +19,12 @@ ColumnDef<Ranking>[] => {
       cell: ({ row }) => (
         <div className="flex items-center">
           <Avatar>
-            <AvatarImage
-              src={`https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${row.original.user.photo}.jpeg`}
+          <AvatarImage
+               src={
+                row.original.user.photo
+                  ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${row.original.user.photo}.jpeg`
+                  : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/default2.png"
+              }
               alt="@avatar"
             />
             <AvatarFallback>

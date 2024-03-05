@@ -1,9 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { getColumns } from "./columns";
 import { DataTable } from "@/components/Table/dataTable";
 
-function MatchesIndex({ match }: { match: any | undefined }) {
-  const playersColums = getColumns();
+function MatchesIndex({
+  match,
+  onUpdateMatches,
+}: {
+  match: any | undefined;
+  onUpdateMatches: any;
+}) {
+  const playersColums = getColumns(onUpdateMatches);
 
   return (
     <>

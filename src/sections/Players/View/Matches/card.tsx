@@ -1,8 +1,7 @@
-import { User } from "@/modules/users/domain/User";
 import React from "react";
-import { FaEdit, FaPlus } from "react-icons/fa";
+import { FaEdit } from "react-icons/fa";
 
-function MatchesDetails({ player }: { player: User | undefined }) {
+function MatchesDetails({ matches }) {
   return (
     <div className="flex sm:mx-auto">
       <div className="bg-white p-4 rounded-lg overflow-hidden shadow-md w-full max-w-lg">
@@ -11,15 +10,38 @@ function MatchesDetails({ player }: { player: User | undefined }) {
             Historial de Partidos
           </h3>
           <div className="space-y-4">
-            {/* <div className="p-2 rounded hover:bg-gray-100 flex justify-between items-center">
-              <div>
-                <p className="text-gray-800 font-semibold"> Influenza </p>
-                <p className="text-gray-600 text-xs">FECHA HOY</p>
-              </div>
-              <button className="ml-4 text-gray-500 hover:text-gray-700">
-                <FaEdit className="w-4 h-4 text-teal-600" />
-              </button>
-            </div> */}
+            {matches.map((match, index) => {
+              // Generamos la cadena de texto con los resultados de los sets
+              const resultsString = match.sets
+                .map((set, index) => {
+                  const setLabel =
+                    index === 2 ? "Super Tiebreak" : `Set ${index + 1}`;
+                  return `${setLabel}: ${set.pointsPlayer1} - ${set.pointsPlayer2}`;
+                })
+                .join(", "); // Unimos los resultados con ', '
+
+              return (
+                <div
+                  key={index}
+                  className="flex items-center justify-between
+                  p-4 rounded-lg
+                  hover:bg-gray-200
+                  transition duration-300 ease-in-out"
+                >
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-700">
+                      {match.finalResult}
+                    </h3>
+                    <p className="text-gray-600">Rival: {match.rivalName}</p>
+                    <p className="text-gray-600">{resultsString}</p>{" "}
+                    {/* Mostramos los resultados aquí */}
+                  </div>
+                  <div>
+                    <FaEdit className="text-gray-600" />
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
