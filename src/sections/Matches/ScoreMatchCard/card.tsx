@@ -53,7 +53,11 @@ export const ScoreMatchCard = ({
                   <div className="text-slate-700 font-bold">
                     <Avatar>
                       <AvatarImage
-                        src={`https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${player1.photo}.jpeg`}
+                        src={
+                          player1?.photo
+                            ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${player1?.photo}.jpeg`
+                            : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/default2.png"
+                        }
                         alt="@avatar"
                       />
                       <AvatarFallback>
@@ -91,7 +95,11 @@ export const ScoreMatchCard = ({
                     <div className="text-slate-700 font-bold">
                       <Avatar>
                         <AvatarImage
-                          src={`https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${player2.photo}.jpeg`}
+                          src={
+                            player2?.photo
+                              ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${player2?.photo}.jpeg`
+                              : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/default2.png"
+                          }
                           alt="@avatar"
                         />
                         <AvatarFallback>

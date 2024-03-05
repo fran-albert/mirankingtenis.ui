@@ -6,37 +6,46 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { RiLock2Fill } from "react-icons/ri";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { User } from "@/modules/users/domain/User";
+import { createApiUserRepository } from "@/modules/users/infra/ApiUserRepository";
+import { createUser } from "@/modules/users/application/create/createUser";
+import { toast } from "sonner";
+import { goBack } from "@/lib/utils";
+import { requestResetPassword } from "@/modules/users/application/request-reset-password/requestResetPassword";
+
+interface Inputs extends User {}
 
 function ResetPasswordForm() {
-  const [errors, setErrors] = useState<string[]>([]);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const router = useRouter();
-  //   const { data: session } = useSession();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+  } = useForm<Inputs>();
+  const userRepository = createApiUserRepository();
+  const createRequestFn = requestResetPassword(userRepository);
 
-  //   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-  //     event.preventDefault();
-  //     setErrors([]);
-
-  //     const responseNextAuth = await signIn("credentials", {
-  //       email,
-  //       password,
-  //       redirect: false,
-  //     });
-
-  //     if (responseNextAuth?.error) {
-  //       setErrors(responseNextAuth.error.split(","));
-  //       return;
-  //     }
-
-  //     router.push("/home");
-  //   };
-
-  //   useEffect(() => {
-  //     if (session?.user) {
-  //       router.push("/home");
-  //     }
-  //   }, [session, router]);
+  const onSubmit: SubmitHandler<Inputs> = async (data) => {
+    console.log(data);
+    try {
+      const playerCreationPromise = createRequestFn(data);
+      toast.promise(playerCreationPromise, {
+        loading: "Enviando correo electrónico...",
+        success: "Correo enviado éxito!",
+        duration: 3000,
+      });
+      await playerCreationPromise;
+    } catch (error) {
+      {
+        toast.error("Error al crear el Jugador: Error desconocido", {
+          duration: 3000,
+        });
+        console.error("Error al crear el paciente", error);
+      }
+    }
+  };
 
   return (
     <>
@@ -45,33 +54,28 @@ function ResetPasswordForm() {
           <div className="flex flex-col items-center">
             <RiLock2Fill size={80} />
             <h1 className="text-2xl font-bold text-center my-4">
-            ¿Tienes problemas para entrar?
+              ¿Tienes problemas para entrar?
             </h1>
-            <p className="text-center">Introduce tu correo electrónico y te enviaremos un enlace para restablecer su contraseña.</p>
+            <p className="text-center">
+              Introduce tu correo electrónico y te enviaremos un enlace para
+              restablecer su contraseña.
+            </p>
           </div>
-          <form className="mt-6 flex flex-col gap-6">
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="mt-6 flex flex-col gap-6"
+          >
             <div className="flex flex-col gap-2">
               <Label htmlFor="email" className="font-medium">
                 Ingrese su correo electrónico
               </Label>
               <Input
                 type="email"
-                name="email"
-                id="email"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
+                {...register("email", { required: true })}
                 className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
               />
             </div>
-            {errors.length > 0 && (
-              <div className="alert alert-danger mt-2">
-                <ul className="mb-0 text-red-500">
-                  {errors.map((error) => (
-                    <li key={error}>{error}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
+
             <button
               type="submit"
               className="py-2 px-4 bg-slate-500 text-white font-bold rounded-lg hover:bg-slate-700 transition duration-300 ease-in-out"

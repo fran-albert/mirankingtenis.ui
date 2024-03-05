@@ -114,10 +114,14 @@ export default function Navbar() {
                           <span className="sr-only">Open user menu</span>
                           <Image
                             className="h-8 w-8 rounded-full"
-                            src={`https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${session?.user.photo}.jpeg`}
-                            alt=""
-                            height={20}
-                            width={20}
+                            src={
+                              session?.user?.photo
+                                ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${session.user.photo}.jpeg`
+                                : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/default2.png"
+                            }
+                            alt="User profile"
+                            height={32}
+                            width={32}
                           />
                         </Menu.Button>
                       </div>

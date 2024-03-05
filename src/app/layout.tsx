@@ -24,6 +24,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <link
+        type="image/png"
+        sizes="16x16"
+        rel="icon"
+        href="https://mirankingtenis.com.ar/wp-content/uploads/2023/05/cropped-cropped-LOGOTENIS-171x172.png"
+      />
       <body
         className={cn(
           "min-h-screen bg-gray-50 font-sans antialiased",

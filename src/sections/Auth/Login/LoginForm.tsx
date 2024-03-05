@@ -10,7 +10,7 @@ import { PasswordInput } from "@/components/ui/passwordInput";
 import Loading from "@/components/Loading/loading";
 import { Separator } from "@/components/ui/separator";
 import { User } from "@/modules/users/domain/User";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { useCustomSession } from "@/context/SessionAuthProviders";
 
 interface Inputs extends User {}
@@ -20,14 +20,17 @@ function LoginForm() {
     register,
     handleSubmit,
     formState: { errors },
+    setError,
+    clearErrors,
+    control,
   } = useForm<Inputs>();
   const router = useRouter();
   const { session } = useCustomSession();
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
+  const [loginError, setLoginError] = useState<string>("");
   useEffect(() => {
     if (session) {
-      router.push("/inicio");
+      router.push("/mi-perfil");
     }
   }, [session, router]);
 
@@ -44,9 +47,9 @@ function LoginForm() {
 
     if (result?.error) {
       if (result.error === "No user found") {
-        console.log("Usuario no encontrado");
+        setLoginError("Usuario no encontrado.");
       } else {
-        console.log("Error al iniciar sesión");
+        setLoginError("Error al iniciar sesión: " + result.error);
       }
     } else {
       router.push("/inicio");
@@ -64,7 +67,10 @@ function LoginForm() {
           >
             <h1 className="text-lg md:text-2xl font-bold text-center">
               Iniciar Sesión
-            </h1>
+            </h1>{" "}
+            {loginError && (
+              <div className="text-red-500 text-center">{loginError}</div>
+            )}
             <div className="space-y-4">
               <div>
                 <Label htmlFor="email">Correo Electrónico</Label>
@@ -72,10 +78,13 @@ function LoginForm() {
               </div>
               <div>
                 <Label htmlFor="password">Contraseña</Label>
-                <PasswordInput {...register("password", { required: true })} />
+                <Controller
+                  name="password"
+                  control={control}
+                  render={({ field }) => <PasswordInput {...field} />}
+                />
               </div>
             </div>
-
             <div className="flex items-center space-x-2">
               <Checkbox id="terms" className="bg-white" />
               <label

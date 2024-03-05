@@ -11,7 +11,11 @@ function UserCardComponent({ player }: { player: User | undefined }) {
           <div className="flex-shrink-0 pb-4 sm:pb-0">
             <Image
               className="rounded-xl"
-              src={`https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${player?.photo}.jpeg`}
+              src={
+                player?.photo
+                  ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${player?.photo}.jpeg`
+                  : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/default2.png"
+              }
               alt=""
               height={100}
               width={100}

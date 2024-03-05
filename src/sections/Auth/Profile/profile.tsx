@@ -52,11 +52,14 @@ function Profile() {
     fetchUserAndMatches();
   }, [idUser]);
 
-  console.log(matches, idUser);
-
   if (isLoading) {
     return <Loading isLoading />;
   }
+
+  const updateMatches = async () => {
+    const userMatches = await loadMatches(idUser);
+    setMatches(userMatches);
+  };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -94,7 +97,11 @@ function Profile() {
                   />
                 ) : (
                   <Image
-                    src={`https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${user?.photo}.jpeg`}
+                  src={
+                    session?.user?.photo
+                      ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${session.user.photo}.jpeg`
+                      : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/default2.png"
+                  }
                     alt="Profile Picture"
                     width={100}
                     height={100}
@@ -166,7 +173,7 @@ function Profile() {
           {activeTab === "MisDatos" && (
             <div>{/* Contenido de Mis Datos */}</div>
           )}
-          {activeTab === "MisPartidos" && <MatchesIndex match={matches} />}
+          {activeTab === "MisPartidos" && <MatchesIndex match={matches} onUpdateMatches={updateMatches} />}
           {activeTab === "MisEstadisticas" && (
             <div>{/* Contenido de Mis Estadísticas */}</div>
           )}

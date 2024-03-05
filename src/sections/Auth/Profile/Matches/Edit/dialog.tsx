@@ -11,31 +11,27 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import ActionIcon from "@/components/ui/actionIcon";
-import { FaTrashAlt } from "react-icons/fa";
-import { createApiUserRepository } from "@/modules/users/infra/ApiUserRepository";
-import { deleteUser } from "@/modules/users/application/delete/deleteUser";
 import { toast } from "sonner";
 import { Match } from "@/modules/match/domain/Match";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { Sets } from "@/modules/sets/domain/Sets";
 import { createApiSetsRepository } from "@/modules/sets/infra/ApiSetsRepository";
 import { createSets } from "@/modules/sets/application/create/createSets";
 import axios from "axios";
 
 interface EidtMatchDialogProps {
-  handlePlayerDeleted?: (idlayer: number) => void;
+  onUpdateMatches?: () => void;
   match: Match;
 }
 
 export default function EditMatchDialog({
-  handlePlayerDeleted,
   match,
+  onUpdateMatches,
 }: EidtMatchDialogProps) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isConfirmOpen, setIsConfirmOpen] = useState<boolean>(false);
+  const [formData, setFormData] = useState<any>(null);
   const toggleDialog = () => setIsOpen(!isOpen);
+  const toggleConfirmDialog = () => setIsConfirmOpen(!isConfirmOpen);
   const {
     register,
     handleSubmit,
@@ -48,12 +44,17 @@ export default function EditMatchDialog({
   console.log("match", match)
 
   const onSubmit = async (formData: any) => {
+    setFormData(formData);
+    toggleConfirmDialog();
+  };
+
+  const onConfirm = async () => {
     const dataToSend: any = {
       idMatch: match.id,
-      sets: Object.values(formData.sets).map((set: any) => ({
+      sets: Object.values(formData.sets).map((set: any, index) => ({
         pointsPlayer1: parseInt(set.pointsPlayer1, 10),
         pointsPlayer2: parseInt(set.pointsPlayer2, 10),
-        setNumber: parseInt(set.setNumber, 10),
+        setNumber: index + 1,
       })),
     };
     console.log("dataToSend", dataToSend)
@@ -65,10 +66,14 @@ export default function EditMatchDialog({
         duration: 3000,
       });
       await setCreationPromise;
+      if (onUpdateMatches) {
+        onUpdateMatches();
+      }
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const errorMessage =
-          error.response?.data?.message || "Error desconocido al actualizar el partido";
+          error.response?.data?.message ||
+          "Error desconocido al actualizar el partido";
         toast.error(`Error al crear el set: ${errorMessage}`, {
           duration: 3000,
         });
@@ -80,148 +85,209 @@ export default function EditMatchDialog({
         console.error("Error al crear el set", error);
       }
     }
+    toggleConfirmDialog();
+    setIsOpen(false);
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button onClick={toggleDialog} variant="outline">
-          Editar
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="max-w-xl">
-        <DialogHeader>
-          <DialogTitle>Editar Partido</DialogTitle>
-          <DialogDescription>
-            Edita el resultado del partido vs {match.rivalName}
-          </DialogDescription>
-        </DialogHeader>
+    <>
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="grid gap-4 py-4">
-            <div className="overflow-x-auto relative shadow-md sm:rounded-lg">
-              <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                  <tr>
-                    <th scope="col" className="py-3 px-6"></th>
-                    <th scope="col" className="py-3 px-6">
-                      1er Set
-                    </th>
-                    <th scope="col" className="py-3 px-6">
-                      2do Set
-                    </th>
-                    <th scope="col" className="py-3 px-6">
-                      Super Tiebreak
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {/* Jugador 1 */}
-                  <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                    <td className="py-4 px-6">
-                      {match.user1Name}
-                    </td>
-                    {/* Primer set */}
-                    <td className="py-4 px-6">
-                      <Input
-                        {...register("sets.0.pointsPlayer1")}
-                        type="number"
-                        min="0"
-                        max="7"
-                        required
-                        className="input"
-                      />
-                      <Input
-                        {...register("sets.0.setNumber")}
-                        type="hidden"
-                        value="1"
-                      />
-                      {/* Considera si necesitas registrar tiebreak aquí como un checkbox o un input oculto */}
-                    </td>
-                    {/* Segundo set */}
-                    <td className="py-4 px-6">
-                      <Input
-                        {...register("sets.1.pointsPlayer1")}
-                        type="number"
-                        min="0"
-                        max="7"
-                        required
-                        className="input"
-                      />
-                      <Input
-                        {...register("sets.1.setNumber")}
-                        type="hidden"
-                        value="2"
-                      />
-                      {/* Considera si necesitas registrar tiebreak aquí como un checkbox o un input oculto */}
-                    </td>
-                    {/* Super Tiebreak */}
-                    <td className="py-4 px-6">
-                      <Input
-                        {...register("sets.2.pointsPlayer1")}
-                        type="number"
-                        min="0"
-                        max="10"
-                        defaultValue="0"
-                        className="Input"
-                      />
-                      <Input
-                        {...register("sets.2.setNumber")}
-                        type="hidden"
-                        value="3"
-                      />
-                    </td>
-                  </tr>
-                  {/* Jugador 2 */}
-                  <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                    <td className="py-4 px-6">{match.user2Name}</td>
-                    {/* Primer set */}
-                    <td className="py-4 px-6">
-                      <Input
-                        {...register("sets.0.pointsPlayer2")}
-                        type="number"
-                        min="0"
-                        max="7"
-                        required
-                        className="Input"
-                      />
-                    </td>
-                    {/* Segundo set */}
-                    <td className="py-4 px-6">
-                      <Input
-                        {...register("sets.1.pointsPlayer2")}
-                        type="number"
-                        min="0"
-                        max="7"
-                        required
-                        className="Input"
-                      />
-                    </td>
-                    {/* Super Tiebreak */}
-                    <td className="py-4 px-6">
-                      <Input
-                        {...register("sets.2.pointsPlayer2")}
-                        type="number"
-                        min="0"
-                        max="10"
-                        className="Input"
-                        defaultValue="0"
-                      />
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={toggleDialog}>
-              Cancelar
-            </Button>
-            <Button className="bg-slate-700" type="submit">
-              Confirmar
-            </Button>
-          </DialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+      </Dialog>
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogTrigger asChild>
+          <Button onClick={toggleDialog} variant="outline">
+            Editar
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="max-w-xl">
+          <DialogHeader>
+            <DialogTitle>Editar Partido</DialogTitle>
+            <DialogDescription>
+              Edita el resultado del partido vs {match.rivalName}
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <div className="grid gap-4 py-4">
+              <div className="overflow-x-auto relative shadow-md sm:rounded-lg">
+                <table className="min-w-full w-full text-sm text-left text-gray-800 dark:text-gray-400">
+                  <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                    <tr>
+                      <th scope="col" className="py-3 px-6 text-center">
+                        Jugador
+                      </th>
+                      <th scope="col" className="py-3 px-6 text-center">
+                        1° Set
+                      </th>
+                      <th scope="col" className="py-3 px-6 text-center">
+                        2° Set
+                      </th>
+                      <th scope="col" className="py-3 px-6 text-center">
+                        Super Tiebreak
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {/* Jugador 1 */}
+                    <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 font-bold">
+                      <td className="py-4 px-6">{match.user1Name}</td>
+                      {/* Primer set */}
+                      <td className="py-4 px-6">
+                        <input
+                          {...register("sets.0.pointsPlayer1")}
+                          type="number"
+                          min="0"
+                          defaultValue="0"
+                          max="7"
+                          required
+                          className="input input-bordered w-full sm:max-w-sm"
+                        />
+                        {/* Considera si necesitas registrar tiebreak aquí como un checkbox o un input oculto */}
+                      </td>
+                      {/* Segundo set */}
+                      <td className="py-4 px-6">
+                        <input
+                          {...register("sets.1.pointsPlayer1")}
+                          type="number"
+                          min="0"
+                          defaultValue="0"
+                          max="7"
+                          required
+                          className="input input-bordered w-full sm:max-w-sm"
+                        />
+                      </td>
+                      {/* Super Tiebreak */}
+                      <td className="py-4 px-6">
+                        <input
+                          {...register("sets.2.pointsPlayer1")}
+                          type="number"
+                          min="0"
+                          max="10"
+                          defaultValue="0"
+                          className="input input-bordered w-full sm:max-w-sm"
+                        />
+                      </td>
+                    </tr>
+                    {/* Jugador 2 */}
+                    <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 font-bold">
+                      <td className="py-4 px-6">{match.user2Name}</td>
+                      {/* Primer set */}
+                      <td className="py-4 px-6">
+                        <input
+                          {...register("sets.0.pointsPlayer2")}
+                          type="number"
+                          min="0"
+                          max="7"
+                          defaultValue="0"
+                          required
+                          className="input input-bordered w-full max-w-sm"
+                        />
+                      </td>
+                      {/* Segundo set */}
+                      <td className="py-4 px-6">
+                        <input
+                          {...register("sets.1.pointsPlayer2")}
+                          type="number"
+                          min="0"
+                          defaultValue="0"
+                          max="7"
+                          required
+                          className="input input-bordered w-full max-w-sm"
+                        />
+                      </td>
+                      {/* Super Tiebreak */}
+                      <td className="py-4 px-6">
+                        <input
+                          {...register("sets.2.pointsPlayer2")}
+                          type="number"
+                          min="0"
+                          max="10"
+                          defaultValue="0"
+                          className="input input-bordered w-full max-w-sm"
+                        />
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <DialogFooter className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full md:w-auto"
+                onClick={toggleDialog}
+              >
+                Cancelar
+              </Button>
+              <Button className="bg-slate-700" type="submit">
+                Confirmar
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+      {isConfirmOpen && (
+        <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Confirmar Cambios</DialogTitle>
+            </DialogHeader>
+            <div className="bg-white rounded-lg p-4 shadow-md">
+              <p className="text-sm text-center mb-2">
+                Por favor, confirma los resultados del partido:
+              </p>
+              <div className="border-t border-gray-200"></div>
+              <div className="mt-2">
+                <p className="text-md font-medium text-gray-800">
+                  <span className="font-normal">
+                    {match.user1Name} vs {match.user2Name}
+                  </span>
+                </p>
+                <ul className="mt-2 space-y-1">
+                  <li className="flex justify-between">
+                    <span className="text-gray-600">1° Set:</span>
+                    <span className="font-semibold">
+                      {formData.sets[0].pointsPlayer1} -{" "}
+                      {formData.sets[0].pointsPlayer2}
+                    </span>
+                  </li>
+                  <li className="flex justify-between">
+                    <span className="text-gray-600">2° Set:</span>
+                    <span className="font-semibold">
+                      {formData.sets[1].pointsPlayer1} -{" "}
+                      {formData.sets[1].pointsPlayer2}
+                    </span>
+                  </li>
+                  <li className="flex justify-between">
+                    <span className="text-gray-600">Super Tiebreak:</span>
+                    <span className="font-semibold">
+                      {formData.sets[2].pointsPlayer1} -{" "}
+                      {formData.sets[2].pointsPlayer2}
+                    </span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <DialogFooter>
+              <DialogFooter className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full md:w-auto"
+                  onClick={toggleDialog}
+                >
+                  Cancelar
+                </Button>
+                <Button className="bg-slate-700" onClick={onConfirm}>
+                  Actualizar partido
+                </Button>
+              </DialogFooter>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+    </>
   );
 }

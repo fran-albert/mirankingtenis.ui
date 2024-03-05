@@ -26,26 +26,37 @@ import UserCardComponent from "./Card/card";
 import DetailsPlayer from "./Details/card";
 import PersonalData from "./PersonalData/card";
 import MatchesDetails from "./Matches/card";
+import { Match } from "@/modules/match/domain/Match";
+import { createApiMatchRepository } from "@/modules/match/infra/ApiMatchRepository";
+import { getMatchesByUser } from "@/modules/match/application/get-by-user/getMatchesByUser";
 
 function ProfilePlayer() {
   const params = useParams();
   const id = params.id;
   const [player, setPlayer] = useState<User>();
+  const [matches, setMatches] = useState<Match[]>([]);
+  const matchRepository = createApiMatchRepository();
+  const loadMatches = getMatchesByUser(matchRepository);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const userRepository = createApiUserRepository();
   const loadUser = getUser(userRepository);
 
   useEffect(() => {
-    const fetchUser = async () => {
+    setIsLoading(true);
+    const fetchUserAndMatches = async () => {
       try {
         const idUser = Number(id);
         const userData = await loadUser(idUser);
         setPlayer(userData);
+        const userMatches = await loadMatches(idUser);
+        setMatches(userMatches);
+        setIsLoading(false);
       } catch (error) {
         console.error(error);
       }
     };
-    fetchUser();
+    fetchUserAndMatches();
   }, [Number(id)]);
 
   return (
@@ -57,7 +68,7 @@ function ProfilePlayer() {
           <DetailsPlayer />
         </div>
         <div className="flex-1 mt-3 md:mt-0 p-4">
-          <MatchesDetails player={player} />
+          <MatchesDetails matches={matches} />
         </div>
       </div>
     </>

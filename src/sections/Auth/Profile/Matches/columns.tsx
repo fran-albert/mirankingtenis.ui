@@ -6,7 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Sets } from "@/modules/sets/domain/Sets";
 import EditMatchDialog from "./Edit/dialog";
 
-export const getColumns = (): ColumnDef<Match>[] => {
+export const getColumns = (
+  onUpdateMatches: () => void,
+  ): ColumnDef<Match>[] => {
   const columns: ColumnDef<Match>[] = [
     {
       header: "Fecha",
@@ -64,7 +66,10 @@ export const getColumns = (): ColumnDef<Match>[] => {
       cell: ({ row }) => (
         <div className="flex items-center justify-end">
           {row.original.status === "pending" ? (
-            <EditMatchDialog match={row.original} />
+            <EditMatchDialog
+              match={row.original}
+              onUpdateMatches={onUpdateMatches}
+            />
           ) : (
             <Button className="mr-2" onClick={() => console.log(row.original)}>
               Ver
