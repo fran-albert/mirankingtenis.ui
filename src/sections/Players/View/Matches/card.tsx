@@ -1,7 +1,8 @@
+import { Match } from "@/modules/match/domain/Match";
 import React from "react";
 import { FaEdit } from "react-icons/fa";
 
-function MatchesDetails({ matches }) {
+function MatchesDetails({ matches } : {matches: Match[]}) {
   return (
     <div className="flex sm:mx-auto">
       <div className="bg-white p-4 rounded-lg overflow-hidden shadow-md w-full max-w-lg">

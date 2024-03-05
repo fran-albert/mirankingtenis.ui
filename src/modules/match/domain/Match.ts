@@ -9,8 +9,6 @@ export interface Match {
   user1: User;
   user2: User;
   shift: string;
-  user1Name: string;
-  user2Name: string;
   sets: Sets[];
   status: string;
   round: number;
