@@ -34,7 +34,35 @@ export function createApiUserRepository(): UserRepository {
     return user;
   }
 
-  async function deleteUser(idUser: number): Promise<User>{
+  async function requestResetPassword(email: User): Promise<User | undefined> {
+    const response = await axiosInstance.patch(
+      "auth/request-reset-password",
+      email
+    );
+    const user = response.data as User;
+    return user;
+  }
+
+  async function resetPassword(
+    resetPasswordToken: string,
+    password: string,
+    confirmPassword: string
+  ) {
+    try {
+      const response = await axiosInstance.patch("/auth/reset-password", {
+        resetPasswordToken,
+        password,
+        confirmPassword,
+      });
+      const user = response.data as User;
+      return user;
+    } catch (error) {
+      console.error("Error resetting password: ", error);
+      throw error;
+    }
+  }
+
+  async function deleteUser(idUser: number): Promise<User> {
     const response = await axiosInstance.delete(`users/${idUser}`);
     const user = response.data as User;
     return user;
@@ -43,6 +71,8 @@ export function createApiUserRepository(): UserRepository {
   return {
     getUser,
     createUser,
+    requestResetPassword,
+    resetPassword,
     getTotalUsers,
     getUsersByCategory,
     deleteUser,
