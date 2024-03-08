@@ -4,11 +4,11 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Match } from "@/modules/match/domain/Match";
 import { Button } from "@/components/ui/button";
 import { Sets } from "@/modules/sets/domain/Sets";
-import EditMatchDialog from "./Edit/dialog";
-
-export const getColumns = (
-  onUpdateMatches: () => void,
-  ): ColumnDef<Match>[] => {
+import { IoTimeOutline } from "react-icons/io5";
+import DeleteMatchDialog from "./Delete/button";
+import AddResultMatchDialog from "./AddResult/dialog";
+import EditMatchDialog from "./Time/dialog";
+export const getColumns = (onUpdateMatches: () => void): ColumnDef<Match>[] => {
   const columns: ColumnDef<Match>[] = [
     {
       header: "Fecha",
@@ -28,34 +28,39 @@ export const getColumns = (
     },
     {
       header: "Resultado",
-      cell: ({ row }) => (
-        <div className="flex items-center">
-          {row.original.finalResult}
-          {row.original.sets.map((set, index) => (
-            <div className="m-2" key={index}>
-              <span className="player-scores">{set.pointsPlayer1}</span>
-              <span className="player-scores">-</span>
-              <span className="player-scores">{set.pointsPlayer2}</span>
-            </div>
-          ))}
-        </div>
-      ),
+      cell: ({ row }) => {
+        if (row.original.status === "pending") {
+          return (
+            <span className="px-3 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+              Pendiente
+            </span>
+          );
+        }
+        return (
+          <div className="flex items-center">
+            {row.original.finalResult}
+            {row.original.sets.map((set, index) => (
+              <div className="m-2" key={index}>
+                <span className="player-scores">{set.pointsPlayer1}</span>
+                <span className="player-scores">-</span>
+                <span className="player-scores">{set.pointsPlayer2}</span>
+              </div>
+            ))}
+          </div>
+        );
+      },
     },
     {
       header: "Estado",
       cell: ({ row }) => (
         <div className="flex items-center">
-          {row.original.status === "pending" ? (
-            <span className="px-3 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-              Pendiente
-            </span>
-          ) : row.original.status === "played" ? (
+          {row.original.status === "played" ? (
             <span className="px-3 inline-flex text-xs leading-5 font-bold rounded-full bg-green-100 text-green-800">
               Jugado
             </span>
           ) : (
-            <span className="px-3 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-              Cancelado
+            <span className="px-3 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+              Pendiente
             </span>
           )}
         </div>
@@ -64,16 +69,19 @@ export const getColumns = (
     {
       header: " ",
       cell: ({ row }) => (
-        <div className="flex items-center justify-end">
-          {row.original.status === "pending" ? (
-            <EditMatchDialog
-              match={row.original}
-              onUpdateMatches={onUpdateMatches}
-            />
-          ) : (
-            <Button className="mr-2" onClick={() => console.log(row.original)}>
-              Ver
-            </Button>
+        <div className="flex items-center justify-end space-x-1">
+          {row.original.status !== "played" && (
+            <>
+              <AddResultMatchDialog
+                match={row.original}
+                onUpdateMatches={onUpdateMatches}
+              />
+              <EditMatchDialog
+                match={row.original}
+                onUpdateMatches={onUpdateMatches}
+              />
+              {/* <DeleteMatchDialog /> */}
+            </>
           )}
         </div>
       ),
