@@ -14,7 +14,10 @@ import { FaPencilAlt, FaTrashAlt } from "react-icons/fa";
 import useRoles from "@/hooks/useRoles";
 import DeleteMatchDialog from "../Delete/button";
 import { Match } from "@/modules/match/domain/Match";
-
+import { es } from "date-fns/locale/es";
+import { registerLocale } from "react-datepicker";
+import { formatDate } from "@/lib/utils";
+registerLocale("es", es);
 export const ScoreMatchCard = ({
   player1,
   player2,
@@ -135,7 +138,14 @@ export const ScoreMatchCard = ({
         </form>
       </CardContent>
       <CardFooter className="flex justify-between">
-        <div className="text-sm text-gray-500">Día - Cancha</div>
+        <div className="text-sm text-gray-500">
+          {match.shift && match.shift.startHour && (
+            <span>
+              {formatDate(match?.shift?.startHour)} - Cancha{" "}
+              {match?.shift?.court?.id}
+            </span>
+          )}
+        </div>
         {isAdmin && (
           <div className="flex items-center space-x-2">
             <button onClick={() => handleEdit(player1.id)} className="p-2">
