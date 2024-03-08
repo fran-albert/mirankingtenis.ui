@@ -17,16 +17,18 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { createApiSetsRepository } from "@/modules/sets/infra/ApiSetsRepository";
 import { createSets } from "@/modules/sets/application/create/createSets";
 import axios from "axios";
+import { MdScoreboard } from "react-icons/md";
+import ActionIcon from "@/components/ui/actionIcon";
 
-interface EidtMatchDialogProps {
+interface AddResultMatchDialogProps {
   onUpdateMatches?: () => void;
   match: Match;
 }
 
-export default function EditMatchDialog({
+export default function AddResultMatchDialog({
   match,
   onUpdateMatches,
-}: EidtMatchDialogProps) {
+}: AddResultMatchDialogProps) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState<boolean>(false);
   const [formData, setFormData] = useState<any>(null);
@@ -92,13 +94,20 @@ export default function EditMatchDialog({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <form onSubmit={handleSubmit(onSubmit)}>
-        </form>
+        <form onSubmit={handleSubmit(onSubmit)}></form>
       </Dialog>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
-          <Button onClick={toggleDialog} variant="outline">
-            Editar
+          <Button onClick={toggleDialog} variant="outline" size="icon">
+            <ActionIcon
+              icon={
+                <MdScoreboard
+                  size={30}
+                  className="text-green-500 hover:text-green-700"
+                />
+              }
+              tooltip="Insertar Resultado"
+            />
           </Button>
         </DialogTrigger>
         <DialogContent className="max-w-xl">
