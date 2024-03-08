@@ -10,6 +10,7 @@ import { Match } from "@/modules/match/domain/Match";
 import { createApiMatchRepository } from "@/modules/match/infra/ApiMatchRepository";
 import { getMatchesByUser } from "@/modules/match/application/get-by-user/getMatchesByUser";
 import Loading from "@/components/Loading/loading";
+import DataIndex from "./Data";
 
 function Profile() {
   const { session } = useCustomSession();
@@ -97,11 +98,11 @@ function Profile() {
                   />
                 ) : (
                   <Image
-                  src={
-                    session?.user?.photo
-                      ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${session.user.photo}.jpeg`
-                      : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/default2.png"
-                  }
+                    src={
+                      session?.user?.photo
+                        ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${session.user.photo}.jpeg`
+                        : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/default2.png"
+                    }
                     alt="Profile Picture"
                     width={100}
                     height={100}
@@ -171,9 +172,14 @@ function Profile() {
 
           {/* About Me & Social Links */}
           {activeTab === "MisDatos" && (
-            <div>{/* Contenido de Mis Datos */}</div>
+            <div>
+              {" "}
+              <DataIndex user={user}/>
+            </div>
           )}
-          {activeTab === "MisPartidos" && <MatchesIndex match={matches} onUpdateMatches={updateMatches} />}
+          {activeTab === "MisPartidos" && (
+            <MatchesIndex match={matches} onUpdateMatches={updateMatches} />
+          )}
           {activeTab === "MisEstadisticas" && (
             <div>{/* Contenido de Mis Estadísticas */}</div>
           )}
