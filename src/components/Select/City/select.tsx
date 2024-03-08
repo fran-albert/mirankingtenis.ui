@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/select";
 import { City } from "@/modules/city/domain/City";
 import { CityRepository } from "@/modules/city/domain/CityRepository";
-import { createApiCityRepository } from "@/modules/city/infra/ApiUserRepository";
+import { createApiCityRepository } from "@/modules/city/infra/ApiCityRepository";
 import { useEffect, useState } from "react";
 
 interface CitySelectProps {
