@@ -102,16 +102,8 @@ export default function EditMatchDialog({
     <>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
-          <Button onClick={toggleDialog} variant="outline" size="icon">
-            <ActionIcon
-              icon={
-                <IoTimeSharp
-                  size={30}
-                  className="text-gray-500 hover:text-gray-700"
-                />
-              }
-              tooltip="Seleccionar turno"
-            />
+          <Button onClick={toggleDialog} variant="edit">
+            Turno
           </Button>
         </DialogTrigger>
         <DialogContent className="p-4">
@@ -127,7 +119,6 @@ export default function EditMatchDialog({
                 >
                   Día
                 </label>
-
                 <DatePicker
                   showIcon
                   selected={startDate}
@@ -153,7 +144,6 @@ export default function EditMatchDialog({
                 }}
               />
             </div>
-
             <DialogFooter className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
               <Button
                 type="button"

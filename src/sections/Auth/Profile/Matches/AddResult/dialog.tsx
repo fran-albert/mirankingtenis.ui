@@ -29,10 +29,10 @@ export default function AddResultMatchDialog({
   match,
   onUpdateMatches,
 }: AddResultMatchDialogProps) {
-  const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [isConfirmOpen, setIsConfirmOpen] = useState<boolean>(false);
+  const [isAddResultOpen, setIsAddResultOpen] = useState<boolean>(false); // Para el diálogo de agregar resultado
+  const [isConfirmOpen, setIsConfirmOpen] = useState<boolean>(false); // Para el diálogo de confirmación
   const [formData, setFormData] = useState<any>(null);
-  const toggleDialog = () => setIsOpen(!isOpen);
+  const toggleAddResultDialog = () => setIsAddResultOpen(!isAddResultOpen);
   const toggleConfirmDialog = () => setIsConfirmOpen(!isConfirmOpen);
   const {
     register,
@@ -45,11 +45,10 @@ export default function AddResultMatchDialog({
 
   console.log("match", match)
 
-  const onSubmit = async (formData: any) => {
-    setFormData(formData);
-    toggleConfirmDialog();
+  const onSubmit: SubmitHandler<any> = async (formData) => {
+    setFormData(formData); // Guarda los datos del formulario
+    toggleConfirmDialog(); // Abre el diálogo de confirmación directamente
   };
-
   const onConfirm = async () => {
     const dataToSend: any = {
       idMatch: match.id,
@@ -87,34 +86,21 @@ export default function AddResultMatchDialog({
         console.error("Error al crear el set", error);
       }
     }
-    toggleConfirmDialog();
-    setIsOpen(false);
+    setIsConfirmOpen(false); // Cierra el diálogo de confirmación
+    setIsAddResultOpen(false);
   };
 
   return (
     <>
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <form onSubmit={handleSubmit(onSubmit)}></form>
-      </Dialog>
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <Dialog open={isAddResultOpen} onOpenChange={setIsAddResultOpen}>
         <DialogTrigger asChild>
-          <Button onClick={toggleDialog} variant="outline" size="icon">
-            <ActionIcon
-              icon={
-                <MdScoreboard
-                  size={30}
-                  className="text-green-500 hover:text-green-700"
-                />
-              }
-              tooltip="Insertar Resultado"
-            />
-          </Button>
+          <Button variant="green">Resultado</Button>
         </DialogTrigger>
         <DialogContent className="max-w-xl">
           <DialogHeader>
-            <DialogTitle>Editar Partido</DialogTitle>
+            <DialogTitle>Insertar Resultado del Partido</DialogTitle>
             <DialogDescription>
-              Edita el resultado del partido vs {match.rivalName}
+              Ingresa los resultados del partido vs {match.rivalName}.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit(onSubmit)}>
@@ -226,6 +212,110 @@ export default function AddResultMatchDialog({
                 type="button"
                 variant="outline"
                 className="w-full md:w-auto"
+                onClick={() => setIsAddResultOpen(false)}
+              >
+                Cancelar
+              </Button>
+              <Button className="bg-slate-700" type="submit">
+                Siguiente
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {isConfirmOpen && (
+        <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Confirmar Cambios</DialogTitle>
+            </DialogHeader>
+            <div className="bg-white rounded-lg p-4 shadow-md">
+              <p className="text-sm text-center mb-2">
+                Por favor, confirma los resultados del partido:
+              </p>
+              <div className="border-t border-gray-200"></div>
+              <div className="mt-2">
+                <div className="mt-2">
+                  <p className="text-md font-medium text-gray-800">
+                    <span className="font-normal">
+                      {match.user1Name} vs {match.user2Name}
+                    </span>
+                  </p>
+                  <ul className="mt-2 space-y-1">
+                    <li className="flex justify-between">
+                      <span className="text-gray-600">1° Set:</span>
+                      <span className="font-semibold">
+                        {formData.sets[0].pointsPlayer1} -{" "}
+                        {formData.sets[0].pointsPlayer2}
+                      </span>
+                    </li>
+                    <li className="flex justify-between">
+                      <span className="text-gray-600">2° Set:</span>
+                      <span className="font-semibold">
+                        {formData.sets[1].pointsPlayer1} -{" "}
+                        {formData.sets[1].pointsPlayer2}
+                      </span>
+                    </li>
+                    <li className="flex justify-between">
+                      <span className="text-gray-600">Super Tiebreak:</span>
+                      <span className="font-semibold">
+                        {formData.sets[2].pointsPlayer1} -{" "}
+                        {formData.sets[2].pointsPlayer2}
+                      </span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <DialogFooter className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full md:w-auto"
+                onClick={() => setIsConfirmOpen(false)}
+              >
+                Cancelar
+              </Button>
+              <Button className="bg-slate-700" onClick={onConfirm}>
+                Confirmar
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <form onSubmit={handleSubmit(onSubmit)}></form>
+      </Dialog>
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogTrigger asChild>
+          <Button onClick={toggleDialog} variant="outline" size="icon">
+            <ActionIcon
+              icon={
+                <MdScoreboard
+                  size={30}
+                  className="text-green-500 hover:text-green-700"
+                />
+              }
+              tooltip="Insertar Resultado"
+            />
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="max-w-xl">
+          <DialogHeader>
+            <DialogTitle>Editar Partido</DialogTitle>
+            <DialogDescription>
+              Edita el resultado del partido vs {match.rivalName}
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <div className="grid gap-4 py-4"></div>
+            <DialogFooter className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full md:w-auto"
                 onClick={toggleDialog}
               >
                 Cancelar
@@ -296,7 +386,7 @@ export default function AddResultMatchDialog({
             </DialogFooter>
           </DialogContent>
         </Dialog>
-      )}
+      )} */}
     </>
   );
 }

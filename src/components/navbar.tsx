@@ -28,11 +28,22 @@ export default function Navbar() {
   ]);
 
   useEffect(() => {
-    const updatedNavigation = [
+    const baseNavigation = [
       { name: "Jugadores", href: "/jugadores", current: false },
       { name: "Ranking", href: "/ranking", current: false },
       { name: "Partidos", href: "/partidos", current: false },
-      // { name: "Turnos", href: "/turnos", current: false },
+    ];
+
+    if (session) {
+      baseNavigation.push({
+        name: "Mis Partidos",
+        href: "/mis-partidos",
+        current: false,
+      });
+    }
+
+    const updatedNavigation = [
+      ...baseNavigation,
       ...(isAdmin
         ? [{ name: "Fixture", href: "/fixture", current: false }]
         : []),
@@ -42,7 +53,7 @@ export default function Navbar() {
     }));
 
     setNavigation(updatedNavigation);
-  }, [pathname, isAdmin]);
+  }, [pathname, isAdmin, session]); // Asegúrate de incluir 'session' en la lista de dependencias
 
   return (
     <Disclosure as="nav" className="bg-slate-700">

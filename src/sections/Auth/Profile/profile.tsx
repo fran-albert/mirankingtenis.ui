@@ -142,47 +142,7 @@ function Profile() {
             </p>
           </div>
 
-          {/* Profile Navigation */}
-          <div className="flex justify-around text-sm font-medium text-gray-600 border-t border-b py-3">
-            <a
-              onClick={() => changeTab("MisDatos")}
-              className={`hover:text-blue-600 cursor-pointer ${
-                activeTab === "MisDatos" ? "text-blue-600" : ""
-              }`}
-            >
-              Mis Datos
-            </a>
-            <a
-              onClick={() => changeTab("MisPartidos")}
-              className={`hover:text-blue-600 cursor-pointer ${
-                activeTab === "MisPartidos" ? "text-blue-600" : ""
-              }`}
-            >
-              Mis Partidos
-            </a>
-            <a
-              onClick={() => changeTab("MisEstadisticas")}
-              className={`hover:text-blue-600 cursor-pointer ${
-                activeTab === "MisEstadisticas" ? "text-blue-600" : ""
-              }`}
-            >
-              Mis Estadísticas
-            </a>
-          </div>
-
-          {/* About Me & Social Links */}
-          {activeTab === "MisDatos" && (
-            <div>
-              {" "}
-              <DataIndex user={user}/>
-            </div>
-          )}
-          {activeTab === "MisPartidos" && (
-            <MatchesIndex match={matches} onUpdateMatches={updateMatches} />
-          )}
-          {activeTab === "MisEstadisticas" && (
-            <div>{/* Contenido de Mis Estadísticas */}</div>
-          )}
+          <DataIndex user={user} />
         </div>
       </div>
     </div>
