@@ -27,8 +27,8 @@ function MatchesIndex({
             <h3
               className={`text-xl font-semibold mb-2 ${
                 m.finalResult === "pending"
-                  ? "px-3 inline-flex leading-10 font-bold rounded-full text-gray-900"
-                  : "px-3 inline-flex leading-10 font-bold rounded-full text-gray-800"
+                  ? " inline-flex text-sm font-bold rounded-full text-gray-900"
+                  : " inline-flex text-sm font-bold rounded-full text-gray-800"
               }`}
             >
               {m.finalResult === "pending"
@@ -50,13 +50,18 @@ function MatchesIndex({
                 </span>
               ))}
             </div>
-            {m.status === "pending" && (
+            {m.status !== "played" && (
               <div className="mt-10 flex justify-end">
                 <AddResultMatchDialog
                   match={m}
                   onUpdateMatches={onUpdateMatches}
                 />
-                <EditMatchDialog match={m} />
+                {m.shift ? null : (
+                  <EditMatchDialog
+                    match={m}
+                    onUpdateMatches={onUpdateMatches}
+                  />
+                )}
                 {/* Consider adding DeleteMatchDialog with an icon button as well */}
               </div>
             )}
