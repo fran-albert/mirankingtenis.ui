@@ -8,6 +8,7 @@ import { IoTimeOutline } from "react-icons/io5";
 import DeleteMatchDialog from "./Delete/button";
 import AddResultMatchDialog from "./AddResult/dialog";
 import EditMatchDialog from "./Time/dialog";
+import { formatDate } from "@/lib/utils";
 export const getColumns = (onUpdateMatches: () => void): ColumnDef<Match>[] => {
   const columns: ColumnDef<Match>[] = [
     {
@@ -27,13 +28,41 @@ export const getColumns = (onUpdateMatches: () => void): ColumnDef<Match>[] => {
       cell: ({ row }) => <div>{row.original.rivalName}</div>,
     },
     {
+      header: "Día y Hora",
+      cell: ({ row }) => {
+        if (row.original.shift === null) {
+          return (
+            <span className="px-3 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800"></span>
+          );
+        }
+        return (
+          <div className="flex items-center">
+            {formatDate(row.original.shift.startHour)}
+          </div>
+        );
+      },
+    },
+    {
+      header: "Cancha",
+      cell: ({ row }) => {
+        if (row.original.shift === null) {
+          return (
+            <span className="px-3 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800"></span>
+          );
+        }
+        return (
+          <div className="flex items-center">
+            {row.original.shift.court?.name}
+          </div>
+        );
+      },
+    },
+    {
       header: "Resultado",
       cell: ({ row }) => {
         if (row.original.status === "pending") {
           return (
-            <span className="px-3 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-              Pendiente
-            </span>
+            <span className="px-3 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800"></span>
           );
         }
         return (
@@ -55,11 +84,11 @@ export const getColumns = (onUpdateMatches: () => void): ColumnDef<Match>[] => {
       cell: ({ row }) => (
         <div className="flex items-center">
           {row.original.status === "played" ? (
-            <span className="px-3 inline-flex text-xs leading-5 font-bold rounded-full bg-green-100 text-green-800">
+            <span className="px-3 inline-flex text-xs leading-5 font-bold rounded-full bg-green-600 text-gray-800">
               Jugado
             </span>
           ) : (
-            <span className="px-3 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+            <span className="px-3 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-500 text-gray-900">
               Pendiente
             </span>
           )}
@@ -76,10 +105,12 @@ export const getColumns = (onUpdateMatches: () => void): ColumnDef<Match>[] => {
                 match={row.original}
                 onUpdateMatches={onUpdateMatches}
               />
-              <EditMatchDialog
-                match={row.original}
-                onUpdateMatches={onUpdateMatches}
-              />
+              {row.original.shift ? null : (
+                <EditMatchDialog
+                  match={row.original}
+                  onUpdateMatches={onUpdateMatches}
+                />
+              )}
               {/* <DeleteMatchDialog /> */}
             </>
           )}
