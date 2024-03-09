@@ -15,6 +15,8 @@ function MatchesIndex({
 }) {
   const playersColums = getColumns(onUpdateMatches);
 
+  console.log(match)
+
   if (window.innerWidth < 768) {
     return (
       <div className="flex flex-col py-2">
