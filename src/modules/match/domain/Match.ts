@@ -22,4 +22,5 @@ export interface Match {
   };
   rivalName: string;
   winner: string;
+  idWinner: number;
 }

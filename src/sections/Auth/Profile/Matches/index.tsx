@@ -5,7 +5,7 @@ import { Match } from "@/modules/match/domain/Match";
 import EditMatchDialog from "./Time/dialog";
 import AddResultMatchDialog from "./AddResult/dialog";
 import DeleteMatchDialog from "./Delete/button";
-import { formatDate } from "@/lib/utils";
+import { formatDate, formatDateComplete } from "@/lib/utils";
 
 function MatchesIndex({
   match,
@@ -38,7 +38,7 @@ function MatchesIndex({
             <p className="text-gray-600">Fecha: {m.fixture.jornada}</p>
             <p className="text-gray-600">Cancha: {m.shift?.court?.name}</p>
             <p className="text-gray-600">
-              Día y Hora: {m.shift?.startHour && formatDate(m.shift?.startHour)}
+              Día y Hora: {m.shift?.startHour && formatDateComplete(m.shift?.startHour)}
             </p>
             <div className="mt-4">
               {m.sets.map((set) => (

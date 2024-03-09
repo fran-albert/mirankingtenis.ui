@@ -8,7 +8,7 @@ import { IoTimeOutline } from "react-icons/io5";
 import DeleteMatchDialog from "./Delete/button";
 import AddResultMatchDialog from "./AddResult/dialog";
 import EditMatchDialog from "./Time/dialog";
-import { formatDate } from "@/lib/utils";
+import { formatDate, formatDateComplete } from "@/lib/utils";
 export const getColumns = (onUpdateMatches: () => void): ColumnDef<Match>[] => {
   const columns: ColumnDef<Match>[] = [
     {
@@ -37,7 +37,7 @@ export const getColumns = (onUpdateMatches: () => void): ColumnDef<Match>[] => {
         }
         return (
           <div className="flex items-center">
-            {formatDate(row.original.shift.startHour)}
+            {formatDateComplete(row.original.shift.startHour)} hs
           </div>
         );
       },

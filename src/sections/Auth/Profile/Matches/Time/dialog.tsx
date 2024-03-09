@@ -112,7 +112,7 @@ export default function EditMatchDialog({
           </DialogHeader>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="flex flex-col gap-4">
-              <div className="w-full">
+              <div className="flex flex-col gap-4 px-4 py-2 w-full sm:w-3/4 md:w-1/2 lg:w-1/3">
                 <label
                   htmlFor="day"
                   className="block mb-2 text-sm font-medium text-gray-900"
@@ -134,15 +134,15 @@ export default function EditMatchDialog({
                   }
                   dateFormat="d MMMM h:mm aa"
                 />
+                <Label htmlFor="court">Cancha</Label>
+                <CourtSelect
+                  selected={selectedCourt}
+                  onCourt={(value) => {
+                    setSelectedCourt(value);
+                    setValue("idCourt", value);
+                  }}
+                />
               </div>
-              <Label htmlFor="court">Cancha</Label>
-              <CourtSelect
-                selected={selectedCourt}
-                onCourt={(value) => {
-                  setSelectedCourt(value);
-                  setValue("idCourt", value);
-                }}
-              />
             </div>
             <DialogFooter className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
               <Button
