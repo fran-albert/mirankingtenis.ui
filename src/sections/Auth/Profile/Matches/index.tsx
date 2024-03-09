@@ -45,7 +45,7 @@ function MatchesIndex({
                   onUpdateMatches={onUpdateMatches}
                 />
                 <EditMatchDialog match={m} />
-                <DeleteMatchDialog match={m} />
+                {/* <DeleteMatchDialog match={m} /> */}
               </div>
             )}
           </div>
