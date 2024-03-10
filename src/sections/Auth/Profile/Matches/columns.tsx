@@ -105,12 +105,12 @@ export const getColumns = (onUpdateMatches: () => void): ColumnDef<Match>[] => {
                 match={row.original}
                 onUpdateMatches={onUpdateMatches}
               />
-              {row.original.shift ? null : (
+              {/* {row.original.shift ? null : ( */}
                 <EditMatchDialog
                   match={row.original}
                   onUpdateMatches={onUpdateMatches}
                 />
-              )}
+              {/* )} */}
               {/* <DeleteMatchDialog /> */}
             </>
           )}

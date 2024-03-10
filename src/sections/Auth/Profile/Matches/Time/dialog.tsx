@@ -54,14 +54,12 @@ export default function EditMatchDialog({
   const [startDate, setStartDate] = useState(new Date());
   const [selectedCourt, setSelectedCourt] = useState<string>("");
 
-  console.log(match.id);
 
   const onSubmit = async (data: any) => {
     const dataToSend: any = {
       idCourt: Number(data.idCourt),
       startHour: data.startHour,
     };
-    console.log(dataToSend, "datatonsemd");
     try {
       const shiftCreationPromise = shitForMatchFn(dataToSend, match.id);
       toast.promise(shiftCreationPromise, {
@@ -98,12 +96,12 @@ export default function EditMatchDialog({
     setValue("startHour", dateInUTC.format());
   };
 
-  return (
+  return (  
     <>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
           <Button onClick={toggleDialog} variant="edit">
-            Turno
+            {match.shift ? "Editar turno" : "Agregar turno"}
           </Button>
         </DialogTrigger>
         <DialogContent className="p-4">
@@ -112,7 +110,7 @@ export default function EditMatchDialog({
           </DialogHeader>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="flex flex-col gap-4">
-              <div className="flex flex-col gap-4 px-4 py-2 w-full sm:w-3/4 md:w-1/2 lg:w-1/3">
+              <div className="flex flex-col gap-4 px-4 py-2 w-full sm:w-3/4 md:w-1/2 lg:w-full">
                 <label
                   htmlFor="day"
                   className="block mb-2 text-sm font-medium text-gray-900"

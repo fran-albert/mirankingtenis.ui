@@ -74,7 +74,7 @@ export const ScoreMatchCard = ({
                   </div>
                   <Link
                     href={`/jugadores/${player1.id}`}
-                    className="font-medium text-xl text-gray-900 hover:text-sky-800"
+                    className="font-medium text-base md:text-xl lg:text-xl text-gray-900 hover:text-sky-800"
                   >
                     {player1.lastname}, {player1.name}
                     {match.idWinner === player1.id && (
@@ -85,14 +85,16 @@ export const ScoreMatchCard = ({
                   </Link>
                 </div>
                 <div className="flex items-center justify-center space-x-1">
-                  {match.sets.map((set, index) => (
-                    <div
-                      key={index}
-                      className="text-xl font-bold text-gray-800 text-center min-w-[1.5rem]"
-                    >
-                      {set.pointsPlayer1}
-                    </div>
-                  ))}
+                  {match.sets
+                    .sort((a, b) => a.setNumber - b.setNumber)
+                    .map((set, index) => (
+                      <div
+                        key={index}
+                        className="text-xl font-bold text-gray-800 text-center min-w-[1.5rem]"
+                      >
+                        {set.pointsPlayer1}
+                      </div>
+                    ))}
                 </div>
               </div>
             </div>
@@ -120,7 +122,7 @@ export const ScoreMatchCard = ({
                   </div>
                   <Link
                     href={`/jugadores/${player2.id}`}
-                    className="font-medium text-xl text-gray-900 hover:text-sky-800"
+                    className="font-medium text- md:text-xl lg:text-xl text-gray-900 hover:text-sky-800"
                   >
                     {player2.lastname}, {player2.name}
                     {match.idWinner === player2.id && (
@@ -131,14 +133,16 @@ export const ScoreMatchCard = ({
                   </Link>
                 </div>
                 <div className="flex items-center justify-center space-x-1">
-                  {match.sets.map((set, index) => (
-                    <div
-                      key={index}
-                      className="text-xl font-bold text-gray-800 text-center min-w-[1.5rem]"
-                    >
-                      {set.pointsPlayer2}
-                    </div>
-                  ))}
+                  {match.sets
+                    .sort((a, b) => a.setNumber - b.setNumber)
+                    .map((set, index) => (
+                      <div
+                        key={index}
+                        className="text-xl font-bold text-gray-800 text-center min-w-[1.5rem]"
+                      >
+                        {set.pointsPlayer2}
+                      </div>
+                    ))}
                 </div>
               </div>
             </div>

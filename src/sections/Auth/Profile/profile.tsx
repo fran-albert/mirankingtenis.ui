@@ -5,10 +5,6 @@ import { createApiUserRepository } from "@/modules/users/infra/ApiUserRepository
 import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
 import { FaPencilAlt } from "react-icons/fa";
-import MatchesIndex from "./Matches";
-import { Match } from "@/modules/match/domain/Match";
-import { createApiMatchRepository } from "@/modules/match/infra/ApiMatchRepository";
-import { getMatchesByUser } from "@/modules/match/application/get-by-user/getMatchesByUser";
 import Loading from "@/components/Loading/loading";
 import DataIndex from "./Data";
 
@@ -17,19 +13,10 @@ function Profile() {
   const idUser = session?.user.id as number;
   const [user, setUser] = useState<User>();
   const userRepository = createApiUserRepository();
-  const [matches, setMatches] = useState<Match[]>([]);
-  const matchRepository = createApiMatchRepository();
-  const loadMatches = getMatchesByUser(matchRepository);
   const loadUser = getUser(userRepository);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState("MisDatos");
   const [isLoading, setIsLoading] = useState<boolean>(true);
-
-  // Función para cambiar la pestaña activa
-  const changeTab = (tab: any) => {
-    setActiveTab(tab);
-  };
 
   const handleEditPictureClick = () => {
     if (fileInputRef.current) {
@@ -39,28 +26,21 @@ function Profile() {
 
   useEffect(() => {
     setIsLoading(true);
-    const fetchUserAndMatches = async () => {
+    const fetchUser = async () => {
       try {
         const userData = await loadUser(idUser);
         setUser(userData);
-        const userMatches = await loadMatches(idUser);
-        setMatches(userMatches);
         setIsLoading(false);
       } catch (error) {
         console.error(error);
       }
     };
-    fetchUserAndMatches();
+    fetchUser();
   }, [idUser]);
 
   if (isLoading) {
     return <Loading isLoading />;
   }
-
-  const updateMatches = async () => {
-    const userMatches = await loadMatches(idUser);
-    setMatches(userMatches);
-  };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];

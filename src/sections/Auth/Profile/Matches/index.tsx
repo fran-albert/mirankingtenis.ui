@@ -38,7 +38,8 @@ function MatchesIndex({
             <p className="text-gray-600">Fecha: {m.fixture.jornada}</p>
             <p className="text-gray-600">Cancha: {m.shift?.court?.name}</p>
             <p className="text-gray-600">
-              Día y Hora: {m.shift?.startHour && formatDateComplete(m.shift?.startHour)}
+              Día y Hora:{" "}
+              {m.shift?.startHour && formatDateComplete(m.shift?.startHour)}
             </p>
             <div className="mt-4">
               {m.sets.map((set) => (
@@ -56,12 +57,7 @@ function MatchesIndex({
                   match={m}
                   onUpdateMatches={onUpdateMatches}
                 />
-                {m.shift ? null : (
-                  <EditMatchDialog
-                    match={m}
-                    onUpdateMatches={onUpdateMatches}
-                  />
-                )}
+                <EditMatchDialog match={m} onUpdateMatches={onUpdateMatches} />
                 {/* Consider adding DeleteMatchDialog with an icon button as well */}
               </div>
             )}
