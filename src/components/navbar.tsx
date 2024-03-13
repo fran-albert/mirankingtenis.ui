@@ -53,7 +53,7 @@ export default function Navbar() {
     }));
 
     setNavigation(updatedNavigation);
-  }, [pathname, isAdmin, session]); // Asegúrate de incluir 'session' en la lista de dependencias
+  }, [pathname, isAdmin, session]); 
 
   return (
     <Disclosure as="nav" className="bg-slate-700">

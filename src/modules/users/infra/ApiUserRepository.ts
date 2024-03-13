@@ -34,6 +34,16 @@ export function createApiUserRepository(): UserRepository {
     return user;
   }
 
+  async function updateUser(updatedUser: FormData, idUser: number): Promise<User> {
+    const response = await axiosInstance.patch(`users/${idUser}`, updatedUser, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    const user = response.data as User;
+    return user;
+  }
+
   async function requestResetPassword(email: User): Promise<User | undefined> {
     const response = await axiosInstance.patch(
       "auth/request-reset-password",
@@ -71,6 +81,7 @@ export function createApiUserRepository(): UserRepository {
   return {
     getUser,
     createUser,
+    updateUser,
     requestResetPassword,
     resetPassword,
     getTotalUsers,

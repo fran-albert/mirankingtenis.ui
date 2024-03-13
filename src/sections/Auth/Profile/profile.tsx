@@ -3,10 +3,27 @@ import { getUser } from "@/modules/users/application/get/getUser";
 import { User } from "@/modules/users/domain/User";
 import { createApiUserRepository } from "@/modules/users/infra/ApiUserRepository";
 import Image from "next/image";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { FaPencilAlt } from "react-icons/fa";
 import Loading from "@/components/Loading/loading";
 import DataIndex from "./Data";
+import { Button } from "@/components/ui/button";
+import { CategorySelect } from "@/components/Select/Category/select";
+import { CitySelect } from "@/components/Select/City/select";
+import { StateSelect } from "@/components/Select/State/select";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { goBack } from "@/lib/utils";
+import { createUser } from "@/modules/users/application/create/createUser";
+import axios from "axios";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { toast } from "sonner";
+import { updateUser } from "@/modules/users/application/update/updateUser";
+
+interface Inputs extends User {
+  [key: string]: any;
+}
 
 function Profile() {
   const { session } = useCustomSession();
@@ -17,6 +34,21 @@ function Profile() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+  } = useForm<Inputs>();
+  const [selectedState, setSelectedState] = useState(
+    user?.city.idState.toString()
+  );
+  const [selectedCity, setSelectedCity] = useState(user?.city.id.toString());
+  const [selectedCategory, setSelectedCategory] = useState(
+    user?.category.id.toString()
+  );
+
+  const updateUserFn = updateUser(userRepository);
 
   const handleEditPictureClick = () => {
     if (fileInputRef.current) {
@@ -24,38 +56,86 @@ function Profile() {
     }
   };
 
+  const updateProfilePicture = useCallback((newImageUrl: string) => {
+    setSelectedImage(`${newImageUrl}?timestamp=${new Date().getTime()}`);
+  }, []);
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const imageUrl = URL.createObjectURL(file);
+      setSelectedImage(imageUrl);
+    } else {
+      console.log("Not an image file.");
+    }
+  };
+
   useEffect(() => {
-    setIsLoading(true);
     const fetchUser = async () => {
       try {
         const userData = await loadUser(idUser);
         setUser(userData);
+        setSelectedState(userData?.city.idState.toString());
+        setSelectedCity(userData?.city.id.toString());
+        setSelectedCategory(userData?.category.id.toString());
         setIsLoading(false);
       } catch (error) {
         console.error(error);
       }
     };
     fetchUser();
-  }, [idUser]);
+  }, [idUser, loadUser]);
+  
+
+  useEffect(() => {
+    return () => {
+      if (selectedImage) {
+        URL.revokeObjectURL(selectedImage);
+      }
+    };
+  }, [selectedImage]);
+
+  const onSubmit: SubmitHandler<Inputs> = async (data) => {
+    const formData = new FormData();
+    Object.entries(data).forEach(([key, value]) => {
+      if (key !== "photo") {
+        formData.append(key, value);
+      }
+    });
+
+    if (fileInputRef.current?.files && fileInputRef.current.files[0]) {
+      formData.append("photo", fileInputRef.current.files[0]);
+    }
+    try {
+      const updateDataPromise = updateUserFn(formData, idUser);
+      toast.promise(updateDataPromise, {
+        loading: "Actualizando datos...",
+        success: "Datos actualizados con éxito!",
+        duration: 3000,
+      });
+      await updateDataPromise;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const errorMessage =
+          error.response?.data?.message ||
+          "Error desconocido al crear el jugador";
+        toast.error(`Error al crear el Jugador: ${errorMessage}`, {
+          duration: 3000,
+        });
+        console.error("Error al crear el jugador", errorMessage);
+      } else {
+        toast.error("Error al crear el Jugador: Error desconocido", {
+          duration: 3000,
+        });
+        console.error("Error al crear el jugador", error);
+      }
+    }
+  };
 
   if (isLoading) {
     return <Loading isLoading />;
   }
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file && file.type.substr(0, 5) === "image") {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        if (typeof reader.result === "string") {
-          setSelectedImage(reader.result);
-        }
-      };
-      reader.readAsDataURL(file);
-    } else {
-      console.log("Not an image file.");
-    }
-  };
   return (
     <div className="flex justify-center w-full px-4 lg:px-0 m-2">
       <div className="w-full max-w-7xl bg-white rounded-xl">
@@ -122,7 +202,85 @@ function Profile() {
             </p>
           </div>
 
-          <DataIndex user={user} />
+          <div className="flex flex-wrap items-center justify-center rounded-lg p-4 ">
+            <div className="w-full p-4">
+              <form onSubmit={handleSubmit(onSubmit)}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="name">Nombre</Label>
+                    <Input
+                      {...register("name", { required: true })}
+                      className="w-full bg-gray-200 border-gray-300 text-gray-800"
+                      defaultValue={user?.name}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="lastname">Apellido</Label>
+                    <Input
+                      {...register("lastname", { required: true })}
+                      className="w-full bg-gray-200 border-gray-300 text-gray-800"
+                      defaultValue={user?.lastname}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="phone">Teléfono</Label>
+                    <Input
+                      {...register("phone", { required: true })}
+                      className="w-full bg-gray-200 border-gray-300 text-gray-800"
+                      defaultValue={user?.phone}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="category">Categoría</Label>
+                    <CategorySelect
+                      selected={selectedCategory}
+                      onCategory={(value) => {
+                        setSelectedCategory(value);
+                        setValue("idCategory", value);
+                      }}
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="state">Provincia</Label>
+                    <StateSelect
+                      selected={selectedState}
+                      onStateChange={setSelectedState}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="city">Localidad</Label>
+                    <CitySelect
+                      idState={selectedState}
+                      selected={selectedCity}
+                      onCityChange={(value) => {
+                        setSelectedCity(value);
+                        setValue("idCity", value);
+                      }}
+                    />
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <Label htmlFor="userName">Correo Electrónico</Label>
+                  <Input
+                    id="email"
+                    className="w-full bg-gray-200 border-gray-300 text-gray-800"
+                    {...register("email")}
+                    defaultValue={user?.email}
+                  />
+                </div>
+                <div className="flex flex-col sm:flex-row justify-center gap-4 mt-10">
+                  <Button
+                    className="w-full sm:w-auto"
+                    variant="outline"
+                    type="submit"
+                  >
+                    Modificar Datos
+                  </Button>
+                </div>
+              </form>
+            </div>
+          </div>
         </div>
       </div>
     </div>

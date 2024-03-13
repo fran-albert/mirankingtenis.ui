@@ -21,13 +21,17 @@ function DataIndex({ user }: { user: User | undefined }) {
     formState: { errors },
     setValue,
   } = useForm<Inputs>();
-  const [selectedState, setSelectedState] = useState(user?.city.idState.toString());
+  const [selectedState, setSelectedState] = useState(
+    user?.city.idState.toString()
+  );
   const [selectedCity, setSelectedCity] = useState(user?.city.id.toString());
-  const [selectedCategory, setSelectedCategory] = useState(user?.category.id.toString());
+  const [selectedCategory, setSelectedCategory] = useState(
+    user?.category.id.toString()
+  );
   const userRepository = createApiUserRepository();
   const createUserFn = createUser(userRepository);
 
-  console.log(user)
+  console.log(user);
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
@@ -56,89 +60,7 @@ function DataIndex({ user }: { user: User | undefined }) {
       }
     }
   };
-  return (
-    <>
-      <div className="flex flex-wrap items-center justify-center rounded-lg p-4 ">
-        <div className="w-full p-4">
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="name">Nombre</Label>
-                <Input
-                  {...register("name", { required: true })}
-                  className="w-full bg-gray-200 border-gray-300 text-gray-800"
-                  defaultValue={user?.name}
-                />
-              </div>
-              <div>
-                <Label htmlFor="lastname">Apellido</Label>
-                <Input
-                  {...register("lastname", { required: true })}
-                  className="w-full bg-gray-200 border-gray-300 text-gray-800"
-                  defaultValue={user?.lastname}
-                />
-              </div>
-              <div>
-                <Label htmlFor="phone">Teléfono</Label>
-                <Input
-                  {...register("phone", { required: true })}
-                  className="w-full bg-gray-200 border-gray-300 text-gray-800"
-                  defaultValue={user?.phone}
-                />
-              </div>
-              <div>
-              <Label htmlFor="category">Categoría</Label>
-                <CategorySelect
-                  selected={selectedCategory}
-                  onCategory={(value) => {
-                    setSelectedCategory(value);
-                    setValue("idCategory", value);
-                  }}
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="state">Provincia</Label>
-                <StateSelect
-                  selected={selectedState}
-                  onStateChange={setSelectedState}
-                />
-              </div>
-              <div>
-                <Label htmlFor="city">Localidad</Label>
-                <CitySelect
-                  idState={selectedState}
-                  selected={selectedCity}
-                  onCityChange={(value) => {
-                    setSelectedCity(value);
-                    setValue("idCity", value);
-                  }}
-                />
-              </div>
-            </div>
-            <div className="mt-4">
-              <Label htmlFor="userName">Correo Electrónico</Label>
-              <Input
-                id="email"
-                className="w-full bg-gray-200 border-gray-300 text-gray-800"
-                {...register("email")}
-                defaultValue={user?.email}
-              />
-            </div>
-            <div className="flex flex-col sm:flex-row justify-center gap-4 mt-10">
-              <Button
-                className="w-full sm:w-auto"
-                variant="outline"
-                type="submit"
-              >
-                Modificar Datos
-              </Button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </>
-  );
+  return <></>;
 }
 
 export default DataIndex;
