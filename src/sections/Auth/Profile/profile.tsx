@@ -40,13 +40,9 @@ function Profile() {
     formState: { errors },
     setValue,
   } = useForm<Inputs>();
-  const [selectedState, setSelectedState] = useState(
-    user?.city.idState.toString()
-  );
-  const [selectedCity, setSelectedCity] = useState(user?.city.id.toString());
-  const [selectedCategory, setSelectedCategory] = useState(
-    user?.category.id.toString()
-  );
+  const [selectedState, setSelectedState] = useState("");
+  const [selectedCity, setSelectedCity] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
 
   const updateUserFn = updateUser(userRepository);
 
@@ -74,18 +70,36 @@ function Profile() {
     const fetchUser = async () => {
       try {
         const userData = await loadUser(idUser);
-        setUser(userData);
-        setSelectedState(userData?.city.idState.toString());
-        setSelectedCity(userData?.city.id.toString());
-        setSelectedCategory(userData?.category.id.toString());
-        setIsLoading(false);
+        if (userData && userData.city && userData.category) {
+          setUser(userData);
+          setIsLoading(false);
+
+          setSelectedState(userData.city.idState.toString());
+          setSelectedCity(userData.city.id.toString());
+          setSelectedCategory(userData.category.id.toString());
+
+          setValue("idCity", userData.city.id.toString());
+          setValue("idCategory", userData.category.id.toString());
+        }
       } catch (error) {
         console.error(error);
       }
     };
     fetchUser();
-  }, [idUser, loadUser]);
-  
+  }, [idUser, loadUser, setValue]);
+
+  const handleStateChange = (value: string) => {
+    setSelectedState(value);
+
+    // Restablecer la selección de la ciudad
+    setSelectedCity("");
+    setValue("idCity", ""); // Asegúrate de que este campo existe en tu formulario
+  };
+
+  const handleCityChange = (value: string) => {
+    setSelectedCity(value);
+    setValue("idCity", value);
+  };
 
   useEffect(() => {
     return () => {
@@ -99,36 +113,38 @@ function Profile() {
     const formData = new FormData();
     Object.entries(data).forEach(([key, value]) => {
       if (key !== "photo") {
-        formData.append(key, value);
+        formData.append(key, value.toString());
       }
     });
 
-    if (fileInputRef.current?.files && fileInputRef.current.files[0]) {
+    if (fileInputRef.current?.files?.[0]) {
       formData.append("photo", fileInputRef.current.files[0]);
     }
+
     try {
-      const updateDataPromise = updateUserFn(formData, idUser);
-      toast.promise(updateDataPromise, {
+      await toast.promise(updateUserFn(formData, idUser), {
         loading: "Actualizando datos...",
         success: "Datos actualizados con éxito!",
-        duration: 3000,
+        error: "Error al actualizar los datos",
       });
-      await updateDataPromise;
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        const errorMessage =
-          error.response?.data?.message ||
-          "Error desconocido al crear el jugador";
-        toast.error(`Error al crear el Jugador: ${errorMessage}`, {
-          duration: 3000,
-        });
-        console.error("Error al crear el jugador", errorMessage);
-      } else {
-        toast.error("Error al crear el Jugador: Error desconocido", {
-          duration: 3000,
-        });
-        console.error("Error al crear el jugador", error);
+      const updatedUserData = await loadUser(idUser);
+      if (updatedUserData) {
+        setUser(updatedUserData);
+        updateProfilePicture(
+          `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${updatedUserData.photo}.jpeg`
+        );
       }
+    } catch (error) {
+      console.error("Error al actualizar el perfil", error);
+      toast.error(
+        "Error al actualizar el perfil: " +
+          (axios.isAxiosError(error)
+            ? error.response?.data?.message || "Error desconocido"
+            : "Error desconocido"),
+        {
+          duration: 3000,
+        }
+      );
     }
   };
 
@@ -157,7 +173,7 @@ function Profile() {
                     style={{ width: "100px", height: "100px" }}
                   />
                 ) : (
-                  <Image
+                  <img
                     src={
                       session?.user?.photo
                         ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${session.user.photo}.jpeg`
@@ -245,7 +261,7 @@ function Profile() {
                     <Label htmlFor="state">Provincia</Label>
                     <StateSelect
                       selected={selectedState}
-                      onStateChange={setSelectedState}
+                      onStateChange={handleStateChange}
                     />
                   </div>
                   <div>
@@ -253,10 +269,7 @@ function Profile() {
                     <CitySelect
                       idState={selectedState}
                       selected={selectedCity}
-                      onCityChange={(value) => {
-                        setSelectedCity(value);
-                        setValue("idCity", value);
-                      }}
+                      onCityChange={handleCityChange}
                     />
                   </div>
                 </div>

@@ -5,7 +5,10 @@ export interface UserRepository {
   getAllUsers: () => Promise<User[]>;
   getTotalUsers: () => Promise<number>;
   createUser: (newUser: User) => Promise<User | undefined>;
-  updateUser: (updatedUser: FormData, idUser:number) => Promise<User | undefined>;
+  updateUser: (
+    updatedUser: FormData,
+    idUser: number
+  ) => Promise<User | undefined>;
   getUsersByCategory: (idCategory: number) => Promise<User[]>;
   deleteUser: (id: number) => Promise<User>;
   requestResetPassword: (email: User) => Promise<User | undefined>;
