@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import Navbar from "@/components/navbar";
 import { Toaster } from "sonner";
 import SessionAuthProvider from "@/context/SessionAuthProviders";
+import { ProfilePhotoProvider } from "@/context/ProfilePhotoContext";
 
 const roboto = Roboto({
   weight: ["300", "400", "500", "700"],
@@ -36,11 +37,13 @@ export default function RootLayout({
           roboto.className
         )}
       >
-        <SessionAuthProvider>
-          <Toaster richColors position="top-center" />
-          <Navbar />
-          {children}
-        </SessionAuthProvider>
+        <ProfilePhotoProvider>
+          <SessionAuthProvider>
+            <Toaster richColors position="top-center" />
+            <Navbar />
+            {children}
+          </SessionAuthProvider>
+        </ProfilePhotoProvider>
       </body>
     </html>
   );

@@ -34,13 +34,33 @@ export function createApiUserRepository(): UserRepository {
     return user;
   }
 
-  async function updateUser(updatedUser: FormData, idUser: number): Promise<User> {
+  async function updateUser(
+    updatedUser: FormData,
+    idUser: number
+  ): Promise<User> {
     const response = await axiosInstance.patch(`users/${idUser}`, updatedUser, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
     });
     const user = response.data as User;
+    return user;
+  }
+
+  async function updatePhoto(
+    updatedUser: FormData,
+    idUser: number
+  ): Promise<string> {
+    const response = await axiosInstance.patch(
+      `users/${idUser}/upload-photo`,
+      updatedUser,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    const user = response.data;
     return user;
   }
 
@@ -82,6 +102,7 @@ export function createApiUserRepository(): UserRepository {
     getUser,
     createUser,
     updateUser,
+    updatePhoto,
     requestResetPassword,
     resetPassword,
     getTotalUsers,

@@ -10,6 +10,7 @@ import { useCustomSession } from "@/context/SessionAuthProviders";
 import { usePathname, useRouter } from "next/navigation";
 import useRoles from "@/hooks/useRoles";
 import Image from "next/image";
+import { useProfilePhoto } from "@/context/ProfilePhotoContext";
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
@@ -18,7 +19,9 @@ function classNames(...classes: string[]) {
 export default function Navbar() {
   const { session } = useCustomSession();
   const { isAdmin } = useRoles();
+  console.log(session);
   const pathname = usePathname();
+  const { profilePhoto } = useProfilePhoto();
 
   const [navigation, setNavigation] = useState([
     { name: "Jugadores", href: "/jugadores", current: false },
@@ -53,7 +56,7 @@ export default function Navbar() {
     }));
 
     setNavigation(updatedNavigation);
-  }, [pathname, isAdmin, session]); 
+  }, [pathname, isAdmin, session]);
 
   return (
     <Disclosure as="nav" className="bg-slate-700">
@@ -123,13 +126,18 @@ export default function Navbar() {
                         <Menu.Button className="relative flex rounded-full bg-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                           <span className="absolute -inset-1.5" />
                           <span className="sr-only">Open user menu</span>
+
                           <Image
                             className="h-8 w-8 rounded-full"
                             src={
-                              session?.user?.photo
-                                ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${session.user.photo}.jpeg`
-                                : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/default2.png"
+                              profilePhoto ||
+                              "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/default2.png"
                             }
+                            // src={
+                            //   session?.user?.photo
+                            //     ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${session.user.photo}.jpeg`
+                            //     : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/default2.png"
+                            // }
                             alt="User profile"
                             height={32}
                             width={32}
