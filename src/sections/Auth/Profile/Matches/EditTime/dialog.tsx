@@ -31,13 +31,14 @@ import { createApiShiftRepository } from "@/modules/shift/infra/ApiShiftReposito
 import { shiftForMatch } from "@/modules/shift/application/shift-for-match/shiftForMatch";
 registerLocale("es", es);
 import moment from "moment-timezone";
+import { updateShift } from "@/modules/shift/application/update/updateShift";
 
 interface EidtMatchDialogProps {
   onUpdateMatches?: () => void;
   match: Match;
 }
 
-export default function EditMatchDialog({
+export default function UpdateShiftDialog({
   match,
   onUpdateMatches,
 }: EidtMatchDialogProps) {
@@ -50,7 +51,7 @@ export default function EditMatchDialog({
     setValue,
   } = useForm();
   const shiftRepository = createApiShiftRepository();
-  const shitForMatchFn = shiftForMatch(shiftRepository);
+  const updateShiftFn = updateShift(shiftRepository);
   const [startDate, setStartDate] = useState(new Date());
   const [selectedCourt, setSelectedCourt] = useState<string>("");
 
@@ -61,7 +62,7 @@ export default function EditMatchDialog({
       startHour: data.startHour,
     };
     try {
-      const shiftCreationPromise = shitForMatchFn(dataToSend, match.id);
+      const shiftCreationPromise = updateShiftFn(dataToSend, match.id);
       toast.promise(shiftCreationPromise, {
         loading: "Reservando turno para el partido partido...",
         success: "Turno reservado con éxito!",
@@ -101,12 +102,12 @@ export default function EditMatchDialog({
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
           <Button onClick={toggleDialog} variant="edit">
-            Agregar Turno
+            Editar Turno
           </Button>
         </DialogTrigger>
         <DialogContent className="p-4">
           <DialogHeader>
-            <DialogTitle>Seleccionar turno</DialogTitle>
+            <DialogTitle>Seleccionar nuevo turno</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="flex flex-col gap-4">

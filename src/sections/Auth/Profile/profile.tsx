@@ -21,10 +21,10 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { toast } from "sonner";
 import { updateUser } from "@/modules/users/application/update/updateUser";
 import ImageContainer from "./Image-Container";
+import { State } from "@/modules/state/domain/State";
+import { City } from "@/modules/city/domain/City";
 
-interface Inputs extends User {
-  [key: string]: any;
-}
+interface Inputs extends User {}
 
 function Profile() {
   const { session } = useCustomSession();
@@ -41,23 +41,18 @@ function Profile() {
   } = useForm<Inputs>();
   const [selectedState, setSelectedState] = useState("");
   const [selectedCity, setSelectedCity] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
   const updateUserFn = updateUser(userRepository);
+  const [cities, setCities] = useState<City[]>([]);
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const userData = await loadUser(idUser);
-        if (userData && userData.city && userData.category) {
+        if (userData && userData.city) {
           setUser(userData);
-          setIsLoading(false);
-
           setSelectedState(userData.city.idState.toString());
           setSelectedCity(userData.city.id.toString());
-          setSelectedCategory(userData.category.id.toString());
-
-          setValue("idCity", userData.city.id.toString());
-          setValue("idCategory", userData.category.id.toString());
+          setIsLoading(false);
         }
       } catch (error) {
         console.error(error);
@@ -66,43 +61,58 @@ function Profile() {
     fetchUser();
   }, [idUser, loadUser, setValue]);
 
-  const handleStateChange = (value: string) => {
-    setSelectedState(value);
+  // const handleStateChange = (selectedState: State | undefined) => {
+  //   console.log("Seleccionando provincia:", selectedState);
+  //   if (!selectedState) {
+  //     setSelectedCity(undefined);
+  //     setValue("idCity", "");
+  //   } else {
+  //     setValue("idCity", selectedState.id.toString());
+  //     setSelectedCity(undefined);
+  //     // Posiblemente necesites reiniciar el valor de selectedCity aquí para reflejar el cambio en el UI
+  //   }
+  // };
 
-    setSelectedCity("");
-    setValue("idCity", "");
-  };
-
-  const handleCityChange = (value: string) => {
-    setSelectedCity(value);
-    setValue("idCity", value);
-  };
+  // const handleCityChange = (selectedCity: string | undefined) => {
+  //   console.log("Seleccionando localidad:", selectedCity);
+  //   if (selectedCity) {
+  //     setValue("idCity", selectedCity);
+  //   }
+  // };
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    const formData = new FormData();
-    Object.entries(data).forEach(([key, value]) => {
-      if (key !== "photo") {
-        formData.append(key, value.toString());
-      }
-    });
+    const dataToSend = {
+      ...data,
+      // idCity: parseInt(data.idCity),
+      // idCategory: parseInt(data.idCategory),
+    };
+
+    console.log(dataToSend);
 
     try {
-      toast.promise(updateUserFn(formData, idUser), {
+      const playerCreationPromise = updateUserFn(dataToSend, idUser);
+      toast.promise(playerCreationPromise, {
         loading: "Actualizando datos...",
         success: "Datos actualizados con éxito!",
-        error: "Error al actualizar los datos",
+        duration: 3000,
       });
+      await playerCreationPromise;
+      goBack();
     } catch (error) {
-      console.error("Error al actualizar el perfil", error);
-      toast.error(
-        "Error al actualizar el perfil: " +
-          (axios.isAxiosError(error)
-            ? error.response?.data?.message || "Error desconocido"
-            : "Error desconocido"),
-        {
+      if (axios.isAxiosError(error)) {
+        const errorMessage =
+          error.response?.data?.message ||
+          "Error desconocido al crear el jugador";
+        toast.error(`Error al actualizar los datos: ${errorMessage}`, {
           duration: 3000,
-        }
-      );
+        });
+        console.error("Error al actualizar los datos", errorMessage);
+      } else {
+        toast.error("Error al actualizar los datos: Error desconocido", {
+          duration: 3000,
+        });
+        console.error("Error al actualizar los datos", error);
+      }
     }
   };
 
@@ -167,12 +177,10 @@ function Profile() {
                 </div>
                 <div>
                   <Label htmlFor="category">Categoría</Label>
-                  <CategorySelect
-                    selected={selectedCategory}
-                    onCategory={(value) => {
-                      setSelectedCategory(value);
-                      setValue("idCategory", value);
-                    }}
+                  <Input
+                    className="w-full bg-gray-200 border-gray-300 text-gray-800 cursor-not-allowed"
+                    defaultValue={user?.category.name}
+                    readOnly
                   />
                 </div>
 
@@ -180,22 +188,24 @@ function Profile() {
                   <Label htmlFor="state">Provincia</Label>
                   <StateSelect
                     selected={selectedState}
-                    onStateChange={handleStateChange}
+                    onStateChange={setSelectedState}
                   />
                 </div>
                 <div>
-                  <Label htmlFor="city">Localidad</Label>
+                  <Label htmlFor="city">Ciudad</Label>
                   <CitySelect
                     idState={selectedState}
                     selected={selectedCity}
-                    onCityChange={handleCityChange}
+                    onCityChange={(value) => {
+                      setSelectedCity(value);
+                      setValue("idCity", (value));
+                    }}
                   />
                 </div>
               </div>
               <div className="mt-4">
                 <Label htmlFor="userName">Correo Electrónico</Label>
                 <Input
-                  id="email"
                   className="w-full bg-gray-200 border-gray-300 text-gray-800"
                   {...register("email")}
                   defaultValue={user?.email}

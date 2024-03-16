@@ -19,7 +19,6 @@ function classNames(...classes: string[]) {
 export default function Navbar() {
   const { session } = useCustomSession();
   const { isAdmin } = useRoles();
-  console.log(session);
   const pathname = usePathname();
   const { profilePhoto } = useProfilePhoto();
 

@@ -34,15 +34,8 @@ export function createApiUserRepository(): UserRepository {
     return user;
   }
 
-  async function updateUser(
-    updatedUser: FormData,
-    idUser: number
-  ): Promise<User> {
-    const response = await axiosInstance.patch(`users/${idUser}`, updatedUser, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
+  async function updateUser(updatedUser: User, idUser: number): Promise<User> {
+    const response = await axiosInstance.patch(`users/${idUser}`, updatedUser);
     const user = response.data as User;
     return user;
   }

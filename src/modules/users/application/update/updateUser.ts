@@ -3,7 +3,7 @@ import { UserRepository } from "../../domain/UserRepository";
 
 export function updateUser(userRepository: UserRepository) {
   return async (
-    updatedUser: FormData,
+    updatedUser: User,
     idUser: number
   ): Promise<User | undefined> => {
     return await userRepository.updateUser(updatedUser, idUser);

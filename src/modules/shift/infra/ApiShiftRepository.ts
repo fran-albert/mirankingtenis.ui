@@ -12,7 +12,17 @@ export function createApiShiftRepository(): ShiftRepository {
     return data;
   }
 
+  async function updateShift(
+    newShift: Shift,
+    idShift: number
+  ): Promise<Shift> {
+    const response = await axiosInstance.patch(`shift/${idShift}`, newShift);
+    const data = response.data as Shift;
+    return data;
+  }
+
   return {
     shiftForMatch,
+    updateShift,
   };
 }

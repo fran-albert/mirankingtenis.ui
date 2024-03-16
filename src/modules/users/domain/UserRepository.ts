@@ -6,7 +6,7 @@ export interface UserRepository {
   getTotalUsers: () => Promise<number>;
   createUser: (newUser: User) => Promise<User | undefined>;
   updateUser: (
-    updatedUser: FormData,
+    updatedUser: User,
     idUser: number
   ) => Promise<User | undefined>;
   updatePhoto: (updatedPhoto: FormData, idUser: number) => Promise<string>;
