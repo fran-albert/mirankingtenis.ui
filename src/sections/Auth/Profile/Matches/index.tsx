@@ -6,6 +6,7 @@ import AddResultMatchDialog from "./AddResult/dialog";
 import DeleteMatchDialog from "./Delete/button";
 import { formatDate, formatDateComplete } from "@/lib/utils";
 import { Match } from "@/modules/match/domain/Match";
+import UpdateShiftDialog from "./EditTime/dialog";
 
 function MatchesIndex({
   match,
@@ -51,15 +52,30 @@ function MatchesIndex({
                 </span>
               ))}
             </div>
+
             {m.status !== "played" && (
-              <div className="mt-10 flex justify-end">
-                <AddResultMatchDialog
-                  match={m}
-                  onUpdateMatches={onUpdateMatches}
-                />
-                <EditMatchDialog match={m} onUpdateMatches={onUpdateMatches} />
-                {/* Consider adding DeleteMatchDialog with an icon button as well */}
-              </div>
+              <>
+                {/* Si no está jugado y no tiene turno, muestra EditMatchDialog */}
+                {m.shift === null ? (
+                  <EditMatchDialog
+                    match={m}
+                    onUpdateMatches={onUpdateMatches}
+                  />
+                ) : (
+                  <>
+                    <UpdateShiftDialog
+                      match={m}
+                      onUpdateMatches={onUpdateMatches}
+                    />
+                    <AddResultMatchDialog
+                      match={m}
+                      onUpdateMatches={onUpdateMatches}
+                    />
+                  </>
+                )}
+                {/* Opcionalmente, si DeleteMatchDialog debe aparecer siempre cuando el partido no está jugado, independientemente del estado del turno */
+                /* <DeleteMatchDialog match={row.original} onUpdateMatches={onUpdateMatches} /> */}
+              </>
             )}
           </div>
         ))}

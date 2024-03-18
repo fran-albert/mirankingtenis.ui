@@ -91,7 +91,9 @@ export const Step3 = ({
                   <td className="py-4 px-6">Partido {index + 1}</td>
                   <td className="py-4 px-6">
                     <Select
-                      value={match.idUser1 || ""}
+                      value={
+                        match.idUser1 !== null ? String(match.idUser1) : ""
+                      }
                       onValueChange={(value) =>
                         updateMatch(index, "player1", value)
                       }
@@ -103,7 +105,10 @@ export const Step3 = ({
                         {players
                           .filter(
                             (player) =>
-                              !isPlayerSelectedElsewhere(String(player.id), index)
+                              !isPlayerSelectedElsewhere(
+                                String(player.id),
+                                index
+                              )
                           )
                           .map((player) => (
                             <SelectItem
@@ -121,7 +126,9 @@ export const Step3 = ({
                   </td>
                   <td className="py-4 px-6">
                     <Select
-                      value={match.idUser2 || ""}
+                      value={
+                        match.idUser2 !== null ? String(match.idUser2) : ""
+                      }
                       onValueChange={(value) =>
                         updateMatch(index, "player2", value)
                       }
@@ -133,7 +140,10 @@ export const Step3 = ({
                         {players
                           .filter(
                             (player) =>
-                              !isPlayerSelectedElsewhere(String(player.id), index)
+                              !isPlayerSelectedElsewhere(
+                                String(player.id),
+                                index
+                              )
                           )
                           .map((player) => (
                             <SelectItem
