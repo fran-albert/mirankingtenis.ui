@@ -1,7 +1,5 @@
 "use client";
-
 import { ColumnDef } from "@tanstack/react-table";
-import { Match } from "@/modules/match/domain/Match";
 import { Button } from "@/components/ui/button";
 import { Sets } from "@/modules/sets/domain/Sets";
 import { IoTimeOutline } from "react-icons/io5";
@@ -10,6 +8,7 @@ import AddResultMatchDialog from "./AddResult/dialog";
 import EditMatchDialog from "./Time/dialog";
 import { formatDate, formatDateComplete } from "@/lib/utils";
 import UpdateShiftDialog from "./EditTime/dialog";
+import { Match } from "@/modules/match/domain/Match";
 export const getColumns = (onUpdateMatches: () => void): ColumnDef<Match>[] => {
   const columns: ColumnDef<Match>[] = [
     {
@@ -102,10 +101,6 @@ export const getColumns = (onUpdateMatches: () => void): ColumnDef<Match>[] => {
         <div className="flex items-center justify-end space-x-1">
           {row.original.status !== "played" && (
             <>
-              <AddResultMatchDialog
-                match={row.original}
-                onUpdateMatches={onUpdateMatches}
-              />
               {/* Si no está jugado y no tiene turno, muestra EditMatchDialog */}
               {row.original.shift === null ? (
                 <EditMatchDialog
@@ -113,11 +108,16 @@ export const getColumns = (onUpdateMatches: () => void): ColumnDef<Match>[] => {
                   onUpdateMatches={onUpdateMatches}
                 />
               ) : (
-                /* Si no está jugado y tiene turno, muestra UpdateShiftDialog */
-                <UpdateShiftDialog
-                  match={row.original}
-                  onUpdateMatches={onUpdateMatches}
-                />
+                <>
+                  <UpdateShiftDialog
+                    match={row.original}
+                    onUpdateMatches={onUpdateMatches}
+                  />
+                  <AddResultMatchDialog
+                    match={row.original}
+                    onUpdateMatches={onUpdateMatches}
+                  />
+                </>
               )}
               {/* Opcionalmente, si DeleteMatchDialog debe aparecer siempre cuando el partido no está jugado, independientemente del estado del turno */
               /* <DeleteMatchDialog match={row.original} onUpdateMatches={onUpdateMatches} /> */}

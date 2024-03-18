@@ -19,4 +19,5 @@ export interface User {
   idCategory: string | number;
   idCity: string | number;
   position?: number;
+  rankingInitial: number;
 }

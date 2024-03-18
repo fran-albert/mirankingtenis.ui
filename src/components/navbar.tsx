@@ -26,7 +26,7 @@ export default function Navbar() {
     { name: "Jugadores", href: "/jugadores", current: false },
     { name: "Ranking", href: "/ranking", current: false },
     { name: "Partidos", href: "/partidos", current: false },
-    // { name: "Turnos", href: "/turnos", current: false },
+    { name: "Turnos", href: "/turnos", current: false },
   ]);
 
   useEffect(() => {
@@ -34,6 +34,7 @@ export default function Navbar() {
       { name: "Jugadores", href: "/jugadores", current: false },
       { name: "Ranking", href: "/ranking", current: false },
       { name: "Partidos", href: "/partidos", current: false },
+      { name: "Turnos", href: "/turnos", current: false },
     ];
 
     if (session) {

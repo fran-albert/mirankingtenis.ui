@@ -26,9 +26,9 @@ import UserCardComponent from "./Card/card";
 import DetailsPlayer from "./Details/card";
 import PersonalData from "./PersonalData/card";
 import MatchesDetails from "./Matches/card";
-import { Match } from "@/modules/match/domain/Match";
 import { createApiMatchRepository } from "@/modules/match/infra/ApiMatchRepository";
 import { getMatchesByUser } from "@/modules/match/application/get-by-user/getMatchesByUser";
+import { Match } from "@/modules/match/domain/Match";
 
 function ProfilePlayer() {
   const params = useParams();

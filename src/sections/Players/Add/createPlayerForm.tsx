@@ -89,15 +89,24 @@ function CreatePlayerForm() {
                   className="w-full bg-gray-200 border-gray-300 text-gray-800"
                 />
               </div>
-              <div>
-                <Label htmlFor="category">Categoría</Label>
-                <CategorySelect
-                  selected={selectedCategory}
-                  onCategory={(value) => {
-                    setSelectedCategory(value);
-                    setValue("idCategory", (value));
-                  }}
-                />
+              <div className="md:flex md:gap-4">
+                <div className="flex-1">
+                  <Label htmlFor="category">Categoría</Label>
+                  <CategorySelect
+                    selected={selectedCategory}
+                    onCategory={(value) => {
+                      setSelectedCategory(value);
+                      setValue("idCategory", value);
+                    }}
+                  />
+                </div>
+                <div className="flex-1">
+                  <Label htmlFor="category">Ranking Inicial</Label>
+                  <Input
+                    {...register("rankingInitial", { required: true })}
+                    className="w-full bg-gray-200 border-gray-300 text-gray-800"
+                  />
+                </div>
               </div>
 
               <div>
@@ -114,7 +123,7 @@ function CreatePlayerForm() {
                   selected={selectedCity}
                   onCityChange={(value) => {
                     setSelectedCity(value);
-                    setValue("idCity", (value));
+                    setValue("idCity", value);
                   }}
                 />
               </div>

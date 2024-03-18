@@ -29,12 +29,23 @@ export const Step3 = ({
   onMatchesSelect,
   players,
 }: Step3Props) => {
+  const initialMatchesCount = Math.floor(players.length / 2);
   const [matches, setMatches] = useState(
-    Array(8).fill({ idUser1: null, idUser2: null })
+    Array(initialMatchesCount).fill({ idUser1: null, idUser2: null })
   );
 
-  const updateMatch = (matchIndex: any, playerPosition: any, playerId: any) => {
-    const newPlayerId = playerId !== "" ? playerId : null;
+  // Ajusta los matches cada vez que cambia la cantidad de jugadores
+  useEffect(() => {
+    const matchesCount = Math.floor(players.length / 2);
+    setMatches(Array(matchesCount).fill({ idUser1: null, idUser2: null }));
+  }, [players.length]);
+
+  const updateMatch = (
+    matchIndex: any,
+    playerPosition: any,
+    playerId: string
+  ) => {
+    const newPlayerId = playerId !== "" ? Number(playerId) : null;
     const newPosition = playerPosition === "player1" ? "idUser1" : "idUser2";
     const newMatches = matches.map((match, index) =>
       index === matchIndex ? { ...match, [newPosition]: newPlayerId } : match
@@ -42,10 +53,13 @@ export const Step3 = ({
     setMatches(newMatches);
   };
 
-  const isPlayerSelectedElsewhere = (playerId: any, currentMatchIndex: any) => {
+  const isPlayerSelectedElsewhere = (
+    playerId: string,
+    currentMatchIndex: number
+  ) => {
     return matches.some((match, index) => {
       if (index !== currentMatchIndex) {
-        return match.player1 === playerId || match.player2 === playerId;
+        return match.idUser1 === playerId || match.idUser2 === playerId;
       }
       return false;
     });
@@ -89,7 +103,7 @@ export const Step3 = ({
                         {players
                           .filter(
                             (player) =>
-                              !isPlayerSelectedElsewhere(player.id, index)
+                              !isPlayerSelectedElsewhere(String(player.id), index)
                           )
                           .map((player) => (
                             <SelectItem
@@ -119,7 +133,7 @@ export const Step3 = ({
                         {players
                           .filter(
                             (player) =>
-                              !isPlayerSelectedElsewhere(player.id, index)
+                              !isPlayerSelectedElsewhere(String(player.id), index)
                           )
                           .map((player) => (
                             <SelectItem

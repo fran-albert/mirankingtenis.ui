@@ -1,5 +1,4 @@
 import { Category } from "@/modules/category/domain/Category";
-import { Match } from "@/modules/match/domain/Match";
 
 export interface Fixture {
   idCategory: number;

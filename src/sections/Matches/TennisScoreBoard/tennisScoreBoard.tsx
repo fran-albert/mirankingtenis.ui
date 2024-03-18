@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { ScoreMatchCard } from "@/sections/Matches/ScoreMatchCard/card";
-import { Match } from "@/modules/match/domain/Match";
 import { createApiMatchRepository } from "@/modules/match/infra/ApiMatchRepository";
 import { toast } from "sonner";
+import { Match } from "@/modules/match/domain/Match";
 
 export const TennisScoreboard = ({
   jornada,

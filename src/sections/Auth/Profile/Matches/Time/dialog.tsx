@@ -12,7 +12,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Match } from "@/modules/match/domain/Match";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { createApiSetsRepository } from "@/modules/sets/infra/ApiSetsRepository";
 import { createSets } from "@/modules/sets/application/create/createSets";
@@ -31,6 +30,7 @@ import { createApiShiftRepository } from "@/modules/shift/infra/ApiShiftReposito
 import { shiftForMatch } from "@/modules/shift/application/shift-for-match/shiftForMatch";
 registerLocale("es", es);
 import moment from "moment-timezone";
+import { Match } from "@/modules/match/domain/Match";
 
 interface EidtMatchDialogProps {
   onUpdateMatches?: () => void;

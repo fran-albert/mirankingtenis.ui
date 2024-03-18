@@ -13,10 +13,10 @@ import Link from "next/link";
 import { FaPencilAlt, FaTrashAlt } from "react-icons/fa";
 import useRoles from "@/hooks/useRoles";
 import DeleteMatchDialog from "../Delete/button";
-import { Match } from "@/modules/match/domain/Match";
 import { es } from "date-fns/locale/es";
 import { registerLocale } from "react-datepicker";
 import { formatDate } from "@/lib/utils";
+import { Match } from "@/modules/match/domain/Match";
 registerLocale("es", es);
 export const ScoreMatchCard = ({
   player1,

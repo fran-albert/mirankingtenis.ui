@@ -12,7 +12,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Match } from "@/modules/match/domain/Match";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { createApiSetsRepository } from "@/modules/sets/infra/ApiSetsRepository";
 import { createSets } from "@/modules/sets/application/create/createSets";
@@ -32,6 +31,7 @@ import { shiftForMatch } from "@/modules/shift/application/shift-for-match/shift
 registerLocale("es", es);
 import moment from "moment-timezone";
 import { updateShift } from "@/modules/shift/application/update/updateShift";
+import { Match } from "@/modules/match/domain/Match";
 
 interface EidtMatchDialogProps {
   onUpdateMatches?: () => void;
@@ -61,6 +61,7 @@ export default function UpdateShiftDialog({
       idCourt: Number(data.idCourt),
       startHour: data.startHour,
     };
+    console.log("dataToSend", dataToSend, match.id);
     try {
       const shiftCreationPromise = updateShiftFn(dataToSend, match.id);
       toast.promise(shiftCreationPromise, {

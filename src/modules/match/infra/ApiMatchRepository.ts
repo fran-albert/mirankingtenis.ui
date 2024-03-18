@@ -8,6 +8,11 @@ export function createApiMatchRepository(): MatchRepository {
     const matches = response.data as Match[];
     return matches;
   }
+  async function getAllByDate(): Promise<Match[]> {
+    const response = await axiosInstance.get(`matches/by-date`);
+    const matches = response.data as Match[];
+    return matches;
+  }
 
   async function getByCategoryAndMatchday(
     idCategory: number,
@@ -20,9 +25,7 @@ export function createApiMatchRepository(): MatchRepository {
     return matches;
   }
 
-  async function getMatchesByUser(
-    idUser: number,
-  ): Promise<Match[]> {
+  async function getMatchesByUser(idUser: number): Promise<Match[]> {
     const response = await axiosInstance.get(
       `matches/by-user?idUser=${idUser}`
     );
@@ -39,6 +42,7 @@ export function createApiMatchRepository(): MatchRepository {
     getAllMatches,
     getByCategoryAndMatchday,
     getMatchesByUser,
+    getAllByDate,
     deleteMatch,
   };
 }

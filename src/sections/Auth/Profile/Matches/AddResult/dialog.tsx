@@ -12,13 +12,13 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Match } from "@/modules/match/domain/Match";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { createApiSetsRepository } from "@/modules/sets/infra/ApiSetsRepository";
 import { createSets } from "@/modules/sets/application/create/createSets";
 import axios from "axios";
 import { MdScoreboard } from "react-icons/md";
 import ActionIcon from "@/components/ui/actionIcon";
+import { Match } from "@/modules/match/domain/Match";
 
 interface AddResultMatchDialogProps {
   onUpdateMatches?: () => void;
@@ -43,7 +43,6 @@ export default function AddResultMatchDialog({
   const setRepository = createApiSetsRepository();
   const createSetFn = createSets(setRepository);
 
-  console.log("match", match)
 
   const onSubmit: SubmitHandler<any> = async (formData) => {
     setFormData(formData); // Guarda los datos del formulario
@@ -58,7 +57,6 @@ export default function AddResultMatchDialog({
         setNumber: index + 1,
       })),
     };
-    console.log("dataToSend", dataToSend)
     try {
       const setCreationPromise = createSetFn(dataToSend);
       toast.promise(setCreationPromise, {
@@ -133,7 +131,6 @@ export default function AddResultMatchDialog({
                           {...register("sets.0.pointsPlayer1")}
                           type="number"
                           min="0"
-                          defaultValue="0"
                           max="7"
                           required
                           className="input input-bordered w-full sm:max-w-sm"
@@ -146,7 +143,6 @@ export default function AddResultMatchDialog({
                           {...register("sets.1.pointsPlayer1")}
                           type="number"
                           min="0"
-                          defaultValue="0"
                           max="7"
                           required
                           className="input input-bordered w-full sm:max-w-sm"
@@ -159,7 +155,6 @@ export default function AddResultMatchDialog({
                           type="number"
                           min="0"
                           max="10"
-                          defaultValue="0"
                           className="input input-bordered w-full sm:max-w-sm"
                         />
                       </td>
@@ -174,7 +169,6 @@ export default function AddResultMatchDialog({
                           type="number"
                           min="0"
                           max="7"
-                          defaultValue="0"
                           required
                           className="input input-bordered w-full max-w-sm"
                         />
@@ -185,7 +179,6 @@ export default function AddResultMatchDialog({
                           {...register("sets.1.pointsPlayer2")}
                           type="number"
                           min="0"
-                          defaultValue="0"
                           max="7"
                           required
                           className="input input-bordered w-full max-w-sm"
@@ -198,7 +191,6 @@ export default function AddResultMatchDialog({
                           type="number"
                           min="0"
                           max="10"
-                          defaultValue="0"
                           className="input input-bordered w-full max-w-sm"
                         />
                       </td>

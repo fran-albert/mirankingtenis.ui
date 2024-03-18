@@ -175,13 +175,24 @@ function Profile() {
                     defaultValue={user?.phone}
                   />
                 </div>
-                <div>
-                  <Label htmlFor="category">Categoría</Label>
-                  <Input
-                    className="w-full bg-gray-200 border-gray-300 text-gray-800 cursor-not-allowed"
-                    defaultValue={user?.category.name}
-                    readOnly
-                  />
+
+                <div className="md:flex md:gap-4">
+                  <div className="flex-1">
+                    <Label htmlFor="category">Categoría</Label>
+                    <Input
+                      className="w-full bg-gray-200 border-gray-300 text-gray-800 cursor-not-allowed"
+                      defaultValue={user?.category.name}
+                      readOnly
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <Label htmlFor="category">Ranking Inicial</Label>
+                    <Input
+                      className="w-full bg-gray-200 border-gray-300 text-gray-800 cursor-not-allowed"
+                      defaultValue={user?.category.name}
+                      readOnly
+                    />
+                  </div>
                 </div>
 
                 <div>
@@ -198,7 +209,7 @@ function Profile() {
                     selected={selectedCity}
                     onCityChange={(value) => {
                       setSelectedCity(value);
-                      setValue("idCity", (value));
+                      setValue("idCity", value);
                     }}
                   />
                 </div>
