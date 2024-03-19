@@ -43,7 +43,7 @@ export const Step4 = ({
       toast.promise(fixtureCreationPromise, {
         loading: "Creando fixture...",
         success: "Fixture creado con éxito!",
-        duration: 3000,
+        duration: 1000,
       });
       await fixtureCreationPromise;
       router.push("/partidos");
@@ -53,7 +53,7 @@ export const Step4 = ({
           error.response?.data?.message ||
           "Error desconocido al crear el fixture";
         toast.error(`Error al crear el fixture: ${errorMessage}`, {
-          duration: 3000,
+          duration: 1000,
         });
         console.error("Error al enviar los datos:", errorMessage);
       }

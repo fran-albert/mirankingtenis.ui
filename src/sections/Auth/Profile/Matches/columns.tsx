@@ -32,11 +32,11 @@ export const getColumns = (onUpdateMatches: () => void): ColumnDef<Match>[] => {
       cell: ({ row }) => {
         if (row.original.shift === null) {
           return (
-            <span className="px-3 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800"></span>
+            <span className="px-3 inline-flex text-xs w-16 leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800"></span>
           );
         }
         return (
-          <div className="flex items-center">
+          <div className="flex items-center w-48">
             {formatDateComplete(row.original.shift.startHour)} hs
           </div>
         );
@@ -62,11 +62,11 @@ export const getColumns = (onUpdateMatches: () => void): ColumnDef<Match>[] => {
       cell: ({ row }) => {
         if (row.original.status === "pending") {
           return (
-            <span className="px-3 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800"></span>
+            <span className="px-3 inline-flex text-xs leading-5 w-48 font-semibold rounded-full bg-yellow-100 text-yellow-800"></span>
           );
         }
         return (
-          <div className="flex items-center">
+          <div className="flex items-center w-48">
             {row.original.finalResult}
             {row.original.sets.map((set, index) => (
               <div className="m-2" key={index}>

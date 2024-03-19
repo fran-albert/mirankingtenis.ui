@@ -20,7 +20,7 @@ function MyMatchesPage() {
   const loadMatches = getMatchesByUser(matchRepository);
   const loadUser = getUser(userRepository);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  
+
   useEffect(() => {
     setIsLoading(true);
     const fetchUserAndMatches = async () => {

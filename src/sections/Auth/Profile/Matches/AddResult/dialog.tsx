@@ -43,7 +43,6 @@ export default function AddResultMatchDialog({
   const setRepository = createApiSetsRepository();
   const createSetFn = createSets(setRepository);
 
-
   const onSubmit: SubmitHandler<any> = async (formData) => {
     setFormData(formData); // Guarda los datos del formulario
     toggleConfirmDialog(); // Abre el diálogo de confirmación directamente
@@ -155,6 +154,7 @@ export default function AddResultMatchDialog({
                           type="number"
                           min="0"
                           max="10"
+                          defaultValue="0"
                           className="input input-bordered w-full sm:max-w-sm"
                         />
                       </td>
@@ -189,6 +189,7 @@ export default function AddResultMatchDialog({
                         <input
                           {...register("sets.2.pointsPlayer2")}
                           type="number"
+                          defaultValue="0"
                           min="0"
                           max="10"
                           className="input input-bordered w-full max-w-sm"

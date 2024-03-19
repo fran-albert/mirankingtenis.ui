@@ -26,7 +26,7 @@ export const ShiftTable = () => {
     }
   };
 
-  const playersColumns = getColumns();
+  const shiftsColumns = getColumns(matches.length);
 
   useEffect(() => {
     fetchMatches();
@@ -42,7 +42,7 @@ export const ShiftTable = () => {
     <>
       <h1 className="text-2xl text-center font-medium mb-4">Lista de Turnos</h1>
       <DataTable
-        columns={playersColumns}
+        columns={shiftsColumns}
         data={matches}
         searchPlaceholder="Buscar partido..."
         showSearch={false}

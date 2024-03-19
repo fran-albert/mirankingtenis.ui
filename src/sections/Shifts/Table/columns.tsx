@@ -8,20 +8,21 @@ import { Button } from "@/components/ui/button";
 import { Match } from "@/modules/match/domain/Match";
 import { formatDate, formatDateComplete } from "@/lib/utils";
 
-export const getColumns = (): ColumnDef<Match>[] => {
+export const getColumns = (totalRows: number): ColumnDef<Match>[] => {
   const columns: ColumnDef<Match>[] = [
     {
       accessorKey: "#",
       header: "#",
       cell: ({ row }) => {
-        const index = row.index;
-        return <div>{index + 1}</div>;
+        const reverseIndex = totalRows - row.index;
+        return <div>{reverseIndex}</div>;
       },
+      size: 100,
     },
     {
       header: "Partido",
       cell: ({ row }) => (
-        <div>
+        <div className="w-36">
           {row.original.user1.lastname} vs {row.original.user2.lastname}
         </div>
       ),
@@ -29,14 +30,28 @@ export const getColumns = (): ColumnDef<Match>[] => {
     {
       header: "Fecha",
       cell: ({ row }) => (
-        <div>{formatDateComplete(row.original.shift.startHour)}</div>
+        <div className="w-32">{formatDate(row.original.shift.startHour)}</div>
+      ),
+    },
+    {
+      header: "Cancha",
+      cell: ({ row }) => (
+        <div className="w-10">{row.original.shift.court.name}</div>
       ),
     },
     {
       header: "Estado",
       cell: ({ row }) => (
         <div>
-          {row.original.status === "pending" ? "Pendiente" : "Finalizado"}
+          {row.original.status === "pending" ? (
+            <span className="text-sm font-semibold text-red-600">
+              Pendiente
+            </span>
+          ) : (
+            <span className="text-sm font-semibold text-green-600">
+              Finalizado
+            </span>
+          )}
         </div>
       ),
     },
