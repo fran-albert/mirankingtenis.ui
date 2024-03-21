@@ -37,6 +37,10 @@ export function createApiMatchRepository(): MatchRepository {
     const response = await axiosInstance.delete(`matches/${id}`);
     return response.data;
   }
+  async function decideMatch(id: number): Promise<void> {
+    const response = await axiosInstance.post(`matches/${id}/decide-winner`);
+    return response.data;
+  }
 
   return {
     getAllMatches,
@@ -44,5 +48,6 @@ export function createApiMatchRepository(): MatchRepository {
     getMatchesByUser,
     getAllByDate,
     deleteMatch,
+    decideMatch,
   };
 }

@@ -7,6 +7,8 @@ import { User } from "@/modules/users/domain/User";
 import { Button } from "@/components/ui/button";
 import { Match } from "@/modules/match/domain/Match";
 import { formatDate, formatDateComplete } from "@/lib/utils";
+import { BadgeWin } from "@/components/Badge/Green/badge";
+import { BadgePending } from "@/components/Badge/Pending/badge";
 
 export const getColumns = (totalRows: number): ColumnDef<Match>[] => {
   const columns: ColumnDef<Match>[] = [
@@ -44,12 +46,12 @@ export const getColumns = (totalRows: number): ColumnDef<Match>[] => {
       cell: ({ row }) => (
         <div>
           {row.original.status === "pending" ? (
-            <span className="text-sm font-semibold text-red-600">
-              Pendiente
+            <span className="ml-2 text-sm font-semibold ">
+              <BadgePending text="Pendiente" />
             </span>
           ) : (
-            <span className="text-sm font-semibold text-green-600">
-              Finalizado
+            <span className="ml-2 text-sm font-semibold ">
+              <BadgeWin text="Finalizado" />
             </span>
           )}
         </div>

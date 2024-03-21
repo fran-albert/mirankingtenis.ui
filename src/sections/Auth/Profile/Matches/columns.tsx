@@ -9,6 +9,8 @@ import EditMatchDialog from "./Time/dialog";
 import { formatDate, formatDateComplete } from "@/lib/utils";
 import UpdateShiftDialog from "./EditTime/dialog";
 import { Match } from "@/modules/match/domain/Match";
+import { BadgeWin } from "@/components/Badge/Green/badge";
+import { BadgePending } from "@/components/Badge/Pending/badge";
 export const getColumns = (onUpdateMatches: () => void): ColumnDef<Match>[] => {
   const columns: ColumnDef<Match>[] = [
     {
@@ -84,13 +86,13 @@ export const getColumns = (onUpdateMatches: () => void): ColumnDef<Match>[] => {
       cell: ({ row }) => (
         <div className="flex items-center">
           {row.original.status === "played" ? (
-            <span className="px-3 inline-flex text-xs leading-5 font-bold rounded-full bg-green-600 text-gray-800">
-              Jugado
+            <span className="ml-2 text-sm font-semibold ">
+              <BadgeWin text="Jugado" />
             </span>
           ) : (
-            <span className="px-3 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-500 text-gray-900">
-              Pendiente
-            </span>
+            <span className="ml-2 text-sm font-semibold ">
+            <BadgePending text="Pendiente" />
+          </span>
           )}
         </div>
       ),

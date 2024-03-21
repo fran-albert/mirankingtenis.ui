@@ -24,6 +24,18 @@ export const TennisScoreboard = ({
     setMatches(updatedMatches);
   };
 
+  const fetchMatches = async () => {
+    const matches = await matchRepository.getByCategoryAndMatchday(
+      idCategory,
+      jornada
+    );
+    setMatches(matches);
+  };
+
+  useEffect(() => {
+    fetchMatches();
+  }, [jornada, idCategory]);
+
   useEffect(() => {
     const fetchMatches = async () => {
       const matches = await matchRepository.getByCategoryAndMatchday(
@@ -45,6 +57,7 @@ export const TennisScoreboard = ({
             player1={match.user1}
             player2={match.user2}
             match={match}
+            onMatchDecided={() => fetchMatches()}
             onDeleteMatch={() => handleDeleteMatch(match.id)}
           />
         ))}

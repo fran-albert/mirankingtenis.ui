@@ -17,22 +17,25 @@ import { es } from "date-fns/locale/es";
 import { registerLocale } from "react-datepicker";
 import { formatDate } from "@/lib/utils";
 import { Match } from "@/modules/match/domain/Match";
+import { BadgeWin } from "@/components/Badge/Green/badge";
+import DecideMatchDialog from "../DecideWinner/button";
 registerLocale("es", es);
 export const ScoreMatchCard = ({
   player1,
   player2,
   match,
+  onMatchDecided,
   onDeleteMatch,
 }: {
   player1: User;
   player2: User;
   match: Match;
+  onMatchDecided: () => void;
   onDeleteMatch: () => void;
 }) => {
   const { isAdmin } = useRoles();
   const handleEdit = (idPlayer: number) => {
     console.log(`Editar partido con ID: ${match}`);
-    // Aquí puedes añadir la lógica para editar el partido
   };
 
   console.log("Match", match);
@@ -78,8 +81,8 @@ export const ScoreMatchCard = ({
                   >
                     {player1.lastname}, {player1.name}
                     {match.idWinner === player1.id && (
-                      <span className="ml-2 text-sm font-semibold text-green-600">
-                        Ganador
+                      <span className="ml-2 text-sm font-semibold ">
+                        <BadgeWin text="Ganador" />
                       </span>
                     )}
                   </Link>
@@ -160,9 +163,18 @@ export const ScoreMatchCard = ({
         </div>
         {isAdmin && (
           <div className="flex items-center space-x-2">
-            <button onClick={() => handleEdit(player1.id)} className="p-2">
-              <FaPencilAlt className="text-slate-500 hover:text-slate-800" />
-            </button>
+            {match.status !== "played" ? (
+              <>
+                <DecideMatchDialog match={match} onMatchDecided={onMatchDecided} />
+                <button onClick={() => handleEdit(player1.id)}>
+                  <FaPencilAlt className="text-slate-500 hover:text-slate-800" />
+                </button>
+              </>
+            ) : (
+              <button onClick={() => handleEdit(player1.id)}>
+                <FaPencilAlt className="text-slate-500 hover:text-slate-800" />
+              </button>
+            )}
             <DeleteMatchDialog onDeleteMatch={onDeleteMatch} />
           </div>
         )}
