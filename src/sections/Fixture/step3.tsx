@@ -55,11 +55,23 @@ export const Step3 = ({
 
   const isPlayerSelectedElsewhere = (
     playerId: string,
-    currentMatchIndex: number
+    currentMatchIndex: number,
+    playerPosition: string
   ) => {
+    const playerNumId = Number(playerId);
     return matches.some((match, index) => {
       if (index !== currentMatchIndex) {
-        return match.idUser1 === playerId || match.idUser2 === playerId;
+        return match.idUser1 === playerNumId || match.idUser2 === playerNumId;
+      } else if (index === currentMatchIndex) {
+        // Verifica dentro del mismo partido si el jugador ya fue seleccionado en la otra posición
+        if (playerPosition === "player1" && match.idUser2 === playerNumId) {
+          return true;
+        } else if (
+          playerPosition === "player2" &&
+          match.idUser1 === playerNumId
+        ) {
+          return true;
+        }
       }
       return false;
     });
@@ -107,7 +119,8 @@ export const Step3 = ({
                             (player) =>
                               !isPlayerSelectedElsewhere(
                                 String(player.id),
-                                index
+                                index,
+                                "player1"
                               )
                           )
                           .map((player) => (
@@ -142,7 +155,8 @@ export const Step3 = ({
                             (player) =>
                               !isPlayerSelectedElsewhere(
                                 String(player.id),
-                                index
+                                index,
+                                "player2"
                               )
                           )
                           .map((player) => (
