@@ -12,12 +12,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import ActionIcon from "@/components/ui/actionIcon";
-import { FaTrashAlt } from "react-icons/fa";
 import { Match } from "@/modules/match/domain/Match";
 import { IoTennisballSharp } from "react-icons/io5";
 import { createApiMatchRepository } from "@/modules/match/infra/ApiMatchRepository";
 import { decideMatch } from "@/modules/match/application/decide-match/decideMatch";
 import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
 
 interface DecideMatchDialogProps {
   match: Match;
@@ -31,18 +31,34 @@ export default function DecideMatchDialog({
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const matchRepository = createApiMatchRepository();
   const decideMatchFn = decideMatch(matchRepository);
+  const [selectedPlayer, setSelectedPlayer] = useState<number | null>(null);
   const toggleDialog = () => setIsOpen(!isOpen);
 
-  const handleDecideMatch = async () => {
+  const selectPlayer = (playerId: any) => {
+    setSelectedPlayer(playerId === selectedPlayer ? null : playerId);
+  };
+
+  const onSubmit = async () => {
+    if (selectedPlayer === null) {
+      console.error("No se ha seleccionado ningún jugador.");
+      return;
+    }
+
+    const winnerUserId = Number(selectedPlayer);
+    if (isNaN(winnerUserId)) {
+      console.error("El ID del jugador seleccionado no es un número válido.");
+      return;
+    }
+
     try {
-      const decideMatchPromise = decideMatchFn(match.id);
-      await decideMatchPromise;
-      toast.success("Partido sorteado con éxito");
+      const result = await decideMatchFn(match.id, winnerUserId);
+      console.log("Resultado de la operación:", result);
+      toast.success("Partido decidido con éxito");
       onMatchDecided?.();
       toggleDialog();
     } catch (error) {
-      console.error("Error al sortear el partido", error);
-      toast.error("Error al sortear el partido");
+      console.error("Error al decidir el partido", error);
+      toast.error("Error al decidir el partido");
     }
   };
 
@@ -57,25 +73,54 @@ export default function DecideMatchDialog({
                 className="text-green-500 hover:text-green-700"
               />
             }
-            tooltip="Eliminar"
+            tooltip="Decidir Partido"
           />
         </button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Sortear Partido</DialogTitle>
+          <DialogTitle>Decidir Partido</DialogTitle>
         </DialogHeader>
-        <DialogDescription>
-          ¿Estás seguro de que quieres sortear este partido?
-        </DialogDescription>
-        <DialogFooter>
-          <Button variant="outline" onClick={toggleDialog}>
-            Cancelar
-          </Button>
-          <Button variant="green" onClick={handleDecideMatch}>
-            Confirmar
-          </Button>
-        </DialogFooter>
+        <form onSubmit={(e) => e.preventDefault()}>
+          <DialogDescription>
+            <div
+              className="cursor-pointer p-2"
+              onClick={() => selectPlayer(match.idUser1)}
+            >
+              <Badge
+                className={`${
+                  selectedPlayer === match.idUser1
+                    ? "bg-green-500 text-gray-900 font-bold"
+                    : "bg-gray-300 text-gray-900 font-bold"
+                }`}
+              >
+                {match?.user1.name} {match?.user1.lastname}
+              </Badge>
+            </div>
+            <div
+              className="cursor-pointer p-2"
+              onClick={() => selectPlayer(match.user2.id)}
+            >
+              <Badge
+                className={`${
+                  selectedPlayer === match.user2.id
+                    ? "bg-green-500 text-gray-900 font-bold"
+                    : "bg-gray-300 text-gray-900 font-bold"
+                }`}
+              >
+                {match?.user2.name} {match?.user2.lastname}
+              </Badge>
+            </div>
+          </DialogDescription>
+          <DialogFooter>
+            <Button variant="outline" onClick={toggleDialog}>
+              Cancelar
+            </Button>
+            <Button variant="green" onClick={onSubmit}>
+              Confirmar
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );

@@ -9,5 +9,5 @@ export interface MatchRepository {
   ) => Promise<Match[]>;
   getMatchesByUser: (idUser: number) => Promise<Match[]>;
   deleteMatch: (id: number) => Promise<void>;
-  decideMatch: (id: number) => Promise<void>;
+  decideMatch: (id: number, idUserWinner: number) => Promise<void>;
 }

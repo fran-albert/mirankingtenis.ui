@@ -4,8 +4,8 @@ import { Shift } from "@/modules/shift/domain/Shift";
 import { User } from "@/modules/users/domain/User";
 export interface Match {
   id: number;
-  idUser1: number | User[] | null;
-  idUser2: number | User[] | null;
+  idUser1: any;
+  idUser2: any;
   result: string;
   user1: User;
   user2: User;

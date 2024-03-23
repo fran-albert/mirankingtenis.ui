@@ -38,8 +38,6 @@ export const ScoreMatchCard = ({
     console.log(`Editar partido con ID: ${match}`);
   };
 
-  console.log("Match", match);
-
   return (
     <Card className="w-full transition duration-300 ease-in-out transform hover:scale-105 shadow-lg rounded-lg ">
       <CardHeader>
@@ -130,7 +128,7 @@ export const ScoreMatchCard = ({
                     {player2.lastname}, {player2.name}
                     {match.idWinner === player2.id && (
                       <span className="ml-2 text-sm font-semibold text-green-600">
-                        Ganador
+                        <BadgeWin text="Ganador" />
                       </span>
                     )}
                   </Link>
@@ -165,7 +163,10 @@ export const ScoreMatchCard = ({
           <div className="flex items-center space-x-2">
             {match.status !== "played" ? (
               <>
-                <DecideMatchDialog match={match} onMatchDecided={onMatchDecided} />
+                <DecideMatchDialog
+                  match={match}
+                  onMatchDecided={onMatchDecided}
+                />
                 <button onClick={() => handleEdit(player1.id)}>
                   <FaPencilAlt className="text-slate-500 hover:text-slate-800" />
                 </button>
