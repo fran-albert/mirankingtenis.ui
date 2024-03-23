@@ -25,6 +25,7 @@ interface DataTableProps<TData, TValue> {
   addLinkText?: string;
   searchColumn?: string;
   canAddUser?: boolean;
+  customFilter?: (data: TData, query: string) => boolean;
   onAddClick?: () => void;
 }
 
@@ -36,6 +37,7 @@ export function DataTable<TData, TValue>({
   addLinkPath = "/",
   addLinkText = "Agregar",
   searchColumn = "name",
+  customFilter,
   canAddUser = true,
   onAddClick,
 }: DataTableProps<TData, TValue>) {
@@ -47,8 +49,16 @@ export function DataTable<TData, TValue>({
     pageIndex: 0,
     pageSize: 16,
   });
+  const [searchInput, setSearchInput] = React.useState("");
+
+  const filteredData = React.useMemo(() => {
+    if (customFilter && searchInput) {
+      return data.filter((item) => customFilter(item, searchInput));
+    }
+    return data;
+  }, [data, customFilter, searchInput]);
   const table = useReactTable({
-    data,
+    data: filteredData,
     columns,
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
@@ -62,6 +72,10 @@ export function DataTable<TData, TValue>({
       pagination,
     },
   });
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchInput(event.target.value);
+  };
 
   const pageCount = table.getPageCount();
 
@@ -101,12 +115,8 @@ export function DataTable<TData, TValue>({
           <Search
             placeholder={searchPlaceholder}
             className="w-full px-4 py-2 border rounded-md"
-            value={
-              (table.getColumn(searchColumn)?.getFilterValue() as string) ?? ""
-            }
-            onChange={(event) =>
-              table.getColumn(searchColumn)?.setFilterValue(event.target.value)
-            }
+            value={searchInput}
+            onChange={handleSearchChange}
           />
           {canAddUser && (
             <Button

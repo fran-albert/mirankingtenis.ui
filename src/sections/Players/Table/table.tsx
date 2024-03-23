@@ -41,6 +41,14 @@ export const PlayersTable = () => {
     fetchUsers();
   }, []);
 
+  const customFilterFunction = (player: User, query: string) => {
+    const searchLowercase = query.toLowerCase();
+    return (
+      player.name.toLowerCase().includes(searchLowercase) ||
+      player.lastname.toLowerCase().includes(searchLowercase)
+    );
+  };
+
   if (isLoading) {
     return <Loading isLoading />;
   }
@@ -56,7 +64,7 @@ export const PlayersTable = () => {
         searchPlaceholder="Buscar jugadores..."
         showSearch={true}
         addLinkPath="jugadores/agregar"
-        searchColumn="name"
+        customFilter={customFilterFunction}
         addLinkText="Agregar Jugador"
         canAddUser={canAddUser}
       />
