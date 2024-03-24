@@ -29,6 +29,18 @@ export function createApiUserRepository(): UserRepository {
     return users;
   }
 
+  async function changePassword(
+    id: number,
+    data: User
+  ): Promise<User | undefined> {
+    const response = await axiosInstance.post(
+      `users/change-password/${id}`,
+      data
+    );
+    const user = response.data as User;
+    return user;
+  }
+
   async function getTotalUsers(): Promise<number> {
     const response = await axiosInstance.get(`account/all`, {});
     const user = response.data as User[];
@@ -103,6 +115,7 @@ export function createApiUserRepository(): UserRepository {
     getUser,
     createUser,
     updateUser,
+    changePassword,
     getUsersTotalByCategory,
     updatePhoto,
     requestResetPassword,

@@ -20,4 +20,7 @@ export interface User {
   idCity: string | number;
   position?: number;
   rankingInitial: number;
+  currentPassword: string;
+  newPassword: string;
+  confirmNewPassword: string;
 }

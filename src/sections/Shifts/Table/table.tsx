@@ -32,8 +32,6 @@ export const ShiftTable = () => {
     fetchMatches();
   }, []);
 
-  console.log(matches)
-
   if (isLoading) {
     return <Loading isLoading />;
   }

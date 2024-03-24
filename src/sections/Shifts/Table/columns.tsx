@@ -24,7 +24,7 @@ export const getColumns = (totalRows: number): ColumnDef<Match>[] => {
     {
       header: "Partido",
       cell: ({ row }) => (
-        <div className="w-36">
+        <div className="w-36 text-center">
           {row.original.user1.lastname} vs {row.original.user2.lastname}
         </div>
       ),
@@ -32,13 +32,15 @@ export const getColumns = (totalRows: number): ColumnDef<Match>[] => {
     {
       header: "Fecha",
       cell: ({ row }) => (
-        <div className="w-32">{formatDate(row.original.shift.startHour)}</div>
+        <div className="w-32 h-20 text-center">
+          {formatDateComplete(row.original.shift.startHour)}
+        </div>
       ),
     },
     {
       header: "Cancha",
       cell: ({ row }) => (
-        <div className="w-10">{row.original.shift.court.name}</div>
+        <div className="w-10 text-center">{row.original.shift.court.name}</div>
       ),
     },
     {

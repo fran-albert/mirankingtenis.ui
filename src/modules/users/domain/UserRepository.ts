@@ -13,6 +13,7 @@ export interface UserRepository {
   updatePhoto: (updatedPhoto: FormData, idUser: number) => Promise<string>;
   getUsersByCategory: (idCategory: number) => Promise<User[]>;
   deleteUser: (id: number) => Promise<User>;
+  changePassword: (id: number, data: User) => Promise<User | undefined>;
   requestResetPassword: (email: User) => Promise<User | undefined>;
   resetPassword: (
     resetPasswordToken: string,

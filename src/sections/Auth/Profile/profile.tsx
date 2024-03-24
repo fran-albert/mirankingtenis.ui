@@ -6,7 +6,6 @@ import Image from "next/image";
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { FaPencilAlt } from "react-icons/fa";
 import Loading from "@/components/Loading/loading";
-import DataIndex from "./Data";
 import { Button } from "@/components/ui/button";
 import { CategorySelect } from "@/components/Select/Category/select";
 import { CitySelect } from "@/components/Select/City/select";
@@ -23,6 +22,7 @@ import { updateUser } from "@/modules/users/application/update/updateUser";
 import ImageContainer from "./Image-Container";
 import { State } from "@/modules/state/domain/State";
 import { City } from "@/modules/city/domain/City";
+import ChangePasswordDialog from "./ChangePassword/dialog";
 
 interface Inputs extends User {}
 
@@ -87,8 +87,6 @@ function Profile() {
       // idCategory: parseInt(data.idCategory),
     };
 
-    console.log(dataToSend);
-
     try {
       const playerCreationPromise = updateUserFn(dataToSend, idUser);
       toast.promise(playerCreationPromise, {
@@ -123,7 +121,7 @@ function Profile() {
   return (
     <div className="flex justify-center w-full px-4 lg:px-0 m-2">
       <div className="w-full max-w-7xl bg-white rounded-xl">
-        <div className=" p-6 shadow rounded-lg">
+        <div className="p-6 shadow rounded-lg">
           {/* Header */}
           <div className="border-b pb-6">
             <h2 className="text-2xl font-semibold leading-tight">Mi Perfil</h2>
@@ -222,16 +220,18 @@ function Profile() {
                   defaultValue={user?.email}
                 />
               </div>
-              <div className="flex flex-col sm:flex-row justify-center gap-4 mt-10">
-                <Button
-                  className="w-full sm:w-auto"
-                  variant="outline"
-                  type="submit"
-                >
-                  Modificar Datos
-                </Button>
-              </div>
             </form>
+            <div className="flex justify-center gap-4 mt-10">
+              <Button
+                className="w-full sm:w-auto"
+                variant="outline"
+                type="button"
+                onClick={handleSubmit(onSubmit)}
+              >
+                Modificar Datos
+              </Button>
+              <ChangePasswordDialog id={idUser} />
+            </div>
           </div>
         </div>
       </div>
