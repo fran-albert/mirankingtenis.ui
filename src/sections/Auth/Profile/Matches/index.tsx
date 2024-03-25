@@ -7,6 +7,7 @@ import DeleteMatchDialog from "./Delete/button";
 import { formatDate, formatDateComplete } from "@/lib/utils";
 import { Match } from "@/modules/match/domain/Match";
 import UpdateShiftDialog from "./EditTime/dialog";
+import DeleteShiftDialog from "./DeleteShift/dialog";
 
 function MatchesIndex({
   match,
@@ -63,12 +64,16 @@ function MatchesIndex({
                   />
                 ) : (
                   <>
+                    <AddResultMatchDialog
+                      match={m}
+                      onUpdateMatches={onUpdateMatches}
+                    />
                     <UpdateShiftDialog
                       match={m}
                       onUpdateMatches={onUpdateMatches}
                     />
-                    <AddResultMatchDialog
-                      match={m}
+                    <DeleteShiftDialog
+                      idShift={2}
                       onUpdateMatches={onUpdateMatches}
                     />
                   </>

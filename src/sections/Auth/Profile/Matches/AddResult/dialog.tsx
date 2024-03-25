@@ -91,7 +91,7 @@ export default function AddResultMatchDialog({
     <>
       <Dialog open={isAddResultOpen} onOpenChange={setIsAddResultOpen}>
         <DialogTrigger asChild>
-          <Button variant="green">Resultado</Button>
+          <Button variant="green" className="text-xs">Resultado</Button>
         </DialogTrigger>
         <DialogContent className="max-w-xl">
           <DialogHeader>

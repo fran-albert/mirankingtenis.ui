@@ -11,18 +11,15 @@ import UpdateShiftDialog from "./EditTime/dialog";
 import { Match } from "@/modules/match/domain/Match";
 import { BadgeWin } from "@/components/Badge/Green/badge";
 import { BadgePending } from "@/components/Badge/Pending/badge";
+import DeleteShiftDialog from "./DeleteShift/dialog";
 export const getColumns = (onUpdateMatches: () => void): ColumnDef<Match>[] => {
   const columns: ColumnDef<Match>[] = [
     {
       header: "Fecha",
       cell: ({ row }) => (
-        <div className="flex items-center">
-          <div className="flex flex-col ml-2">
-            <p className="text-sm font-medium">
-              {row.original.fixture?.jornada}
-            </p>
-          </div>
-        </div>
+        <p className="text-sm font-medium text-center">
+          {row.original.fixture?.jornada}
+        </p>
       ),
     },
     {
@@ -53,9 +50,9 @@ export const getColumns = (onUpdateMatches: () => void): ColumnDef<Match>[] => {
           );
         }
         return (
-          <div className="flex items-center">
+          <p className="text-sm text-center">
             {row.original.shift.court?.name}
-          </div>
+          </p>
         );
       },
     },
@@ -91,8 +88,8 @@ export const getColumns = (onUpdateMatches: () => void): ColumnDef<Match>[] => {
             </span>
           ) : (
             <span className="ml-2 text-sm font-semibold ">
-            <BadgePending text="Pendiente" />
-          </span>
+              <BadgePending text="Pendiente" />
+            </span>
           )}
         </div>
       ),
@@ -100,7 +97,7 @@ export const getColumns = (onUpdateMatches: () => void): ColumnDef<Match>[] => {
     {
       header: " ",
       cell: ({ row }) => (
-        <div className="flex items-center justify-end space-x-1">
+        <div className="flex items-center justify-end">
           {row.original.status !== "played" && (
             <>
               {/* Si no está jugado y no tiene turno, muestra EditMatchDialog */}
@@ -111,12 +108,16 @@ export const getColumns = (onUpdateMatches: () => void): ColumnDef<Match>[] => {
                 />
               ) : (
                 <>
+                  <AddResultMatchDialog
+                    match={row.original}
+                    onUpdateMatches={onUpdateMatches}
+                  />
                   <UpdateShiftDialog
                     match={row.original}
                     onUpdateMatches={onUpdateMatches}
                   />
-                  <AddResultMatchDialog
-                    match={row.original}
+                  <DeleteShiftDialog
+                    idShift={Number(row.original.shift.id)}
                     onUpdateMatches={onUpdateMatches}
                   />
                 </>

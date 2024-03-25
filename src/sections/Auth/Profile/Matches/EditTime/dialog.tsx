@@ -55,7 +55,6 @@ export default function UpdateShiftDialog({
   const [startDate, setStartDate] = useState(new Date());
   const [selectedCourt, setSelectedCourt] = useState<string>("");
 
-
   const onSubmit = async (data: any) => {
     const dataToSend: any = {
       idCourt: Number(data.idCourt),
@@ -98,11 +97,11 @@ export default function UpdateShiftDialog({
     setValue("startHour", dateInUTC.format());
   };
 
-  return (  
+  return (
     <>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
-          <Button onClick={toggleDialog} variant="edit">
+          <Button onClick={toggleDialog} variant="edit" className="text-xs">
             Editar Turno
           </Button>
         </DialogTrigger>
