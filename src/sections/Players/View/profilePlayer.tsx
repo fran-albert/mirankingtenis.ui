@@ -65,7 +65,7 @@ function ProfilePlayer() {
         <div className="md:flex-1 md:mr-3 p-4">
           <UserCardComponent player={player} />
           <PersonalData player={player} />
-          <DetailsPlayer />
+          {/* <DetailsPlayer /> */}
         </div>
         <div className="flex-1 mt-3 md:mt-0 p-4">
           <MatchesDetails matches={matches} />

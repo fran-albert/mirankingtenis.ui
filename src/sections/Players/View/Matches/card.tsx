@@ -2,7 +2,7 @@ import { Match } from "@/modules/match/domain/Match";
 import React from "react";
 import { FaEdit } from "react-icons/fa";
 
-function MatchesDetails({ matches } : {matches: Match[]}) {
+function MatchesDetails({ matches }: { matches: Match[] }) {
   return (
     <div className="flex sm:mx-auto">
       <div className="bg-white p-4 rounded-lg overflow-hidden shadow-md w-full max-w-lg">
@@ -12,14 +12,13 @@ function MatchesDetails({ matches } : {matches: Match[]}) {
           </h3>
           <div className="space-y-4">
             {matches.map((match, index) => {
-              // Generamos la cadena de texto con los resultados de los sets
               const resultsString = match.sets
                 .map((set, index) => {
                   const setLabel =
                     index === 2 ? "Super Tiebreak" : `Set ${index + 1}`;
                   return `${setLabel}: ${set.pointsPlayer1} - ${set.pointsPlayer2}`;
                 })
-                .join(", "); // Unimos los resultados con ', '
+                .join(", ");
 
               return (
                 <div
@@ -31,7 +30,9 @@ function MatchesDetails({ matches } : {matches: Match[]}) {
                 >
                   <div>
                     <h3 className="text-lg font-bold text-gray-700">
-                      {match.finalResult}
+                      {match.finalResult === "pending"
+                        ? "Pendiente"
+                        : match.finalResult}
                     </h3>
                     <p className="text-gray-600">Rival: {match.rivalName}</p>
                     <p className="text-gray-600">{resultsString}</p>{" "}
