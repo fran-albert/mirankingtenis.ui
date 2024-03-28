@@ -4,10 +4,8 @@ import React from "react";
 
 function ShiftsPage() {
   return (
-    <div className="flex justify-center w-full px-4 lg:px-0 mt-2">
-      <div className="">
-        <ShiftTable />
-      </div>
+    <div className="container">
+      <ShiftTable />
     </div>
   );
 }

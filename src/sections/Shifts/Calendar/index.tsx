@@ -23,9 +23,8 @@ const localizer = momentLocalizer(moment);
 export const ShiftCalendar = ({ matches }: { matches: any }) => {
   const [events, setEvents] = useState<MatchEvent[]>([]);
   const [view, setView] = useState<View | undefined>(Views.DAY);
-  const availableViews = [Views.MONTH, Views.DAY];
+  const availableViews = [Views.DAY];
   const onView = useCallback((newView: View) => {
-    console.log("Cambiando la vista a:", newView);
     setView(newView);
   }, []);
 
@@ -37,7 +36,7 @@ export const ShiftCalendar = ({ matches }: { matches: any }) => {
     return events;
   };
 
-  const [date, setDate] = useState(new Date(2015, 3, 1));
+  const [date, setDate] = useState(new Date());
 
   const onNavigate = useCallback(
     (newDate: Date) => setDate(newDate),
@@ -87,27 +86,34 @@ export const ShiftCalendar = ({ matches }: { matches: any }) => {
   maxTime.setHours(22, 0, 0);
 
   return (
-    <div style={{ height: "95vh", width: "70vw" }}>
-      <Calendar
-        localizer={localizer}
-        events={events}
-        startAccessor="start"
-        endAccessor="end"
-        date={date}
-        messages={messages}
-        onView={onView}
-        views={availableViews}
-        view={view}
-        resources={resourceMap}
-        resourceIdAccessor="resourceId"
-        resourceTitleAccessor="resourceTitle"
-        min={minTime}
-        max={maxTime}
-        onNavigate={onNavigate}
-        components={{
-          event: CustomEvent,
-        }}
-      />
+    <div className="flex flex-col justify-center items-center w-full overflow-x-auto">
+      <div className="w-full px-2 max-h-[90vh] overflow-y-auto">
+        <h1 className="text-2xl text-center font-medium my-2">
+          Lista de Turnos
+        </h1>
+        <div className="responsive-calendar-container">
+          <Calendar
+            localizer={localizer}
+            events={events}
+            startAccessor="start"
+            endAccessor="end"
+            date={date}
+            messages={messages}
+            onView={onView}
+            views={availableViews}
+            view={view}
+            resources={resourceMap}
+            resourceIdAccessor="resourceId"
+            resourceTitleAccessor="resourceTitle"
+            min={minTime}
+            max={maxTime}
+            onNavigate={onNavigate}
+            components={{
+              event: CustomEvent,
+            }}
+          />
+        </div>
+      </div>
     </div>
   );
 };

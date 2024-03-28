@@ -39,7 +39,6 @@ export const ShiftTable = () => {
 
   return (
     <>
-      <h1 className="text-2xl text-center font-medium mb-4">Lista de Turnos</h1>
       <ShiftCalendar matches={matches} />
     </>
   );

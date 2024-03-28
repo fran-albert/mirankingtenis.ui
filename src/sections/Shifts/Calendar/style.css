@@ -4,11 +4,13 @@
   border: none !important;
 }
 
-/* Tus clases personalizadas */
+.rbc-event-label {
+  display: none !important;  /* Tus clases personalizadas */
+}
 .my-custom-event {
-  height: auto !important; /* Asegúrate de que el evento no tenga una altura fija */
-  min-height: 100% !important; /* Hace que el evento expanda para llenar el espacio disponible */
-  /* Otros estilos */
+  height: auto !important; /* Esto permitirá que el contenido determine la altura */
+  min-height: 100% !important; /* Esto hará que el evento ocupe toda la altura disponible */
+  /* Otros estilos que desees aplicar */
 }
 
 .my-pending-event {
