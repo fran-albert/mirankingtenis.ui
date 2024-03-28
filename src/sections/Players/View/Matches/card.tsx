@@ -36,10 +36,6 @@ function MatchesDetails({ matches }: { matches: Match[] }) {
                     </h3>
                     <p className="text-gray-600">Rival: {match.rivalName}</p>
                     <p className="text-gray-600">{resultsString}</p>{" "}
-                    {/* Mostramos los resultados aquí */}
-                  </div>
-                  <div>
-                    <FaEdit className="text-gray-600" />
                   </div>
                 </div>
               );

@@ -33,7 +33,6 @@ function LoginForm() {
       router.push("/mi-perfil");
     }
   }, [session, router]);
-
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     const { email, password } = data;
     setIsLoading(true);
@@ -51,10 +50,15 @@ function LoginForm() {
       } else {
         setLoginError("Error al iniciar sesión: " + result.error);
       }
-    } else {
-      router.push("/inicio");
     }
   };
+
+  useEffect(() => {
+    if (session) {
+      // Asegúrate de que tu objeto de sesión incluya el ID del usuario de alguna manera.
+      router.push(`/jugadores/${session.user.id}`);
+    }
+  }, [session, router]);
 
   return (
     <>

@@ -120,8 +120,8 @@ function Profile() {
 
   return (
     <div className="flex justify-center w-full px-4 lg:px-0 m-2">
-      <div className="w-full max-w-7xl bg-white rounded-xl">
-        <div className="p-6 shadow rounded-lg">
+      <div className="w-full max-w-7xl bg-white">
+        <div className="p-6">
           {/* Header */}
           <div className="border-b pb-6">
             <h2 className="text-2xl font-semibold leading-tight">Mi Perfil</h2>
@@ -145,7 +145,7 @@ function Profile() {
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center justify-center rounded-lg p-4 ">
+        <div className="flex flex-wrap items-center justify-center p-4 ">
           <div className="w-full p-4">
             <form onSubmit={handleSubmit(onSubmit)}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -187,7 +187,7 @@ function Profile() {
                     <Label htmlFor="category">Ranking Inicial</Label>
                     <Input
                       className="w-full bg-gray-200 border-gray-300 text-gray-800 cursor-not-allowed"
-                      defaultValue={user?.category.name}
+                      defaultValue={user?.historyRankings[0].position + "°"}
                       readOnly
                     />
                   </div>

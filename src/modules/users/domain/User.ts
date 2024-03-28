@@ -1,5 +1,6 @@
 import { Category } from "@/modules/category/domain/Category";
 import { City } from "@/modules/city/domain/City";
+import { HistoryRanking } from "@/modules/historyRanking/domain/HistoryRanking";
 import { Ranking } from "@/modules/ranking/domain/Ranking";
 
 export interface User {
@@ -23,4 +24,5 @@ export interface User {
   currentPassword: string;
   newPassword: string;
   confirmNewPassword: string;
+  historyRankings: HistoryRanking[];
 }

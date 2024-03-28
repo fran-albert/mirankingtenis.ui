@@ -29,6 +29,7 @@ import MatchesDetails from "./Matches/card";
 import { createApiMatchRepository } from "@/modules/match/infra/ApiMatchRepository";
 import { getMatchesByUser } from "@/modules/match/application/get-by-user/getMatchesByUser";
 import { Match } from "@/modules/match/domain/Match";
+import PlayerChart from "./HistoryRanking/chart";
 
 function ProfilePlayer() {
   const params = useParams();
@@ -61,14 +62,22 @@ function ProfilePlayer() {
 
   return (
     <>
-      <div className="md:flex block">
-        <div className="md:flex-1 md:mr-3 p-4">
-          <UserCardComponent player={player} />
-          <PersonalData player={player} />
-          {/* <DetailsPlayer /> */}
+      <div className="md:flex flex-wrap -mx-4">
+        <div className="md:w-1/2 p-4">
+          <div className=" mb-4">
+            <UserCardComponent player={player} />
+          </div>
+          <div className="">
+            <PlayerChart player={player} />
+          </div>
         </div>
-        <div className="flex-1 mt-3 md:mt-0 p-4">
-          <MatchesDetails matches={matches} />
+        <div className="md:w-1/2 p-4 ">
+          <div className=" mb-4">
+            <PersonalData player={player} />
+          </div>
+          <div className="">
+            <MatchesDetails matches={matches} />
+          </div>
         </div>
       </div>
     </>

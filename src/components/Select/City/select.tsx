@@ -45,8 +45,9 @@ export const CitySelect = ({
   }, [idState]);
 
   const handleChange = (value: string) => {
-    if (onCityChange) {
-      onCityChange(value);
+    const selectedCity = cities.find((city) => String(city.id) === value);
+    if (onCityChange && selectedCity) {
+      onCityChange(selectedCity.id.toString());
     }
   };
 
