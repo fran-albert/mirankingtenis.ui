@@ -7,6 +7,7 @@ import { getColumns } from "./columns";
 import { createApiMatchRepository } from "@/modules/match/infra/ApiMatchRepository";
 import { getAllByDate } from "@/modules/match/application/get-by-date/getAllByDate";
 import { Match } from "@/modules/match/domain/Match";
+import { ShiftCalendar } from "../Calendar";
 
 export const ShiftTable = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -26,7 +27,7 @@ export const ShiftTable = () => {
     }
   };
 
-  const shiftsColumns = getColumns(matches.length);
+  console.log(matches);
 
   useEffect(() => {
     fetchMatches();
@@ -39,15 +40,7 @@ export const ShiftTable = () => {
   return (
     <>
       <h1 className="text-2xl text-center font-medium mb-4">Lista de Turnos</h1>
-      <DataTable
-        columns={shiftsColumns}
-        data={matches}
-        searchPlaceholder="Buscar partido..."
-        showSearch={false}
-        addLinkPath="jugadores/agregar"
-        searchColumn="user1.lastname"
-        canAddUser={false}
-      />
+      <ShiftCalendar matches={matches} />
     </>
   );
 };

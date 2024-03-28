@@ -1,0 +1,16 @@
+.rbc-event {
+  background: none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* Tus clases personalizadas */
+.my-custom-event {
+  height: auto !important; /* Asegúrate de que el evento no tenga una altura fija */
+  min-height: 100% !important; /* Hace que el evento expanda para llenar el espacio disponible */
+  /* Otros estilos */
+}
+
+.my-pending-event {
+  color: red;
+}

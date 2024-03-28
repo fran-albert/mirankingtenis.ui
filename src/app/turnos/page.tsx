@@ -1,11 +1,11 @@
-"use client"
+"use client";
 import { ShiftTable } from "@/sections/Shifts/Table/table";
 import React from "react";
 
 function ShiftsPage() {
   return (
-    <div className="flex justify-center w-full px-4 lg:px-0 mt-10">
-      <div className="w-full max-w-7xl">
+    <div className="flex justify-center w-full px-4 lg:px-0 mt-2">
+      <div className="">
         <ShiftTable />
       </div>
     </div>
