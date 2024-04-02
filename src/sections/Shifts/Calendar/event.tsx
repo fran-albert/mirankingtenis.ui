@@ -9,7 +9,7 @@ export const CustomEvent = ({ event }: { event: any }) => {
 
   return (
     <div className="bg-slate-700 text-white text-xs p-1 sm:text-sm sm:p-2 rounded-lg shadow h-full">
-      <div className="font-bold text-sm">{event.title}</div>
+      <div className="font-bold">{event.title}</div>
       <div className="opacity-80">{`${startTime} - ${endTime}`}</div>
       {event.status === "pending" && (
         <div className="mt-1">

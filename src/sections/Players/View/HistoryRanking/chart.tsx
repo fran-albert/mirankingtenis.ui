@@ -25,6 +25,7 @@ function PlayerChart({ player }: { player: User | undefined }) {
     position: ranking.position,
   }));
 
+  console.log(historyRankings, "historiyRankings", data, "data");
   const minY = data.length > 0 ? Math.min(...data.map((d) => d.position)) : 1;
 
   const maxY =

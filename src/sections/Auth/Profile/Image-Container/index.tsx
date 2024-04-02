@@ -3,6 +3,7 @@ import { createApiUserRepository } from "@/modules/users/infra/ApiUserRepository
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { FaPencilAlt } from "react-icons/fa";
 import Loading from "@/components/Loading/loading";
+import Image from "next/image";
 import { toast } from "sonner";
 import { updatePhoto } from "@/modules/users/application/update-photo/updatePhoto";
 import { useProfilePhoto } from "@/context/ProfilePhotoContext";
@@ -50,14 +51,15 @@ function ImageContainer({ user }: { user: User | undefined }) {
       {/* Image Container */}
       <div className="group rounded-2xl overflow-hidden">
         {selectedImage ? (
-          <img
+          <Image
             src={selectedImage}
             alt="Profile Picture"
+            width={100} // Estos valores determinan el tamaño de la imagen y ayudan con la optimización
+            height={100}
             className="rounded-2xl"
-            style={{ width: "100px", height: "100px" }}
           />
         ) : (
-          <img
+          <Image
             src={
               user?.photo
                 ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${user.photo}.jpeg`
@@ -69,6 +71,7 @@ function ImageContainer({ user }: { user: User | undefined }) {
             className="rounded-2xl"
           />
         )}
+
         {/* Edit Icon Container */}
         <div className="absolute bottom-0 right-0 mb-2 mr-2 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out">
           <div

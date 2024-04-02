@@ -10,6 +10,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { FaCamera } from "react-icons/fa";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import { toast } from "sonner";
+import Image from "next/image";
+
 import "react-datepicker/dist/react-datepicker.css";
 import { User } from "@/modules/users/domain/User";
 import { createApiUserRepository } from "@/modules/users/infra/ApiUserRepository";
@@ -17,43 +19,41 @@ import { getUser } from "@/modules/users/application/get/getUser";
 interface Inputs extends User {}
 
 function EditPlayerForm({ user }: { user: User | null }) {
-  const [selectedState, setSelectedState] = useState<string>("");
-  const [selectedCity, setSelectedCity] = useState<string | undefined>(
-    undefined
-  );
+  const [selectedState, setSelectedState] = useState<number>(0);
+  const [selectedCity, setSelectedCity] = useState<number>(0);
   const userRepository = createApiUserRepository();
   const loadUser = getUser(userRepository);
-  //   const {
-  //     register,
-  //     handleSubmit,
-  //     watch,
-  //     formState: { errors },
-  //     setValue,
-  //   } = useForm<Inputs>();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+  } = useForm<Inputs>();
   //   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         const userData = await loadUser(Number(user?.id));
-        setSelectedState(String(userData?.city.idState));
-        setSelectedCity(String(userData?.city.id));
+        setSelectedState(Number(userData?.city.idState));
+        setSelectedCity(Number(userData?.city.id));
       } catch (error) {
         console.log(error);
       }
     };
 
     fetchUsers();
-  }, []);
+  }, [loadUser, user?.id]);
+
   //   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   //   const inputFileRef = useRef<HTMLInputElement>(null);
-  const handleStateChange = (idState: string) => {
-    setSelectedState(idState);
-    setSelectedCity(undefined);
-  };
+  // const handleStateChange = (idState: string) => {
+  //   setSelectedState(idState);
+  //   setSelectedCity(undefined);
+  // };
 
-  const handleCityChange = (idCity: string) => {
-    setSelectedCity(idCity);
-  };
+  // const handleCityChange = (idCity: string) => {
+  //   setSelectedCity(idCity);
+  // };
 
   //   const handleHealthInsuranceChange = (healthInsurance: HealthInsurance) => {
   //     setSelectedHealthInsurance(healthInsurance);
@@ -158,6 +158,10 @@ function EditPlayerForm({ user }: { user: User | null }) {
   //     setValue("birthDate", formattedDateISO);
   //   };
 
+  const handleStateChange = (selectedState: number) => {
+    setSelectedState(selectedState);
+  };
+
   return (
     <>
       <div className="w-1/2 p-6 mt-4 items-center justify-center border shadow-xl rounded-lg max-w-4xl mx-auto bg-white">
@@ -175,16 +179,17 @@ function EditPlayerForm({ user }: { user: User | null }) {
         <div className="flex flex-col items-center text-center">
           <div className="relative mb-3">
             <div className="group rounded-2xl overflow-hidden">
-              <img
+              <Image
                 src={
                   user?.photo
                     ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${user.photo}.jpeg`
                     : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/default2.png"
                 }
-                alt="Imagen del Paciente"
+                alt="Imagen del Jugador"
                 width={100}
                 height={100}
                 className="rounded-2xl"
+                layout="fixed"
               />
 
               <div className="absolute bottom-0 right-0 mb-2 mr-2 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out">
@@ -260,9 +265,12 @@ function EditPlayerForm({ user }: { user: User | null }) {
               <div>
                 <Label htmlFor="city">Ciudad</Label>
                 <CitySelect
-                  idState={selectedState}
-                  selected={selectedCity}
-                  onCityChange={handleCityChange}
+                  idState={Number(selectedState)}
+                  selected={String(selectedCity)}
+                  onCityChange={(value) => {
+                    setSelectedCity(Number(value));
+                    setValue("idCity", value);
+                  }}
                 />
               </div>
             </div>

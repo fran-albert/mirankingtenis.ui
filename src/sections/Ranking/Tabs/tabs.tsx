@@ -1,5 +1,4 @@
-import { Category } from "@/modules/category/domain/Category";
-import { createApiCategoryRepository } from "@/modules/category/infra/ApiCategoryRepository";
+import useCategoriesStore from "@/context/CategoriesContext";
 import React, { useEffect, useState } from "react";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 
@@ -8,21 +7,14 @@ function RankingTabs({
 }: {
   onSelectCategory: (idCategory: number) => void;
 }) {
-  const [activeCategory, setActiveCategory] = useState(1);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const categoryRepository = createApiCategoryRepository();
-  const activeCategoryIndex = categories.findIndex(
-    (category) => category.id === activeCategory
-  );
+  const { categories, activeCategory, setActiveCategory, loadCategories } =
+    useCategoriesStore();
 
   useEffect(() => {
-    const fetchCategories = async () => {
-      const fetchedCategories = await categoryRepository.getAllCategories();
-      setCategories(fetchedCategories);
-    };
-
-    fetchCategories();
-  }, [categoryRepository]);
+    if (categories.length === 0) {
+      loadCategories();
+    }
+  }, [loadCategories, categories.length]);
 
   const handleSelectCategory = (idCategory: number) => {
     setActiveCategory(idCategory);
@@ -30,7 +22,7 @@ function RankingTabs({
   };
 
   const scrollLeft = () => {
-    const prevIndex = Math.max(0, activeCategoryIndex - 1);
+    const prevIndex = Math.max(0, activeCategory - 1);
     const prevCategory = categories[prevIndex];
     if (prevCategory) {
       setActiveCategory(prevCategory.id);
@@ -39,7 +31,7 @@ function RankingTabs({
   };
 
   const scrollRight = () => {
-    const nextIndex = Math.min(categories.length - 1, activeCategoryIndex + 1);
+    const nextIndex = Math.min(categories.length - 1, activeCategory + 1);
     const nextCategory = categories[nextIndex];
     if (nextCategory) {
       setActiveCategory(nextCategory.id);

@@ -14,8 +14,9 @@ import { useEffect, useState } from "react";
 interface CitySelectProps {
   selected?: string;
   onCityChange?: (value: string) => void;
-  idState?: string;
+  idState?: number;
 }
+const cityRepository: CityRepository = createApiCityRepository();
 
 export const CitySelect = ({
   selected,
@@ -23,15 +24,12 @@ export const CitySelect = ({
   idState,
 }: CitySelectProps) => {
   const [cities, setCities] = useState<City[]>([]);
-  const cityRepository: CityRepository = createApiCityRepository();
 
   useEffect(() => {
     if (idState) {
       const loadCities = async () => {
         try {
-          const loadedCities = await cityRepository.getAllByState(
-            parseInt(idState, 10)
-          );
+          const loadedCities = await cityRepository.getAllByState(idState);
           setCities(loadedCities || []);
         } catch (error) {
           console.error("Error al obtener las localidades:", error);

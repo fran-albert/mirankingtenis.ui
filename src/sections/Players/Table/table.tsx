@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Loading from "@/components/Loading/loading";
 import { DataTable } from "@/components/Table/dataTable";
 import { getColumns } from "./columns";
@@ -11,23 +11,29 @@ import { useCustomSession } from "@/context/SessionAuthProviders";
 export const PlayersTable = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [players, setPlayers] = useState<User[]>([]);
-  const userRepository = createApiUserRepository();
-  const loadAllPlayers = getAllUsers(userRepository);
+  const userRepository = useMemo(() => createApiUserRepository(), []);
+  const loadAllPlayers = useCallback(async () => {
+    const users = await getAllUsers(userRepository)();
+    return users;
+  }, [userRepository]);
   const { isAdmin } = useRoles();
   const { session } = useCustomSession();
   const canAddUser = !!session && isAdmin;
 
-  const fetchUsers = async () => {
-    try {
-      setIsLoading(true);
-      const userData = await loadAllPlayers();
-      setPlayers(userData);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        setIsLoading(true);
+        const userData = await loadAllPlayers();
+        setPlayers(userData);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchUsers();
+  }, [loadAllPlayers]);
 
   const handlePlayerDeleted = (idPlayer: number) => {
     setPlayers((currentPlayers) =>
@@ -37,20 +43,12 @@ export const PlayersTable = () => {
 
   const playersColumns = getColumns(handlePlayerDeleted, { isAdmin });
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  const customFilterFunction = (player: User, query: string) => {
-    const searchLowercase = query.toLowerCase();
-    return (
-      player.name.toLowerCase().includes(searchLowercase) ||
-      player.lastname.toLowerCase().includes(searchLowercase)
-    );
-  };
+  const customFilterFunction = (player: User, query: string) =>
+    player.name.toLowerCase().includes(query.toLowerCase()) ||
+    player.lastname.toLowerCase().includes(query.toLowerCase());
 
   if (isLoading) {
-    return <Loading isLoading />;
+    return <Loading isLoading={true} />;
   }
 
   return (

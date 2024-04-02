@@ -10,13 +10,13 @@ import { State } from "@/modules/state/domain/State";
 import { createApiStateRepository } from "@/modules/state/infra/ApiStateRepository";
 
 interface StateSelectProps {
-  selected?: string;
-  onStateChange?: (value: string) => void;
+  selected?: number;
+  onStateChange?: (value: number) => void;
 }
 
+const stateRepository = createApiStateRepository();
 export const StateSelect = ({ selected, onStateChange }: StateSelectProps) => {
   const [states, setStates] = useState<State[]>([]);
-  const stateRepository = createApiStateRepository();
 
   useEffect(() => {
     const loadStates = async () => {
@@ -36,12 +36,12 @@ export const StateSelect = ({ selected, onStateChange }: StateSelectProps) => {
       (state) => String(state.id) === selectedId
     );
     if (onStateChange && selectedState) {
-      onStateChange(String(selectedState.id));
+      onStateChange(selectedState.id);
     }
   };
 
   return (
-    <Select value={selected} onValueChange={handleValueChange}>
+    <Select value={String(selected)} onValueChange={handleValueChange}>
       <SelectTrigger className="w-full bg-gray-200 border-gray-300 text-gray-800">
         <SelectValue placeholder="Seleccione la provincia..." />
       </SelectTrigger>

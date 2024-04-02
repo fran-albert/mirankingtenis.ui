@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Loading from "@/components/Loading/loading";
 import { DataTable } from "@/components/Table/dataTable";
 import { User } from "@/modules/users/domain/User";
@@ -12,26 +12,27 @@ import { ShiftCalendar } from "../Calendar";
 export const ShiftTable = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [matches, setMatches] = useState<Match[]>([]);
-  const matchRepository = createApiMatchRepository();
-  const loadAllMatches = getAllByDate(matchRepository);
-
-  const fetchMatches = async () => {
-    try {
-      setIsLoading(true);
-      const matchData = await loadAllMatches();
-      setMatches(matchData);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  console.log(matches);
+  const matchRepository = useMemo(() => createApiMatchRepository(), []);
+  const loadAllMatches = useMemo(
+    () => getAllByDate(matchRepository),
+    [matchRepository]
+  );
 
   useEffect(() => {
+    const fetchMatches = async () => {
+      try {
+        setIsLoading(true);
+        const matchData = await loadAllMatches();
+        setMatches(matchData);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
     fetchMatches();
-  }, []);
+  }, [loadAllMatches])
 
   if (isLoading) {
     return <Loading isLoading />;

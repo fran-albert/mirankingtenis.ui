@@ -28,14 +28,6 @@ export const ShiftCalendar = ({ matches }: { matches: any }) => {
     setView(newView);
   }, []);
 
-  const sortEvents = (events: MatchEvent[]): MatchEvent[] => {
-    if (view === Views.DAY) {
-      events.sort((a, b) => a.start.getTime() - b.start.getTime());
-      return events.sort((a, b) => a.shift.court.id - b.shift.court.id);
-    }
-    return events;
-  };
-
   const [date, setDate] = useState(new Date());
 
   const onNavigate = useCallback(
@@ -44,6 +36,14 @@ export const ShiftCalendar = ({ matches }: { matches: any }) => {
   );
 
   useEffect(() => {
+    const sortEvents = (events: MatchEvent[]): MatchEvent[] => {
+      if (view === Views.DAY) {
+        events.sort((a, b) => a.start.getTime() - b.start.getTime());
+        return events.sort((a, b) => a.shift.court.id - b.shift.court.id);
+      }
+      return events;
+    };
+
     let myEventsList: MatchEvent[] = matches.map((match: any) => ({
       title: `${match.user1.lastname} vs ${match.user2.lastname}`,
       start: new Date(match.shift.startHour),

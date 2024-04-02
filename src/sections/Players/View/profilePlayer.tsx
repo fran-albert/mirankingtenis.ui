@@ -19,7 +19,7 @@ import {
   FaUser,
   FaRegFilePdf,
 } from "react-icons/fa";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { GiWeightLiftingUp } from "react-icons/gi";
 import UserCardComponent from "./Card/card";
@@ -33,21 +33,27 @@ import PlayerChart from "./HistoryRanking/chart";
 
 function ProfilePlayer() {
   const params = useParams();
-  const id = params.id;
+  const idParam = params.id;
   const [player, setPlayer] = useState<User>();
   const [matches, setMatches] = useState<Match[]>([]);
-  const matchRepository = createApiMatchRepository();
-  const loadMatches = getMatchesByUser(matchRepository);
+  const matchRepository = useMemo(() => createApiMatchRepository(), []);
+  const userRepository = useMemo(() => createApiUserRepository(), []);
+
+  const loadMatches = useCallback(
+    (id: number) => getMatchesByUser(matchRepository)(id),
+    [matchRepository]
+  );
+  const loadUser = useCallback(
+    (id: number) => getUser(userRepository)(id),
+    [userRepository]
+  );
+
   const [isLoading, setIsLoading] = useState<boolean>(true);
-
-  const userRepository = createApiUserRepository();
-  const loadUser = getUser(userRepository);
-
+  const idUser = Number(idParam);
   useEffect(() => {
     setIsLoading(true);
     const fetchUserAndMatches = async () => {
       try {
-        const idUser = Number(id);
         const userData = await loadUser(idUser);
         setPlayer(userData);
         const userMatches = await loadMatches(idUser);
@@ -58,7 +64,7 @@ function ProfilePlayer() {
       }
     };
     fetchUserAndMatches();
-  }, [Number(id)]);
+  }, [idUser, loadMatches, loadUser]);
 
   return (
     <>

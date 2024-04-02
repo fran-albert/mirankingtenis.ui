@@ -8,7 +8,7 @@ import EditPlayerForm from "@/sections/Players/Edit/EditPlayerForm";
 // import { createApiPatientRepository } from "@/modules/patients/infra/ApiPatientRepository";
 // import EditPatientForm from "@/sections/users/patients/edit/EditPatientForm";
 import { useParams } from "next/navigation";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
 function EditPlayerPage() {
   const [user, setUser] = useState<User | null>(null);
@@ -17,9 +17,9 @@ function EditPlayerPage() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const userRepository = createApiUserRepository();
-    const loadUser = getUser(userRepository);
+  const loadUser = getUser(userRepository);
 
-  const fetchUser = async () => {
+  const fetchUser = useCallback(async () => {
     try {
       setIsLoading(true);
       const userData = await loadUser(Number(id));
@@ -29,12 +29,12 @@ function EditPlayerPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [id, loadUser]);
 
   useEffect(() => {
     fetchUser();
-  }, []);
-
+  }, [fetchUser]);
+  
   if (isLoading) {
     return <Loading isLoading />;
   }

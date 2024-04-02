@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Loading from "@/components/Loading/loading";
 import { DataTable } from "@/components/Table/dataTable";
 import { getColumns } from "./columns";
@@ -13,24 +13,28 @@ export const RankingTable = ({
 }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [ranking, setRanking] = useState<Ranking[]>([]);
-  const rankingRepository = createApiRankingRepositroy();
-  const loadRanking = getRankingByCategory(rankingRepository);
-
-  const fetchRanking = async (idCategory: number) => {
-    try {
-      setIsLoading(true);
-      const rankingData = await loadRanking(idCategory);
-      setRanking(rankingData);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const rankingRepository = useMemo(() => createApiRankingRepositroy(), []);
+  const loadRanking = useMemo(
+    () => getRankingByCategory(rankingRepository),
+    [rankingRepository]
+  );
 
   useEffect(() => {
-    fetchRanking(selectedCategory);
-  }, [selectedCategory]);
+    const fetchRanking = async () => {
+      try {
+        setIsLoading(true);
+        const rankingData = await loadRanking(selectedCategory);
+        setRanking(rankingData);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchRanking();
+  }, [selectedCategory, loadRanking]);
+
   const rankingColumns = getColumns();
 
   if (isLoading) {

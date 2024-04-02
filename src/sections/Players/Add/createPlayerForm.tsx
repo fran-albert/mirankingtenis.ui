@@ -24,8 +24,8 @@ function CreatePlayerForm() {
     formState: { errors },
     setValue,
   } = useForm<Inputs>();
-  const [selectedState, setSelectedState] = useState("");
-  const [selectedCity, setSelectedCity] = useState("");
+  const [selectedState, setSelectedState] = useState(0);
+  const [selectedCity, setSelectedCity] = useState(0);
   const [selectedCategory, setSelectedCategory] = useState("");
   const userRepository = createApiUserRepository();
   const createUserFn = createUser(userRepository);
@@ -112,17 +112,17 @@ function CreatePlayerForm() {
               <div>
                 <Label htmlFor="state">Provincia</Label>
                 <StateSelect
-                  selected={selectedState}
+                  selected={Number(selectedState)}
                   onStateChange={setSelectedState}
                 />
               </div>
               <div>
                 <Label htmlFor="city">Localidad</Label>
                 <CitySelect
-                  idState={selectedState}
-                  selected={selectedCity}
+                  idState={Number(selectedState)}
+                  selected={String(selectedCity)}
                   onCityChange={(value) => {
-                    setSelectedCity(value);
+                    setSelectedCity(Number(value));
                     setValue("idCity", value);
                   }}
                 />

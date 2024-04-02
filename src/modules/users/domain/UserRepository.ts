@@ -7,7 +7,7 @@ export interface UserRepository {
   getUsersTotalByCategory: (idCategory: number) => Promise<number>;
   createUser: (newUser: User) => Promise<User | undefined>;
   updateUser: (
-    updatedUser: User,
+    updatedUser: Partial<User>,
     idUser: number
   ) => Promise<User | undefined>;
   updatePhoto: (updatedPhoto: FormData, idUser: number) => Promise<string>;

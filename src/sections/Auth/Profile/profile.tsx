@@ -1,37 +1,25 @@
 import { useCustomSession } from "@/context/SessionAuthProviders";
-import { getUser } from "@/modules/users/application/get/getUser";
 import { User } from "@/modules/users/domain/User";
-import { createApiUserRepository } from "@/modules/users/infra/ApiUserRepository";
-import Image from "next/image";
 import React, { useEffect, useRef, useState, useCallback } from "react";
-import { FaPencilAlt } from "react-icons/fa";
 import Loading from "@/components/Loading/loading";
 import { Button } from "@/components/ui/button";
-import { CategorySelect } from "@/components/Select/Category/select";
 import { CitySelect } from "@/components/Select/City/select";
 import { StateSelect } from "@/components/Select/State/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
 import { goBack } from "@/lib/utils";
-import { createUser } from "@/modules/users/application/create/createUser";
 import axios from "axios";
-import { useForm, SubmitHandler } from "react-hook-form";
+import { useForm, SubmitHandler, set } from "react-hook-form";
 import { toast } from "sonner";
-import { updateUser } from "@/modules/users/application/update/updateUser";
 import ImageContainer from "./Image-Container";
-import { State } from "@/modules/state/domain/State";
-import { City } from "@/modules/city/domain/City";
 import ChangePasswordDialog from "./ChangePassword/dialog";
+import useUserStore from "@/context/UserContext";
 
 interface Inputs extends User {}
 
 function Profile() {
   const { session } = useCustomSession();
   const idUser = session?.user.id as number;
-  const [user, setUser] = useState<User | undefined>(undefined);
-  const userRepository = createApiUserRepository();
-  const loadUser = getUser(userRepository);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const {
     register,
@@ -39,27 +27,32 @@ function Profile() {
     formState: { errors },
     setValue,
   } = useForm<Inputs>();
-  const [selectedState, setSelectedState] = useState("");
-  const [selectedCity, setSelectedCity] = useState("");
-  const updateUserFn = updateUser(userRepository);
-  const [cities, setCities] = useState<City[]>([]);
+  const [selectedState, setSelectedState] = useState(0);
+  const [selectedCity, setSelectedCity] = useState(0);
+  const { user, loadUser, updateUser } = useUserStore();
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const userData = await loadUser(idUser);
-        if (userData && userData.city) {
-          setUser(userData);
-          setSelectedState(userData.city.idState.toString());
-          setSelectedCity(userData.city.id.toString());
+    const fetchData = async () => {
+      if (session?.user.id) {
+        setIsLoading(true);
+        try {
+          await loadUser(session.user.id);
+          setSelectedState(Number(user?.city.idState));
+          setSelectedCity(Number(user?.city.id));
+        } catch (error) {
+          console.error("Error cargando el usuario:", error);
+        } finally {
           setIsLoading(false);
         }
-      } catch (error) {
-        console.error(error);
       }
     };
-    fetchUser();
-  }, [idUser, loadUser, setValue]);
+
+    fetchData();
+  }, [session?.user.id, loadUser, user?.city.idState, user?.city.id]);
+
+  if (isLoading) {
+    return <Loading isLoading />;
+  }
 
   // const handleStateChange = (selectedState: State | undefined) => {
   //   console.log("Seleccionando provincia:", selectedState);
@@ -83,18 +76,13 @@ function Profile() {
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     const dataToSend = {
       ...data,
-      // idCity: parseInt(data.idCity),
-      // idCategory: parseInt(data.idCategory),
+      idCity: data.idCity,
     };
 
     try {
-      const playerCreationPromise = updateUserFn(dataToSend, idUser);
-      toast.promise(playerCreationPromise, {
-        loading: "Actualizando datos...",
-        success: "Datos actualizados con éxito!",
-        duration: 3000,
-      });
-      await playerCreationPromise;
+      await updateUser(idUser, dataToSend);
+      await loadUser(idUser);
+      toast.success("Datos actualizados con éxito!", { duration: 3000 });
       goBack();
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -113,10 +101,6 @@ function Profile() {
       }
     }
   };
-
-  if (isLoading) {
-    return <Loading isLoading />;
-  }
 
   return (
     <div className="flex justify-center w-full px-4 lg:px-0 m-2">
@@ -196,17 +180,17 @@ function Profile() {
                 <div>
                   <Label htmlFor="state">Provincia</Label>
                   <StateSelect
-                    selected={selectedState}
+                    selected={Number(selectedState)}
                     onStateChange={setSelectedState}
                   />
                 </div>
                 <div>
                   <Label htmlFor="city">Ciudad</Label>
                   <CitySelect
-                    idState={selectedState}
-                    selected={selectedCity}
+                    idState={Number(selectedState)}
+                    selected={String(selectedCity)}
                     onCityChange={(value) => {
-                      setSelectedCity(value);
+                      setSelectedCity(Number(value));
                       setValue("idCity", value);
                     }}
                   />
