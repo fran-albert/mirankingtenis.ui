@@ -1,12 +1,37 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { TennisScoreboard } from "../../sections/Matches/TennisScoreBoard/tennisScoreBoard";
 import FixtureTabs from "@/sections/Matches/FixtureTabs/tabs";
 import RankingTabs from "@/sections/Ranking/Tabs/tabs";
+import { createApiFixtureRepository } from "@/modules/fixture/infra/ApiFixtureRepository";
 
 function MatchesPage() {
   const [selectedJornada, setSelectedJornada] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState(1);
+  const [jornadas, setJornadas] = useState<number[]>([]);
+  const fixtureRepository = createApiFixtureRepository();
+
+  useEffect(() => {
+    const fetchJornadas = async () => {
+      try {
+        const numeroDeJornadas = await fixtureRepository.countByCategory(
+          selectedCategory
+        );
+        const jornadasArray = Array.from(
+          { length: numeroDeJornadas },
+          (_, i) => i + 1
+        );
+        setJornadas(jornadasArray);
+        setSelectedJornada(jornadasArray[jornadasArray.length - 1]);
+      } catch (error) {
+        console.error("Error fetching número de jornadas", error);
+      }
+    };
+
+    if (selectedCategory) {
+      fetchJornadas();
+    }
+  }, [selectedCategory]);
   return (
     <>
       <div className="flex justify-center w-full px-4 lg:px-0 mt-10">
@@ -19,6 +44,8 @@ function MatchesPage() {
           />
           <FixtureTabs
             onSelectJornada={(jornada) => setSelectedJornada(jornada)}
+            selectedJornada={selectedJornada}
+            jornadas={jornadas}
           />
           <div className="flex justify-center w-full lg:px-0 m-2">
             <div className="w-full">

@@ -1,14 +1,20 @@
-import React, { useState } from "react";
+import { createApiFixtureRepository } from "@/modules/fixture/infra/ApiFixtureRepository";
+import React, { useEffect, useState } from "react";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 
 function FixtureTabs({
   onSelectJornada,
+  jornadas,
+  selectedJornada,
 }: {
   onSelectJornada: (jornada: number) => void;
+  jornadas: number[];
+  selectedJornada: number;
 }) {
-  const [activeJornada, setActiveJornada] = useState(1);
-
-  const jornadas = [1, 2, 3, 4];
+  const [activeJornada, setActiveJornada] = useState(selectedJornada);
+  useEffect(() => {
+    setActiveJornada(selectedJornada);
+  }, [selectedJornada]);
 
   const handleSelectJornada = (jornada: number) => {
     setActiveJornada(jornada);

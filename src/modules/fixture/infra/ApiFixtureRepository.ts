@@ -17,8 +17,17 @@ export function createApiFixtureRepository(): FixtureRepository {
     return fixtures;
   }
 
+  async function countByCategory(idCategory: number): Promise<number> {
+    const response = await axiosInstance.get(
+      `fixture/count-fixtures-by-category/${idCategory}`
+    );
+    const fixtures = response.data;
+    return fixtures;
+  }
+
   return {
     createFixture,
+    countByCategory,
     getFixtureByCategory,
   };
 }
