@@ -11,6 +11,7 @@ import { usePathname, useRouter } from "next/navigation";
 import useRoles from "@/hooks/useRoles";
 import Image from "next/image";
 import { useProfilePhoto } from "@/context/ProfilePhotoContext";
+import AutoSignOut from "./autoSignOut";
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
@@ -62,6 +63,7 @@ export default function Navbar() {
     <Disclosure as="nav" className="bg-slate-700">
       {({ open }) => (
         <>
+          <AutoSignOut />
           <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
             <div className="relative flex h-16 items-center justify-between">
               <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">

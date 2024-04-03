@@ -1,11 +1,11 @@
 "use client";
-import { ShiftTable } from "@/sections/Shifts/Table/table";
+import { ShiftManagement } from "@/sections/Shifts";
 import React from "react";
 
 function ShiftsPage() {
   return (
     <div className="container">
-      <ShiftTable />
+      <ShiftManagement />
     </div>
   );
 }

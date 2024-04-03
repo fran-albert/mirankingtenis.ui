@@ -3,13 +3,12 @@ import Loading from "@/components/Loading/loading";
 import { DataTable } from "@/components/Table/dataTable";
 import { User } from "@/modules/users/domain/User";
 import { getAllUsers } from "@/modules/users/application/get-all/getAllUsers";
-import { getColumns } from "./columns";
 import { createApiMatchRepository } from "@/modules/match/infra/ApiMatchRepository";
 import { getAllByDate } from "@/modules/match/application/get-by-date/getAllByDate";
 import { Match } from "@/modules/match/domain/Match";
-import { ShiftCalendar } from "../Calendar";
+import { ShiftCalendar } from "./Calendar";
 
-export const ShiftTable = () => {
+export const ShiftManagement = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [matches, setMatches] = useState<Match[]>([]);
   const matchRepository = useMemo(() => createApiMatchRepository(), []);
@@ -34,23 +33,13 @@ export const ShiftTable = () => {
     fetchMatches();
   }, [loadAllMatches]);
 
-  const shiftsColumns = getColumns(matches.length);
-
   if (isLoading) {
     return <Loading isLoading />;
   }
 
   return (
     <>
-      <DataTable
-        columns={shiftsColumns}
-        data={matches}
-        searchPlaceholder="Buscar partido..."
-        showSearch={false}
-        addLinkPath="jugadores/agregar"
-        searchColumn="user1.lastname"
-        canAddUser={false}
-      />
+      <ShiftCalendar matches={matches} />
     </>
   );
 };

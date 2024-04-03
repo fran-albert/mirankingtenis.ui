@@ -5,6 +5,8 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import "moment/locale/es";
 import "../Calendar/style.css";
 import { CustomEvent } from "./event";
+import { Button } from "@/components/ui/button";
+import { ShiftTable } from "../Table/table";
 moment.locale("es");
 interface MatchEvent {
   title: string;
@@ -27,14 +29,14 @@ export const ShiftCalendar = ({ matches }: { matches: any }) => {
   const onView = useCallback((newView: View) => {
     setView(newView);
   }, []);
-
+  const [showCalendar, setShowCalendar] = useState(true);
   const [date, setDate] = useState(new Date());
 
   const onNavigate = useCallback(
     (newDate: Date) => setDate(newDate),
     [setDate]
   );
-
+  const toggleView = () => setShowCalendar(!showCalendar);
   useEffect(() => {
     const sortEvents = (events: MatchEvent[]): MatchEvent[] => {
       if (view === Views.DAY) {
@@ -86,32 +88,44 @@ export const ShiftCalendar = ({ matches }: { matches: any }) => {
   maxTime.setHours(22, 0, 0);
 
   return (
-    <div className="flex flex-col justify-center items-center w-full overflow-x-auto">
-      <div className="w-full px-2 max-h-[90vh] overflow-y-auto">
+    <div className="flex flex-col justify-center items-center w-full">
+      <div className="w-full px-2 max-h-[90vh]">
+        <div className="w-full flex justify-center my-4">
+          <Button
+            onClick={toggleView}
+            className="bg-primary text-white py-2 px-4 rounded-md shadow"
+          >
+            {showCalendar ? "Listado de Turnos" : "Calendario"}
+          </Button>
+        </div>
         <h1 className="text-2xl text-center font-medium my-2">
-          Lista de Turnos
+          {showCalendar ? "Calendario" : "Listado de Turnos"}
         </h1>
         <div className="responsive-calendar-container">
-          <Calendar
-            localizer={localizer}
-            events={events}
-            startAccessor="start"
-            endAccessor="end"
-            date={date}
-            messages={messages}
-            onView={onView}
-            views={availableViews}
-            view={view}
-            resources={resourceMap}
-            resourceIdAccessor="resourceId"
-            resourceTitleAccessor="resourceTitle"
-            min={minTime}
-            max={maxTime}
-            onNavigate={onNavigate}
-            components={{
-              event: CustomEvent,
-            }}
-          />
+          {showCalendar ? (
+            <Calendar
+              localizer={localizer}
+              events={events}
+              startAccessor="start"
+              endAccessor="end"
+              date={date}
+              messages={messages}
+              onView={onView}
+              views={availableViews}
+              view={view}
+              resources={resourceMap}
+              resourceIdAccessor="resourceId"
+              resourceTitleAccessor="resourceTitle"
+              min={minTime}
+              max={maxTime}
+              onNavigate={onNavigate}
+              components={{
+                event: CustomEvent,
+              }}
+            />
+          ) : (
+            <ShiftTable />
+          )}
         </div>
       </div>
     </div>
