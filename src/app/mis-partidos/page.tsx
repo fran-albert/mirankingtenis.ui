@@ -32,9 +32,9 @@ function MyMatchesPage() {
       setIsLoading(true);
       const fetchUserAndMatches = async () => {
         try {
-          const userData = await loadUser(idUser);
+          const userData = await loadUser(Number(idUser));
           setUser(userData);
-          const userMatches = await loadMatches(idUser);
+          const userMatches = await loadMatches(Number(idUser));
           setMatches(userMatches);
         } catch (error) {
           console.error("Error fetching data:", error);
@@ -53,7 +53,7 @@ function MyMatchesPage() {
   }
 
   const updateMatches = async () => {
-    const userMatches = await loadMatches(idUser);
+    const userMatches = await loadMatches(Number(idUser));
     setMatches(userMatches);
   };
 
