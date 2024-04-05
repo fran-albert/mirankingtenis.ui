@@ -73,13 +73,11 @@ function MatchesIndex({
                       onUpdateMatches={onUpdateMatches}
                     />
                     <DeleteShiftDialog
-                      idShift={2}
+                      idShift={Number(m.shift.id)}
                       onUpdateMatches={onUpdateMatches}
                     />
                   </>
                 )}
-                {/* Opcionalmente, si DeleteMatchDialog debe aparecer siempre cuando el partido no está jugado, independientemente del estado del turno */
-                /* <DeleteMatchDialog match={row.original} onUpdateMatches={onUpdateMatches} /> */}
               </>
             )}
           </div>

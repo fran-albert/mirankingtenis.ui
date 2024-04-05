@@ -39,8 +39,14 @@ export const CourtSelect = ({
     loadCourt();
   }, [courtRepository]);
 
+  const handleCourtChange = (value: string) => {
+    if (onCourt) {
+      onCourt(value);
+    }
+  };
+  
   return (
-    <Select value={selected} onValueChange={onCourt}>
+    <Select value={selected} onValueChange={handleCourtChange}>
       <SelectTrigger
         className={`w-full ${
           className ? className : "bg-gray-200 border-gray-300 text-gray-800"

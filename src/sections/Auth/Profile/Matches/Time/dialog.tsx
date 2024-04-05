@@ -1,6 +1,5 @@
 "use client";
-
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -31,7 +30,8 @@ import { shiftForMatch } from "@/modules/shift/application/shift-for-match/shift
 registerLocale("es", es);
 import moment from "moment-timezone";
 import { Match } from "@/modules/match/domain/Match";
-
+const { setHours } = require("date-fns");
+const { setMinutes } = require("date-fns");
 interface EidtMatchDialogProps {
   onUpdateMatches?: () => void;
   match: Match;
@@ -42,7 +42,6 @@ export default function EditMatchDialog({
   onUpdateMatches,
 }: EidtMatchDialogProps) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const toggleDialog = () => setIsOpen(!isOpen);
   const {
     register,
     handleSubmit,
@@ -52,10 +51,18 @@ export default function EditMatchDialog({
   const shiftRepository = createApiShiftRepository();
   const shitForMatchFn = shiftForMatch(shiftRepository);
   const [startDate, setStartDate] = useState(new Date());
+  const [renderDatePicker, setRenderDatePicker] = useState<boolean>(false);
   const [selectedCourt, setSelectedCourt] = useState<string>("");
-
+  const includeTimes = [];
+  for (let hour = 9; hour <= 20; hour++) {
+    includeTimes.push(setHours(setMinutes(new Date(), 0), hour));
+    includeTimes.push(setHours(setMinutes(new Date(), 15), hour));
+    includeTimes.push(setHours(setMinutes(new Date(), 30), hour));
+    includeTimes.push(setHours(setMinutes(new Date(), 45), hour));
+  }
 
   const onSubmit = async (data: any) => {
+    console.log("Datos del formulario al enviar:", data);
     const dataToSend: any = {
       idCourt: Number(data.idCourt),
       startHour: data.startHour,
@@ -95,8 +102,31 @@ export default function EditMatchDialog({
     const dateInUTC = moment(date).utc();
     setValue("startHour", dateInUTC.format());
   };
+  
+  const handleCourtSelection = (value: string) => {
+    setSelectedCourt(value);
+    setValue("idCourt", value);
+  };
+  
+  const toggleDialog = () => {
+    setIsOpen(!isOpen);
+    if (!isOpen) {
+      setTimeout(() => setRenderDatePicker(true), 100);
+    } else {
+      setRenderDatePicker(false);
+    }
+  };
 
-  return (  
+  useEffect(() => {
+    if (!isOpen) {
+      setRenderDatePicker(false);
+    } else {
+      setTimeout(() => setRenderDatePicker(true), 100);
+    }
+  }, [isOpen]);
+  
+
+  return (
     <>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
@@ -117,28 +147,31 @@ export default function EditMatchDialog({
                 >
                   Día
                 </label>
-                <DatePicker
-                  showIcon
-                  selected={startDate}
-                  className="w-full"
-                  onChange={handleDateChange}
-                  showTimeSelect
-                  timeFormat="HH:mm"
-                  locale="es"
-                  timeIntervals={15}
-                  timeCaption="time"
-                  customInput={
-                    <Input {...register("startHour")} className="bg-gray-200" />
-                  }
-                  dateFormat="d MMMM h:mm aa"
-                />
+                {renderDatePicker && (
+                  <DatePicker
+                    showIcon
+                    selected={startDate}
+                    className="w-full"
+                    onChange={handleDateChange}
+                    showTimeSelect
+                    timeFormat="HH:mm"
+                    locale="es"
+                    timeIntervals={15}
+                    includeTimes={includeTimes}
+                    timeCaption="time"
+                    customInput={
+                      <Input
+                        {...register("startHour")}
+                        className="bg-gray-200"
+                      />
+                    }
+                    dateFormat="d MMMM h:mm aa"
+                  />
+                )}
                 <Label htmlFor="court">Cancha</Label>
                 <CourtSelect
                   selected={selectedCourt}
-                  onCourt={(value) => {
-                    setSelectedCourt(value);
-                    setValue("idCourt", value);
-                  }}
+                  onCourt={handleCourtSelection}
                 />
               </div>
             </div>
@@ -146,12 +179,15 @@ export default function EditMatchDialog({
               <Button
                 type="button"
                 variant="outline"
-                className="w-full md:w-auto"
+                className="w-full sm:w-auto px-4 py-2 text-sm"
                 onClick={toggleDialog}
               >
                 Cancelar
               </Button>
-              <Button className="bg-slate-700" type="submit">
+              <Button
+                className="w-full sm:w-auto px-4 py-2 text-sm bg-slate-700"
+                type="submit"
+              >
                 Confirmar
               </Button>
             </DialogFooter>

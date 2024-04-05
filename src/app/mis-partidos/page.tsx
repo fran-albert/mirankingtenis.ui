@@ -13,7 +13,9 @@ import React, { useEffect, useMemo, useState } from "react";
 
 function MyMatchesPage() {
   const { session } = useCustomSession();
-  const idUser = session?.user.id as number;
+  let idUser = session?.user?.id;
+  idUser = Number(idUser);
+  const isValidIdUser = !isNaN(idUser) && idUser > 0;
   const [user, setUser] = useState<User>();
   const userRepository = useMemo(() => createApiUserRepository(), []);
   const matchRepository = useMemo(() => createApiMatchRepository(), []);
@@ -26,25 +28,24 @@ function MyMatchesPage() {
   const loadUser = useMemo(() => getUser(userRepository), [userRepository]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   useEffect(() => {
-    console.log("useEffect triggered");
-    setIsLoading(true);
-    const fetchUserAndMatches = async () => {
-      try {
-        console.log("Fetching data");
-        const userData = await loadUser(idUser);
-        console.log("User data fetched", userData);
-        setUser(userData);
-        const userMatches = await loadMatches(idUser);
-        console.log("Matches fetched", userMatches);
-        setMatches(userMatches);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setIsLoading(false);
-        console.log("Finished fetching data");
-      }
-    };
-    fetchUserAndMatches();
+    if (isValidIdUser) {
+      setIsLoading(true);
+      const fetchUserAndMatches = async () => {
+        try {
+          const userData = await loadUser(idUser);
+          setUser(userData);
+          const userMatches = await loadMatches(idUser);
+          setMatches(userMatches);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      fetchUserAndMatches();
+    } else {
+      console.error("ID de usuario no válido:", idUser);
+    }
   }, [idUser, loadMatches, loadUser]);
 
   if (isLoading) {
