@@ -44,9 +44,9 @@ export const CourtSelect = ({
       onCourt(value);
     }
   };
-  
+
   return (
-    <Select value={selected} onValueChange={handleCourtChange}>
+    <Select value={String(selected)} onValueChange={handleCourtChange}>
       <SelectTrigger
         className={`w-full ${
           className ? className : "bg-gray-200 border-gray-300 text-gray-800"

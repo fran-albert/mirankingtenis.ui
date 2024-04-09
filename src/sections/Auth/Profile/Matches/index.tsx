@@ -56,7 +56,6 @@ function MatchesIndex({
 
             {m.status !== "played" && (
               <>
-                {/* Si no está jugado y no tiene turno, muestra EditMatchDialog */}
                 {m.shift === null ? (
                   <EditMatchDialog
                     match={m}

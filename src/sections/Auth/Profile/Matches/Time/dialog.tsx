@@ -49,10 +49,11 @@ export default function EditMatchDialog({
     setValue,
   } = useForm();
   const shiftRepository = createApiShiftRepository();
+  const [isDatePickerOpen, setDatePickerOpen] = useState(false);
   const shitForMatchFn = shiftForMatch(shiftRepository);
   const [startDate, setStartDate] = useState(new Date());
   const [renderDatePicker, setRenderDatePicker] = useState<boolean>(false);
-  const [selectedCourt, setSelectedCourt] = useState<string>("");
+  const [selectedCourt, setSelectedCourt] = useState<string>();
   const includeTimes = [];
   for (let hour = 9; hour <= 20; hour++) {
     includeTimes.push(setHours(setMinutes(new Date(), 0), hour));
@@ -61,8 +62,11 @@ export default function EditMatchDialog({
     includeTimes.push(setHours(setMinutes(new Date(), 45), hour));
   }
 
-  const onSubmit = async (data: any) => {
-    console.log("Datos del formulario al enviar:", data);
+  const onSubmit = async (data: any, event?: React.BaseSyntheticEvent) => {
+    if (event) {
+      event.preventDefault();
+    }
+    console.log("onSubmit called with data", data);
     const dataToSend: any = {
       idCourt: Number(data.idCourt),
       startHour: data.startHour,
@@ -98,17 +102,20 @@ export default function EditMatchDialog({
   };
 
   const handleDateChange = (date: Date) => {
+    console.log("handleDateChange", date);
     setStartDate(date);
     const dateInUTC = moment(date).utc();
     setValue("startHour", dateInUTC.format());
   };
-  
+
   const handleCourtSelection = (value: string) => {
+    console.log("handleCourtSelection", value);
     setSelectedCourt(value);
     setValue("idCourt", value);
   };
-  
+
   const toggleDialog = () => {
+    console.log("toggleDialog: current state", isOpen);
     setIsOpen(!isOpen);
     if (!isOpen) {
       setTimeout(() => setRenderDatePicker(true), 100);
@@ -118,19 +125,30 @@ export default function EditMatchDialog({
   };
 
   useEffect(() => {
+    console.log("useEffect: Modal isOpen", isOpen);
     if (!isOpen) {
       setRenderDatePicker(false);
     } else {
       setTimeout(() => setRenderDatePicker(true), 100);
     }
   }, [isOpen]);
-  
+
+  const handleCourtChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = event.target.value;
+    setSelectedCourt(value);
+    setValue("idCourt", value);
+  };
+
+  // Esta parte es para asegurarse de que react-hook-form conoce el valor inicial
+  useEffect(() => {
+    setValue("idCourt", selectedCourt);
+  }, [selectedCourt, setValue]);
 
   return (
     <>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
-          <Button onClick={toggleDialog} variant="edit">
+          <Button onClick={toggleDialog} variant="edit" type="button">
             Agregar Turno
           </Button>
         </DialogTrigger>
@@ -141,12 +159,25 @@ export default function EditMatchDialog({
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-4 px-4 py-2 w-full sm:w-3/4 md:w-1/2 lg:w-full">
-                <label
+                <Label htmlFor="court">Cancha</Label>
+                <select
+                  name="idCourt"
+                  className="w-full h-10 bg-gray-200 border-gray-300 text-gray-800 rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  value={selectedCourt}
+                  onChange={handleCourtChange}
+                >
+                  <option value="">Seleccione una cancha...</option>
+                  <option value="1">Cancha 1</option>
+                  <option value="2">Cancha 2</option>
+                  <option value="3">Cancha 3</option>
+                  <option value="4">Cancha 4</option>
+                </select>
+                <Label
                   htmlFor="day"
                   className="block mb-2 text-sm font-medium text-gray-900"
                 >
                   Día
-                </label>
+                </Label>
                 {renderDatePicker && (
                   <DatePicker
                     showIcon
@@ -154,7 +185,7 @@ export default function EditMatchDialog({
                     className="w-full"
                     onChange={handleDateChange}
                     showTimeSelect
-                    timeFormat="HH:mm"
+                    timeInputLabel="Time:"
                     locale="es"
                     timeIntervals={15}
                     includeTimes={includeTimes}
@@ -168,11 +199,6 @@ export default function EditMatchDialog({
                     dateFormat="d MMMM h:mm aa"
                   />
                 )}
-                <Label htmlFor="court">Cancha</Label>
-                <CourtSelect
-                  selected={selectedCourt}
-                  onCourt={handleCourtSelection}
-                />
               </div>
             </div>
             <DialogFooter className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
