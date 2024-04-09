@@ -24,7 +24,12 @@ export const getColumns = (
       accessorKey: "name",
       header: "Jugador",
       cell: ({ row }) => (
-        <div className="flex items-center">
+        <div
+          className="flex items-center cursor-pointer"
+          onClick={() =>
+            (window.location.href = `/jugadores/${row.original.id}`)
+          }
+        >
           <Avatar>
             <AvatarImage
               src={

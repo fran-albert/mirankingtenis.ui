@@ -30,6 +30,7 @@ import { createApiMatchRepository } from "@/modules/match/infra/ApiMatchReposito
 import { getMatchesByUser } from "@/modules/match/application/get-by-user/getMatchesByUser";
 import { Match } from "@/modules/match/domain/Match";
 import PlayerChart from "./HistoryRanking/chart";
+import Loading from "@/components/Loading/loading";
 
 function ProfilePlayer() {
   const params = useParams();
@@ -65,6 +66,10 @@ function ProfilePlayer() {
     };
     fetchUserAndMatches();
   }, [idUser, loadMatches, loadUser]);
+
+  if (isLoading) {
+    return <Loading isLoading />;
+  }
 
   return (
     <>

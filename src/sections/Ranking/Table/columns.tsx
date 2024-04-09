@@ -4,7 +4,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Ranking } from "@/modules/ranking/domain/Ranking";
 
-export const getColumns = (): //
+export const getColumns = (): 
 ColumnDef<Ranking>[] => {
   const columns: ColumnDef<Ranking>[] = [
     {
@@ -19,8 +19,8 @@ ColumnDef<Ranking>[] => {
       cell: ({ row }) => (
         <div className="flex items-center">
           <Avatar>
-          <AvatarImage
-               src={
+            <AvatarImage
+              src={
                 row.original.user.photo
                   ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${row.original.user.photo}.jpeg`
                   : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/default2.png"
@@ -41,20 +41,20 @@ ColumnDef<Ranking>[] => {
       ),
     },
     {
-      header: "PG",
-      cell: ({ row }) => <div>{row.original.wonMatches}</div>,
-    },
-    {
-      header: "PP",
-      cell: ({ row }) => <div>{row.original.lostMatches}</div>,
+      header: "PTS",
+      cell: ({ row }) => <div className="font-bold">{row.original.points}</div>,
     },
     {
       header: "PJ",
-      cell: ({ row }) => <div>{row.original.playedMatches}</div>,
+      cell: ({ row }) => <div className="">{row.original.playedMatches}</div>,
     },
     {
-      header: "PTS",
-      cell: ({ row }) => <div className="font-bold">{row.original.points}</div>,
+      header: "PG",
+      cell: ({ row }) => <div className="">{row.original.wonMatches}</div>,
+    },
+    {
+      header: "PP",
+      cell: ({ row }) => <div className="">{row.original.lostMatches}</div>,
     },
   ];
 
