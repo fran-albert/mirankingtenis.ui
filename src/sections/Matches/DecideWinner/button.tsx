@@ -34,15 +34,20 @@ export default function DecideMatchDialog({
   const [selectedPlayer, setSelectedPlayer] = useState<number | null>(null);
   const toggleDialog = () => setIsOpen(!isOpen);
 
-  const selectPlayer = (playerId: any) => {
+  console.log(match, "patido ")
+
+  const selectPlayer = (playerId: number) => {
+    console.log('ID del jugador seleccionado:', playerId);
     setSelectedPlayer(playerId === selectedPlayer ? null : playerId);
   };
-
+  
   const onSubmit = async () => {
     if (selectedPlayer === null) {
       console.error("No se ha seleccionado ningún jugador.");
       return;
     }
+
+
 
     const winnerUserId = Number(selectedPlayer);
     if (isNaN(winnerUserId)) {
@@ -85,11 +90,11 @@ export default function DecideMatchDialog({
           <DialogDescription>
             <div
               className="cursor-pointer p-2"
-              onClick={() => selectPlayer(match.idUser1)}
+              onClick={() => selectPlayer(match.user1.id)}
             >
               <Badge
                 className={`${
-                  selectedPlayer === match.idUser1
+                  selectedPlayer === match.user1.id
                     ? "bg-green-500 text-gray-900 font-bold"
                     : "bg-gray-300 text-gray-900 font-bold"
                 }`}
