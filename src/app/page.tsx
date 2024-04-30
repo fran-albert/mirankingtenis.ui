@@ -1,9 +1,13 @@
-import Navbar from "@/components/navbar";
+"use client";
 import React from "react";
-
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 function HomePage() {
-  return <div>
-  </div>;
+  const router = useRouter();
+  useEffect(() => {
+    router.push("/jugadores");
+  }, [router]);
+  return <div></div>;
 }
 
 export default HomePage;
