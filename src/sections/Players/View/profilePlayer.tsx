@@ -48,7 +48,7 @@ function ProfilePlayer() {
     (id: number) => getUser(userRepository)(id),
     [userRepository]
   );
-
+  const currentUser = player?.name + " " + player?.lastname;
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const idUser = Number(idParam);
   useEffect(() => {
@@ -87,7 +87,7 @@ function ProfilePlayer() {
             <PersonalData player={player} />
           </div>
           <div className="">
-            <MatchesDetails matches={matches} />
+            <MatchesDetails matches={matches} currentUser={currentUser} />
           </div>
         </div>
       </div>

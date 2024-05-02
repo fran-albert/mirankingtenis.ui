@@ -25,7 +25,6 @@ function PlayerChart({ player }: { player: User | undefined }) {
     position: ranking.position,
   }));
 
-  console.log(historyRankings, "historiyRankings", data, "data");
   const minY = data.length > 0 ? Math.min(...data.map((d) => d.position)) : 1;
 
   const maxY =
@@ -85,12 +84,12 @@ function PlayerChart({ player }: { player: User | undefined }) {
                   />
                   <YAxis
                     allowDecimals={false}
-                    domain={[maxY, minY]} // Invertimos el dominio aquí
-                    type="number" // Aseguramos que se traten como números para ordenar correctamente
+                    domain={[maxY, minY]}
+                    type="number" 
                     tickFormatter={(value) => value.toFixed(0)}
                     tick={{ fill: "#2E4053" }}
                     tickMargin={10}
-                    reversed // Esto invertirá el eje Y
+                    reversed 
                   />
 
                   <Tooltip content={<CustomTooltip />} />
