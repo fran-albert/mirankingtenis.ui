@@ -35,7 +35,7 @@ export const getColumns = (
               src={
                 row.original.photo
                   ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${row.original.photo}.jpeg`
-                  : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/default2.png"
+                  : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/mirankingtenis_default.png"
               }
               alt="@avatar"
             />

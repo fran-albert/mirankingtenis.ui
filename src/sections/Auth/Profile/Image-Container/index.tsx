@@ -8,6 +8,14 @@ import { toast } from "sonner";
 import { updatePhoto } from "@/modules/users/application/update-photo/updatePhoto";
 import { useProfilePhoto } from "@/context/ProfilePhotoContext";
 
+const validarTamañoImagen = (file: any) => {
+  const maxSize = 2 * 1024 * 1024;
+  if (file.size > maxSize) {
+    return false;
+  }
+  return true;
+};
+
 function ImageContainer({ user }: { user: User | undefined }) {
   const userRepository = createApiUserRepository();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -28,6 +36,14 @@ function ImageContainer({ user }: { user: User | undefined }) {
       console.log("No file selected.");
       return;
     }
+
+    if (!validarTamañoImagen(file)) {
+      toast.error(
+        "El archivo es demasiado grande. El tamaño máximo permitido es de 2MB."
+      );
+      return;
+    }
+
     const photoData = new FormData();
     photoData.append("photo", file);
     try {
@@ -37,11 +53,11 @@ function ImageContainer({ user }: { user: User | undefined }) {
         const newPhotoUrl = `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${response}.jpeg`;
         setSelectedImage(newPhotoUrl);
         updateProfilePhoto(newPhotoUrl);
-        setIsLoading(false);
       }
     } catch (error) {
       toast.error("Error al actualizar la foto");
       console.error("Error updating photo: ", error);
+    } finally {
       setIsLoading(false);
     }
   };
@@ -63,7 +79,7 @@ function ImageContainer({ user }: { user: User | undefined }) {
             src={
               user?.photo
                 ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${user.photo}.jpeg`
-                : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/default2.png"
+                : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/mirankingtenis_default.png"
             }
             alt="Profile Picture"
             width={100}

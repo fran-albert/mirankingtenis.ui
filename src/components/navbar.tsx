@@ -24,6 +24,7 @@ export default function Navbar() {
   const { profilePhoto } = useProfilePhoto();
 
   const [navigation, setNavigation] = useState([
+    { name: "Master", href: "/master", current: false },
     { name: "Jugadores", href: "/jugadores", current: false },
     { name: "Ranking", href: "/ranking", current: false },
     { name: "Partidos", href: "/partidos", current: false },
@@ -32,6 +33,7 @@ export default function Navbar() {
 
   useEffect(() => {
     const baseNavigation = [
+      { name: "Master", href: "/master", current: false },
       { name: "Jugadores", href: "/jugadores", current: false },
       { name: "Ranking", href: "/ranking", current: false },
       { name: "Partidos", href: "/partidos", current: false },
@@ -133,12 +135,12 @@ export default function Navbar() {
                             className="h-8 w-8 rounded-full"
                             src={
                               profilePhoto ||
-                              "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/default2.png"
+                              "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/mirankingtenis_default.png"
                             }
                             // src={
                             //   session?.user?.photo
                             //     ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${session.user.photo}.jpeg`
-                            //     : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/default2.png"
+                            //     : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/mirankingtenis_default.png"
                             // }
                             alt="User profile"
                             height={32}

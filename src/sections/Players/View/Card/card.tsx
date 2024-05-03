@@ -14,7 +14,7 @@ function UserCardComponent({ player }: { player: User | undefined }) {
               src={
                 player?.photo
                   ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${player?.photo}.jpeg`
-                  : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/default2.png"
+                  : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/mirankingtenis_default.png"
               }
               alt=""
               height={100}

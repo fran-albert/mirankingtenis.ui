@@ -9,6 +9,7 @@ import { getUser } from "@/modules/users/application/get/getUser";
 import { User } from "@/modules/users/domain/User";
 import { createApiUserRepository } from "@/modules/users/infra/ApiUserRepository";
 import MatchesIndex from "@/sections/Auth/Profile/Matches";
+import PlayerChart from "@/sections/Players/View/HistoryRanking/chart";
 import React, { useEffect, useMemo, useState } from "react";
 
 function MyMatchesPage() {
@@ -61,6 +62,7 @@ function MyMatchesPage() {
     <div className="flex justify-center w-full px-4 lg:px-0 mt-10">
       <div className="w-full max-w-7xl space-y-6">
         <AutoSignOut />
+        <PlayerChart player={user} />
         <MatchesIndex match={matches} onUpdateMatches={updateMatches} />
       </div>
     </div>

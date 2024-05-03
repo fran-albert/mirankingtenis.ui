@@ -11,7 +11,7 @@ function MatchesDetails({
   matches: Match[];
   currentUser: string | undefined;
 }) {
-  console.log(matches)
+  console.log(matches);
   return (
     <div className="flex sm:mx-auto">
       <div className="bg-white p-4 rounded-lg overflow-hidden shadow-md w-full max-w-lg">
@@ -41,7 +41,9 @@ function MatchesDetails({
                     <BadgeLost text="Derrota" />
                   )}
                 </h3>
-                <p className="text-gray-600">Rival: {match.rivalName}</p>
+                <p className="text-gray-600">
+                  Fecha {match.fixture.jornada} vs {match.rivalName}
+                </p>
                 {!isPending && (
                   <p className="text-gray-600">
                     {match.sets

@@ -60,7 +60,7 @@ export const ScoreMatchCard = ({
                         src={
                           player1?.photo
                             ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${player1?.photo}.jpeg`
-                            : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/default2.png"
+                            : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/mirankingtenis_default.png"
                         }
                         alt="@avatar"
                       />
@@ -108,7 +108,7 @@ export const ScoreMatchCard = ({
                         src={
                           player2?.photo
                             ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${player2?.photo}.jpeg`
-                            : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/default2.png"
+                            : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/mirankingtenis_default.png"
                         }
                         alt="@avatar"
                       />

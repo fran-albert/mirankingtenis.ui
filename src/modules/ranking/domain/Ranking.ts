@@ -9,5 +9,6 @@ export interface Ranking {
     name: string;
     lastname: string;
     photo: string;
+    id: number
   };
 }

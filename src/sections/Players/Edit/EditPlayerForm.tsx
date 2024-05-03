@@ -183,7 +183,7 @@ function EditPlayerForm({ user }: { user: User | null }) {
                 src={
                   user?.photo
                     ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${user.photo}.jpeg`
-                    : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/default2.png"
+                    : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/mirankingtenis_default.png"
                 }
                 alt="Imagen del Jugador"
                 width={100}

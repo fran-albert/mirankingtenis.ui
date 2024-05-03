@@ -23,7 +23,7 @@ ColumnDef<Ranking>[] => {
               src={
                 row.original.user.photo
                   ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${row.original.user.photo}.jpeg`
-                  : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/default2.png"
+                  : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/mirankingtenis_default.png"
               }
               alt="@avatar"
             />
