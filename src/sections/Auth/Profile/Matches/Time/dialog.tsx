@@ -66,7 +66,6 @@ export default function EditMatchDialog({
     if (event) {
       event.preventDefault();
     }
-    console.log("onSubmit called with data", data);
     const dataToSend: any = {
       idCourt: Number(data.idCourt),
       startHour: data.startHour,
@@ -102,20 +101,17 @@ export default function EditMatchDialog({
   };
 
   const handleDateChange = (date: Date) => {
-    console.log("handleDateChange", date);
     setStartDate(date);
     const dateInUTC = moment(date).utc();
     setValue("startHour", dateInUTC.format());
   };
 
   const handleCourtSelection = (value: string) => {
-    console.log("handleCourtSelection", value);
     setSelectedCourt(value);
     setValue("idCourt", value);
   };
 
   const toggleDialog = () => {
-    console.log("toggleDialog: current state", isOpen);
     setIsOpen(!isOpen);
     if (!isOpen) {
       setTimeout(() => setRenderDatePicker(true), 100);
@@ -125,7 +121,6 @@ export default function EditMatchDialog({
   };
 
   useEffect(() => {
-    console.log("useEffect: Modal isOpen", isOpen);
     if (!isOpen) {
       setRenderDatePicker(false);
     } else {
@@ -139,7 +134,6 @@ export default function EditMatchDialog({
     setValue("idCourt", value);
   };
 
-  // Esta parte es para asegurarse de que react-hook-form conoce el valor inicial
   useEffect(() => {
     setValue("idCourt", selectedCourt);
   }, [selectedCourt, setValue]);

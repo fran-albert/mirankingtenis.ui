@@ -33,7 +33,7 @@ import moment from "moment-timezone";
 import { updateShift } from "@/modules/shift/application/update/updateShift";
 import { Match } from "@/modules/match/domain/Match";
 
-interface EidtMatchDialogProps {
+interface UpdateShiftDialogProps {
   onUpdateMatches?: () => void;
   match: Match;
 }
@@ -41,7 +41,7 @@ interface EidtMatchDialogProps {
 export default function UpdateShiftDialog({
   match,
   onUpdateMatches,
-}: EidtMatchDialogProps) {
+}: UpdateShiftDialogProps) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const toggleDialog = () => setIsOpen(!isOpen);
   const {
@@ -52,7 +52,7 @@ export default function UpdateShiftDialog({
   } = useForm();
   const shiftRepository = createApiShiftRepository();
   const updateShiftFn = updateShift(shiftRepository);
-  const [startDate, setStartDate] = useState(new Date());
+  const [startDate, setStartDate] = useState(new Date(match.shift?.startHour));
   const [selectedCourt, setSelectedCourt] = useState<string>("");
 
   const onSubmit = async (data: any) => {
@@ -60,7 +60,6 @@ export default function UpdateShiftDialog({
       idCourt: Number(data.idCourt),
       startHour: data.startHour,
     };
-    console.log("dataToSend", dataToSend, match.id);
     try {
       const shiftCreationPromise = updateShiftFn(dataToSend, match.id);
       toast.promise(shiftCreationPromise, {
@@ -96,6 +95,11 @@ export default function UpdateShiftDialog({
     const dateInUTC = moment(date).utc();
     setValue("startHour", dateInUTC.format());
   };
+  const handleCourtChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = event.target.value;
+    setSelectedCourt(value);
+    setValue("idCourt", value);
+  };
 
   return (
     <>
@@ -112,12 +116,25 @@ export default function UpdateShiftDialog({
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-4 px-4 py-2 w-full sm:w-3/4 md:w-1/2 lg:w-full">
-                <label
+                <Label htmlFor="court">Cancha</Label>
+                <select
+                  name="idCourt"
+                  className="w-full h-10 bg-gray-200 border-gray-300 text-gray-800 rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  value={selectedCourt}
+                  onChange={handleCourtChange}
+                >
+                  <option value="">Seleccione una cancha...</option>
+                  <option value="1">Cancha 1</option>
+                  <option value="2">Cancha 2</option>
+                  <option value="3">Cancha 3</option>
+                  <option value="4">Cancha 4</option>
+                </select>
+                <Label
                   htmlFor="day"
                   className="block mb-2 text-sm font-medium text-gray-900"
                 >
                   Día
-                </label>
+                </Label>
                 <DatePicker
                   showIcon
                   selected={startDate}
@@ -132,14 +149,6 @@ export default function UpdateShiftDialog({
                     <Input {...register("startHour")} className="bg-gray-200" />
                   }
                   dateFormat="d MMMM h:mm aa"
-                />
-                <Label htmlFor="court">Cancha</Label>
-                <CourtSelect
-                  selected={selectedCourt}
-                  onCourt={(value) => {
-                    setSelectedCourt(value);
-                    setValue("idCourt", value);
-                  }}
                 />
               </div>
             </div>

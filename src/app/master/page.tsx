@@ -39,7 +39,7 @@ function MasterPage() {
   }
 
   return (
-    <div>
+    <div className="container">
       <div className="flex justify-center w-full px-4 lg:px-0 mt-10">
         <div className="w-full max-w-7xl space-y-6">
           <h1 className="text-2xl text-center font-medium">Torneo de Master</h1>

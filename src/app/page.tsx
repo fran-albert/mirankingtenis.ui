@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 function HomePage() {
   const router = useRouter();
   useEffect(() => {
-    router.push("/jugadores");
+    router.push("/master");
   }, [router]);
   return <div></div>;
 }
