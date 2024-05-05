@@ -4,8 +4,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Ranking } from "@/modules/ranking/domain/Ranking";
 
-export const getColumns = (): 
-ColumnDef<Ranking>[] => {
+export const getColumns = (): ColumnDef<Ranking>[] => {
   const columns: ColumnDef<Ranking>[] = [
     {
       accessorKey: "POS",
@@ -14,10 +13,15 @@ ColumnDef<Ranking>[] => {
       },
     },
     {
-      accessorKey: "firstName",
+      accessorKey: "name",
       header: "Jugador",
       cell: ({ row }) => (
-        <div className="flex items-center">
+        <div
+          className="flex items-center cursor-pointer"
+          onClick={() =>
+            (window.location.href = `/jugadores/${row.original.id}`)
+          }
+        >
           <Avatar>
             <AvatarImage
               src={
