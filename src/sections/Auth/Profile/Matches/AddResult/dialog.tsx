@@ -19,6 +19,7 @@ import axios from "axios";
 import { MdScoreboard } from "react-icons/md";
 import ActionIcon from "@/components/ui/actionIcon";
 import { Match } from "@/modules/match/domain/Match";
+import "./dialog.style.css";
 
 interface AddResultMatchDialogProps {
   onUpdateMatches?: () => void;
@@ -84,7 +85,7 @@ export default function AddResultMatchDialog({
         console.error("Error al crear el set", error);
       }
     }
-    setIsConfirmOpen(false); // Cierra el diálogo de confirmación
+    setIsConfirmOpen(false);
     setIsAddResultOpen(false);
     reset();
   };
@@ -96,86 +97,94 @@ export default function AddResultMatchDialog({
 
   return (
     <>
-      <Dialog open={isAddResultOpen} onOpenChange={setIsAddResultOpen}>
-        <DialogTrigger asChild>
-          <Button variant="green" className="text-xs">
-            Resultado
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="max-w-xl mx-auto">
-          <DialogHeader>
-            <DialogTitle>Insertar Resultado del Partido</DialogTitle>
-            <DialogDescription>
-              Ingresa los resultados del partido vs {match.rivalName}.
-            </DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <div className=" overflow-hidden max-w-full">
-              <div className="px-2 py-4 overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200 bg-gray-50">
-                  <thead>
-                    <tr>
-                      <th className="py-2 px-4 text-xs md:text-sm font-medium text-center text-gray-900 uppercase">
-                        SETS
-                      </th>
-                      <th className="py-2 px-4 text-xs md:text-sm font-medium text-center text-gray-900 uppercase">
-                        {match.user1Name}
-                      </th>
-                      <th className="py-2 px-4 text-xs md:text-sm font-medium text-center text-gray-900 uppercase"></th>
-                      <th className="py-2 px-4 text-xs md:text-sm font-medium text-center text-gray-900 uppercase">
-                        {match.user2Name}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="text-center font-medium">
-                    {["1° Set", "2° Set", "Super Tie-Break"].map(
-                      (set, index) => (
-                        <tr key={index}>
-                          <td className="py-4 px-6 text-sm text-gray-900 whitespace-nowrap">
-                            {set}
-                          </td>
-                          <td className="py-4 px-6">
-                            <input
-                              type="number"
-                              {...register(`sets.${index}.pointsPlayer1`)}
-                              className="text-black border-2 border-slate-600 rounded w-11 text-center no-spinners"
-                              required
-                              defaultValue={set === "Super Tie-Break" ? 0 : ""}
-                            />
-                          </td>
-                          <td className="">-</td>
-                          <td className="py-4 px-6">
-                            <input
-                              type="number"
-                              {...register(`sets.${index}.pointsPlayer2`)}
-                              className="text-black border-2 border-slate-600 rounded w-11 text-center no-spinners"
-                              required
-                              defaultValue={set === "Super Tie-Break" ? 0 : ""}
-                            />
-                          </td>
-                        </tr>
-                      )
-                    )}
-                  </tbody>
-                </table>
+      <div className="sm:max-w-full">
+        <Dialog open={isAddResultOpen} onOpenChange={setIsAddResultOpen}>
+          <DialogTrigger asChild>
+            <Button variant="green" className="text-xs">
+              Resultado
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="dialog-content">
+            <DialogHeader>
+              <DialogTitle>Insertar Resultado del Partido</DialogTitle>
+              <DialogDescription>
+                Ingresa los resultados del partido vs {match.rivalName}.
+              </DialogDescription>
+            </DialogHeader>
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <div className="overflow-hidden">
+                <div className="px-2 py-4 overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200 bg-gray-50">
+                    <thead>
+                      <tr>
+                        <th className="text-center text-gray-900 uppercase text-sm">
+                          SETS
+                        </th>
+                        <th className="text-center text-gray-900 uppercase text-sm">
+                          {match.user1Name}
+                        </th>
+                        <th className="text-center text-gray-900 uppercase text-sm">
+                          -
+                        </th>
+                        <th className="text-center text-gray-900 uppercase text-sm">
+                          {match.user2Name}
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="text-center ">
+                      {["1° Set", "2° Set", "Super Tie-Break"].map(
+                        (set, index) => (
+                          <tr key={index}>
+                            <td className="table-cell text-gray-900 whitespace-nowrap">
+                              {set}
+                            </td>
+                            <td className="table-cell">
+                              <input
+                                type="number"
+                                {...register(`sets.${index}.pointsPlayer1`)}
+                                className="input-number border-2 border-slate-600 rounded text-center no-spinners"
+                                required
+                                defaultValue={
+                                  set === "Super Tie-Break" ? 0 : ""
+                                }
+                              />
+                            </td>
+                            <td className="table-cell">-</td>
+                            <td className="table-cell">
+                              <input
+                                type="number"
+                                {...register(`sets.${index}.pointsPlayer2`)}
+                                className="input-number border-2 border-slate-600 rounded text-center no-spinners"
+                                required
+                                defaultValue={
+                                  set === "Super Tie-Break" ? 0 : ""
+                                }
+                              />
+                            </td>
+                          </tr>
+                        )
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               </div>
-            </div>
-            <DialogFooter className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 mt-2">
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full md:w-auto"
-                onClick={() => closeAndResetDialog()}
-              >
-                Cancelar
-              </Button>
-              <Button className="bg-slate-700" type="submit">
-                Siguiente
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+              <DialogFooter className="flex flex-col space-y-4 w-1/2 mx-auto sm:flex-row sm:space-y-0 sm:space-x-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="button w-full md:w-auto"
+                  onClick={closeAndResetDialog}
+                >
+                  Cancelar
+                </Button>
+                <Button className="button bg-slate-700" type="submit">
+                  Siguiente
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
 
       {formData && formData.sets && (
         <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>

@@ -1,0 +1,21 @@
+/* Ajustar padding y márgenes para mejor aprovechamiento del espacio */
+.table-cell {
+  padding: 2px 4px; /* Reducción del padding */
+}
+
+.input-number {
+  width: 50%;
+  padding: 2px; /* Añadir algo de padding dentro del input */
+  font-size: 1rem; /* Asegura legibilidad */
+}
+
+.button {
+  padding: 12px 24px; /* Aumentar padding para una mejor área de clic */
+}
+
+@media (max-width: 768px) {
+  .dialog-content {
+    width: 95vw;
+    padding: 10px; /* Añadir un poco de padding para no tocar los bordes */
+  }
+}
