@@ -54,7 +54,7 @@ export default function DeletePlayerDialog({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <button onClick={toggleDialog}>
+        <button onClick={toggleDialog} className="m-2">
           <ActionIcon
             icon={
               <FaTrashAlt

@@ -11,13 +11,13 @@ export const EditButton = ({ id, path }: { id: number; path: string }) => {
 
   return (
     <div className="flex justify-center">
-      <Button variant="ghost" onClick={handleEdit}>
+      <button onClick={handleEdit} className="m-2">
         <ActionIcon
           icon={<FaPencilAlt size={20} />}
           tooltip="Editar"
           color="text-gray-600"
         />
-      </Button>
+      </button>
     </div>
   );
 };

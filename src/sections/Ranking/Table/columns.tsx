@@ -19,7 +19,7 @@ export const getColumns = (): ColumnDef<Ranking>[] => {
         <div
           className="flex items-center cursor-pointer"
           onClick={() =>
-            (window.location.href = `/jugadores/${row.original.id}`)
+            (window.location.href = `/jugadores/${row.original.user.id}`)
           }
         >
           <Avatar>

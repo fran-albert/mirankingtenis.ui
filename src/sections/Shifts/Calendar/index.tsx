@@ -37,6 +37,7 @@ export const ShiftCalendar = ({ matches }: { matches: any }) => {
     [setDate]
   );
   const toggleView = () => setShowCalendar(!showCalendar);
+  console.log(matches);
   useEffect(() => {
     const sortEvents = (events: MatchEvent[]): MatchEvent[] => {
       if (view === Views.DAY) {
