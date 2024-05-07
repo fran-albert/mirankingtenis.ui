@@ -1,9 +1,13 @@
+import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import useRoles from "@/hooks/useRoles";
 import { User } from "@/modules/users/domain/User";
 import Image from "next/image";
 import React from "react";
+import DefaultPasswordDialog from "../DefaultPassword/dialog";
 
 function UserCardComponent({ player }: { player: User | undefined }) {
+  const { isPlayer, isAdmin } = useRoles();
   return (
     <>
       <Card className="w-full max-w-lg shadow-md rounded-lg overflow-hidden mb-4">
@@ -29,6 +33,7 @@ function UserCardComponent({ player }: { player: User | undefined }) {
               {player?.ranking.position}° - Categoría {player?.category.name}
             </p>
           </div>
+          {isAdmin && <DefaultPasswordDialog id={Number(player?.id)} />}
         </CardHeader>
       </Card>
     </>

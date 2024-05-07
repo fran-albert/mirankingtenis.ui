@@ -20,4 +20,5 @@ export interface UserRepository {
     password: string,
     confirmPassword: string
   ) => Promise<User | undefined>;
+  resetUserPassword: (idUser:number) => Promise<string>;
 }
