@@ -31,6 +31,7 @@ import { getMatchesByUser } from "@/modules/match/application/get-by-user/getMat
 import { Match } from "@/modules/match/domain/Match";
 import PlayerChart from "./HistoryRanking/chart";
 import Loading from "@/components/Loading/loading";
+import { PlayerComponent } from "@/components/component/player-component";
 
 function ProfilePlayer() {
   const params = useParams();
@@ -73,24 +74,11 @@ function ProfilePlayer() {
 
   return (
     <>
-      <div className="md:flex flex-wrap -mx-4">
-        <div className="md:w-1/2 p-4">
-          <div className=" mb-4">
-            <UserCardComponent player={player} />
-          </div>
-          <div className="">
-            <PlayerChart player={player} />
-          </div>
-        </div>
-        <div className="md:w-1/2 p-4 ">
-          <div className=" mb-4">
-            <PersonalData player={player} />
-          </div>
-          <div className="">
-            <MatchesDetails matches={matches} currentUser={currentUser} />
-          </div>
-        </div>
-      </div>
+      <PlayerComponent
+        player={player}
+        currentUser={currentUser}
+        matches={matches}
+      />
     </>
   );
 }

@@ -1,0 +1,12 @@
+@media (min-width: 768px) {
+    /* Ajusta este valor según tus puntos de interrupción */
+    .user-card-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr; /* Ajusta las proporciones según necesites */
+    }
+  
+    .user-card {
+      grid-column: 2 / 3; /* Coloca el componente en la columna central */
+    }
+  }
+  
