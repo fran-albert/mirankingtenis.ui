@@ -1,6 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { createFixture } from "@/modules/fixture/application/create/createFixture";
 import { createApiFixtureRepository } from "@/modules/fixture/infra/ApiFixtureRepository";
+import { TournamentParticipant } from "@/modules/tournament-participant/domain/TournamentParticipant";
+import { TournamentRanking } from "@/modules/tournament-ranking/domain/TournamentRanking";
 import { User } from "@/modules/users/domain/User";
 import axios from "axios";
 import { useRouter } from "next/navigation";
@@ -13,7 +15,7 @@ interface Step5Props {
   selectedTournamentId: number;
   selectedJornada: string;
   selectedMatches: { idUser1: number | null; idUser2: number | null }[];
-  players: User[];
+  players: TournamentRanking[];
 }
 
 export const Step5 = ({
@@ -88,10 +90,10 @@ export const Step5 = ({
             <tbody className="text-gray-700">
               {selectedMatches.map((match, index) => {
                 const player1 = players.find(
-                  (p) => p.id === Number(match.idUser1)
+                  (p) => p.idPlayer === Number(match.idUser1)
                 );
                 const player2 = players.find(
-                  (p) => p.id === Number(match.idUser2)
+                  (p) => p.idPlayer === Number(match.idUser2)
                 );
                 return (
                   <tr key={index}>

@@ -51,7 +51,7 @@ export const CitySelect = ({
 
   return (
     <Select value={selected} onValueChange={handleChange}>
-      <SelectTrigger className="w-full bg-gray-200 border-gray-300 text-gray-800">
+      <SelectTrigger className="w-full">
         <SelectValue placeholder="Seleccione la localidad..." />
       </SelectTrigger>
       <SelectContent>

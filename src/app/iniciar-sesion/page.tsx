@@ -1,9 +1,10 @@
+import { Login } from "@/components/component/login";
 import LoginForm from "@/sections/Auth/Login/LoginForm";
 
 function LoginPage() {
   return (
     <>
-      <LoginForm />
+      <Login />
     </>
   );
 }

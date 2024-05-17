@@ -5,8 +5,6 @@ import { getColumns } from "./columns";
 import { User } from "@/modules/users/domain/User";
 import { createApiUserRepository } from "@/modules/users/infra/ApiUserRepository";
 import { getAllUsers } from "@/modules/users/application/get-all/getAllUsers";
-import useRoles from "@/hooks/useRoles";
-import { useCustomSession } from "@/context/SessionAuthProviders";
 
 export const PlayersTable = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -16,9 +14,6 @@ export const PlayersTable = () => {
     const users = await getAllUsers(userRepository)();
     return users;
   }, [userRepository]);
-  const { isAdmin } = useRoles();
-  const { session } = useCustomSession();
-  const canAddUser = !!session && isAdmin;
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -35,13 +30,7 @@ export const PlayersTable = () => {
     fetchUsers();
   }, [loadAllPlayers]);
 
-  const handlePlayerDeleted = (idPlayer: number) => {
-    setPlayers((currentPlayers) =>
-      currentPlayers.filter((player) => player.id !== idPlayer)
-    );
-  };
-
-  const playersColumns = getColumns(handlePlayerDeleted, { isAdmin });
+  const playersColumns = getColumns();
 
   const customFilterFunction = (player: User, query: string) =>
     player.name.toLowerCase().includes(query.toLowerCase()) ||
@@ -64,7 +53,7 @@ export const PlayersTable = () => {
         addLinkPath="jugadores/agregar"
         customFilter={customFilterFunction}
         addLinkText="Agregar Jugador"
-        canAddUser={canAddUser}
+        canAddUser={false}
       />
     </>
   );

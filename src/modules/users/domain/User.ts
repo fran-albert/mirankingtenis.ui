@@ -11,6 +11,9 @@ export interface User {
   phone: string;
   photo: string;
   password: string;
+  registerDate: string;
+  lastLoginDate: string;
+  isActive: boolean;
   city: City;
   ranking: Ranking;
   role: Array<{
@@ -25,4 +28,6 @@ export interface User {
   newPassword: string;
   confirmNewPassword: string;
   historyRankings: HistoryRanking[];
+  signupDate: Date;
+  idPlayer: number
 }

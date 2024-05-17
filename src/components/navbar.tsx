@@ -50,9 +50,7 @@ export default function Navbar() {
 
     const updatedNavigation = [
       ...baseNavigation,
-      ...(isAdmin
-        ? [{ name: "Fixture", href: "/fixture", current: false }]
-        : []),
+      ...(isAdmin ? [{ name: "Admin", href: "/admin/inicio", current: false }] : []),
     ].map((item) => ({
       ...item,
       current: pathname === item.href,

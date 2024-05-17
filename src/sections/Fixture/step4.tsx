@@ -11,30 +11,29 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { TournamentParticipant } from "@/modules/tournament-participant/domain/TournamentParticipant";
+import { TournamentRanking } from "@/modules/tournament-ranking/domain/TournamentRanking";
 
-interface Step3Props {
-  onBack: () => void;
+interface Step4Props {
   onNext: () => void;
   idCategory: number;
   onMatchesSelect: (
     matches: { idUser1: number | null; idUser2: number | null }[]
   ) => void;
-  players: User[];
+  players: TournamentRanking[];
 }
 
 export const Step4 = ({
-  onBack,
   onNext,
   idCategory,
   onMatchesSelect,
   players,
-}: Step3Props) => {
+}: Step4Props) => {
   const initialMatchesCount = Math.floor(players.length / 2);
   const [matches, setMatches] = useState(
     Array(initialMatchesCount).fill({ idUser1: null, idUser2: null })
   );
 
-  // Ajusta los matches cada vez que cambia la cantidad de jugadores
   useEffect(() => {
     const matchesCount = Math.floor(players.length / 2);
     setMatches(Array(matchesCount).fill({ idUser1: null, idUser2: null }));
@@ -63,7 +62,6 @@ export const Step4 = ({
       if (index !== currentMatchIndex) {
         return match.idUser1 === playerNumId || match.idUser2 === playerNumId;
       } else if (index === currentMatchIndex) {
-        // Verifica dentro del mismo partido si el jugador ya fue seleccionado en la otra posición
         if (playerPosition === "player1" && match.idUser2 === playerNumId) {
           return true;
         } else if (
@@ -118,15 +116,15 @@ export const Step4 = ({
                           .filter(
                             (player) =>
                               !isPlayerSelectedElsewhere(
-                                String(player.id),
+                                String(player.idPlayer),
                                 index,
                                 "player1"
                               )
                           )
                           .map((player) => (
                             <SelectItem
-                              key={player.id}
-                              value={String(player.id)}
+                              key={player.idPlayer}
+                              value={String(player.idPlayer)}
                             >
                               {player.lastname}, {player.name}{" "}
                               <span className="text-xs">
@@ -154,15 +152,15 @@ export const Step4 = ({
                           .filter(
                             (player) =>
                               !isPlayerSelectedElsewhere(
-                                String(player.id),
+                                String(player.idPlayer),
                                 index,
                                 "player2"
                               )
                           )
                           .map((player) => (
                             <SelectItem
-                              key={player.id}
-                              value={String(player.id)}
+                              key={player.idPlayer}
+                              value={String(player.idPlayer)}
                             >
                               {player.lastname}, {player.name}{" "}
                               <span className="text-xs">
@@ -182,14 +180,8 @@ export const Step4 = ({
 
       <div className="flex justify-center mt-4">
         <Button
-          onClick={onBack}
-          className="px-4 py-2 rounded-md bg-slate-500 text-white mr-4 hover:bg-slate-700 transition-colors"
-        >
-          Anterior
-        </Button>
-        <Button
           onClick={handleNext}
-          className="px-4 py-2 rounded-md bg-slate-500 text-white hover:bg-slate-700 transition-colors"
+          className="px-4 py-2 rounded-md bg-slate-700 text-white hover:bg-slate-900 transition-colors"
         >
           Siguiente
         </Button>

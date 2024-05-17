@@ -39,7 +39,7 @@ export const CategorySelect = ({
 
   return (
     <Select value={selected} onValueChange={onCategory}>
-      <SelectTrigger className={`w-full ${className ? className : 'bg-gray-200 border-gray-300 text-gray-800'}`}>
+      <SelectTrigger className="w-full">
         <SelectValue placeholder="Seleccione la categoría..." />
       </SelectTrigger>
       <SelectContent>

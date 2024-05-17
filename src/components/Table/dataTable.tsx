@@ -23,6 +23,7 @@ interface DataTableProps<TData, TValue> {
   searchPlaceholder?: string;
   addLinkPath?: string;
   addLinkText?: string;
+  pageSizes?: number;
   searchColumn?: string;
   canAddUser?: boolean;
   customFilter?: (data: TData, query: string) => boolean;
@@ -39,6 +40,7 @@ export function DataTable<TData, TValue>({
   searchColumn = "name",
   customFilter,
   canAddUser = true,
+  pageSizes,
   onAddClick,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -47,7 +49,7 @@ export function DataTable<TData, TValue>({
   );
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
-    pageSize: 16,
+    pageSize: pageSizes || 16,
   });
   const [searchInput, setSearchInput] = React.useState("");
 

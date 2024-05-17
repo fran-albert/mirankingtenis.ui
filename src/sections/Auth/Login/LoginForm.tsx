@@ -28,14 +28,10 @@ function LoginForm() {
   const { session } = useCustomSession();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [loginError, setLoginError] = useState<string>("");
-  useEffect(() => {
-    if (session) {
-      router.push("/mi-perfil");
-    }
-  }, [session, router]);
+
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    const { email, password } = data;
     setIsLoading(true);
+    const { email, password } = data;
     const result = await signIn("credentials", {
       redirect: false,
       email,
@@ -55,7 +51,6 @@ function LoginForm() {
 
   useEffect(() => {
     if (session) {
-      // Asegúrate de que tu objeto de sesión incluya el ID del usuario de alguna manera.
       router.push(`/jugadores/${session.user.id}`);
     }
   }, [session, router]);
@@ -71,14 +66,27 @@ function LoginForm() {
           >
             <h1 className="text-lg md:text-2xl font-bold text-center">
               Iniciar Sesión
-            </h1>{" "}
+            </h1>
             {loginError && (
               <div className="text-red-500 text-center">{loginError}</div>
             )}
             <div className="space-y-4">
               <div>
                 <Label htmlFor="email">Correo Electrónico</Label>
-                <Input {...register("email", { required: true })} />
+                <Input
+                  {...register("email", {
+                    required: "Este campo es obligatorio",
+                    pattern: {
+                      value: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/,
+                      message: "Introduce un correo electrónico válido",
+                    },
+                  })}
+                />
+                {errors.email && (
+                  <p className="text-red-500 text-xs italic">
+                    {errors.email.message}
+                  </p>
+                )}
               </div>
               <div>
                 <Label htmlFor="password">Contraseña</Label>

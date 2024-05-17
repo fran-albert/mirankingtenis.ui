@@ -3,6 +3,7 @@ import { User } from "./User";
 export interface UserRepository {
   getUser: (id: number) => Promise<User | undefined>;
   getAllUsers: () => Promise<User[]>;
+  getAdminUsers: () => Promise<User[]>;
   getTotalUsers: () => Promise<number>;
   getUsersTotalByCategory: (idCategory: number) => Promise<number>;
   createUser: (newUser: User) => Promise<User | undefined>;
@@ -20,5 +21,5 @@ export interface UserRepository {
     password: string,
     confirmPassword: string
   ) => Promise<User | undefined>;
-  resetUserPassword: (idUser:number) => Promise<string>;
+  resetUserPassword: (idUser: number) => Promise<string>;
 }

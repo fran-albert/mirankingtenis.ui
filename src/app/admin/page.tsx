@@ -1,8 +1,8 @@
-import SideBar from "@/components/sidebar";
+import { AdminComponent } from "@/components/component/admin-component";
 import React from "react";
 
-function AdminPage() {
-  return <SideBar />;
-}
+const AdminPage: React.FC = () => {
+  return <div>{/* <AdminComponent /> */}</div>;
+};
 
 export default AdminPage;

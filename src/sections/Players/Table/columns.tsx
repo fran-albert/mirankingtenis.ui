@@ -6,12 +6,8 @@ import { EditButton } from "@/components/Button/Edit/button";
 import { User } from "@/modules/users/domain/User";
 import { Button } from "@/components/ui/button";
 import DeletePlayerDialog from "../Delete/button";
-import DesactivatePlayerDialog from "../Desactivate/button";
 
-export const getColumns = (
-  handlePlayerDeleted: (idPlayer: number) => void,
-  roles: { isAdmin: boolean | undefined }
-): ColumnDef<User>[] => {
+export const getColumns = (): ColumnDef<User>[] => {
   const columns: ColumnDef<User>[] = [
     {
       accessorKey: "#",
@@ -61,23 +57,22 @@ export const getColumns = (
       accessorKey: "phone",
       header: "Télefono",
     },
-    {
-      header: " ",
-      cell: ({ row }) => (
-        <div className="flex items-center justify-end">
-          {roles.isAdmin && (
-            <>
-              <DesactivatePlayerDialog idPlayer={row.original.id} />
-              <EditButton id={row.original.id} path="jugadores" />
-              <DeletePlayerDialog
-                idPlayer={row.original.id}
-                handlePlayerDeleted={handlePlayerDeleted}
-              />
-            </>
-          )}
-        </div>
-      ),
-    },
+    // {
+    //   header: " ",
+    //   cell: ({ row }) => (
+    //     <div className="flex items-center justify-end">
+    //       {roles.isAdmin && (
+    //         <>
+    //           <EditButton id={row.original.id} path="jugadores" />
+    //           <DeletePlayerDialog
+    //             idPlayer={row.original.id}
+    //             handlePlayerDeleted={handlePlayerDeleted}
+    //           />
+    //         </>
+    //       )}
+    //     </div>
+    //   ),
+    // },
   ];
 
   return columns;

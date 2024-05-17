@@ -14,22 +14,28 @@ import ActionIcon from "@/components/ui/actionIcon";
 import { FaPowerOff } from "react-icons/fa6";
 import { toast } from "sonner";
 import { createApiTournamentRepository } from "@/modules/tournament/infra/ApiTournamentRepository";
-import { desactivatePlayer } from "@/modules/tournament/application/desactivate-player/desactivatePlayer";
+import { createApiTournamentParticipantRepository } from "@/modules/tournament-participant/infra/ApiTournamentRepository";
+import { desactivatePlayer } from "@/modules/tournament-participant/application/desactivate-player/desactivatePlayer";
 
 interface DesactivatePlayerDialogProps {
+  handlePlayerDesactivated?: (idPlayer: number) => void;
   idPlayer: number;
 }
 
 export default function DesactivatePlayerDialog({
+  handlePlayerDesactivated,
   idPlayer,
 }: DesactivatePlayerDialogProps) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const toggleDialog = () => setIsOpen(!isOpen);
-  const tournamentRepository = createApiTournamentRepository();
+  const tournamentParticipantRepository =
+    createApiTournamentParticipantRepository();
 
   const handleConfirmDesactivate = async () => {
     try {
-      const desactivatePlayerFn = desactivatePlayer(tournamentRepository);
+      const desactivatePlayerFn = desactivatePlayer(
+        tournamentParticipantRepository
+      );
       const playerDesactivatePromise = desactivatePlayerFn(idPlayer, 1);
       toast.promise(playerDesactivatePromise, {
         loading: "Desactivando jugador...",
@@ -37,6 +43,9 @@ export default function DesactivatePlayerDialog({
         error: "Error al eliminar el Jugador del Torneo 1",
         duration: 3000,
       });
+      if (handlePlayerDesactivated) {
+        handlePlayerDesactivated(idPlayer);
+      }
     } catch (error) {
       console.error("Error al eliminar el Jugador del Torneo 1", error);
       toast.error("Error al eliminar el Jugador del Torneo 1");
@@ -48,17 +57,9 @@ export default function DesactivatePlayerDialog({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <button onClick={toggleDialog} className="m-2">
-          <ActionIcon
-            icon={
-              <FaPowerOff
-                size={18}
-                className="text-amber-500 hover:text-amber-700"
-              />
-            }
-            tooltip="Desactivar del Torneo Actual"
-          />
-        </button>
+        <Button size="sm" variant="outline" onClick={toggleDialog}>
+          Desactivar
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>

@@ -17,6 +17,14 @@ export function createApiFixtureRepository(): FixtureRepository {
     return fixtures;
   }
 
+  async function getFixtureByCategoryAndTournament(idCategory: number, idTournament: number): Promise<number> {
+    const response = await axiosInstance.get(
+      `fixture/getCountFixturesByTournamentCategory/${idCategory}/${idTournament}`
+    );
+    const fixtures = response.data;
+    return fixtures;
+  }
+
   async function countByCategory(idCategory: number): Promise<number> {
     const response = await axiosInstance.get(
       `fixture/count-fixtures-by-category/${idCategory}`
@@ -26,7 +34,7 @@ export function createApiFixtureRepository(): FixtureRepository {
   }
 
   return {
-    createFixture,
+    createFixture, getFixtureByCategoryAndTournament,
     countByCategory,
     getFixtureByCategory,
   };
