@@ -38,6 +38,8 @@ export const ScoreMatchCard = ({
     console.log(`Editar partido con ID: ${match}`);
   };
 
+  console.log(match, player1, player2)
+
   return (
     <Card className="w-full transition duration-300 ease-in-out transform hover:scale-105 shadow-lg rounded-lg ">
       <CardHeader>
@@ -65,19 +67,19 @@ export const ScoreMatchCard = ({
                         alt="@avatar"
                       />
                       <AvatarFallback>
-                        {player1.name.charAt(0)}
-                        {player1.lastname.charAt(0)}
+                        {player1?.name?.charAt(0) || ""}
+                        {player1?.lastname?.charAt(0) || ""}
                       </AvatarFallback>
                     </Avatar>
                   </div>
                   <div className="text-xs font-bold text-gray-500">
-                    {player1.ranking ? player1.ranking.position : "-"}
+                    {match.user1position ? match.user1position : "-"}
                   </div>
                   <Link
-                    href={`/jugadores/${player1.id}`}
+                    href={`/jugadores/${match.idUser1}`}
                     className="font-medium text-base md:text-xl lg:text-xl text-gray-900 hover:text-sky-800"
                   >
-                    {player1.lastname}, {player1.name}
+                    {match.user1.toString()}
                     {match.idWinner === player1.id && (
                       <span className="ml-2 text-sm font-semibold ">
                         <BadgeWin text="Ganador" />
@@ -113,19 +115,18 @@ export const ScoreMatchCard = ({
                         alt="@avatar"
                       />
                       <AvatarFallback>
-                        {player2.name.charAt(0)}
-                        {player2.lastname.charAt(0)}
+                        {player2?.user2name?.charAt(0) || ""}
                       </AvatarFallback>
                     </Avatar>
                   </div>
                   <div className="text-xs font-bold text-gray-500">
-                    {player2.ranking ? player2.ranking.position : "-"}
+                    {match.user2position ? match.user2position : "-"}
                   </div>
                   <Link
-                    href={`/jugadores/${player2.id}`}
+                    href={`/jugadores/${match.idUser2}`}
                     className="font-medium text- md:text-xl lg:text-xl text-gray-900 hover:text-sky-800"
                   >
-                    {player2.lastname}, {player2.name}
+                    {match.user2.toString()}
                     {match.idWinner === player2.id && (
                       <span className="ml-2 text-sm font-semibold text-green-600">
                         <BadgeWin text="Ganador" />

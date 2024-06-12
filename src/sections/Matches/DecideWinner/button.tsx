@@ -34,20 +34,15 @@ export default function DecideMatchDialog({
   const [selectedPlayer, setSelectedPlayer] = useState<number | null>(null);
   const toggleDialog = () => setIsOpen(!isOpen);
 
-  console.log(match, "patido ")
-
   const selectPlayer = (playerId: number) => {
-    console.log('ID del jugador seleccionado:', playerId);
     setSelectedPlayer(playerId === selectedPlayer ? null : playerId);
   };
-  
+
   const onSubmit = async () => {
     if (selectedPlayer === null) {
       console.error("No se ha seleccionado ningún jugador.");
       return;
     }
-
-
 
     const winnerUserId = Number(selectedPlayer);
     if (isNaN(winnerUserId)) {
@@ -90,30 +85,30 @@ export default function DecideMatchDialog({
           <DialogDescription>
             <div
               className="cursor-pointer p-2"
-              onClick={() => selectPlayer(match.user1.id)}
+              onClick={() => selectPlayer(match.idUser1)}
             >
               <Badge
                 className={`${
-                  selectedPlayer === match.user1.id
+                  selectedPlayer === match.idUser1
                     ? "bg-green-500 text-gray-900 font-bold"
                     : "bg-gray-300 text-gray-900 font-bold"
                 }`}
               >
-                {match?.user1.name} {match?.user1.lastname}
+                {match?.user1.toString()}
               </Badge>
             </div>
             <div
               className="cursor-pointer p-2"
-              onClick={() => selectPlayer(match.user2.id)}
+              onClick={() => selectPlayer(match.idUser2)}
             >
               <Badge
                 className={`${
-                  selectedPlayer === match.user2.id
+                  selectedPlayer === match.idUser2
                     ? "bg-green-500 text-gray-900 font-bold"
                     : "bg-gray-300 text-gray-900 font-bold"
                 }`}
               >
-                {match?.user2.name} {match?.user2.lastname}
+               {match?.user2.toString()}
               </Badge>
             </div>
           </DialogDescription>

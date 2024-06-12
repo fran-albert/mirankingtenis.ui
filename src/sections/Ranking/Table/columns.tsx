@@ -3,9 +3,10 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Ranking } from "@/modules/ranking/domain/Ranking";
+import { TournamentRanking } from "@/modules/tournament-ranking/domain/TournamentRanking";
 
-export const getColumns = (): ColumnDef<Ranking>[] => {
-  const columns: ColumnDef<Ranking>[] = [
+export const getColumns = (): ColumnDef<TournamentRanking>[] => {
+  const columns: ColumnDef<TournamentRanking>[] = [
     {
       accessorKey: "POS",
       cell: ({ row }) => {
@@ -19,26 +20,26 @@ export const getColumns = (): ColumnDef<Ranking>[] => {
         <div
           className="flex items-center cursor-pointer"
           onClick={() =>
-            (window.location.href = `/jugadores/${row.original.user.id}`)
+            (window.location.href = `/jugadores/${row.original.idPlayer}`)
           }
         >
           <Avatar>
             <AvatarImage
               src={
-                row.original.user.photo
-                  ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${row.original.user.photo}.jpeg`
+                row.original.photo
+                  ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${row.original.photo}.jpeg`
                   : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/mirankingtenis_default.png"
               }
               alt="@avatar"
             />
             <AvatarFallback>
-              {row.original.user.name.charAt(0)}
-              {row.original.user.lastname.charAt(0)}
+              {row.original.name.charAt(0)}
+              {row.original.lastname.charAt(0)}
             </AvatarFallback>
           </Avatar>
           <div className="flex flex-col ml-2">
             <p className="text-sm font-medium">
-              {row.original.user.lastname}, {row.original.user.name}
+              {row.original.lastname}, {row.original.name}
             </p>
           </div>
         </div>

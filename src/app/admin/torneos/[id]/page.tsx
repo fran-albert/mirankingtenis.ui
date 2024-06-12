@@ -7,7 +7,7 @@ import { getFixtureByCategoryAndTournament } from "@/modules/fixture/application
 import { createApiFixtureRepository } from "@/modules/fixture/infra/ApiFixtureRepository";
 import { getCategoriesForTournament } from "@/modules/tournament-category/application/get-categories-for-tournament/getCategoriesForTournament";
 import { TournamentCategory } from "@/modules/tournament-category/domain/TournamentCategory";
-import { createApiTournamentCategoryRepository } from "@/modules/tournament-category/infra/ApiTournamentRepository";
+import { createApiTournamentCategoryRepository } from "@/modules/tournament-category/infra/ApiTournamentCategoryRepository";
 import { getTournament } from "@/modules/tournament/application/get/get";
 import { Tournament } from "@/modules/tournament/domain/Tournament";
 import { createApiTournamentRepository } from "@/modules/tournament/infra/ApiTournamentRepository";
@@ -17,18 +17,21 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 function TournamentDetailsPage() {
   const params = useParams();
-  const idParam = params.id;
+  const idTournament = Number(params.id);
   const [tournament, setTournament] = useState<Tournament>();
-  const [categories, setCategories] = useState<TournamentCategory[] | undefined>(
-    undefined
-  );
+  const [categories, setCategories] = useState<
+    TournamentCategory[] | undefined
+  >(undefined);
   const [matchDay, setMatchDay] = useState<number>();
   const tournamentRepository = useMemo(
     () => createApiTournamentRepository(),
     []
   );
   const fixtureRepository = useMemo(() => createApiFixtureRepository(), []);
-  const categoryRepository = useMemo(() => createApiTournamentCategoryRepository(), []);
+  const categoryRepository = useMemo(
+    () => createApiTournamentCategoryRepository(),
+    []
+  );
   const loadTournament = useCallback(
     (id: number) => getTournament(tournamentRepository)(id),
     [tournamentRepository]
@@ -42,11 +45,11 @@ function TournamentDetailsPage() {
       ),
     [tournamentRepository]
   );
-  const loadCategories = useCallback(getCategoriesForTournament(categoryRepository), [
-    tournamentRepository,
-  ]);
+  const loadCategories = useCallback(
+    getCategoriesForTournament(categoryRepository),
+    [tournamentRepository]
+  );
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const idTournament = Number(idParam);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -86,7 +89,7 @@ function TournamentDetailsPage() {
       tournament={tournament}
       categories={categories}
       categoryDates={categoryDates}
-      idTournament={Number(tournament?.id)}
+      idTournament={idTournament}
     />
   );
 }

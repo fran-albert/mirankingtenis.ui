@@ -45,7 +45,7 @@ export const StepsControllerV2 = ({
     if (idCategory) {
       const userRepository = createApiTournamentRankingRepository();
       userRepository
-        .findAllRankingsByTournamentCategory(idTournament, idCategory)
+        .getAllRankingsByTournamentCategory(idTournament, idCategory)
         .then(setPlayers)
         .catch((error) => console.error("Error fetching players:", error));
     }

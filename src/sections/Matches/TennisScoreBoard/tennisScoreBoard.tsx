@@ -8,12 +8,13 @@ const matchRepository = createApiMatchRepository();
 
 export const TennisScoreboard = ({
   jornada,
-  idCategory,
+  tournamentCategoryId,
 }: {
   jornada: number;
-  idCategory: number;
+  tournamentCategoryId: number;
 }) => {
   const [matches, setMatches] = useState<Match[]>([]);
+  console.log(matches)
 
   const handleDeleteMatch = async (id: number) => {
     await matchRepository.deleteMatch(id);
@@ -22,12 +23,13 @@ export const TennisScoreboard = ({
   };
 
   const fetchMatches = useCallback(async () => {
-    const matches = await matchRepository.getByCategoryAndMatchday(
-      idCategory,
-      jornada
-    );
+    const matches =
+      await matchRepository.getMatchesByTournamentCategoryAndMatchday(
+        tournamentCategoryId,
+        jornada
+      );
     setMatches(matches);
-  }, [idCategory, jornada]);
+  }, [tournamentCategoryId, jornada]);
 
   useEffect(() => {
     fetchMatches();

@@ -9,6 +9,7 @@ export interface User {
   lastname: string;
   email: string;
   phone: string;
+  gender: string
   photo: string;
   password: string;
   registerDate: string;
@@ -29,5 +30,7 @@ export interface User {
   confirmNewPassword: string;
   historyRankings: HistoryRanking[];
   signupDate: Date;
-  idPlayer: number
+  idPlayer: number;
+  user2name: string;
+  user1name: string;
 }

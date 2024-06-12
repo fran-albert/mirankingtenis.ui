@@ -15,6 +15,8 @@ export interface Match {
   status: string;
   round: number;
   user1Name: string;
+  user1position: number;
+  user2position: number;
   finalResult: string;
   fixture: {
     id: number;

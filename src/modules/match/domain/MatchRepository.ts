@@ -10,4 +10,6 @@ export interface MatchRepository {
   getMatchesByUser: (idUser: number) => Promise<Match[]>;
   deleteMatch: (id: number) => Promise<void>;
   decideMatch: (id: number, idUserWinner: number) => Promise<void>;
+  getMatchesByTournamentCategoryAndMatchday: (idTournamentCategory: number, matchDay: number) => Promise<any[]>;
+  getNextMatch: (idTournament: number, idUser: number) => Promise<any>;
 }

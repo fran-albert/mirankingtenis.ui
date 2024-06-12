@@ -17,7 +17,7 @@ import { createApiCategoryRepository } from "@/modules/category/infra/ApiCategor
 import { createCategory } from "@/modules/category/application/create/createCategory";
 import { Tournament } from "@/modules/tournament/domain/Tournament";
 import { createApiTournamentRepository } from "@/modules/tournament/infra/ApiTournamentRepository";
-import { create } from "@/modules/tournament/application/create/createTournament";
+import { createTournament } from "@/modules/tournament/application/create/createTournament";
 
 interface AddTournamentDialogProps {
   isOpen: boolean;
@@ -47,7 +47,7 @@ export default function AddTournamentDialog({
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
-      const createCatFn = create(tournamentRepository);
+      const createCatFn = createTournament(tournamentRepository);
       const specialityCreationPromise = createCatFn(data);
 
       toast.promise(specialityCreationPromise, {

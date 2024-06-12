@@ -1,5 +1,7 @@
+import { MatchSummaryDto } from "@/common/types/match-summary.dto";
 import { TournamentRanking } from "./TournamentRanking";
 
 export interface TournamentRankingRepository {
-    findAllRankingsByTournamentCategory(idTournament: number, idCategory: number): Promise<TournamentRanking[]>;
+    getAllRankingsByTournamentCategory(idTournament: number, idCategory: number): Promise<TournamentRanking[]>;
+    getTotalPlayerMatchSummary(idPlayer: number): Promise<MatchSummaryDto>;
 }

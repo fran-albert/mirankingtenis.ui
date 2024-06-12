@@ -33,6 +33,21 @@ export function createApiMatchRepository(): MatchRepository {
     return matches;
   }
 
+  async function getMatchesByTournamentCategoryAndMatchday(idTournamentCategory: number, matchDay: number): Promise<any[]> {
+    const response = await axiosInstance.get(
+      `matches/tournament-category/${idTournamentCategory}/matchday/${matchDay}`
+    );
+    return response.data;
+  }
+
+  async function getNextMatch(idTournament: number, idUser: number): Promise<any> {
+    const response = await axiosInstance.get(
+      `matches/${idTournament}/players/${idUser}/next-match`
+    );
+    return response.data;
+  }
+
+
   async function deleteMatch(id: number): Promise<void> {
     const response = await axiosInstance.delete(`matches/${id}`);
     return response.data;
@@ -49,7 +64,7 @@ export function createApiMatchRepository(): MatchRepository {
     getByCategoryAndMatchday,
     getMatchesByUser,
     getAllByDate,
-    deleteMatch,
-    decideMatch,
+    deleteMatch, getMatchesByTournamentCategoryAndMatchday,
+    decideMatch, getNextMatch
   };
 }
