@@ -17,15 +17,15 @@ export function createApiTournamentRepository(): TournamentRepository {
         return tournament;
     }
 
-    async function startTournament(idTournament: number): Promise<string> {
+    async function startTournament(idTournament: number): Promise<any[]> {
         const response = await axiosInstance.post(`tournament/start/${idTournament}`);
-        const tournament = response.data as string;
+        const tournament = response.data as any[];
         return tournament;
     }
 
-    async function finishTournament(idTournament: number): Promise<string> {
+    async function finishTournament(idTournament: number): Promise<any[]> {
         const response = await axiosInstance.post(`tournament/finish/${idTournament}`);
-        const tournament = response.data as string;
+        const tournament = response.data as any[];
         return tournament;
     }
 
@@ -59,7 +59,6 @@ export function createApiTournamentRepository(): TournamentRepository {
         return tournament;
     }
 
-
     async function deleteTournament(idTournament: number): Promise<string> {
         const response = await axiosInstance.delete(`tournament/${idTournament}`);
         const tournament = response.data as string;
@@ -77,8 +76,6 @@ export function createApiTournamentRepository(): TournamentRepository {
         const tournament = response.data.length;
         return tournament;
     }
-
-
 
     return {
         getAllTournaments, getCompletedTournamentsByPlayer, getAllTournamentsByPlayer, getPlayerInfo, getCurrentTournamentByPlayer, isCurrentTournament, create, deleteTournament, startTournament, finishTournament, getTournament, getTotalTournaments

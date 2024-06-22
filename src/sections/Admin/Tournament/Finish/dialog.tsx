@@ -17,40 +17,52 @@ import { createApiTournamentRepository } from "@/modules/tournament/infra/ApiTou
 import { createApiTournamentParticipantRepository } from "@/modules/tournament-participant/infra/ApiTournamentRepository";
 import { desactivatePlayer } from "@/modules/tournament-participant/application/desactivate-player/desactivatePlayer";
 import { Tournament } from "@/modules/tournament/domain/Tournament";
+import { useTournamentStore } from "@/hooks/useTournament";
+import axios from "axios";
+import { isAxiosError } from "@/common/helpers/helpers";
 
 interface FinishTournamentDialogDialogProps {
-  handlePlayerDesactivated?: (idTournament: number) => void;
   tournament: Tournament;
+  onUpdateTournamentOnList?: (newTournament: any) => void;
 }
 
 export default function FinishTournamentDialog({
-  handlePlayerDesactivated,
   tournament,
+  onUpdateTournamentOnList,
 }: FinishTournamentDialogDialogProps) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const toggleDialog = () => setIsOpen(!isOpen);
-  const tournamentParticipantRepository =
-    createApiTournamentParticipantRepository();
+  const { finishTournament } = useTournamentStore();
 
-  const handleConfirmDesactivate = async () => {
+  const handleConfirmFinished = async () => {
     try {
-      const desactivatePlayerFn = desactivatePlayer(
-        tournamentParticipantRepository
-      );
-      const playerDesactivatePromise = desactivatePlayerFn(tournament.id, 1);
-      toast.promise(playerDesactivatePromise, {
-        loading: "Desactivando jugador...",
-        success: "Jugador eliminado del Torneo 1 con éxito!",
-        error: "Error al eliminar el Jugador del Torneo 1",
+      const finishPromise = finishTournament(tournament.id);
+      toast.promise(finishPromise, {
+        loading: "Finalizando torneo...",
+        success: "Torneo finalizado con éxito!",
+        error: (err) => {
+          if (isAxiosError(err)) {
+            return err.response.data.message || "Error al finalizar el torneo";
+          }
+          return "Error al finalizar el torneo";
+        },
         duration: 3000,
       });
-      if (handlePlayerDesactivated) {
-        handlePlayerDesactivated(tournament.id);
+      const updatedTournament = await finishPromise;
+      if (onUpdateTournamentOnList) {
+        onUpdateTournamentOnList(updatedTournament);
       }
+      setIsOpen(false);
     } catch (error) {
-      console.error("Error al eliminar el Jugador del Torneo 1", error);
-      toast.error("Error al eliminar el Jugador del Torneo 1");
-    } finally {
+      if (axios.isAxiosError(error)) {
+        const errorMessage =
+          error.response?.data?.message ||
+          "Error desconocido al finalizar el torneo";
+        toast.error(`Error al finalizar el torneo: ${errorMessage}`, {
+          duration: 1000,
+        });
+        console.error("Error al enviar los datos:", errorMessage);
+      }
       setIsOpen(false);
     }
   };
@@ -58,7 +70,11 @@ export default function FinishTournamentDialog({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" className="bg-red-700 hover:bg-red-900" onClick={toggleDialog}>
+        <Button
+          size="sm"
+          className="bg-red-700 hover:bg-red-900"
+          onClick={toggleDialog}
+        >
           Finalizar
         </Button>
       </DialogTrigger>
@@ -68,13 +84,13 @@ export default function FinishTournamentDialog({
         </DialogHeader>
         <DialogDescription className="text-gray-900">
           ¿Estás seguro de que quieres finalizar el torneo
-          <span className="font-bold"> "{tournament.name}"</span>?
+          <span className="font-bold"> &quot;{tournament.name}&quot;</span>?
         </DialogDescription>
         <DialogFooter>
           <Button variant="outline" onClick={toggleDialog}>
             Cancelar
           </Button>
-          <Button variant="green" onClick={handleConfirmDesactivate}>
+          <Button variant="green" onClick={handleConfirmFinished}>
             Confirmar
           </Button>
         </DialogFooter>

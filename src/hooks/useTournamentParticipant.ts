@@ -5,6 +5,7 @@ import { getParticipantsByTournamentCategory } from '@/modules/tournament-partic
 import { getPlayersByTournament } from '@/modules/tournament-participant/application/get-players-by-tournament/getPlayersByTournament';
 import { TournamentParticipant } from '@/modules/tournament-participant/domain/TournamentParticipant';
 import { createApiTournamentParticipantRepository } from '@/modules/tournament-participant/infra/ApiTournamentRepository';
+import { NonParticipantsDto } from '@/common/types/non-participants.dto';
 
 const tournamentParticipantRepository = createApiTournamentParticipantRepository();
 
@@ -12,28 +13,62 @@ interface TournamentParticipantState {
     tournamentParticipants: TournamentParticipant[];
     loading: boolean;
     error: string | null;
-    create: (idTournament: number, idCategory: number, userIds: number[], positionInitials: number[]) => Promise<TournamentParticipant[]>;
+    nonParticipants: NonParticipantsDto[];
+    hasPlayers: boolean;
+    create: (idTournament: number, idCategory: number, userIds: number[], positionInitials: number[]) => Promise<string>;
+    findNonParticipants: (idTournament: number) => Promise<NonParticipantsDto[]>;
     getPlayersByTournament: (idTournament: number) => Promise<TournamentParticipant[]>;
+    hasPlayersForCategory: (idTournament: number, idCategory: number) => Promise<boolean>;
     desactivatePlayer: (idPlayer: number, tournamentId: number) => Promise<string>;
     getParticipantsByTournamentCategory: (idTournament: number, idCategory: number) => Promise<TournamentParticipant[]>;
 }
 
-const createTournamentFn = createParticipantsForTournament(tournamentParticipantRepository);
 const desactivatePlayerFn = desactivatePlayer(tournamentParticipantRepository);
 const getPlayersByTournamentFn = getPlayersByTournament(tournamentParticipantRepository);
 const getParticipantsByTournamentCategoryFn = getParticipantsByTournamentCategory(tournamentParticipantRepository);
 
 export const useTournamentParticipantStore = create<TournamentParticipantState>((set) => ({
     tournamentParticipants: [],
+    nonParticipants: [],
+    hasPlayers: false,
     loading: false,
     error: null,
 
     create: async (idTournament, idCategory, userIds, positionInitials) => {
         set({ loading: true, error: null });
         try {
-            const tournamentParticipants = await createTournamentFn(idTournament, idCategory, userIds, positionInitials);
-            set({ tournamentParticipants });
-            return tournamentParticipants;
+            const response = await tournamentParticipantRepository.createParticipantsForTournament(idTournament, idCategory, userIds, positionInitials);
+            return response;
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Unexpected error';
+            set({ error: errorMessage });
+            return '';
+        } finally {
+            set({ loading: false });
+        }
+    },
+
+    hasPlayersForCategory: async (idTournament, idCategory) => {
+        set({ loading: true, error: null });
+        try {
+            const hasPlayers = await tournamentParticipantRepository.hasPlayersForCategory(idTournament, idCategory);
+            set({ hasPlayers });
+            return hasPlayers;
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Unexpected error';
+            set({ error: errorMessage });
+            return false;
+        } finally {
+            set({ loading: false });
+        }
+    },
+
+    findNonParticipants: async (idTournament) => {
+        set({ loading: true, error: null });
+        try {
+            const nonParticipants = await tournamentParticipantRepository.findNonParticipants(idTournament);
+            set({ nonParticipants });
+            return nonParticipants;
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : 'Unexpected error';
             set({ error: errorMessage });

@@ -12,8 +12,13 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { createApiSetsRepository } from "@/modules/sets/infra/ApiSetsRepository";
-import { createSets } from "@/modules/sets/application/create/createSets";
+import {
+  SelectValue,
+  SelectTrigger,
+  SelectItem,
+  SelectContent,
+  Select,
+} from "@/components/ui/select";
 import axios from "axios";
 import { MdScoreboard } from "react-icons/md";
 import ActionIcon from "@/components/ui/actionIcon";
@@ -30,8 +35,6 @@ import { shiftForMatch } from "@/modules/shift/application/shift-for-match/shift
 registerLocale("es", es);
 import moment from "moment-timezone";
 import { Match } from "@/modules/match/domain/Match";
-const { setHours } = require("date-fns");
-const { setMinutes } = require("date-fns");
 interface EidtMatchDialogProps {
   onUpdateMatches?: () => void;
   match: Match;
@@ -49,27 +52,20 @@ export default function EditMatchDialog({
     setValue,
   } = useForm();
   const shiftRepository = createApiShiftRepository();
-  const [isDatePickerOpen, setDatePickerOpen] = useState(false);
   const shitForMatchFn = shiftForMatch(shiftRepository);
-  const [startDate, setStartDate] = useState(new Date());
-  const [renderDatePicker, setRenderDatePicker] = useState<boolean>(false);
   const [selectedCourt, setSelectedCourt] = useState<string>();
-  const includeTimes = [];
-  for (let hour = 9; hour <= 20; hour++) {
-    includeTimes.push(setHours(setMinutes(new Date(), 0), hour));
-    includeTimes.push(setHours(setMinutes(new Date(), 15), hour));
-    includeTimes.push(setHours(setMinutes(new Date(), 30), hour));
-    includeTimes.push(setHours(setMinutes(new Date(), 45), hour));
-  }
 
   const onSubmit = async (data: any, event?: React.BaseSyntheticEvent) => {
     if (event) {
       event.preventDefault();
     }
+    const { date, time, court } = data;
+    const startHour = new Date(`${date}T${time}:00Z`).toISOString();
     const dataToSend: any = {
       idCourt: Number(data.idCourt),
-      startHour: data.startHour,
+      startHour: startHour,
     };
+    console.log(dataToSend);
     try {
       const shiftCreationPromise = shitForMatchFn(dataToSend, match.id);
       toast.promise(shiftCreationPromise, {
@@ -100,12 +96,6 @@ export default function EditMatchDialog({
     setIsOpen(false);
   };
 
-  const handleDateChange = (date: Date) => {
-    setStartDate(date);
-    const dateInUTC = moment(date).utc();
-    setValue("startHour", dateInUTC.format());
-  };
-
   const handleCourtSelection = (value: string) => {
     setSelectedCourt(value);
     setValue("idCourt", value);
@@ -113,30 +103,7 @@ export default function EditMatchDialog({
 
   const toggleDialog = () => {
     setIsOpen(!isOpen);
-    if (!isOpen) {
-      setTimeout(() => setRenderDatePicker(true), 100);
-    } else {
-      setRenderDatePicker(false);
-    }
   };
-
-  useEffect(() => {
-    if (!isOpen) {
-      setRenderDatePicker(false);
-    } else {
-      setTimeout(() => setRenderDatePicker(true), 100);
-    }
-  }, [isOpen]);
-
-  const handleCourtChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = event.target.value;
-    setSelectedCourt(value);
-    setValue("idCourt", value);
-  };
-
-  useEffect(() => {
-    setValue("idCourt", selectedCourt);
-  }, [selectedCourt, setValue]);
 
   return (
     <>
@@ -147,54 +114,48 @@ export default function EditMatchDialog({
           </Button>
         </DialogTrigger>
         <DialogContent className="p-4">
-          <DialogHeader>
-            <DialogTitle>Seleccionar turno</DialogTitle>
-          </DialogHeader>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div className="flex flex-col gap-4">
-              <div className="flex flex-col gap-4 px-4 py-2 w-full sm:w-3/4 md:w-1/2 lg:w-full">
-                <Label htmlFor="court">Cancha</Label>
-                <select
-                  name="idCourt"
-                  className="w-full h-10 bg-gray-200 border-gray-300 text-gray-800 rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  value={selectedCourt}
-                  onChange={handleCourtChange}
-                >
-                  <option value="">Seleccione una cancha...</option>
-                  <option value="1">Cancha 1</option>
-                  <option value="2">Cancha 2</option>
-                  <option value="3">Cancha 3</option>
-                  <option value="4">Cancha 4</option>
-                </select>
-                <Label
-                  htmlFor="day"
-                  className="block mb-2 text-sm font-medium text-gray-900"
-                >
-                  Día
+            <section className="w-full max-w-md bg-white p-6 flex flex-col space-y-4">
+              <h2 className="text-2xl font-semibold">Reservar Turno</h2>
+              <div>
+                <Label className="mb-2" htmlFor="court">
+                  Cancha
                 </Label>
-                {renderDatePicker && (
-                  <DatePicker
-                    showIcon
-                    selected={startDate}
-                    className="w-full"
-                    onChange={handleDateChange}
-                    showTimeSelect
-                    timeInputLabel="Time:"
-                    locale="es"
-                    timeIntervals={15}
-                    includeTimes={includeTimes}
-                    timeCaption="time"
-                    customInput={
-                      <Input
-                        {...register("startHour")}
-                        className="bg-gray-200"
-                      />
-                    }
-                    dateFormat="d MMMM h:mm aa"
-                  />
-                )}
+                <Select onValueChange={handleCourtSelection}>
+                  <SelectTrigger id="court">
+                    <SelectValue placeholder="Seleccionar cancha" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1">Cancha 1</SelectItem>
+                    <SelectItem value="2">Cancha 2</SelectItem>
+                    <SelectItem value="3">Cancha 3</SelectItem>
+                    <SelectItem value="4">Cancha 4</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-            </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="mb-2" htmlFor="date">
+                    Fecha
+                  </Label>
+                  <Input
+                    id="date"
+                    type="date"
+                    {...register("date", { required: true })}
+                  />
+                </div>
+                <div>
+                  <Label className="mb-2" htmlFor="time">
+                    Hora
+                  </Label>
+                  <Input
+                    id="time"
+                    type="time"
+                    {...register("time", { required: true })}
+                  />
+                </div>
+              </div>
+            </section>
             <DialogFooter className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
               <Button
                 type="button"
@@ -205,7 +166,7 @@ export default function EditMatchDialog({
                 Cancelar
               </Button>
               <Button
-                className="w-full sm:w-auto px-4 py-2 text-sm bg-slate-700"
+                className="bg-slate-500 hover:bg-slate-600 text-white"
                 type="submit"
               >
                 Confirmar

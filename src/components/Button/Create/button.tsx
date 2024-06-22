@@ -19,12 +19,12 @@ export const Create = ({
   const router = useRouter();
   const handleEdit = () => {
     router.push(
-      `/${path}/${idTournament}/categoria/${category.idCategory}/nueva-fecha/${number}`
+      `/${path}/${idTournament}/categoria/${category.id}/nueva-fecha/${number}`
     );
   };
 
   return (
-    <div className="flex justify-center">
+    <div className="flex justify-start">
       <Button size="sm" variant="outline" onClick={handleEdit}>
         Agregar fecha {number ?? ""}
       </Button>

@@ -2,12 +2,9 @@ import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import "@/styles/globals.css";
 import { cn } from "@/lib/utils";
-import Navbar from "@/components/navbar";
 import { Toaster } from "sonner";
 import SessionAuthProvider from "@/context/SessionAuthProviders";
 import { ProfilePhotoProvider } from "@/context/ProfilePhotoContext";
-import { Login } from "@/components/component/login";
-import { NavBar } from "@/components/component/nav-bar";
 import MainContainer from "./mainContainer";
 
 const roboto = Roboto({
@@ -18,7 +15,7 @@ const roboto = Roboto({
 
 export const metadata: Metadata = {
   title: "Mi Ranking Tenis",
-  description: "Mi Ranking Tenis  - Firmat, Santa Fé",
+  description: "Mi Ranking Tenis - Firmat, Santa Fé",
 };
 
 export default function RootLayout({
@@ -43,9 +40,9 @@ export default function RootLayout({
         <ProfilePhotoProvider>
           <SessionAuthProvider>
             <Toaster richColors position="top-center" />
-            {/* <Navbar /> */}
-            {/* <NavBar /> */}
-            <MainContainer children={children} />
+            <MainContainer>
+              {children}
+            </MainContainer>
           </SessionAuthProvider>
         </ProfilePhotoProvider>
       </body>

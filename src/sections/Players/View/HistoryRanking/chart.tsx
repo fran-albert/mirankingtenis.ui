@@ -25,19 +25,20 @@ type DataType = {
   date: string;
   position: number;
 };
-function PlayerChart({ player }: { player: User | undefined }) {
+function PlayerChart({ player }: { player: any | null }) {
   const historyRankings = player?.historyRankings || [];
 
-  const data = historyRankings.map((ranking) => ({
+  const data = historyRankings.map((ranking: any) => ({
     date: new Date(ranking.date).toLocaleDateString(),
     position: ranking.position,
   }));
 
-  const minY = data.length > 0 ? Math.min(...data.map((d) => d.position)) : 1;
+  const minY =
+    data.length > 0 ? Math.min(...data.map((d: any) => d.position)) : 1;
 
   const maxY =
     data.length > 0
-      ? Math.max(5, Math.max(...data.map((d) => d.position)) + 5)
+      ? Math.max(5, Math.max(...data.map((d: any) => d.position)) + 5)
       : 5;
   const CustomTooltip = ({
     active,

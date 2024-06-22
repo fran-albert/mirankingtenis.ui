@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   CardTitle,
   CardHeader,
@@ -9,39 +9,60 @@ import {
 import { Create } from "@/components/Button/Create/button";
 import { Category } from "@/modules/category/domain/Category";
 import { TournamentCategory } from "@/modules/tournament-category/domain/TournamentCategory";
+import { useTournamentParticipantStore } from "@/hooks/useTournamentParticipant";
+import Loading from "@/components/Loading/loading";
 function CategoriesCard({
   category,
   nextMatchDay,
-  idTournament
+  idTournament,
 }: {
   category: TournamentCategory;
   idTournament: number;
   nextMatchDay: any;
 }) {
+  const { hasPlayersForCategory } = useTournamentParticipantStore();
+
+  const [hasParticipants, setHasParticipants] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  useEffect(() => {
+    const fetchGroupAndPlayersStatus = async () => {
+      setIsLoading(true);
+
+      const playersStatus = await hasPlayersForCategory(
+        idTournament,
+        category.id
+      );
+      setHasParticipants(playersStatus);
+      setIsLoading(false);
+    };
+    fetchGroupAndPlayersStatus();
+  }, [category.id, hasPlayersForCategory, idTournament]);
+
+  if (isLoading) {
+    return <Loading isLoading />;
+  }
+
   return (
     <div>
       <Card>
         <CardHeader>
-          <CardTitle>Categoría {category.nameCategory}</CardTitle>
+          <CardTitle>Categoría {category.name}</CardTitle>
         </CardHeader>
         <CardContent>
-          {/* <div className="flex items-center gap-2">
-            <span>Team A</span>
-            <span>vs</span>
-            <span>Team B</span>
-          </div>
-          <div className="mt-2">
-            <span>Date: 13th December 2023, 10:00 AM</span>
-          </div> */}
+          {hasParticipants ? (
+            <Create
+              idTournament={idTournament}
+              path="admin/torneos/"
+              category={category}
+              number={nextMatchDay}
+            />
+          ) : (
+            <p className="text-gray-500 dark:text-gray-400">
+              Para generar un fixture, primero debes agregar jugadores a la
+              categoría.
+            </p>
+          )}
         </CardContent>
-        <CardFooter>
-          <Create
-            idTournament={idTournament}
-            path="admin/torneos/"
-            category={category}
-            number={nextMatchDay}
-          />
-        </CardFooter>
       </Card>
     </div>
   );

@@ -1,6 +1,7 @@
 import axiosInstance from "@/services/axiosConfig";
 import { MatchRepository } from "../domain/MatchRepository";
 import { Match } from "../domain/Match";
+import { GroupFixtureDto } from "@/common/types/group-fixture.dto";
 
 export function createApiMatchRepository(): MatchRepository {
   async function getAllMatches(): Promise<Match[]> {
@@ -25,11 +26,27 @@ export function createApiMatchRepository(): MatchRepository {
     return matches;
   }
 
-  async function getMatchesByUser(idUser: number): Promise<Match[]> {
+  async function getMatchesByUser(idUser: number, idTournament: number, idCategory: number): Promise<Match[]> {
     const response = await axiosInstance.get(
-      `matches/by-user?idUser=${idUser}`
+      `matches/by-user/${idUser}/tournament/${idTournament}/category/${idCategory}`
     );
     const matches = response.data as Match[];
+    return matches;
+  }
+
+  async function getAllMatchesByUser(idUser: number): Promise<Match[]> {
+    const response = await axiosInstance.get(
+      `matches/all-matches-by-user/${idUser}`
+    );
+    const matches = response.data as Match[];
+    return matches;
+  }
+
+  async function findMatchesByGroupStage(idGroupStage: number): Promise<GroupFixtureDto[]> {
+    const response = await axiosInstance.get(
+      `matches/group-stage/${idGroupStage}`
+    );
+    const matches = response.data as GroupFixtureDto[];
     return matches;
   }
 
@@ -63,8 +80,8 @@ export function createApiMatchRepository(): MatchRepository {
     getAllMatches,
     getByCategoryAndMatchday,
     getMatchesByUser,
-    getAllByDate,
-    deleteMatch, getMatchesByTournamentCategoryAndMatchday,
+    getAllByDate, findMatchesByGroupStage,
+    deleteMatch, getMatchesByTournamentCategoryAndMatchday, getAllMatchesByUser,
     decideMatch, getNextMatch
   };
 }

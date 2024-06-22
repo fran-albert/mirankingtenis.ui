@@ -38,7 +38,8 @@ export const ScoreMatchCard = ({
     console.log(`Editar partido con ID: ${match}`);
   };
 
-  console.log(match, player1, player2)
+
+  console.log(match)
 
   return (
     <Card className="w-full transition duration-300 ease-in-out transform hover:scale-105 shadow-lg rounded-lg ">
@@ -156,7 +157,7 @@ export const ScoreMatchCard = ({
           {match.shift && match.shift.startHour && (
             <span>
               {formatDate(match?.shift?.startHour)} - Cancha{" "}
-              {match?.shift?.court?.id}
+              {match?.shift?.court?.toString()}
             </span>
           )}
         </div>

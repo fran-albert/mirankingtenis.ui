@@ -1,5 +1,5 @@
 import { useTournamentStore } from "@/hooks/useTournament";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 
 function TournamentTabs({
@@ -27,21 +27,24 @@ function TournamentTabs({
 
   const scrollLeft = () => {
     const prevIndex = Math.max(0, activeTournament - 1);
-    const prevCategory = tournaments[prevIndex];
-    if (prevCategory) {
-      setActiveTournament(prevCategory.id);
-      onSelectTournament(prevCategory.id);
+    const prevTournament = tournaments.filter(t => t.type === "league")[prevIndex];
+    if (prevTournament) {
+      setActiveTournament(prevTournament.id);
+      onSelectTournament(prevTournament.id);
     }
   };
 
   const scrollRight = () => {
-    const nextIndex = Math.min(tournaments.length - 1, activeTournament + 1);
-    const nextCategory = tournaments[nextIndex];
-    if (nextCategory) {
-      setActiveTournament(nextCategory.id);
-      onSelectTournament(nextCategory.id);
+    const nextIndex = Math.min(tournaments.filter(t => t.type === "league").length - 1, activeTournament + 1);
+    const nextTournament = tournaments.filter(t => t.type === "league")[nextIndex];
+    if (nextTournament) {
+      setActiveTournament(nextTournament.id);
+      onSelectTournament(nextTournament.id);
     }
   };
+
+  const leagueTournaments = tournaments.filter(tournament => tournament.type === "league");
+
   return (
     <div className="flex items-center justify-center py-2 px-4 bg-white rounded-lg shadow-md">
       <button
@@ -52,17 +55,17 @@ function TournamentTabs({
       </button>
 
       <div className="flex overflow-x-auto space-x-4 scrollbar-hide">
-        {tournaments.map((category) => (
+        {leagueTournaments.map((tournament) => (
           <span
-            key={category.id}
+            key={tournament.id}
             className={`whitespace-nowrap py-1 px-4 font-semibold ${
-              category.id === activeTournament
+              tournament.id === activeTournament
                 ? "bg-slate-700 text-white"
                 : "hover:bg-slate-100"
             } rounded-full cursor-pointer transition-colors duration-200 ease-in-out`}
-            onClick={() => handleSelectTournament(category.id)}
+            onClick={() => handleSelectTournament(tournament.id)}
           >
-            {category.name}
+            {tournament.name}
           </span>
         ))}
       </div>

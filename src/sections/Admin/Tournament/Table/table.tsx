@@ -8,14 +8,16 @@ import { useCustomSession } from "@/context/SessionAuthProviders";
 import { Category } from "@/modules/category/domain/Category";
 import { Tournament } from "@/modules/tournament/domain/Tournament";
 import AddTournamentDialog from "../Add/dialog";
+
 function TournamentTable({
   tournament,
   addTournamentToList,
+  onUpdateTournamentOnList,
 }: {
   tournament: Tournament[];
   addTournamentToList: (newTournament: Tournament) => void;
+  onUpdateTournamentOnList: (updatedTournament: Tournament) => void;
 }) {
-  const [isLoading, setIsLoading] = useState(true);
   const { isAdmin } = useRoles();
   const { session } = useCustomSession();
   const canAddUser = !!session && isAdmin;
@@ -28,14 +30,16 @@ function TournamentTable({
       currentPlayers.filter((player) => player.id !== idPlayer);
   };
 
-  const columns  = getColumns(handlePlayerDeleted, { isAdmin });
+  const columns = getColumns(handlePlayerDeleted, onUpdateTournamentOnList, {
+    isAdmin,
+  });
   const customFilterFunction = (player: Category, query: string) =>
     player.name.toLowerCase().includes(query.toLowerCase());
 
   return (
     <div>
       <DataTable
-        columns={columns }
+        columns={columns}
         data={tournament}
         searchPlaceholder="Buscar torneos..."
         showSearch={true}

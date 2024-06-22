@@ -12,6 +12,8 @@ interface FixtureState {
     loading: boolean;
     error: string | null;
     createFixture: (newFixture: Fixture) => Promise<void>;
+    isGroupStageFixturesCreated: (idTournament: number, idCategory: number) => Promise<boolean>;
+    createFixtureGroup: (idTournament: number, idCategory: number) => Promise<string>;
     getFixtureByCategory: (idCategory: number) => Promise<void>;
     getFixtureByCategoryAndTournament: (idCategory: number, idTournament: number) => Promise<void>;
 }
@@ -37,6 +39,30 @@ export const useFixtureStore = create<FixtureState>((set) => ({
             set({ loading: false });
         } catch (error) {
             set({ error: getErrorMessage(error), loading: false });
+        }
+    },
+
+    createFixtureGroup: async (idTournament: number, idCategory: number) => {
+        set({ loading: true, error: null });
+        try {
+            const fixture = await fixtureRepository.createFixtureGroup(idTournament, idCategory);
+            set({ loading: false });
+            return fixture;
+        } catch (error) {
+            set({ error: getErrorMessage(error), loading: false });
+            throw error;
+        }
+    },
+
+    isGroupStageFixturesCreated: async (idTournament: number, idCategory: number) => {
+        set({ loading: true, error: null });
+        try {
+            const fixture = await fixtureRepository.isGroupStageFixturesCreated(idTournament, idCategory);
+            set({ loading: false });
+            return fixture;
+        } catch (error) {
+            set({ error: getErrorMessage(error), loading: false });
+            return false;
         }
     },
 

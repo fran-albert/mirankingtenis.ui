@@ -2,6 +2,7 @@
 import Loading from "@/components/Loading/loading";
 import { useCustomSession } from "@/context/SessionAuthProviders";
 import useRoles from "@/hooks/useRoles";
+import { useUserStore } from "@/hooks/useUser";
 import { getAdminUsers } from "@/modules/users/application/get-all-admin/getAdminUsers";
 import { User } from "@/modules/users/domain/User";
 import { createApiUserRepository } from "@/modules/users/infra/ApiUserRepository";
@@ -11,36 +12,20 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 function AdminPlayersPage() {
   const [isLoading, setIsLoading] = useState(true);
-  const [players, setPlayers] = useState<User[]>([]);
-  const userRepository = useMemo(() => createApiUserRepository(), []);
-  const loadAllPlayers = useCallback(async () => {
-    const users = await getAdminUsers(userRepository)();
-    return users;
-  }, [userRepository]);
+  const { adminUsers, getAdminUsers, loading: isLoadingUsers} = useUserStore();  
   const { isAdmin } = useRoles();
   const { session } = useCustomSession();
   const canAddUser = !!session && isAdmin;
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        setIsLoading(true);
-        const userData = await loadAllPlayers();
-        setPlayers(userData);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchUsers();
-  }, [loadAllPlayers]);
+   getAdminUsers();
+  }, [getAdminUsers]);
 
-  const handlePlayerDeleted = (idPlayer: number) => {
-    setPlayers((currentPlayers) =>
-      currentPlayers.filter((player) => player.id !== idPlayer)
-    );
-  };
+  // const handlePlayerDeleted = (idPlayer: number) => {
+  //   setPlayers((currentPlayers) =>
+  //     currentPlayers.filter((player) => player.id !== idPlayer)
+  //   );
+  // };
 
   // const playersColumns = getColumns(handlePlayerDeleted, { isAdmin });
 
@@ -48,13 +33,13 @@ function AdminPlayersPage() {
   //   player.name.toLowerCase().includes(query.toLowerCase()) ||
   //   player.lastname.toLowerCase().includes(query.toLowerCase());
 
-  if (isLoading) {
+  if (isLoadingUsers) {
     return <Loading isLoading={true} />;
   }
 
   return (
     <div>
-      <AdminPlayersTanstackTable players={players} />
+      <AdminPlayersTanstackTable players={adminUsers} />
     </div>
   );
 }

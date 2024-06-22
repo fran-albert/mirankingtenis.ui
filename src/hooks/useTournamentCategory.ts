@@ -7,14 +7,14 @@ import { createApiTournamentCategoryRepository } from '@/modules/tournament-cate
 const tournamentCategoryRepository = createApiTournamentCategoryRepository();
 
 interface TournamentCategoryState {
-    categories: TournamentCategory[];
+    categories: TournamentCategory[] | any[];
     tournamentCategoryId: number;
     loading: boolean;
     error: string | null;
     getCategoriesForTournament: (idTournament: number) => Promise<void>;
-    createCategoryForTournament: (idTournament: number, idCategory: number[]) => Promise<void>;
+    getTournamentCategoriesByUser: (idUser: number) => Promise<void>;
+    createCategoryForTournament: (idTournament: number, idCategory: number[]) => Promise<TournamentCategory[]>; 
     getTournamentCategoryId: (idTournament: number, idCategory: number) => Promise<void>;
-
 }
 
 const loadAllCategoriesFn = getCategoriesForTournament(tournamentCategoryRepository);
@@ -40,7 +40,22 @@ export const useTournamentCategoryStore = create<TournamentCategoryState>((set) 
     createCategoryForTournament: async (idTournament: number, idCategory: number[]) => {
         set({ loading: true, error: null });
         try {
-            const categories = await createCategoryForTournamentFn(idTournament, idCategory);
+            const newCategories = await createCategoryForTournamentFn(idTournament, idCategory);
+            set((state) => ({
+                categories: [...state.categories, ...newCategories],
+                loading: false
+            }));
+            return newCategories; // Ensure it returns the new categories
+        } catch (error: any) {
+            set({ error: error.message, loading: false });
+            throw error; // Rethrow the error to be handled by the calling component
+        }
+    },
+
+    getTournamentCategoriesByUser: async (idUser: number) => {
+        set({ loading: true, error: null });
+        try {
+            const categories = await tournamentCategoryRepository.getTournamentCategoriesByUser(idUser);
             set({ categories, loading: false });
         } catch (error: any) {
             set({ error: error.message, loading: false });
@@ -56,4 +71,5 @@ export const useTournamentCategoryStore = create<TournamentCategoryState>((set) 
             set({ error: error.message, loading: false });
         }
     },
+
 }));

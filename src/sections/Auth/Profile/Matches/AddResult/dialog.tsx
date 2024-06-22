@@ -20,6 +20,8 @@ import { MdScoreboard } from "react-icons/md";
 import ActionIcon from "@/components/ui/actionIcon";
 import { Match } from "@/modules/match/domain/Match";
 import "./dialog.style.css";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 interface AddResultMatchDialogProps {
   onUpdateMatches?: () => void;
@@ -57,6 +59,7 @@ export default function AddResultMatchDialog({
         pointsPlayer2: parseInt(set.pointsPlayer2, 10),
         setNumber: index + 1,
       })),
+      tournamentCategoryId: match.fixture.tournamentCategories.id,
     };
     try {
       const setCreationPromise = createSetFn(dataToSend);
@@ -97,13 +100,8 @@ export default function AddResultMatchDialog({
 
   return (
     <>
-      <div className="sm:max-w-full">
+      {/* <div className="sm:max-w-full">
         <Dialog open={isAddResultOpen} onOpenChange={setIsAddResultOpen}>
-          <DialogTrigger asChild>
-            <Button variant="green" className="text-xs">
-              Resultado
-            </Button>
-          </DialogTrigger>
           <DialogContent className="dialog-content">
             <DialogHeader>
               <DialogTitle>Insertar Resultado del Partido</DialogTitle>
@@ -184,7 +182,111 @@ export default function AddResultMatchDialog({
             </form>
           </DialogContent>
         </Dialog>
-      </div>
+      </div> */}
+
+      <Dialog open={isAddResultOpen} onOpenChange={setIsAddResultOpen}>
+        <DialogTrigger asChild>
+          <Button variant="green" type="button">
+            Resultado
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Resultados del Partido de Tenis</DialogTitle>
+            <DialogDescription>
+              Ingresa los nombres de los jugadores y los puntajes de cada set.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-5 items-center gap-4">
+                <Label htmlFor="player1" className="col-span-2 text-right">
+                  {match.user1Name}
+                </Label>
+                <div className="col-span-1" />
+                <Label htmlFor="player2" className="col-span-2 text-left">
+                  {match.user2Name}
+                </Label>
+              </div>
+              <div className="grid grid-cols-5 gap-4 items-center">
+                <div className="col-span-1 text-right">Set 1</div>
+                <Input
+                  id="set1-player1"
+                  type="number"
+                  {...register("sets.0.pointsPlayer1")}
+                  min="0"
+                  max="6"
+                  className="col-span-1"
+                />
+                <div className="col-span-1 text-center">-</div>
+                <Input
+                  id="set1-player2"
+                  type="number"
+                  {...register("sets.0.pointsPlayer2")}
+                  min="0"
+                  max="6"
+                  className="col-span-1"
+                />
+              </div>
+              <div className="grid grid-cols-5 gap-4 items-center">
+                <div className="col-span-1 text-right">Set 2</div>
+                <Input
+                  id="set2-player1"
+                  type="number"
+                  {...register("sets.1.pointsPlayer1")}
+                  min="0"
+                  max="7"
+                  className="col-span-1"
+                />
+                <div className="col-span-1 text-center">-</div>
+                <Input
+                  id="set2-player2"
+                  type="number"
+                  min="0"
+                  {...register("sets.1.pointsPlayer2")}
+                  max="7"
+                  className="col-span-1"
+                />
+              </div>
+              <div className="grid grid-cols-5 gap-4 items-center">
+                <div className="col-span-1 text-right">Super Tie Break</div>
+                <Input
+                  id="set3-player1"
+                  type="number"
+                  min="0"
+                  defaultValue={0}
+                  {...register("sets.2.pointsPlayer1")}
+                  max="7"
+                  className="col-span-1"
+                />
+                <div className="col-span-1 text-center">-</div>
+                <Input
+                  id="set3-player2"
+                  type="number"
+                  min="0"
+                  defaultValue={0}
+                  {...register("sets.2.pointsPlayer2")}
+                  max="6"
+                  className="col-span-1"
+                />
+              </div>
+            </div>
+            <DialogFooter className="flex flex-col space-y-4 w-1/2 mx-auto sm:flex-row sm:space-y-0 sm:space-x-4">
+              <Button
+                type="button"
+                variant="outline"
+                className="button w-full md:w-auto"
+                onClick={closeAndResetDialog}
+              >
+                Cancelar
+              </Button>
+              <Button className="button bg-slate-700" type="submit">
+                Siguiente
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {formData && formData.sets && (
         <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>

@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 
 import { User } from "@/modules/users/domain/User";
 import { createApiUserRepository } from "@/modules/users/infra/ApiUserRepository";
-import { Step1 } from "./step1";
 import { Step2 } from "./step2";
 import { Step3 } from "./step3";
 import { Step4 } from "./step4";
@@ -17,10 +16,12 @@ import { TournamentRanking } from "@/modules/tournament-ranking/domain/Tournamen
 export const StepsControllerV2 = ({
   idTournament,
   idCategory,
+  tournamentCategoryId,
   nextMatchDay,
 }: {
   idTournament: number;
   nextMatchDay: number;
+  tournamentCategoryId: number;
   idCategory: number;
 }) => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -34,13 +35,6 @@ export const StepsControllerV2 = ({
   >([]);
   const [players, setPlayers] = useState<TournamentRanking[]>([]);
 
-  const handleCategorySelect = (idCategory: number) => {
-    setSelectedCategoryId(idCategory);
-  };
-  const handleTournamentSelect = (idTournament: number) => {
-    setSelectedTournamentId(idTournament);
-  };
-
   useEffect(() => {
     if (idCategory) {
       const userRepository = createApiTournamentRankingRepository();
@@ -49,11 +43,8 @@ export const StepsControllerV2 = ({
         .then(setPlayers)
         .catch((error) => console.error("Error fetching players:", error));
     }
-  }, [idCategory]);
+  }, [idCategory, idTournament]);
 
-  const handleJornadaSelect = (jornada: string) => {
-    setSelectedJornada(jornada);
-  };
 
   switch (currentStep) {
     case 1:
@@ -69,10 +60,10 @@ export const StepsControllerV2 = ({
       return (
         <Step5
           onBack={previousStep}
-          onSubmit={() => console.log("Submit")}
           selectedTournamentId={idTournament}
           selectedCategoryId={idCategory}
           selectedJornada={String(nextMatchDay)}
+          tournamentCategoryId={tournamentCategoryId}
           selectedMatches={selectedMatches}
           players={players}
         />

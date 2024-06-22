@@ -14,6 +14,7 @@ import FinishTournamentDialog from "../Finish/dialog";
 
 export const getColumns = (
   handlePlayerDeleted: (idPlayer: number) => void,
+  updateTournamentOnList: (newTournament: Tournament) => void,
   roles: { isAdmin: boolean | undefined }
 ): ColumnDef<Tournament>[] => {
   const columns: ColumnDef<Tournament>[] = [
@@ -39,6 +40,12 @@ export const getColumns = (
             <p className="text-sm font-medium">{row.original.name}</p>
           </div>
         </div>
+      ),
+    },
+    {
+      header: "Tipo",
+      cell: ({ row }) => (
+        <div>{row.original.type === "master" ? "Master" : "Liga"}</div>
       ),
     },
     {
@@ -100,12 +107,12 @@ export const getColumns = (
             {row.original.status === TournamentStatus.pending ? (
               <StartTournamentDialog
                 tournament={row.original}
-                handlePlayerDeleted={handlePlayerDeleted}
+                onUpdateTournamentOnList={updateTournamentOnList}
               />
-            ) : row.original.status === TournamentStatus.started ? (
+            ) : row.original.status === TournamentStatus.ongoing ? (
               <FinishTournamentDialog
                 tournament={row.original}
-                handlePlayerDeleted={handlePlayerDeleted}
+                onUpdateTournamentOnList={updateTournamentOnList}
               />
             ) : null}
           </div>

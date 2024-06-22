@@ -5,8 +5,8 @@ export interface TournamentRepository {
     getAllTournaments(): Promise<Tournament[]>;
     create(newTournament: Tournament): Promise<Tournament>;
     deleteTournament(idTournament: number): Promise<string>;
-    startTournament(idTournament: number): Promise<string>;
-    finishTournament(idTournament: number): Promise<string>;
+    startTournament(idTournament: number): Promise<any[]>;
+    finishTournament(idTournament: number): Promise<any[]>;
     getTournament(idTournament: number): Promise<Tournament>;
     getTotalTournaments(): Promise<number>;
     getPlayerInfo(idTournament: number, idPlayer: number): Promise<GetPlayerInfoDto>;

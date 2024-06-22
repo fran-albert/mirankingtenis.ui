@@ -5,9 +5,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Category } from "@/modules/category/domain/Category";
-import { CategoryRepository } from "@/modules/category/domain/CategoryRepository";
-import { createApiCategoryRepository } from "@/modules/category/infra/ApiCategoryRepository";
 import { Tournament } from "@/modules/tournament/domain/Tournament";
 import { createApiTournamentRepository } from "@/modules/tournament/infra/ApiTournamentRepository";
 import { useEffect, useState } from "react";
@@ -15,22 +12,23 @@ import { useEffect, useState } from "react";
 interface TournamentSelectProps {
   selected?: string;
   onTournament?: (value: string) => void;
-  className?: string;
 }
 
-export const TournamentSelect = ({
+export const TournamentLeagueSelect = ({
   selected,
   onTournament,
-  className,
 }: TournamentSelectProps) => {
-  const [tournament, setTournament] = useState<Tournament[]>([]);
+  const [tournaments, setTournaments] = useState<Tournament[]>([]);
   const tournamentRepository = createApiTournamentRepository();
 
   useEffect(() => {
     const loadTournaments = async () => {
       try {
-        const tournaments = await tournamentRepository.getAllTournaments();
-        setTournament(tournaments);
+        const allTournaments = await tournamentRepository.getAllTournaments();
+        const tournamentLeague = allTournaments.filter(
+          (tournament) => tournament.type === "league"
+        );
+        setTournaments(tournamentLeague);
       } catch (error) {
         console.error("Error al obtener los torneos:", error);
       }
@@ -41,15 +39,11 @@ export const TournamentSelect = ({
 
   return (
     <Select value={selected} onValueChange={onTournament}>
-      <SelectTrigger
-        className={`w-full ${
-          className ? className : "bg-gray-200 border-gray-300 text-gray-800"
-        }`}
-      >
-        <SelectValue placeholder="Seleccione el torneo..." />
+      <SelectTrigger className="w-full">
+        <SelectValue placeholder="Torneos" />
       </SelectTrigger>
       <SelectContent>
-        {tournament.map((tournament) => (
+        {tournaments.map((tournament) => (
           <SelectItem key={tournament.id} value={String(tournament.id)}>
             {tournament.name}
           </SelectItem>

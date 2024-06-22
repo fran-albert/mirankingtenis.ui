@@ -201,33 +201,7 @@ function CreatePlayerForm() {
                 </div>
                 <div className="grid grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label htmlFor="phone">Categoría</Label>
-                    <CategorySelect
-                      selected={selectedCategory}
-                      onCategory={(value) => {
-                        setSelectedCategory(value);
-                        setValue("idCategory", value);
-                      }}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">Ranking Inicial</Label>
-                    <Input
-                      id="rankingInitial"
-                      placeholder="Ingresar ranking inicial"
-                      {...register("rankingInitial", {
-                        required: "Este campo es obligatorio",
-                        pattern: {
-                          value: /^[0-9]+$/,
-                          message: "El Ranking debe contener solo números",
-                        },
-                      })}
-                    />
-                    {errors.rankingInitial && (
-                      <p className="text-red-500 text-xs italic">
-                        {errors.rankingInitial.message}
-                      </p>
-                    )}
+                    <Label htmlFor="phone">Sexo</Label>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-6">

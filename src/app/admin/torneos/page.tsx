@@ -51,6 +51,14 @@ function TournamentPage() {
     ]);
   };
 
+  const updateTournamentOnList = (updatedTournament: Tournament) => {
+    setTournament((currentTournaments) =>
+      currentTournaments.map((tournament) =>
+        tournament.id === updatedTournament.id ? updatedTournament : tournament
+      )
+    );
+  };
+
   if (isLoading) {
     return <Loading isLoading={true} />;
   }
@@ -60,6 +68,7 @@ function TournamentPage() {
       <TournamentTable
         tournament={tournament}
         addTournamentToList={addTournamentToList}
+        onUpdateTournamentOnList={updateTournamentOnList}
       />
     </div>
   );

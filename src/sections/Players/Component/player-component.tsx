@@ -25,23 +25,20 @@ export function PlayerComponent({
   matches,
   playerInfo,
 }: {
-  player: User | undefined;
+  player: User | null;
   currentTournaments: any;
   matchSummary: MatchSummaryDto | undefined;
   nextMatch: NextMatchDto | undefined;
   setSummary: SetSummaryDto | undefined;
   completedTournaments: Tournament[];
-  playerInfo: GetPlayerInfoDto | null;
+  playerInfo: GetPlayerInfoDto;
   allTournaments: any;
   currentUser: string;
   matches: Match[];
 }) {
-  console.log(completedTournaments, "completedTournaments");
-  console.log(nextMatch, "nextMatch");
-
   return (
     <div className="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen">
-      <header className="bg-gradient-to-r from-slate-500 to-slate-400 py-8 px-4 md:px-8 flex items-center justify-center">
+      <header className="py-8 px-4 md:px-8 flex items-center justify-center">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="rounded-full w-16 h-16 bg-white flex items-center justify-center text-4xl font-bold">
@@ -51,7 +48,7 @@ export function PlayerComponent({
               <h1 className="text-2xl font-bold">
                 {player?.name} {player?.lastname}
               </h1>
-              <p className="text-gray-200">Swiss, 41 years old</p>
+              <p className="text-gray-900">Swiss, 41 years old</p>
             </div>
           </div>
         </div>
@@ -76,7 +73,7 @@ export function PlayerComponent({
             setSummary={setSummary}
           />
         </section>
-        <section className="mt-8">
+        {/* <section className="mt-8">
           <h2 className="text-2xl font-bold mb-4">Gallery</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             <img
@@ -146,7 +143,7 @@ export function PlayerComponent({
               width={400}
             />
           </div>
-        </section>
+        </section> */}
       </main>
     </div>
   );

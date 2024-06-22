@@ -5,15 +5,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { EditButton } from "@/components/Button/Edit/button";
 import { User } from "@/modules/users/domain/User";
 import { Button } from "@/components/ui/button";
-import DesactivatePlayerDialog from "@/sections/Players/Desactivate/button";
 import DeletePlayerDialog from "@/sections/Players/Delete/button";
 import { formatDate } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 
-export const getColumns = (
-  handlePlayerDeleted: (idPlayer: number) => void,
-  roles: { isAdmin: boolean | undefined }
-): ColumnDef<User>[] => {
+export const getColumns = (roles: {
+  isAdmin: boolean | undefined;
+}): ColumnDef<User>[] => {
   const columns: ColumnDef<User>[] = [
     {
       accessorKey: "#",
@@ -29,9 +27,9 @@ export const getColumns = (
       cell: ({ row }) => (
         <div
           className="flex items-center cursor-pointer"
-          onClick={() =>
-            (window.location.href = `/admin/jugadores/${row.original.id}`)
-          }
+          // onClick={() =>
+          //   (window.location.href = `/admin/jugadores/${row.original.id}`)
+          // }
         >
           <div className="flex flex-col ml-2">
             <p className="text-sm font-medium">
@@ -52,7 +50,7 @@ export const getColumns = (
     {
       header: "Último Login",
       cell: ({ row }) => (
-        <div>
+        <div className="font-bold">
           {" "}
           {row.original.lastLoginDate
             ? formatDate(row.original.lastLoginDate)
@@ -60,38 +58,23 @@ export const getColumns = (
         </div>
       ),
     },
-    {
-      header: "Estado",
-      cell: ({ row }) => (
-        <div>
-          {
-            <Badge
-              variant={row.original.isActive ? "success" : "danger"}
-              className="text-black"
-            >
-              {row.original.isActive ? "Activo" : "Inactivo"}
-            </Badge>
-          }
-        </div>
-      ),
-    },
-    {
-      header: " ",
-      cell: ({ row }) => (
-        <div className="flex items-center justify-end">
-          {roles.isAdmin && (
-            <div className="flex items-center gap-2">
-              <Button size="sm" variant="outline">
-                Ver
-              </Button>
-              <Button color="danger" size="sm" variant="outline">
-                Desactivar
-              </Button>
-            </div>
-          )}
-        </div>
-      ),
-    },
+    // {
+    //   header: " ",
+    //   cell: ({ row }) => (
+    //     <div className="flex items-center justify-end">
+    //       {roles.isAdmin && (
+    //         <div className="flex items-center gap-2">
+    //           <Button size="sm" variant="outline">
+    //             Ver
+    //           </Button>
+    //           <Button color="danger" size="sm" variant="outline">
+    //             Desactivar
+    //           </Button>
+    //         </div>
+    //       )}
+    //     </div>
+    //   ),
+    // },
   ];
 
   return columns;

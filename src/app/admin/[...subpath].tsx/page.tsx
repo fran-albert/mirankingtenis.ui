@@ -1,10 +1,10 @@
 import { AdminComponent } from "@/components/component/admin-component";
-import { useRouter } from "next/router";
+import { useParams } from "next/navigation";
 import CourtPage from "../canchas/page";
 
 const AdminSubpathPage: React.FC = () => {
-  const router = useRouter();
-  const { subpath } = router.query;
+  const params = useParams();
+  const subpath = params?.subpath;
 
   let SubComponent: JSX.Element | null = null;
 

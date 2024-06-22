@@ -1,7 +1,7 @@
 import { User } from "@/modules/users/domain/User";
 import React from "react";
 
-function PersonalInformation({ player }: { player: User | undefined }) {
+function PersonalInformation({ player }: { player: User | null }) {
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">Información Personal</h2>

@@ -28,7 +28,6 @@ export interface User {
   currentPassword: string;
   newPassword: string;
   confirmNewPassword: string;
-  historyRankings: HistoryRanking[];
   signupDate: Date;
   idPlayer: number;
   user2name: string;

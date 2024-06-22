@@ -9,14 +9,12 @@ import { useTournamentStore } from "@/hooks/useTournament";
 import { useMatchStore } from "@/hooks/useMatch";
 import { useTournamentRankingStore } from "@/hooks/useTournamentRanking";
 import { useSetsStore } from "@/hooks/useSet";
+import { useUserStore } from "@/hooks/useUser";
 
 function ProfilePlayer() {
   const params = useParams();
   const idParam = params.id;
-  const [player, setPlayer] = useState<User>();
-  const currentUser = player?.name + " " + player?.lastname;
   const idUser = Number(idParam);
-  const userRepository = useMemo(() => createApiUserRepository(), []);
   const {
     fetchAllDataForPlayer,
     currentTournaments,
@@ -28,7 +26,7 @@ function ProfilePlayer() {
   const { playerMatchSummary, getTotalPlayerMatchSummary } =
     useTournamentRankingStore();
   const {
-    getMatchesByUser,
+    getAllMatchesByUser,
     matches,
     nextMatch,
     getNextMatch,
@@ -39,37 +37,49 @@ function ProfilePlayer() {
     setSummary,
     loading: isLoadingSets,
   } = useSetsStore();
-
-  const loadUser = useCallback(
-    (id: number) => getUser(userRepository)(id),
-    [userRepository]
-  );
+  const { loading: isLoadingUser, getUser, user } = useUserStore();
+  const [loading, setLoading] = useState(true);
+  const currentUser = user?.name + " " + user?.lastname;
 
   useEffect(() => {
     const fetchUserAndMatches = async () => {
       try {
-        const userData = await loadUser(idUser);
-        setPlayer(userData);
-        await getMatchesByUser(idUser);
-        await fetchAllDataForPlayer(idUser);
-        await getTotalPlayerMatchSummary(idUser);
-        await getTotalPlayerSetSummary(idUser);
+        setLoading(true);
+        await getUser(idUser);
+        await Promise.all([
+          getAllMatchesByUser(idUser),
+          fetchAllDataForPlayer(idUser),
+          getTotalPlayerMatchSummary(idUser),
+          getTotalPlayerSetSummary(idUser),
+        ]);
+        setLoading(false);
       } catch (error) {
-        console.error(error);
+        console.error("Error fetching data:", error);
+        setLoading(false);
       }
     };
     fetchUserAndMatches();
-  }, [idUser, loadUser, getMatchesByUser, fetchAllDataForPlayer]);
+  }, [
+    idUser,
+    getUser,
+    getAllMatchesByUser,
+    fetchAllDataForPlayer,
+    getTotalPlayerMatchSummary,
+    getTotalPlayerSetSummary,
+  ]);
 
   useEffect(() => {
     const fetchNextMatch = async () => {
       try {
+        setLoading(true);
         if (currentTournaments && currentTournaments.id) {
           const activeTournamentId = currentTournaments.id;
           await getNextMatch(activeTournamentId, idUser);
         }
+        setLoading(false);
       } catch (error) {
-        console.error(error);
+        setLoading(false);
+        console.error("Error fetching next match:", error);
       }
     };
 
@@ -78,16 +88,14 @@ function ProfilePlayer() {
     }
   }, [idUser, currentTournaments, getNextMatch, isTournamentLoading]);
 
-  console.log(setSummary, "setSummary")
-
-  if (isTournamentLoading || isMatchLoading || isLoadingSets) {
+  if (isTournamentLoading || isMatchLoading || isLoadingSets || isLoadingUser) {
     return <Loading isLoading />;
   }
 
   return (
     <>
       <PlayerComponent
-        player={player}
+        player={user}
         setSummary={setSummary}
         currentUser={currentUser}
         matchSummary={playerMatchSummary}

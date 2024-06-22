@@ -32,3 +32,14 @@ export function formatDateToSpanish(date: Date): string {
 
   return `${day} ${capitalizedMonth}, ${year}`;
 }
+
+export const isAxiosError = (
+  error: any
+): error is { response: { data: { message: string } } } => {
+  return (
+    error &&
+    error.response &&
+    error.response.data &&
+    typeof error.response.data.message === "string"
+  );
+};

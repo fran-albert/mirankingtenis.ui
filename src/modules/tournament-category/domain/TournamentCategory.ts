@@ -1,4 +1,4 @@
 export interface TournamentCategory {
-    idCategory: number;
-    nameCategory: string;
+    id: number;
+    name: string;
 }

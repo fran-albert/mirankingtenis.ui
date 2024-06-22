@@ -1,8 +1,5 @@
 "use client";
 import Loading from "@/components/Loading/loading";
-import { getAllCategories } from "@/modules/category/application/get-all/getAllCategories";
-import { Category } from "@/modules/category/domain/Category";
-import { createApiCategoryRepository } from "@/modules/category/infra/ApiCategoryRepository";
 import { getFixtureByCategoryAndTournament } from "@/modules/fixture/application/get-fixture-by-category-and-tournament/getFixtureByCategoryAndTournament";
 import { createApiFixtureRepository } from "@/modules/fixture/infra/ApiFixtureRepository";
 import { getCategoriesForTournament } from "@/modules/tournament-category/application/get-categories-for-tournament/getCategoriesForTournament";
@@ -18,11 +15,15 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 function TournamentDetailsPage() {
   const params = useParams();
   const idTournament = Number(params.id);
-  const [tournament, setTournament] = useState<Tournament>();
+  const [tournament, setTournament] = useState<Tournament | undefined>();
   const [categories, setCategories] = useState<
     TournamentCategory[] | undefined
   >(undefined);
-  const [matchDay, setMatchDay] = useState<number>();
+  const [categoryDates, setCategoryDates] = useState<{ [key: number]: any }>(
+    {}
+  );
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
   const tournamentRepository = useMemo(
     () => createApiTournamentRepository(),
     []
@@ -32,24 +33,26 @@ function TournamentDetailsPage() {
     () => createApiTournamentCategoryRepository(),
     []
   );
+
   const loadTournament = useCallback(
     (id: number) => getTournament(tournamentRepository)(id),
     [tournamentRepository]
   );
-  const [categoryDates, setCategoryDates] = useState({});
+
   const loadFixture = useCallback(
     (idCategory: number, idTournament: number) =>
       getFixtureByCategoryAndTournament(fixtureRepository)(
         idCategory,
         idTournament
       ),
-    [tournamentRepository]
+    [fixtureRepository]
   );
+
   const loadCategories = useCallback(
     getCategoriesForTournament(categoryRepository),
-    [tournamentRepository]
+    [categoryRepository]
   );
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -61,10 +64,10 @@ function TournamentDetailsPage() {
         await Promise.all(
           categoriesData.map(async (category) => {
             const numberOfFixtures = await loadFixture(
-              category.idCategory,
+              category.id,
               idTournament
             );
-            dates[category.idCategory] = numberOfFixtures + 1;
+            dates[category.id] = numberOfFixtures + 1;
           })
         );
 
@@ -74,6 +77,7 @@ function TournamentDetailsPage() {
         setIsLoading(false);
       } catch (error) {
         console.error(error);
+        setIsLoading(false);
       }
     };
 

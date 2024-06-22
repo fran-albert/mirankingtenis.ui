@@ -52,7 +52,7 @@ function AdminPlayersTanstackTable({ players }: { players: User[] }) {
       currentPlayers.filter((player) => player.id !== idPlayer);
   };
 
-  const playersColumns = getColumns(handlePlayerDeleted, { isAdmin });
+  const playersColumns = getColumns({ isAdmin });
   const customFilterFunction = (player: User, query: string) =>
     player.name.toLowerCase().includes(query.toLowerCase()) ||
     player.lastname.toLowerCase().includes(query.toLowerCase());

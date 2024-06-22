@@ -7,4 +7,5 @@ export interface Tournament {
     createdAt: string;
     startedAt: string;
     finishedAt: string;
+    type: string;
 }

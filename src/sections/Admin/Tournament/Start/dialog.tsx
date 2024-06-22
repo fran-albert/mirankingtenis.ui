@@ -17,40 +17,52 @@ import { createApiTournamentRepository } from "@/modules/tournament/infra/ApiTou
 import { createApiTournamentParticipantRepository } from "@/modules/tournament-participant/infra/ApiTournamentRepository";
 import { desactivatePlayer } from "@/modules/tournament-participant/application/desactivate-player/desactivatePlayer";
 import { Tournament } from "@/modules/tournament/domain/Tournament";
+import { useTournamentStore } from "@/hooks/useTournament";
+import axios from "axios";
+import { isAxiosError } from "@/common/helpers/helpers";
 
 interface StartTournamentDialogDialogProps {
-  handlePlayerDesactivated?: (idTournament: number) => void;
   tournament: Tournament;
+  onUpdateTournamentOnList?: (newTournament: any) => void;
 }
 
 export default function StartTournamentDialog({
-  handlePlayerDesactivated,
   tournament,
+  onUpdateTournamentOnList,
 }: StartTournamentDialogDialogProps) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const toggleDialog = () => setIsOpen(!isOpen);
-  const tournamentParticipantRepository =
-    createApiTournamentParticipantRepository();
+  const { startTournament } = useTournamentStore();
 
-  const handleConfirmDesactivate = async () => {
+  const handleConfirmStarted = async () => {
     try {
-      const desactivatePlayerFn = desactivatePlayer(
-        tournamentParticipantRepository
-      );
-      const playerDesactivatePromise = desactivatePlayerFn(tournament.id, 1);
-      toast.promise(playerDesactivatePromise, {
-        loading: "Desactivando jugador...",
-        success: "Jugador eliminado del Torneo 1 con éxito!",
-        error: "Error al eliminar el Jugador del Torneo 1",
+      const finishPromise = startTournament(tournament.id);
+      toast.promise(finishPromise, {
+        loading: "Iniciando torneo...",
+        success: "Torneo iniciado con éxito!",
+        error: (err) => {
+          if (isAxiosError(err)) {
+            return err.response.data.message || "Error al inciar el torneo";
+          }
+          return "Error al inciar el torneo";
+        },
         duration: 3000,
       });
-      if (handlePlayerDesactivated) {
-        handlePlayerDesactivated(tournament.id);
+      const updatedTournament = await finishPromise;
+      if (onUpdateTournamentOnList) {
+        onUpdateTournamentOnList(updatedTournament);
       }
+      setIsOpen(false);
     } catch (error) {
-      console.error("Error al eliminar el Jugador del Torneo 1", error);
-      toast.error("Error al eliminar el Jugador del Torneo 1");
-    } finally {
+      if (axios.isAxiosError(error)) {
+        const errorMessage =
+          error.response?.data?.message ||
+          "Error desconocido al iniciar el torneo";
+        toast.error(`Error al iniciar el torneo: ${errorMessage}`, {
+          duration: 1000,
+        });
+        console.error("Error al enviar los datos:", errorMessage);
+      }
       setIsOpen(false);
     }
   };
@@ -58,7 +70,11 @@ export default function StartTournamentDialog({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" className="bg-green-700 hover:bg-green-900" onClick={toggleDialog}>
+        <Button
+          size="sm"
+          className="bg-green-700 hover:bg-green-900"
+          onClick={toggleDialog}
+        >
           Iniciar
         </Button>
       </DialogTrigger>
@@ -68,13 +84,13 @@ export default function StartTournamentDialog({
         </DialogHeader>
         <DialogDescription className="text-gray-900">
           ¿Estás seguro de que quieres empezar el torneo
-          <span className="font-bold"> "{tournament.name}"</span>?
+          <span className="font-bold"> &quot;{tournament.name}&quot;</span>?
         </DialogDescription>
         <DialogFooter>
           <Button variant="outline" onClick={toggleDialog}>
             Cancelar
           </Button>
-          <Button variant="green" onClick={handleConfirmDesactivate}>
+          <Button variant="green" onClick={handleConfirmStarted}>
             Confirmar
           </Button>
         </DialogFooter>

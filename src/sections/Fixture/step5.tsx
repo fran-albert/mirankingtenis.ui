@@ -1,3 +1,4 @@
+import { FixtureType } from "@/common/types/fixture-type.dto";
 import { Button } from "@/components/ui/button";
 import { createFixture } from "@/modules/fixture/application/create/createFixture";
 import { createApiFixtureRepository } from "@/modules/fixture/infra/ApiFixtureRepository";
@@ -10,8 +11,8 @@ import { toast } from "sonner";
 
 interface Step5Props {
   onBack: () => void;
-  onSubmit: () => void;
   selectedCategoryId: number;
+  tournamentCategoryId: number;
   selectedTournamentId: number;
   selectedJornada: string;
   selectedMatches: { idUser1: number | null; idUser2: number | null }[];
@@ -20,10 +21,10 @@ interface Step5Props {
 
 export const Step5 = ({
   onBack,
-  onSubmit,
   selectedCategoryId,
   selectedTournamentId,
   selectedJornada,
+  tournamentCategoryId,
   selectedMatches,
   players,
 }: Step5Props) => {
@@ -33,14 +34,16 @@ export const Step5 = ({
 
   const handleSubmit = async () => {
     const payload = {
-      idTournament: selectedTournamentId,
-      idCategory: selectedCategoryId,
+      idTournamentCategory: tournamentCategoryId,
       jornada: Number(selectedJornada),
+      type: FixtureType.LeagueStage,
       matches: selectedMatches.map((match) => ({
         idUser1: Number(match.idUser1),
         idUser2: Number(match.idUser2),
       })),
     };
+
+    console.log("Enviando datos a la API:", payload);
 
     try {
       const fixtureCreationPromise = createFixtureFn(payload);

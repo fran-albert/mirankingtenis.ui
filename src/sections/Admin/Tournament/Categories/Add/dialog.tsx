@@ -18,15 +18,17 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useCategoriesStore } from "@/hooks/useCategories";
 import { toast } from "sonner";
+import { TournamentCategory } from "@/modules/tournament-category/domain/TournamentCategory";
 
 interface AddCategoriesForTournamentDialogProps {
   createCategoryForTournament: (
     idTournament: number,
     idCategory: number[]
-  ) => Promise<void>;
+  ) => Promise<TournamentCategory[]>;
   idTournament: number;
+  onClose: (createdCategories: TournamentCategory[]) => void;
+  existingCategories: number[];
 }
-
 interface Inputs {
   tournamentId: number;
   categoryIds: number[];
@@ -35,6 +37,8 @@ interface Inputs {
 export default function AddCategoriesForTournamentDialog({
   createCategoryForTournament,
   idTournament,
+  onClose,
+  existingCategories, 
 }: AddCategoriesForTournamentDialogProps) {
   const { categories, fetchCategories } = useCategoriesStore();
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -50,28 +54,34 @@ export default function AddCategoriesForTournamentDialog({
   );
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    const payload = {
-      idTournament: idTournament,
-      idCategory: data.categoryIds,
-    };
     try {
-      toast.promise(
-        createCategoryForTournament(idTournament, data.categoryIds),
-        {
-          loading: "Agregando categorías para el torneo...",
-          success: "Categorías agregadas con éxito!",
-          error: "Error al agregar las categorías al torneo.",
-        }
+      const categoryCreationPromise = createCategoryForTournament(
+        idTournament,
+        data.categoryIds
       );
+
+      toast.promise(categoryCreationPromise, {
+        loading: "Creando categoría...",
+        success: "Categoría creada con éxito!",
+        error: "Error al crear la categoría",
+      });
+
+      const createdCategories = await categoryCreationPromise;
       setIsOpen(false);
       reset();
+      onClose(createdCategories);
     } catch (error) {
-      console.error("Error al agregar las categorías al torneo.", error);
+      console.error("Error al crear la categoría", error);
     }
   };
+
   useEffect(() => {
     fetchCategories();
   }, [fetchCategories]);
+
+  const availableCategories = categories.filter(
+    (category) => !existingCategories.includes(category.id)
+  );
 
   const handleCategoryChange = (categoryId: number, checked: boolean) => {
     const currentCategories = getValues("categoryIds");
@@ -98,7 +108,7 @@ export default function AddCategoriesForTournamentDialog({
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              {categories.map((category: Category) => (
+              {availableCategories.map((category: Category) => (
                 <div key={category.id} className="flex items-center space-x-2">
                   <Controller
                     name="categoryIds"

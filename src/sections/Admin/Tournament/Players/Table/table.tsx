@@ -52,7 +52,7 @@ function PlayersTournamentTable({ idTournament }: { idTournament: number }) {
         searchPlaceholder="Buscar jugadores..."
         pageSizes={8}
         showSearch={true}
-        addLinkPath=""
+        addLinkPath={`/admin/torneos/${idTournament}/agregar-jugador`}
         customFilter={customFilterFunction}
         addLinkText="Inscribir Jugador"
         canAddUser={canAddUser}

@@ -1,15 +1,6 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { EditButton } from "@/components/Button/Edit/button";
-import { User } from "@/modules/users/domain/User";
-import { Button } from "@/components/ui/button";
-import DesactivatePlayerDialog from "@/sections/Players/Desactivate/button";
-import DeletePlayerDialog from "@/sections/Players/Delete/button";
-import { formatDate } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
-import { Category } from "@/modules/category/domain/Category";
 import { Court } from "@/modules/court/domain/Court";
 import DeleteCourtDialog from "../Delete/dialog";
 

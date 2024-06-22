@@ -16,6 +16,12 @@ export function createApiTournamentCategoryRepository(): TournamentCategoryRepos
         return tournament;
     }
 
+    async function getTournamentCategoriesByUser(idUser: number): Promise<any[]> {
+        const response = await axiosInstance.get(`tournament-categories/user/${idUser}`);
+        const tournament = response.data as TournamentCategory[];
+        return tournament;
+    }
+
     async function getCategoriesForTournament(idTournament: number): Promise<TournamentCategory[]> {
         const response = await axiosInstance.get(`tournament-categories/${idTournament}`);
         const tournament = response.data as TournamentCategory[];
@@ -23,6 +29,6 @@ export function createApiTournamentCategoryRepository(): TournamentCategoryRepos
     }
 
     return {
-        getCategoriesForTournament, createCategoryForTournament, getTournamentCategoryId
+        getCategoriesForTournament, createCategoryForTournament, getTournamentCategoryId, getTournamentCategoriesByUser
     };
 }

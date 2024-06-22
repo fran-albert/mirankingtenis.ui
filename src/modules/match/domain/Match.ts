@@ -21,6 +21,9 @@ export interface Match {
   fixture: {
     id: number;
     jornada: number;
+    tournamentCategories: {
+      id: number;
+    }
   };
   rivalName: string;
   winner: string;

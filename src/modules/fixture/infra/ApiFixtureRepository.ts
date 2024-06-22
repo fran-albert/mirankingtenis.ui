@@ -9,6 +9,17 @@ export function createApiFixtureRepository(): FixtureRepository {
     return fixture;
   }
 
+  async function createFixtureGroup(idTournament: number, idCategory: number): Promise<string> {
+    const response = await axiosInstance.post(`fixture/create-fixture-group-master/${idTournament}/${idCategory}`);
+    const fixture = response.data as string;
+    return fixture;
+  }
+
+  async function isGroupStageFixturesCreated(idTournament: number, idCategory: number): Promise<boolean> {
+    const response = await axiosInstance.get(`fixture/isGroupStageFixturesCreated/${idTournament}/${idCategory}`);
+    return response.data;
+  }
+
   async function getFixtureByCategory(idCategory: number): Promise<Fixture[]> {
     const response = await axiosInstance.get(
       `fixture/by-category/${idCategory}`
@@ -34,7 +45,7 @@ export function createApiFixtureRepository(): FixtureRepository {
   }
 
   return {
-    createFixture, getFixtureByCategoryAndTournament,
+    createFixture, getFixtureByCategoryAndTournament, createFixtureGroup, isGroupStageFixturesCreated,
     countByCategory,
     getFixtureByCategory,
   };

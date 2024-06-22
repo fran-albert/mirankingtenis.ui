@@ -11,10 +11,14 @@ import {
 import { toast } from "sonner";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { useForm, SubmitHandler } from "react-hook-form";
-import { Category } from "@/modules/category/domain/Category";
-import { createApiCategoryRepository } from "@/modules/category/infra/ApiCategoryRepository";
-import { createCategory } from "@/modules/category/application/create/createCategory";
+import { useForm, SubmitHandler, Controller } from "react-hook-form";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 import { Tournament } from "@/modules/tournament/domain/Tournament";
 import { createApiTournamentRepository } from "@/modules/tournament/infra/ApiTournamentRepository";
 import { createTournament } from "@/modules/tournament/application/create/createTournament";
@@ -41,7 +45,7 @@ export default function AddTournamentDialog({
     register,
     handleSubmit,
     reset,
-    watch,
+    control,
     formState: { errors },
   } = useForm<Inputs>();
 
@@ -55,6 +59,8 @@ export default function AddTournamentDialog({
         success: "Torneo creado con éxito!",
         error: "Error al crear el Torneo",
       });
+
+      console.log("data", data);
 
       specialityCreationPromise
         .then((createdTournament) => {
@@ -80,11 +86,36 @@ export default function AddTournamentDialog({
           <DialogDescription>
             <div className="flex flex-row mt-2">
               <div className="flex-1 pr-1">
-                <div className="mb-2 block ">
-                  <Label htmlFor="name">Nombre</Label>
+                <div className="mb-2 block">
+                  <Label htmlFor="name" className="text-black">
+                    Nombre
+                  </Label>
                   <Input
+                    type="text"
+                    className="text-black"
+                    placeholder="Ingresa el nombre del torneo"
                     {...register("name", { required: true })}
-                    className="bg-gray-200 text-gray-700"
+                  />
+                </div>
+                <div className="mb-2 block">
+                  <Label htmlFor="type" className="text-black">
+                    Tipo
+                  </Label>
+                  <Controller
+                    name="type"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field }) => (
+                      <Select onValueChange={field.onChange}>
+                        <SelectTrigger className="text-black">
+                          <SelectValue placeholder="Seleccione el tipo..." />
+                        </SelectTrigger>
+                        <SelectContent className="text-black">
+                          <SelectItem value="master">Master</SelectItem>
+                          <SelectItem value="league">Liga</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    )}
                   />
                 </div>
               </div>

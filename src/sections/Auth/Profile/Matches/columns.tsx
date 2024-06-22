@@ -12,6 +12,7 @@ import { Match } from "@/modules/match/domain/Match";
 import { BadgeWin } from "@/components/Badge/Green/badge";
 import { BadgePending } from "@/components/Badge/Pending/badge";
 import DeleteShiftDialog from "./DeleteShift/dialog";
+import { NewShift } from "./NewShift/new-shift";
 export const getColumns = (onUpdateMatches: () => void): ColumnDef<Match>[] => {
   const columns: ColumnDef<Match>[] = [
     {
@@ -29,10 +30,11 @@ export const getColumns = (onUpdateMatches: () => void): ColumnDef<Match>[] => {
     {
       header: "Día y Hora",
       cell: ({ row }) => {
-        if (row.original.shift === null) {
-          return (
-            <span className="px-3 inline-flex text-xs w-16 leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800"></span>
-          );
+        if (
+          row.original.shift === null ||
+          row.original.shift.startHour === null
+        ) {
+          return null;
         }
         return (
           <div className="flex items-center w-48">
@@ -51,7 +53,7 @@ export const getColumns = (onUpdateMatches: () => void): ColumnDef<Match>[] => {
         }
         return (
           <p className="text-sm text-center">
-            {row.original.shift.court?.name}
+            {row.original.shift.court?.toString()}
           </p>
         );
       },
@@ -61,11 +63,11 @@ export const getColumns = (onUpdateMatches: () => void): ColumnDef<Match>[] => {
       cell: ({ row }) => {
         if (row.original.status === "pending") {
           return (
-            <span className="px-3 inline-flex text-xs leading-5 w-48 font-semibold rounded-full bg-yellow-100 text-yellow-800"></span>
+            <span className="px-3 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800"></span>
           );
         }
         return (
-          <div className="flex items-center w-48">
+          <div className="flex items-center">
             {row.original.finalResult}
             {row.original.sets.map((set, index) => (
               <div className="m-2" key={index}>
@@ -100,12 +102,14 @@ export const getColumns = (onUpdateMatches: () => void): ColumnDef<Match>[] => {
         <div className="flex items-center justify-end">
           {row.original.status !== "played" && (
             <>
-              {/* Si no está jugado y no tiene turno, muestra EditMatchDialog */}
-              {row.original.shift === null ? (
-                <EditMatchDialog
-                  match={row.original}
-                  onUpdateMatches={onUpdateMatches}
-                />
+              {row.original.shift === null ||
+              row.original.shift.startHour === null ? (
+                <>
+                  <EditMatchDialog
+                    match={row.original}
+                    onUpdateMatches={onUpdateMatches}
+                  />
+                </>
               ) : (
                 <>
                   <AddResultMatchDialog
