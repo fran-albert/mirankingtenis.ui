@@ -124,7 +124,7 @@ function Profile() {
           {/* Stats */}
           <div className="flex justify-center space-x-4">
             <p className="text-gray-600 text-xl font-medium mb-4">
-              {user?.ranking.position}° - Categoría {user?.category.name}
+              {/* {user?.ranking.position}° - Categoría {user?.category.name} */}
             </p>
           </div>
         </div>
@@ -160,12 +160,12 @@ function Profile() {
 
                 <div className="md:flex md:gap-4">
                   <div className="flex-1">
-                    <Label htmlFor="category">Categoría</Label>
-                    <Input
+                    {/* <Label htmlFor="category">Categoría</Label> */}
+                    {/* <Input
                       className="w-full bg-gray-200 border-gray-300 text-gray-800 cursor-not-allowed"
                       defaultValue={user?.category.name}
                       readOnly
-                    />
+                    /> */}
                   </div>
                   {/* <div className="flex-1">
                     <Label htmlFor="category">Ranking Inicial</Label>
