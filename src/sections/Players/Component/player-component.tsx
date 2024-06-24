@@ -37,19 +37,27 @@ export function PlayerComponent({
   matches: Match[];
 }) {
   return (
-    <div className="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen">
+    <div className=" dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen">
       <header className="py-8 px-4 md:px-8 flex items-center justify-center">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="rounded-full w-16 h-16 bg-white flex items-center justify-center text-4xl font-bold">
-              {getInitials(String(player?.name), String(player?.lastname))}
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold">
-                {player?.name} {player?.lastname}
-              </h1>
-              <p className="text-gray-900">Swiss, 41 years old</p>
-            </div>
+        <div className="flex flex-col md:flex-row items-center space-x-6">
+          <img
+            src={
+              player?.photo
+                ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${player.photo}.jpeg`
+                : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/mirankingtenis_default.png"
+            }
+            alt="Player Image"
+            width={150}
+            height={150}
+            className="rounded-full w-[100px] h-[100px] object-cover"
+          />
+          <div className="space-y-2 mt-4 md:mt-0">
+            <h1 className="text-4xl font-bold">
+              {player?.name} {player?.lastname}
+            </h1>
+            <p className="text-muted-foreground text-center">
+              {/* Edad: | Mejor Ranking: */}
+            </p>
           </div>
         </div>
       </header>
@@ -63,11 +71,9 @@ export function PlayerComponent({
           />
         </section>
         <section className="mt-8">
-          <h2 className="text-2xl font-bold mb-4">Torneos Jugados</h2>
-          <CompletedTournament completedTournaments={completedTournaments} />
+          <CompletedTournament completedTournaments={completedTournaments} idPlayer={Number(player?.id)}/>
         </section>
         <section className="mt-8">
-          <h2 className="text-2xl font-bold mb-4">Estadísticas Globales</h2>
           <MatchStatistics
             matchSummary={matchSummary}
             setSummary={setSummary}

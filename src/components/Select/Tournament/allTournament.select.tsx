@@ -7,10 +7,11 @@ import {
 } from "@/components/ui/select";
 import { useTournamentStore } from "@/hooks/useTournament";
 import { useEffect } from "react";
+import { Tournament } from "@/modules/tournament/domain/Tournament";
 
 interface TournamentSelectProps {
-  selected?: string;
-  onTournament?: (value: string) => void;
+  selected?: Tournament;
+  onTournament?: (value: Tournament) => void;
   userId?: number;
 }
 
@@ -36,13 +37,27 @@ export const TournamentSelect = ({
 
   useEffect(() => {}, [allTournaments]);
 
+  const handleValueChange = (value: string) => {
+    const selectedTournament = allTournaments.find(
+      (tournament) => String(tournament.id) === value
+    );
+    if (selectedTournament && onTournament) {
+      onTournament(selectedTournament);
+    }
+  };
+
   return (
     <div className="w-full relative">
-      <Select value={selected} onValueChange={onTournament}>
+      <Select
+        value={selected ? String(selected.id) : ""}
+        onValueChange={handleValueChange}
+      >
         <SelectTrigger className="w-full">
-          <SelectValue placeholder="Torneos" />
+          <SelectValue placeholder="Torneos">
+            {selected ? selected.name : "Torneos"}
+          </SelectValue>
         </SelectTrigger>
-        <SelectContent className="">
+        <SelectContent>
           {allTournaments.map((tournament) => (
             <SelectItem key={tournament.id} value={String(tournament.id)}>
               {tournament.name}

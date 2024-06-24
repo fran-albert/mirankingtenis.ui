@@ -38,9 +38,9 @@ function CategoriesCard({
     fetchGroupAndPlayersStatus();
   }, [category.id, hasPlayersForCategory, idTournament]);
 
-  if (isLoading) {
-    return <Loading isLoading />;
-  }
+  // if (isLoading) {
+  //   return <Loading isLoading />;
+  // }
 
   return (
     <div>

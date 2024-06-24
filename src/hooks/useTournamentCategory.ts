@@ -7,11 +7,11 @@ import { createApiTournamentCategoryRepository } from '@/modules/tournament-cate
 const tournamentCategoryRepository = createApiTournamentCategoryRepository();
 
 interface TournamentCategoryState {
-    categories: TournamentCategory[] | any[];
+    categoriesForTournaments: TournamentCategory[] | any[];
     tournamentCategoryId: number;
     loading: boolean;
     error: string | null;
-    getCategoriesForTournament: (idTournament: number) => Promise<void>;
+    getCategoriesForTournament: (idTournament: number) => Promise<TournamentCategory[]>;
     getTournamentCategoriesByUser: (idUser: number) => Promise<void>;
     createCategoryForTournament: (idTournament: number, idCategory: number[]) => Promise<TournamentCategory[]>; 
     getTournamentCategoryId: (idTournament: number, idCategory: number) => Promise<void>;
@@ -19,10 +19,9 @@ interface TournamentCategoryState {
 
 const loadAllCategoriesFn = getCategoriesForTournament(tournamentCategoryRepository);
 const createCategoryForTournamentFn = createCategoryForTournament(tournamentCategoryRepository);
-const getTournamentCategoryId = tournamentCategoryRepository.getTournamentCategoryId;
 
 export const useTournamentCategoryStore = create<TournamentCategoryState>((set) => ({
-    categories: [],
+    categoriesForTournaments: [],
     loading: false,
     tournamentCategoryId: 0,
     error: null,
@@ -30,10 +29,12 @@ export const useTournamentCategoryStore = create<TournamentCategoryState>((set) 
     getCategoriesForTournament: async (idTournament: number) => {
         set({ loading: true, error: null });
         try {
-            const categories = await loadAllCategoriesFn(idTournament);
-            set({ categories, loading: false });
+            const categoriesForTournaments = await loadAllCategoriesFn(idTournament);
+            set({ categoriesForTournaments, loading: false });
+            return categoriesForTournaments;
         } catch (error: any) {
             set({ error: error.message, loading: false });
+            throw error;
         }
     },
 
@@ -42,7 +43,7 @@ export const useTournamentCategoryStore = create<TournamentCategoryState>((set) 
         try {
             const newCategories = await createCategoryForTournamentFn(idTournament, idCategory);
             set((state) => ({
-                categories: [...state.categories, ...newCategories],
+                categories: [...state.categoriesForTournaments, ...newCategories],
                 loading: false
             }));
             return newCategories; // Ensure it returns the new categories
@@ -55,8 +56,8 @@ export const useTournamentCategoryStore = create<TournamentCategoryState>((set) 
     getTournamentCategoriesByUser: async (idUser: number) => {
         set({ loading: true, error: null });
         try {
-            const categories = await tournamentCategoryRepository.getTournamentCategoriesByUser(idUser);
-            set({ categories, loading: false });
+            const categoriesForTournaments = await tournamentCategoryRepository.getTournamentCategoriesByUser(idUser);
+            set({ categoriesForTournaments, loading: false });
         } catch (error: any) {
             set({ error: error.message, loading: false });
         }
@@ -65,7 +66,7 @@ export const useTournamentCategoryStore = create<TournamentCategoryState>((set) 
     getTournamentCategoryId: async (idTournament: number, idCategory: number) => {
         set({ loading: true, error: null });
         try {
-            const tournamentCategoryId = await getTournamentCategoryId(idTournament, idCategory);
+            const tournamentCategoryId = await tournamentCategoryRepository.getTournamentCategoryId(idTournament, idCategory);
             set({ tournamentCategoryId, loading: false });
         } catch (error: any) {
             set({ error: error.message, loading: false });

@@ -9,6 +9,7 @@ const tournamentRepository = createApiTournamentRepository();
 interface TournamentState {
     tournaments: Tournament[];
     tournament: Tournament | null;
+    tournamentsByPlayer: Tournament[];
     activeTournament: number;
     setTournaments: (tournaments: Tournament[]) => void;
     setActiveTournament: (activeTournament: number) => void;
@@ -37,6 +38,7 @@ export const useTournamentStore = create<TournamentState>((set) => ({
     tournament: null,
     loading: false,
     activeTournament: 1,
+    tournamentsByPlayer: [],
     setTournaments: (tournaments) => set(() => ({ tournaments })),
     setActiveTournament: (activeTournament) => set(() => ({ activeTournament })),
     currentTournaments: null,
@@ -171,9 +173,9 @@ export const useTournamentStore = create<TournamentState>((set) => ({
     getCompletedTournamentsByPlayer: async (idPlayer: number) => {
         set({ loading: true, error: null });
         try {
-            const tournaments = await tournamentRepository.getCompletedTournamentsByPlayer(idPlayer);
-            set({ completedTournaments: tournaments, loading: false });
-            return tournaments;
+            const completedTournaments = await tournamentRepository.getCompletedTournamentsByPlayer(idPlayer);
+            set({ completedTournaments: completedTournaments, loading: false });
+            return completedTournaments;
         } catch (error: any) {
             console.error("Error fetching completed tournaments by player:", error);
             set({ error: error.message, loading: false });
@@ -184,9 +186,9 @@ export const useTournamentStore = create<TournamentState>((set) => ({
     getAllTournamentsByPlayer: async (idPlayer: number) => {
         set({ loading: true, error: null });
         try {
-            const tournaments = await tournamentRepository.getAllTournamentsByPlayer(idPlayer);
-            set({ allTournaments: tournaments, loading: false });
-            return tournaments;
+            const tournamentsByPlayer = await tournamentRepository.getAllTournamentsByPlayer(idPlayer);
+            set({ allTournaments: tournamentsByPlayer, loading: false });
+            return tournamentsByPlayer;
         } catch (error: any) {
             console.error("Error fetching all tournaments by player:", error);
             set({ error: error.message, loading: false });

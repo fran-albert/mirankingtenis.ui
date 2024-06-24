@@ -31,7 +31,6 @@ function MatchesPage() {
         } else {
           const jornadasArray = Array.from({ length: numeroDeJornadas }, (_, i) => i + 1);
           setJornadas(jornadasArray);
-          setSelectedJornada(String(jornadasArray[jornadasArray.length - 1]));
           setError(null); 
         }
       } catch (error) {

@@ -2,6 +2,7 @@ import axiosInstance from "@/services/axiosConfig";
 import { TournamentRankingRepository } from "../domain/TournamentRankingRepository";
 import { TournamentRanking } from "../domain/TournamentRanking";
 import { MatchSummaryDto } from "@/common/types/match-summary.dto";
+import { HistoryRankingDto } from "@/common/types/history-ranking.dto";
 
 export function createApiTournamentRankingRepository(): TournamentRankingRepository {
 
@@ -16,7 +17,16 @@ export function createApiTournamentRankingRepository(): TournamentRankingReposit
         return response.data;
     }
 
+    async function getTotalPlayerTournamentMatchSummary(idPlayer: number, idTournament: number, idCategory: number): Promise<MatchSummaryDto> {
+        const response = await axiosInstance.get(`tournament-ranking/players/${idPlayer}/match-summary/${idTournament}/category/${idCategory}`);
+        return response.data as MatchSummaryDto;
+    }
+    async function getHistoryRanking(idPlayer: number, idTournament: number, idCategory: number): Promise<HistoryRankingDto[]> {
+        const response = await axiosInstance.get(`history-ranking/${idPlayer}/${idTournament}/${idCategory}`);
+        return response.data as HistoryRankingDto[];
+    }
+
     return {
-        getAllRankingsByTournamentCategory, getTotalPlayerMatchSummary
+        getAllRankingsByTournamentCategory, getTotalPlayerMatchSummary, getHistoryRanking, getTotalPlayerTournamentMatchSummary
     };
 }

@@ -256,7 +256,6 @@ export default function AddResultMatchDialog({
                   min="0"
                   defaultValue={0}
                   {...register("sets.2.pointsPlayer1")}
-                  max="7"
                   className="col-span-1"
                 />
                 <div className="col-span-1 text-center">-</div>
@@ -266,7 +265,6 @@ export default function AddResultMatchDialog({
                   min="0"
                   defaultValue={0}
                   {...register("sets.2.pointsPlayer2")}
-                  max="6"
                   className="col-span-1"
                 />
               </div>

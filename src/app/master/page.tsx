@@ -13,6 +13,8 @@ import { FixtureGroupStage } from "@/sections/Master/Fixture";
 import { useMatchStore } from "@/hooks/useMatch";
 import { AxiosError } from "axios";
 import Image from "next/image";
+import PlayOffCards from "@/sections/Master/PlayOffs";
+import { CategorySelect } from "@/components/Select/Category/select";
 
 function MasterPage() {
   const [selectedCategory, setSelectedCategory] = useState(1);
@@ -33,7 +35,7 @@ function MasterPage() {
       try {
         setIsLoading(true);
         const groupStageId = await getGroupStagesByTournamentCategory(
-          22,
+          2,
           selectedCategory
         );
         setGroupStageId(groupStageId);
@@ -67,7 +69,12 @@ function MasterPage() {
     };
 
     fetchGroupsAndRankings();
-  }, [groupStageId, findAllByGroupStage, getGroupRankings, findMatchesByGroupStage]);
+  }, [
+    groupStageId,
+    findAllByGroupStage,
+    getGroupRankings,
+    findMatchesByGroupStage,
+  ]);
 
   useEffect(() => {
     if (!isLoadinGroup && !isLoading) {
@@ -132,6 +139,7 @@ function MasterPage() {
       )}
     </div>
   );
+  <PlayOffCards />
 }
 
 export default MasterPage;

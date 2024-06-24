@@ -32,13 +32,13 @@ export const getColumns = (onUpdateMatches: () => void): ColumnDef<Match>[] => {
       cell: ({ row }) => {
         if (
           row.original.shift === null ||
-          row.original.shift.startHour === null
+          row.original.shift?.startHour === null
         ) {
           return null;
         }
         return (
           <div className="flex items-center w-48">
-            {formatDateComplete(row.original.shift.startHour)} hs
+            {formatDateComplete(row.original.shift?.startHour)} hs
           </div>
         );
       },
@@ -53,7 +53,7 @@ export const getColumns = (onUpdateMatches: () => void): ColumnDef<Match>[] => {
         }
         return (
           <p className="text-sm text-center">
-            {row.original.shift.court?.toString()}
+            {row.original.shift?.court?.toString()}
           </p>
         );
       },

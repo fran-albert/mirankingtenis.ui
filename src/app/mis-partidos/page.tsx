@@ -9,6 +9,8 @@ import React, { useEffect, useState } from "react";
 import { TournamentSelect } from "@/components/Select/Tournament/allTournament.select";
 import { useMatchStore } from "@/hooks/useMatch";
 import { useTournamentCategoryStore } from "@/hooks/useTournamentCategory";
+import { Tournament } from "@/modules/tournament/domain/Tournament";
+import { useTournamentRankingStore } from "@/hooks/useTournamentRanking";
 
 function MyMatchesPage() {
   const { session } = useCustomSession();
@@ -16,13 +18,18 @@ function MyMatchesPage() {
   const isValidIdUser = !isNaN(idUser) && idUser > 0;
   const { getUser, user } = useUserStore();
   const { getAllTournamentsByPlayer } = useTournamentStore();
-  const { getTournamentCategoriesByUser, categoriesForTournaments } =
-    useTournamentCategoryStore();
+  const {
+    getTournamentCategoriesByUser,
+    categoriesForTournaments,
+    getTournamentCategoryId,
+    tournamentCategoryId,
+  } = useTournamentCategoryStore();
   const {
     loading: isLoadingMatches,
     getMatchesByUser,
     matches,
   } = useMatchStore();
+  const { getHistoryRanking, historyRanking } = useTournamentRankingStore();
 
   useEffect(() => {
     if (isValidIdUser) {
@@ -39,39 +46,47 @@ function MyMatchesPage() {
     getMatchesByUser,
   ]);
 
-  const [selectedTournament, setSelectedTournament] = useState<
-    string | undefined
-  >(undefined);
+  const [selectedTournament, setSelectedTournament] = useState<Tournament | undefined>(undefined);
 
   useEffect(() => {
-    if (isValidIdUser && selectedTournament) {
-      const tournamentId = parseInt(selectedTournament);
-      const selectedCategories = categoriesForTournaments.filter(
-        (tc) => tc.tournament.id === tournamentId
-      );
-      selectedCategories.forEach((tc) => {
-        getMatchesByUser(idUser, tc.tournament.id, tc.category.id);
-      });
-    }
+    const fetchHistoryRanking = async () => {
+      if (isValidIdUser && selectedTournament) {
+        const tournamentId = selectedTournament.id;
+        const selectedCategories = categoriesForTournaments.filter(tc => tc.tournament.id === tournamentId);
+        for (const tc of selectedCategories) {
+          await getMatchesByUser(idUser, tc.tournament.id, tc.category.id);
+          await getTournamentCategoryId(tc.tournament.id, tc.category.id);
+          const tcId = tournamentCategoryId;
+          await getHistoryRanking(idUser, tc.tournament.id, tc.category.id);
+        }
+      }
+    };
+
+    fetchHistoryRanking();
   }, [
     isValidIdUser,
     selectedTournament,
     categoriesForTournaments,
     getMatchesByUser,
+    getHistoryRanking,
+    getTournamentCategoryId,
+    tournamentCategoryId, // Incluye tournamentCategoryId como dependencia
     idUser,
   ]);
 
-  const handleTournamentChange = (value: string) => {
-    setSelectedTournament(value);
+  useEffect(() => {
+    console.log("History Ranking:", historyRanking);
+  }, [historyRanking]);
+
+  const handleTournamentChange = (tournament: Tournament) => {
+    setSelectedTournament(tournament);
   };
 
   const handleUpdateMatches = () => {
     if (isValidIdUser && selectedTournament) {
-      const tournamentId = parseInt(selectedTournament);
-      const selectedCategories = categoriesForTournaments.filter(
-        (tc) => tc.tournament.id === tournamentId
-      );
-      selectedCategories.forEach((tc) => {
+      const tournamentId = selectedTournament.id;
+      const selectedCategories = categoriesForTournaments.filter(tc => tc.tournament.id === tournamentId);
+      selectedCategories.forEach(tc => {
         getMatchesByUser(idUser, tc.tournament.id, tc.category.id);
       });
     }
@@ -87,8 +102,7 @@ function MyMatchesPage() {
         <div className="space-y-2">
           <h2 className="text-3xl font-bold tracking-tight">Mis Partidos</h2>
           <p className="text-muted-foreground">
-            Aquí puedes ver el historial de ranking y los próximos partidos de
-            tu equipo favorito.
+            Aquí puedes ver el historial de ranking y los próximos partidos de tu equipo favorito.
           </p>
         </div>
         <div className="w-full relative">
@@ -106,7 +120,12 @@ function MyMatchesPage() {
       ) : (
         <div className="flex justify-center w-full px-4 lg:px-0 mt-10">
           <div className="w-full max-w-7xl space-y-6">
-            <PlayerChart player={user} />
+            {selectedTournament.type === "league" && (
+              <PlayerChart
+                player={historyRanking}
+                tournamentCategoryId={tournamentCategoryId}
+              />
+            )}
             <MatchesIndex
               match={matches}
               onUpdateMatches={handleUpdateMatches}

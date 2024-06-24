@@ -5,8 +5,9 @@ import { useGroupStore } from "@/hooks/useGroup";
 import { useTournamentParticipantStore } from "@/hooks/useTournamentParticipant";
 import { TournamentCategory } from "@/modules/tournament-category/domain/TournamentCategory";
 import Loading from "@/components/Loading/loading";
+import CreatePlayOffForCategory from "./playoffdialog";
 
-function MasterCategoriesCard({
+function PlayOffCategoriesCard({
   category,
   onFixtureCreated,
   idTournament,
@@ -17,10 +18,13 @@ function MasterCategoriesCard({
 }) {
   const { hasGroupsForCategory } = useGroupStore();
   const { hasPlayersForCategory } = useTournamentParticipantStore();
+
   const [hasGroups, setHasGroups] = useState(false);
   const [hasParticipants, setHasParticipants] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
     const fetchGroupAndPlayersStatus = async () => {
+      setIsLoading(true);
       const groupStatus = await hasGroupsForCategory(idTournament, category.id);
       const playersStatus = await hasPlayersForCategory(
         idTournament,
@@ -28,10 +32,14 @@ function MasterCategoriesCard({
       );
       setHasGroups(groupStatus);
       setHasParticipants(playersStatus);
+      setIsLoading(false);
     };
     fetchGroupAndPlayersStatus();
   }, [category.id, hasGroupsForCategory, hasPlayersForCategory, idTournament]);
 
+  if (isLoading) {
+    return <Loading isLoading />;
+  }
 
   return (
     <div>
@@ -41,7 +49,7 @@ function MasterCategoriesCard({
         </CardHeader>
         <CardContent>
           {hasGroups && hasParticipants ? (
-            <CreateFixtureForGroup
+            <CreatePlayOffForCategory
               idTournament={idTournament}
               onFixtureCreated={onFixtureCreated}
               idCategory={category.id}
@@ -58,4 +66,4 @@ function MasterCategoriesCard({
   );
 }
 
-export default MasterCategoriesCard;
+export default PlayOffCategoriesCard;

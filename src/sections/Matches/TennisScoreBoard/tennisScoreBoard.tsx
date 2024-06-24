@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { ScoreMatchCard } from "@/sections/Matches/ScoreMatchCard/card";
 import { createApiMatchRepository } from "@/modules/match/infra/ApiMatchRepository";
 import { toast } from "sonner";
-import { Match } from "@/modules/match/domain/Match";
+import { useMatchStore } from "@/hooks/useMatch";
 
 const matchRepository = createApiMatchRepository();
 
@@ -13,23 +13,25 @@ export const TennisScoreboard = ({
   jornada: number;
   tournamentCategoryId: number;
 }) => {
-  const [matches, setMatches] = useState<Match[]>([]);
-  console.log(matches)
+  const { getMatchesByTournamentCategoryAndMatchday, matches } =
+    useMatchStore();
+
+  const fetchMatches = useCallback(async () => {
+    await getMatchesByTournamentCategoryAndMatchday(
+      tournamentCategoryId,
+      jornada
+    );
+  }, [
+    getMatchesByTournamentCategoryAndMatchday,
+    tournamentCategoryId,
+    jornada,
+  ]);
 
   const handleDeleteMatch = async (id: number) => {
     await matchRepository.deleteMatch(id);
     toast.success("Partido eliminado correctamente");
     fetchMatches();
   };
-
-  const fetchMatches = useCallback(async () => {
-    const matches =
-      await matchRepository.getMatchesByTournamentCategoryAndMatchday(
-        tournamentCategoryId,
-        jornada
-      );
-    setMatches(matches);
-  }, [tournamentCategoryId, jornada]);
 
   useEffect(() => {
     fetchMatches();
@@ -41,8 +43,8 @@ export const TennisScoreboard = ({
         {matches.map((match) => (
           <ScoreMatchCard
             key={match.id}
-            player1={match.user1}
-            player2={match.user2}
+            idUser1={match.idUser1}
+            idUser2={match.idUser2}
             match={match}
             onMatchDecided={fetchMatches}
             onDeleteMatch={() => handleDeleteMatch(match.id)}

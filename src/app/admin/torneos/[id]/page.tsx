@@ -1,13 +1,9 @@
 "use client";
 import Loading from "@/components/Loading/loading";
+import { useTournamentStore } from "@/hooks/useTournament";
+import { useTournamentCategoryStore } from "@/hooks/useTournamentCategory";
 import { getFixtureByCategoryAndTournament } from "@/modules/fixture/application/get-fixture-by-category-and-tournament/getFixtureByCategoryAndTournament";
 import { createApiFixtureRepository } from "@/modules/fixture/infra/ApiFixtureRepository";
-import { getCategoriesForTournament } from "@/modules/tournament-category/application/get-categories-for-tournament/getCategoriesForTournament";
-import { TournamentCategory } from "@/modules/tournament-category/domain/TournamentCategory";
-import { createApiTournamentCategoryRepository } from "@/modules/tournament-category/infra/ApiTournamentCategoryRepository";
-import { getTournament } from "@/modules/tournament/application/get/get";
-import { Tournament } from "@/modules/tournament/domain/Tournament";
-import { createApiTournamentRepository } from "@/modules/tournament/infra/ApiTournamentRepository";
 import DetailsTournament from "@/sections/Admin/Tournament/Details/page";
 import { useParams } from "next/navigation";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
@@ -15,30 +11,14 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 function TournamentDetailsPage() {
   const params = useParams();
   const idTournament = Number(params.id);
-  const [tournament, setTournament] = useState<Tournament | undefined>();
-  const [categories, setCategories] = useState<
-    TournamentCategory[] | undefined
-  >(undefined);
   const [categoryDates, setCategoryDates] = useState<{ [key: number]: any }>(
     {}
   );
   const [isLoading, setIsLoading] = useState<boolean>(true);
-
-  const tournamentRepository = useMemo(
-    () => createApiTournamentRepository(),
-    []
-  );
   const fixtureRepository = useMemo(() => createApiFixtureRepository(), []);
-  const categoryRepository = useMemo(
-    () => createApiTournamentCategoryRepository(),
-    []
-  );
-
-  const loadTournament = useCallback(
-    (id: number) => getTournament(tournamentRepository)(id),
-    [tournamentRepository]
-  );
-
+  const { tournament, getTournament } = useTournamentStore();
+  const { categoriesForTournaments, getCategoriesForTournament } =
+    useTournamentCategoryStore();
   const loadFixture = useCallback(
     (idCategory: number, idTournament: number) =>
       getFixtureByCategoryAndTournament(fixtureRepository)(
@@ -48,19 +28,13 @@ function TournamentDetailsPage() {
     [fixtureRepository]
   );
 
-  const loadCategories = useCallback(
-    getCategoriesForTournament(categoryRepository),
-    [categoryRepository]
-  );
-
   useEffect(() => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        const tournamentData = await loadTournament(idTournament);
-        const categoriesData = await loadCategories(idTournament);
+        const categoriesData = await getCategoriesForTournament(idTournament);
         const dates: { [key: number]: any } = {};
-
+        getTournament(idTournament);
         await Promise.all(
           categoriesData.map(async (category) => {
             const numberOfFixtures = await loadFixture(
@@ -70,9 +44,6 @@ function TournamentDetailsPage() {
             dates[category.id] = numberOfFixtures + 1;
           })
         );
-
-        setTournament(tournamentData);
-        setCategories(categoriesData);
         setCategoryDates(dates);
         setIsLoading(false);
       } catch (error) {
@@ -82,7 +53,7 @@ function TournamentDetailsPage() {
     };
 
     fetchData();
-  }, [idTournament, loadTournament, loadCategories, loadFixture]);
+  }, [idTournament, getTournament, getCategoriesForTournament, loadFixture]);
 
   if (isLoading) {
     return <Loading isLoading />;
@@ -91,9 +62,8 @@ function TournamentDetailsPage() {
   return (
     <DetailsTournament
       tournament={tournament}
-      categories={categories}
+      categories={categoriesForTournaments}
       categoryDates={categoryDates}
-      idTournament={idTournament}
     />
   );
 }

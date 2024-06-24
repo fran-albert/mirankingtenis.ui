@@ -19,7 +19,7 @@ import {
     onCategory,
     idTournament,
   }: CategorySelectProps) => {
-    const { categories, getCategoriesForTournament, loading } =
+    const { categoriesForTournaments, getCategoriesForTournament, loading } =
       useTournamentCategoryStore();
   
     useEffect(() => {
@@ -34,12 +34,12 @@ import {
           <SelectValue placeholder="Categoría" />
         </SelectTrigger>
         <SelectContent>
-          {categories.map((category) => (
+          {categoriesForTournaments.map((category) => (
             <SelectItem
-              key={category.idCategory}
-              value={String(category.idCategory)}
+              key={category.id}
+              value={String(category.id)}
             >
-              Categoría {category.nameCategory}
+              Categoría {category.name}
             </SelectItem>
           ))}
         </SelectContent>

@@ -21,14 +21,14 @@ import { BadgeWin } from "@/components/Badge/Green/badge";
 import DecideMatchDialog from "../DecideWinner/button";
 registerLocale("es", es);
 export const ScoreMatchCard = ({
-  player1,
-  player2,
+  idUser1,
+  idUser2,
   match,
   onMatchDecided,
   onDeleteMatch,
 }: {
-  player1: User;
-  player2: User;
+  idUser1: number;
+  idUser2: number;
   match: Match;
   onMatchDecided: () => void;
   onDeleteMatch: () => void;
@@ -38,8 +38,7 @@ export const ScoreMatchCard = ({
     console.log(`Editar partido con ID: ${match}`);
   };
 
-
-  console.log(match)
+  console.log(match);
 
   return (
     <Card className="w-full transition duration-300 ease-in-out transform hover:scale-105 shadow-lg rounded-lg ">
@@ -61,15 +60,14 @@ export const ScoreMatchCard = ({
                     <Avatar>
                       <AvatarImage
                         src={
-                          player1?.photo
-                            ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${player1?.photo}.jpeg`
+                          match.user1photo
+                            ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${match.user1photo}.jpeg`
                             : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/mirankingtenis_default.png"
                         }
                         alt="@avatar"
                       />
                       <AvatarFallback>
-                        {player1?.name?.charAt(0) || ""}
-                        {player1?.lastname?.charAt(0) || ""}
+                        {match?.user1?.toString().charAt(0) || ""}
                       </AvatarFallback>
                     </Avatar>
                   </div>
@@ -80,8 +78,8 @@ export const ScoreMatchCard = ({
                     href={`/jugadores/${match.idUser1}`}
                     className="font-medium text-base md:text-xl lg:text-xl text-gray-900 hover:text-sky-800"
                   >
-                    {match.user1.toString()}
-                    {match.idWinner === player1.id && (
+                    {match.user1?.toString()}
+                    {match.idWinner === idUser1 && (
                       <span className="ml-2 text-sm font-semibold ">
                         <BadgeWin text="Ganador" />
                       </span>
@@ -109,14 +107,14 @@ export const ScoreMatchCard = ({
                     <Avatar>
                       <AvatarImage
                         src={
-                          player2?.photo
-                            ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${player2?.photo}.jpeg`
+                          match.user2photo
+                            ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${match.user2photo}.jpeg`
                             : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/mirankingtenis_default.png"
                         }
                         alt="@avatar"
                       />
                       <AvatarFallback>
-                        {player2?.user2name?.charAt(0) || ""}
+                        {match?.user2.toString().charAt(0) || ""}
                       </AvatarFallback>
                     </Avatar>
                   </div>
@@ -128,7 +126,7 @@ export const ScoreMatchCard = ({
                     className="font-medium text- md:text-xl lg:text-xl text-gray-900 hover:text-sky-800"
                   >
                     {match.user2.toString()}
-                    {match.idWinner === player2.id && (
+                    {match.idWinner === idUser2 && (
                       <span className="ml-2 text-sm font-semibold text-green-600">
                         <BadgeWin text="Ganador" />
                       </span>
@@ -169,12 +167,12 @@ export const ScoreMatchCard = ({
                   match={match}
                   onMatchDecided={onMatchDecided}
                 />
-                <button onClick={() => handleEdit(player1.id)}>
+                <button onClick={() => handleEdit(idUser1)}>
                   <FaPencilAlt className="text-slate-500 hover:text-slate-800" />
                 </button>
               </>
             ) : (
-              <button onClick={() => handleEdit(player1.id)}>
+              <button onClick={() => handleEdit(idUser1)}>
                 <FaPencilAlt className="text-slate-500 hover:text-slate-800" />
               </button>
             )}

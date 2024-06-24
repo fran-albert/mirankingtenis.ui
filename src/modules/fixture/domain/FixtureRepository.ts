@@ -1,3 +1,4 @@
+import { Match } from "@/modules/match/domain/Match";
 import { Fixture } from "./Fixture";
 
 export interface FixtureRepository {
@@ -6,5 +7,9 @@ export interface FixtureRepository {
   getFixtureByCategory(idCategory: number): Promise<Fixture[]>;
   isGroupStageFixturesCreated(idTournament: number, idCategory: number): Promise<boolean>;
   getFixtureByCategoryAndTournament(idCategory: number, idTournament: number): Promise<number>;
+  getSemiFinals(idCategory: number, idTournament: number): Promise<Match[]>;
+  getQuarterFinals(idCategory: number, idTournament: number): Promise<Match[]>;
+  createPlayOff(idCategory: number, idTournament: number): Promise<string>;
+  getFinals(idCategory: number, idTournament: number): Promise<Match[]>;
   countByCategory(idCategory: number): Promise<number>;
 }

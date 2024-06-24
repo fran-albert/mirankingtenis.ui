@@ -16,6 +16,8 @@ export interface Match {
   round: number;
   user1Name: string;
   user1position: number;
+  user1photo: string;
+  user2photo: string;
   user2position: number;
   finalResult: string;
   fixture: {

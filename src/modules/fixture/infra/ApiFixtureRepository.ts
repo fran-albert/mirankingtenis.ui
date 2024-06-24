@@ -1,6 +1,7 @@
 import axiosInstance from "@/services/axiosConfig";
 import { FixtureRepository } from "../domain/FixtureRepository";
 import { Fixture } from "../domain/Fixture";
+import { Match } from "@/modules/match/domain/Match";
 
 export function createApiFixtureRepository(): FixtureRepository {
   async function createFixture(newFixture: Fixture): Promise<Fixture> {
@@ -36,6 +37,30 @@ export function createApiFixtureRepository(): FixtureRepository {
     return fixtures;
   }
 
+  async function getSemiFinals(idTournament: number, idCategory: number): Promise<Match[]> {
+    const response = await axiosInstance.post(`playoff/quarter-finals/${idTournament}/${idCategory}`);
+    const fixtures = response.data as Match[];
+    return fixtures;
+  }
+  async function getQuarterFinals(idTournament: number, idCategory: number): Promise<Match[]> {
+    const response = await axiosInstance.post(`playoff/semi-finals/${idTournament}/${idCategory}`);
+    const fixtures = response.data as Match[];
+    return fixtures;
+  }
+
+  async function getFinals(idTournament: number, idCategory: number): Promise<Match[]> {
+    const response = await axiosInstance.post(`playoff/finals/${idTournament}/${idCategory}`);
+    const fixtures = response.data as Match[];
+    return fixtures;
+  }
+
+  async function createPlayOff(idTournament: number, idCategory: number): Promise<string> {
+    const response = await axiosInstance.post(`playoff/create/${idTournament}/${idCategory}`);
+    const fixtures = response.data;
+    return fixtures;
+  }
+
+
   async function countByCategory(idCategory: number): Promise<number> {
     const response = await axiosInstance.get(
       `fixture/count-fixtures-by-category/${idCategory}`
@@ -46,7 +71,7 @@ export function createApiFixtureRepository(): FixtureRepository {
 
   return {
     createFixture, getFixtureByCategoryAndTournament, createFixtureGroup, isGroupStageFixturesCreated,
-    countByCategory,
+    countByCategory, getFinals, getQuarterFinals, getSemiFinals, createPlayOff,
     getFixtureByCategory,
   };
 }

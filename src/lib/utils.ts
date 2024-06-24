@@ -20,6 +20,39 @@ export function formatDate(dateString: string): string {
 
   return `${day}-${month}-${year} ${hours}:${minutes}`;
 }
+export function formatDateDays(dateString: string): string {
+  const date = new Date(dateString);
+
+  const daysOfWeek = [
+    "Domingo",
+    "Lunes",
+    "Martes",
+    "Miércoles",
+    "Jueves",
+    "Viernes",
+    "Sábado",
+  ];
+  const monthsOfYear = [
+    "Enero",
+    "Febrero",
+    "Marzo",
+    "Abril",
+    "Mayo",
+    "Junio",
+    "Julio",
+    "Agosto",
+    "Septiembre",
+    "Octubre",
+    "Noviembre",
+    "Diciembre",
+  ];
+
+  const dayOfWeek = daysOfWeek[date.getDay()];
+  const monthName = monthsOfYear[date.getMonth()];
+  const day = date.getDate().toString().padStart(2, "0");
+
+  return `${day} de ${monthName}`;
+}
 
 export function formatDateComplete(dateString: string): string {
   const date = new Date(dateString);
