@@ -10,19 +10,29 @@ import { useTournamentRankingStore } from "@/hooks/useTournamentRanking";
 import { useTournamentStore } from "@/hooks/useTournament";
 import { formatDate } from "@/lib/utils";
 import { formatTournamentDates } from "@/common/helpers/helpers";
+import Loading from "@/components/Loading/loading";
 
 function TournamentPlayerPage() {
   const { id, idTournament } = useParams();
-  const { getTournamentCategoriesByUser, categoriesForTournaments } =
+  const { getTournamentCategoriesByUser, categoriesForTournaments, loading: isLoadingTCategories } =
     useTournamentCategoryStore();
   const {
     getTotalPlayerTournamentMatchSummary,
     playerMatchSummary,
+    loading: isLoadingPlayerMatchSummary,
     getHistoryRanking,
     historyRanking,
   } = useTournamentRankingStore();
-  const { getTournament, tournament } = useTournamentStore();
-  const { getMatchesByUser, matches } = useMatchStore();
+  const {
+    getTournament,
+    tournament,
+    loading: isLoadingTournaments,
+  } = useTournamentStore();
+  const {
+    getMatchesByUser,
+    matches,
+    loading: isLoadingMatches,
+  } = useMatchStore();
   const idUser = Number(id);
 
   const [categories, setCategories] = useState("");
@@ -68,6 +78,10 @@ function TournamentPlayerPage() {
   const bestPosition = Math.min(
     ...validPositions.map((ranking) => ranking.position)
   );
+
+  if(isLoadingTournaments || isLoadingMatches || isLoadingPlayerMatchSummary || isLoadingTCategories) {
+    return <Loading isLoading={true} />
+  }
 
   return (
     <div className="grid gap-6 container mt-10">

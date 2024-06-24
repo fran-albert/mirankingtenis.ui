@@ -38,7 +38,6 @@ export const ScoreMatchCard = ({
     console.log(`Editar partido con ID: ${match}`);
   };
 
-  console.log(match);
 
   return (
     <Card className="w-full transition duration-300 ease-in-out transform hover:scale-105 shadow-lg rounded-lg ">
