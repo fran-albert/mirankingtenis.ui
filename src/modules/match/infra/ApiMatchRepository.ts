@@ -69,9 +69,9 @@ export function createApiMatchRepository(): MatchRepository {
     const response = await axiosInstance.delete(`matches/${id}`);
     return response.data;
   }
-  async function decideMatch(id: number, winnerUserId: number): Promise<void> {
+  async function decideMatch(id: number, winnerUserId: number, tournamentCategoryId: number): Promise<void> {
     const response = await axiosInstance.post(`matches/${id}/decide-winner`, {
-      winnerUserId,
+      winnerUserId, tournamentCategoryId
     });
     return response.data;
   }

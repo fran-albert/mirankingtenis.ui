@@ -5,6 +5,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useTournamentStore } from "@/hooks/useTournament";
 import { Tournament } from "@/modules/tournament/domain/Tournament";
 import { createApiTournamentRepository } from "@/modules/tournament/infra/ApiTournamentRepository";
 import { useEffect, useState } from "react";
@@ -18,24 +19,15 @@ export const TournamentLeagueSelect = ({
   selected,
   onTournament,
 }: TournamentSelectProps) => {
-  const [tournaments, setTournaments] = useState<Tournament[]>([]);
-  const tournamentRepository = createApiTournamentRepository();
+  const { getAllTournaments, tournaments } = useTournamentStore();
 
   useEffect(() => {
-    const loadTournaments = async () => {
-      try {
-        const allTournaments = await tournamentRepository.getAllTournaments();
-        const tournamentLeague = allTournaments.filter(
-          (tournament) => tournament.type === "league"
-        );
-        setTournaments(tournamentLeague);
-      } catch (error) {
-        console.error("Error al obtener los torneos:", error);
-      }
-    };
+    getAllTournaments();
+  }, [getAllTournaments]);
 
-    loadTournaments();
-  }, [tournamentRepository]);
+  const tournamentLeague = tournaments.filter(
+    (tournament) => tournament.type === "league"
+  );
 
   return (
     <Select value={selected} onValueChange={onTournament}>
@@ -43,7 +35,7 @@ export const TournamentLeagueSelect = ({
         <SelectValue placeholder="Torneos" />
       </SelectTrigger>
       <SelectContent>
-        {tournaments.map((tournament) => (
+        {tournamentLeague.map((tournament) => (
           <SelectItem key={tournament.id} value={String(tournament.id)}>
             {tournament.name}
           </SelectItem>

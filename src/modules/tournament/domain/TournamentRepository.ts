@@ -8,7 +8,9 @@ export interface TournamentRepository {
     startTournament(idTournament: number): Promise<any[]>;
     finishTournament(idTournament: number): Promise<any[]>;
     getTournament(idTournament: number): Promise<Tournament>;
+    findLastFinishedLeagueTournament(): Promise<Tournament>;
     getTotalTournaments(): Promise<number>;
+    getLastTournamentByPlayer(idPlayer: number): Promise<Tournament>;
     getPlayerInfo(idTournament: number, idPlayer: number): Promise<GetPlayerInfoDto>;
     getCompletedTournamentsByPlayer(idPlayer: number): Promise<Tournament[]>;
     isCurrentTournament(idTournament: number): Promise<boolean>;

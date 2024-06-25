@@ -9,17 +9,21 @@ const tournamentRepository = createApiTournamentRepository();
 interface TournamentState {
     tournaments: Tournament[];
     tournament: Tournament | null;
+    currentTournamentByPlayer: Tournament | null;
     tournamentsByPlayer: Tournament[];
     activeTournament: number;
     setTournaments: (tournaments: Tournament[]) => void;
+    lastTournamentByPlayer: Tournament | null;
     setActiveTournament: (activeTournament: number) => void;
     loading: boolean;
     error: string | null;
     getAllTournaments: () => Promise<void>;
     getTournament: (idTournament: number) => Promise<Tournament>
     fetchAllDataForPlayer: (idUser: number) => Promise<void>;
+    getLastTournamentByPlayer: (idUser: number) => Promise<Tournament>;
     getPlayerInfo(idTournament: number, idPlayer: number): Promise<GetPlayerInfoDto>;
     isCurrentTournament(idTournament: number): Promise<boolean>;
+    findLastFinishedLeagueTournament(): Promise<Tournament | undefined>;
     getCurrentTournamentByPlayer(idPlayer: number): Promise<Tournament | undefined>;
     getCompletedTournamentsByPlayer(idPlayer: number): Promise<Tournament[]>;
     getAllTournamentsByPlayer(idPlayer: number): Promise<Tournament[]>;
@@ -36,6 +40,8 @@ const loadAllTournamentsFn = getAllTournaments(tournamentRepository);
 export const useTournamentStore = create<TournamentState>((set) => ({
     tournaments: [],
     tournament: null,
+    currentTournamentByPlayer: null,
+    lastTournamentByPlayer: null,
     loading: false,
     activeTournament: 1,
     tournamentsByPlayer: [],
@@ -101,6 +107,19 @@ export const useTournamentStore = create<TournamentState>((set) => ({
         }
     },
 
+    findLastFinishedLeagueTournament: async () => {
+        set({ loading: true, error: null });
+        try {
+            const tournament = await tournamentRepository.findLastFinishedLeagueTournament();
+            set({ tournament, loading: false });
+            return tournament;
+        } catch (error: any) {
+            console.error("Error fetching last finished league tournament:", error);
+            set({ error: error.message, loading: false });
+            return;
+        }
+    },
+
     finishTournament: async (idTournament: number) => {
         set({ loading: true, error: null });
         try {
@@ -157,12 +176,25 @@ export const useTournamentStore = create<TournamentState>((set) => ({
         }
     },
 
+    getLastTournamentByPlayer: async (idPlayer: number) => {
+        set({ loading: true, error: null });
+        try {
+            const lastTournamentByPlayer = await tournamentRepository.getLastTournamentByPlayer(idPlayer);
+            set({ lastTournamentByPlayer: lastTournamentByPlayer, loading: false });
+            return lastTournamentByPlayer;
+        } catch (error: any) {
+            console.error("Error checking if current tournament:", error);
+            set({ error: error.message, loading: false });
+            return error;
+        }
+    },
+
     getCurrentTournamentByPlayer: async (idPlayer: number) => {
         set({ loading: true, error: null });
         try {
-            const tournaments = await tournamentRepository.getCurrentTournamentByPlayer(idPlayer);
+            const currentTournamentByPlayer = await tournamentRepository.getCurrentTournamentByPlayer(idPlayer);
             set({ loading: false });
-            return tournaments;
+            return currentTournamentByPlayer;
         } catch (error: any) {
             console.error("Error fetching current tournament by player:", error);
             set({ error: error.message, loading: false });

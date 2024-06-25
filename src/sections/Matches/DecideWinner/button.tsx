@@ -18,19 +18,22 @@ import { createApiMatchRepository } from "@/modules/match/infra/ApiMatchReposito
 import { decideMatch } from "@/modules/match/application/decide-match/decideMatch";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
+import { useMatchStore } from "@/hooks/useMatch";
+import { isAxiosError } from "axios";
 
 interface DecideMatchDialogProps {
   match: Match;
   onMatchDecided?: () => void;
+  tournamentCategoryId: number;
 }
 
 export default function DecideMatchDialog({
   match,
+  tournamentCategoryId,
   onMatchDecided,
 }: DecideMatchDialogProps) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const matchRepository = createApiMatchRepository();
-  const decideMatchFn = decideMatch(matchRepository);
+  const { decideMatch } = useMatchStore();
   const [selectedPlayer, setSelectedPlayer] = useState<number | null>(null);
   const toggleDialog = () => setIsOpen(!isOpen);
 
@@ -51,14 +54,29 @@ export default function DecideMatchDialog({
     }
 
     try {
-      const result = await decideMatchFn(match.id, winnerUserId);
-      console.log("Resultado de la operación:", result);
-      toast.success("Partido decidido con éxito");
-      onMatchDecided?.();
-      toggleDialog();
+      const matchPromise = decideMatch(
+        match.id,
+        winnerUserId,
+        tournamentCategoryId
+      );
+      toast.promise(matchPromise, {
+        loading: "Decidiendo...",
+        success: "Partido decidido con éxito!",
+        error: (err) => {
+          if (isAxiosError(err)) {
+            return err?.response?.data.message || "Error al crear el PlayOff";
+          }
+          return "Error al crear el PlayOff";
+        },
+        duration: 3000,
+      });
+      await matchPromise;
+      if (onMatchDecided) {
+        onMatchDecided();
+      }
+      setIsOpen(false);
     } catch (error) {
-      console.error("Error al decidir el partido", error);
-      toast.error("Error al decidir el partido");
+      console.error("Error al crear el PlayOff", error);
     }
   };
 
@@ -108,7 +126,7 @@ export default function DecideMatchDialog({
                     : "bg-gray-300 text-gray-900 font-bold"
                 }`}
               >
-               {match?.user2.toString()}
+                {match?.user2.toString()}
               </Badge>
             </div>
           </DialogDescription>

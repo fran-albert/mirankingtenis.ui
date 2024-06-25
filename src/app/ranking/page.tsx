@@ -1,4 +1,5 @@
 "use client";
+import { useTournamentStore } from "@/hooks/useTournament";
 import { useTournamentCategoryStore } from "@/hooks/useTournamentCategory";
 import FiltersRanking from "@/sections/Ranking/Filters";
 import { RankingTable } from "@/sections/Ranking/Table/table";
@@ -7,22 +8,27 @@ import TournamentTabs from "@/sections/Tournament/Tabs/tabs";
 import React, { useEffect, useState } from "react";
 
 function RankingPage() {
-  // const [selectedTournament, setSelectedTournament] = useState(1);
-  // const [selectedCategory, setSelectedCategory] = useState(1);
-  // const { getTournamentCategoryId, tournamentCategoryId } =
-  //   useTournamentCategoryStore();
-  // useEffect(() => {
-  //   if (selectedCategory && selectedTournament) {
-  //     getTournamentCategoryId(selectedTournament, selectedCategory);
-  //   }
-  // }, [selectedCategory, selectedTournament, getTournamentCategoryId]);
+  const {
+    findLastFinishedLeagueTournament,
+    tournament: lastTournament,
+    loading,
+  } = useTournamentStore();
 
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("1");
   const [selectedTournament, setSelectedTournament] = useState("");
-  const [jornadas, setJornadas] = useState<number[]>([]);
   const [error, setError] = useState<string | null>(null);
   const { getTournamentCategoryId, tournamentCategoryId } =
     useTournamentCategoryStore();
+
+  useEffect(() => {
+    findLastFinishedLeagueTournament();
+  }, [findLastFinishedLeagueTournament]);
+
+  useEffect(() => {
+    if (lastTournament && !selectedTournament) {
+      setSelectedTournament(String(lastTournament.id));
+    }
+  }, [lastTournament, selectedTournament]);
 
   useEffect(() => {
     if (selectedCategory && selectedTournament) {
@@ -60,8 +66,8 @@ function RankingPage() {
             </div>
           ) : (
             <div className="text-center text-gray-500">
-              Por favor, seleccione un torneo y una categoría para
-              ver el ranking.
+              Por favor, seleccione un torneo y una categoría para ver el
+              ranking.
             </div>
           )}
         </div>

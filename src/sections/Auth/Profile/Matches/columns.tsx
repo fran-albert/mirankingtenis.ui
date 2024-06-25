@@ -103,7 +103,7 @@ export const getColumns = (onUpdateMatches: () => void): ColumnDef<Match>[] => {
           {row.original.status !== "played" && (
             <>
               {row.original.shift === null ||
-              row.original.shift.startHour === null ? (
+              row.original.shift?.startHour === null ? (
                 <>
                   <EditMatchDialog
                     match={row.original}

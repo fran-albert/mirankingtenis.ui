@@ -43,6 +43,7 @@ export const TennisScoreboard = ({
         {matches.map((match) => (
           <ScoreMatchCard
             key={match.id}
+            tournamentCategoryId={tournamentCategoryId}
             idUser1={match.idUser1}
             idUser2={match.idUser2}
             match={match}

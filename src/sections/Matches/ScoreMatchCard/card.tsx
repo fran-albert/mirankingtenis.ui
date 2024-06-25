@@ -24,12 +24,14 @@ export const ScoreMatchCard = ({
   idUser1,
   idUser2,
   match,
+  tournamentCategoryId,
   onMatchDecided,
   onDeleteMatch,
 }: {
   idUser1: number;
   idUser2: number;
   match: Match;
+  tournamentCategoryId: number;
   onMatchDecided: () => void;
   onDeleteMatch: () => void;
 }) => {
@@ -113,7 +115,7 @@ export const ScoreMatchCard = ({
                         alt="@avatar"
                       />
                       <AvatarFallback>
-                        {match?.user2.toString().charAt(0) || ""}
+                        {match?.user2?.toString().charAt(0) || ""}
                       </AvatarFallback>
                     </Avatar>
                   </div>
@@ -124,7 +126,7 @@ export const ScoreMatchCard = ({
                     href={`/jugadores/${match.idUser2}`}
                     className="font-medium text- md:text-xl lg:text-xl text-gray-900 hover:text-sky-800"
                   >
-                    {match.user2.toString()}
+                    {match.user2?.toString()}
                     {match.idWinner === idUser2 && (
                       <span className="ml-2 text-sm font-semibold text-green-600">
                         <BadgeWin text="Ganador" />
@@ -165,6 +167,7 @@ export const ScoreMatchCard = ({
                 <DecideMatchDialog
                   match={match}
                   onMatchDecided={onMatchDecided}
+                  tournamentCategoryId={tournamentCategoryId}
                 />
                 <button onClick={() => handleEdit(idUser1)}>
                   <FaPencilAlt className="text-slate-500 hover:text-slate-800" />

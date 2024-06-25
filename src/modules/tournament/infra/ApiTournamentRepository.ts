@@ -17,6 +17,12 @@ export function createApiTournamentRepository(): TournamentRepository {
         return tournament;
     }
 
+    async function findLastFinishedLeagueTournament(): Promise<Tournament> {
+        const response = await axiosInstance.get(`tournament/last-played`);
+        const tournament = response.data as Tournament;
+        return tournament;
+    }
+
     async function startTournament(idTournament: number): Promise<any[]> {
         const response = await axiosInstance.post(`tournament/start/${idTournament}`);
         const tournament = response.data as any[];
@@ -37,6 +43,12 @@ export function createApiTournamentRepository(): TournamentRepository {
 
     async function getCurrentTournamentByPlayer(idPlayer: number): Promise<Tournament> {
         const response = await axiosInstance.get(`tournament/players/${idPlayer}/current-tournament`);
+        const tournament = response.data as Tournament;
+        return tournament;
+    }
+
+    async function getLastTournamentByPlayer(idPlayer: number): Promise<Tournament> {
+        const response = await axiosInstance.get(`tournament/last-tournament/${idPlayer}`);
         const tournament = response.data as Tournament;
         return tournament;
     }
@@ -78,6 +90,6 @@ export function createApiTournamentRepository(): TournamentRepository {
     }
 
     return {
-        getAllTournaments, getCompletedTournamentsByPlayer, getAllTournamentsByPlayer, getPlayerInfo, getCurrentTournamentByPlayer, isCurrentTournament, create, deleteTournament, startTournament, finishTournament, getTournament, getTotalTournaments
+        getAllTournaments, getCompletedTournamentsByPlayer, findLastFinishedLeagueTournament, getLastTournamentByPlayer, getAllTournamentsByPlayer, getPlayerInfo, getCurrentTournamentByPlayer, isCurrentTournament, create, deleteTournament, startTournament, finishTournament, getTournament, getTotalTournaments
     };
 }

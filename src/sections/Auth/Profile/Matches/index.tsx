@@ -57,7 +57,8 @@ function MatchesIndex({
 
             {m.status !== "played" && (
               <>
-                {m.shift === null ? (
+                {m.shift === null ||
+                m.shift?.startHour === null ? (
                   <>
                     <EditMatchDialog
                       match={m}

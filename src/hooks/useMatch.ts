@@ -20,7 +20,7 @@ interface MatchState {
     getAllMatchesByUser: (idUser: number) => Promise<void>;
     findMatchesByGroupStage: (idGroupStage: number) => Promise<void>;
     deleteMatch: (id: number) => Promise<void>;
-    decideMatch: (id: number, winnerUserId: number) => Promise<void>;
+    decideMatch: (id: number, winnerUserId: number, tournamentCategoryId: number) => Promise<void>;
     getMatchesByTournamentCategoryAndMatchday: (idTournamentCategory: number, matchDay: number) => Promise<void>;
     getNextMatch: (idTournament: number, idUser: number) => Promise<void>;
 }
@@ -103,10 +103,10 @@ export const useMatchStore = create<MatchState>((set) => ({
         }
     },
 
-    decideMatch: async (id: number, winnerUserId: number) => {
+    decideMatch: async (id: number, winnerUserId: number, tournamentCategoryId: number) => {
         set({ loading: true, error: null });
         try {
-            await matchRepository.decideMatch(id, winnerUserId);
+            await matchRepository.decideMatch(id, winnerUserId, tournamentCategoryId);
             set({ loading: false });
         } catch (error: any) {
             set({ error: error.message, loading: false });
