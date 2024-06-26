@@ -46,27 +46,27 @@ function StepControllerForTournament({
         parseInt(position.position, 10)
       ),
     };
-  
-    try {
-      const createPromise = create(
-        payload.tournamentId,
-        payload.categoryId,
-        payload.userIds,
-        payload.positionInitials
-      );
-  
-      toast.promise(createPromise, {
-        loading: "Enviando datos...",
-        success: "Participantes agregados con éxito!",
-        error: "Error al agregar participantes",
-      });
-  
-      const response = await createPromise;
-      router.push(`/admin/torneos/${idTournament}`);
-    } catch (error) {
-      console.error("Error:", error);
-      toast.error("Error al agregar participantes");
-    }
+    console.log(payload);
+    // try {
+    //   const createPromise = create(
+    //     payload.tournamentId,
+    //     payload.categoryId,
+    //     payload.userIds,
+    //     payload.positionInitials
+    //   );
+
+    //   toast.promise(createPromise, {
+    //     loading: "Enviando datos...",
+    //     success: "Participantes agregados con éxito!",
+    //     error: "Error al agregar participantes",
+    //   });
+
+    //   const response = await createPromise;
+    //   router.push(`/admin/torneos/${idTournament}`);
+    // } catch (error) {
+    //   console.error("Error:", error);
+    //   toast.error("Error al agregar participantes");
+    // }
   };
 
   const handleSelectedPlayersChange = (players: User[]) => {

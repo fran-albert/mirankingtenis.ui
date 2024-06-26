@@ -35,7 +35,7 @@ function MasterPage() {
       try {
         setIsLoading(true);
         const groupStageId = await getGroupStagesByTournamentCategory(
-          2,
+          43,
           selectedCategory
         );
         setGroupStageId(groupStageId);
