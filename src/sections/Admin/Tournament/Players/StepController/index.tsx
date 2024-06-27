@@ -9,12 +9,15 @@ import { useTournamentParticipantStore } from "@/hooks/useTournamentParticipant"
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { NonParticipantsDto } from "@/common/types/non-participants.dto";
+import { Tournament } from "@/modules/tournament/domain/Tournament";
 
 function StepControllerForTournament({
   users,
   idTournament,
+  tournament,
 }: {
   users: NonParticipantsDto[];
+  tournament: Tournament | null;
   idTournament: number;
 }) {
   const router = useRouter();
@@ -25,14 +28,23 @@ function StepControllerForTournament({
   const previousStep = () => setCurrentStep(currentStep - 1);
   const [selectedPlayers, setSelectedPlayers] = useState<User[]>([]);
   const [playerPositions, setPlayerPositions] = useState<
-    { playerId: number; position: string }[]
+    {
+      playerId: number;
+      position: string | null;
+      isDirectlyQualified: boolean;
+    }[]
   >([]);
+
   const handleCategorySelect = (idCategory: number) => {
     setSelectedCategoryId(idCategory);
   };
 
   const handlePlayerPositionsChange = (
-    positions: { playerId: number; position: string }[]
+    positions: {
+      playerId: number;
+      position: string | null;
+      isDirectlyQualified: boolean;
+    }[]
   ) => {
     setPlayerPositions(positions);
   };
@@ -42,36 +54,43 @@ function StepControllerForTournament({
       tournamentId: idTournament,
       categoryId: selectedCategoryId,
       userIds: selectedPlayers.map((player) => player.id),
-      positionInitials: playerPositions.map((position) =>
-        parseInt(position.position, 10)
+      positionInitials: playerPositions
+        .map((position) =>
+          position.position !== null ? parseInt(position.position, 10) : null
+        )
+        .filter((position) => position !== null) as number[],
+      isDirectlyQualified: playerPositions.map(
+        (position) => position.isDirectlyQualified
       ),
     };
     console.log(payload);
-    // try {
-    //   const createPromise = create(
-    //     payload.tournamentId,
-    //     payload.categoryId,
-    //     payload.userIds,
-    //     payload.positionInitials
-    //   );
+    try {
+      const createPromise = create(
+        payload.tournamentId,
+        payload.categoryId,
+        payload.userIds,
+        payload.positionInitials,
+        payload.isDirectlyQualified
+      );
 
-    //   toast.promise(createPromise, {
-    //     loading: "Enviando datos...",
-    //     success: "Participantes agregados con éxito!",
-    //     error: "Error al agregar participantes",
-    //   });
+      toast.promise(createPromise, {
+        loading: "Enviando datos...",
+        success: "Participantes agregados con éxito!",
+        error: "Error al agregar participantes",
+      });
 
-    //   const response = await createPromise;
-    //   router.push(`/admin/torneos/${idTournament}`);
-    // } catch (error) {
-    //   console.error("Error:", error);
-    //   toast.error("Error al agregar participantes");
-    // }
+      const response = await createPromise;
+      router.push(`/admin/torneos/${idTournament}`);
+    } catch (error) {
+      console.error("Error:", error);
+      toast.error("Error al agregar participantes");
+    }
   };
 
   const handleSelectedPlayersChange = (players: User[]) => {
     setSelectedPlayers(players);
   };
+
   switch (currentStep) {
     case 1:
       return (
@@ -90,6 +109,7 @@ function StepControllerForTournament({
       return (
         <Step3
           onBack={previousStep}
+          tournament={tournament}
           onNext={nextStep}
           selectedPlayers={selectedPlayers}
           onPlayerPositionsChange={handlePlayerPositionsChange}
@@ -99,6 +119,7 @@ function StepControllerForTournament({
       return (
         <Step4
           onBack={previousStep}
+          tournament={tournament}
           onNext={nextStep}
           playerPositions={playerPositions}
           selectedPlayers={selectedPlayers}
@@ -108,6 +129,7 @@ function StepControllerForTournament({
       return (
         <Step5
           onBack={previousStep}
+          tournament={tournament}
           onSubmit={handleSubmit}
           tournamentId={idTournament}
           categoryId={selectedCategoryId}

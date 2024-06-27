@@ -38,13 +38,15 @@ export function createApiTournamentParticipantRepository(): TournamentParticipan
         idTournament: number,
         idCategory: number,
         userIds: number[],
-        positionInitials: number[]
+        positionInitials: number[] | null,
+        directToPlayoffsFlags: boolean[]
     ): Promise<string> {
         const response = await axiosInstance.post(`tournament-participants`, {
             tournamentId: idTournament,
             categoryId: idCategory,
             userIds,
-            positionInitials
+            positionInitials,
+            directToPlayoffsFlags
         });
         return response.data as string;
     }

@@ -3,36 +3,55 @@ import { User } from "@/modules/users/domain/User";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Tournament } from "@/modules/tournament/domain/Tournament";
 
 interface Step3Props {
   onNext: () => void;
   onBack: () => void;
+  tournament: Tournament | null;
   selectedPlayers: User[];
   onPlayerPositionsChange: (
-    positions: { playerId: number; position: string }[]
+    positions: { playerId: number; position: string | null; isDirectlyQualified: boolean }[]
   ) => void;
 }
 
 export const Step3 = ({
   onNext,
   onBack,
+  tournament,
   selectedPlayers,
   onPlayerPositionsChange,
 }: Step3Props) => {
   const [playerPositions, setPlayerPositions] = useState<
-    { playerId: number; position: string }[]
-  >(selectedPlayers.map((player) => ({ playerId: player.id, position: "" })));
+    { playerId: number; position: string | null; isDirectlyQualified: boolean }[]
+  >(
+    selectedPlayers.map((player) => ({
+      playerId: player.id,
+      position: null,
+      isDirectlyQualified: false,
+    }))
+  );
 
   const handlePositionChange = (playerId: number, position: string) => {
     setPlayerPositions(
       playerPositions.map((player) =>
-        player.playerId === playerId ? { ...player, position } : player
+        player.playerId === playerId
+          ? { ...player, position: position === "" ? null : position }
+          : player
+      )
+    );
+  };
+
+  const handlePlayoffChange = (playerId: number, isDirectlyQualified: boolean) => {
+    setPlayerPositions(
+      playerPositions.map((player) =>
+        player.playerId === playerId ? { ...player, isDirectlyQualified } : player
       )
     );
   };
 
   const handleSubmit = () => {
-    // Validar y enviar las posiciones
     onPlayerPositionsChange(playerPositions);
     onNext();
   };
@@ -43,11 +62,22 @@ export const Step3 = ({
         <p className="text-lg text-center sm:text-2xl md:text-3xl mb-6">
           Asignar Posiciones Iniciales
         </p>
+        {tournament?.type === "master" && (
+          <span className="text-red-500">
+            Si el usuario está pre-clasificado a los play off, no agregar
+            posición Inicial.
+          </span>
+        )}
         <table className="w-full mt-2 text-center">
           <thead>
             <tr className="bg-gray-100">
               <th className="px-4 py-3 font-medium">Jugador</th>
               <th className="px-4 py-3 font-medium">Posición Inicial</th>
+              {tournament?.type === "master" && (
+                <th className="px-4 py-3 font-medium">
+                  Clasificado a Playoffs
+                </th>
+              )}
             </tr>
           </thead>
           <tbody>
@@ -71,6 +101,19 @@ export const Step3 = ({
                     }
                   />
                 </td>
+                {tournament?.type === "master" && (
+                  <td className="px-4 py-3">
+                    <Checkbox
+                      checked={
+                        playerPositions.find((p) => p.playerId === player.id)
+                          ?.isDirectlyQualified || false
+                      }
+                      onCheckedChange={(checked: boolean) =>
+                        handlePlayoffChange(player.id, checked)
+                      }
+                    />
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>

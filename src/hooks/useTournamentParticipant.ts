@@ -15,7 +15,7 @@ interface TournamentParticipantState {
     error: string | null;
     nonParticipants: NonParticipantsDto[];
     hasPlayers: boolean;
-    create: (idTournament: number, idCategory: number, userIds: number[], positionInitials: number[]) => Promise<string>;
+    create: (idTournament: number, idCategory: number, userIds: number[], positionInitials: number[] | null, directToPlayoffsFlags: boolean[]) => Promise<string>;
     findNonParticipants: (idTournament: number) => Promise<NonParticipantsDto[]>;
     getPlayersByTournament: (idTournament: number) => Promise<TournamentParticipant[]>;
     hasPlayersForCategory: (idTournament: number, idCategory: number) => Promise<boolean>;
@@ -34,10 +34,10 @@ export const useTournamentParticipantStore = create<TournamentParticipantState>(
     loading: false,
     error: null,
 
-    create: async (idTournament, idCategory, userIds, positionInitials) => {
+    create: async (idTournament, idCategory, userIds, positionInitials, directToPlayoffsFlags) => {
         set({ loading: true, error: null });
         try {
-            const response = await tournamentParticipantRepository.createParticipantsForTournament(idTournament, idCategory, userIds, positionInitials);
+            const response = await tournamentParticipantRepository.createParticipantsForTournament(idTournament, idCategory, userIds, positionInitials, directToPlayoffsFlags);
             return response;
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : 'Unexpected error';

@@ -2,13 +2,19 @@ import React from "react";
 import { User } from "@/modules/users/domain/User";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Tournament } from "@/modules/tournament/domain/Tournament";
 
 interface Step5Props {
   onSubmit: () => void;
   onBack: () => void;
   selectedPlayers: User[];
-  playerPositions: { playerId: number; position: string }[];
+  playerPositions: {
+    playerId: number;
+    position: string | null;
+    isDirectlyQualified: boolean;
+  }[];
   tournamentId: number;
+  tournament: Tournament | null;
   categoryId: number;
 }
 
@@ -17,6 +23,7 @@ export const Step5 = ({
   onBack,
   selectedPlayers,
   tournamentId,
+  tournament,
   categoryId,
   playerPositions,
 }: Step5Props) => {
@@ -34,6 +41,12 @@ export const Step5 = ({
       default:
         return "Desconocido";
     }
+  };
+  const isPlayerDirectlyQualified = (playerId: number) => {
+    return (
+      playerPositions.find((p) => p.playerId === playerId)
+        ?.isDirectlyQualified || false
+    );
   };
 
   return (
@@ -56,6 +69,11 @@ export const Step5 = ({
                 <th className="px-4 py-3 text-center font-medium">
                   Posición Inicial
                 </th>
+                {tournament?.type === "master" && (
+                  <th className="px-4 py-3 font-medium">
+                    Clasificado a Playoffs
+                  </th>
+                )}
               </tr>
             </thead>
             <tbody>
@@ -71,6 +89,13 @@ export const Step5 = ({
                       {getPlayerPosition(player.id)}
                     </Label>
                   </td>
+                  {tournament?.type === "master" && (
+                  <td className="px-4 py-3">
+                    <Label className=" text-slate-800">
+                      {isPlayerDirectlyQualified(player.id) ? "Sí" : "No"}
+                    </Label>
+                  </td>
+                )}
                 </tr>
               ))}
             </tbody>

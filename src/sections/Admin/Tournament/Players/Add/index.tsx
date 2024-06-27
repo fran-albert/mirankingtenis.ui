@@ -66,7 +66,7 @@ export default function SelectPlayerTournamentComponent({
               key={player.id}
               className={`bg-white rounded-lg shadow-md p-4 flex items-center gap-4 hover:shadow-lg transition-shadow cursor-pointer ${
                 selectedPlayers.some((p) => p.id === player.id)
-                  ? "border-4 border-blue-500"
+                  ? "border-4 border-green-800"
                   : ""
               }`}
               onClick={() => handlePlayerSelection(player)}
