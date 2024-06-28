@@ -38,65 +38,76 @@ export function FixtureGroupStage({
                 <div className="bg-gray-200 dark:bg-gray-700 px-4 py-2 font-medium">
                   Grupo {groupName}
                 </div>
-                {matches.map((match) => (
-                  <div
-                    key={match.id}
-                    className="flex items-center justify-between bg-white dark:bg-gray-900 p-4 rounded-md shadow-md mb-2"
-                  >
-                    <div className="flex items-center gap-2">
-                      <div className="rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
-                        <Avatar>
-                          <AvatarImage
-                            src={
-                              match.user1.photo
-                                ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${match.user1.photo}.jpeg`
-                                : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/mirankingtenis_default.png"
-                            }
-                            alt={match.user1.name.charAt(0)}
-                          />
-                          <AvatarFallback>
-                            {match.user1.name.charAt(0)}
-                          </AvatarFallback>
-                        </Avatar>
-                      </div>
-                      <div>
-                        <p className="font-medium">{match.user1.name}</p>
-                        <p className="text-gray-500 dark:text-gray-400 text-sm">
-                          {match.user1.position ?? "Sin posición"}°
-                        </p>
-                      </div>
-                    </div>
-                    <div>
-                      <p className="font-medium">vs</p>
-                      <p className="text-gray-500 dark:text-gray-400 text-sm">
-                        {match.shift === null ? "" : formatDate(match.shift)}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
-                        <Avatar>
-                          <AvatarImage
-                            src={
-                              match.user2.photo
-                                ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${match.user2.photo}.jpeg`
-                                : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/mirankingtenis_default.png"
-                            }
-                            alt="@shadcn"
-                          />
-                          <AvatarFallback>
-                            {match.user2.name.charAt(0)}
-                          </AvatarFallback>
-                        </Avatar>
-                      </div>
-                      <div>
-                        <p className="font-medium">{match.user2.name}</p>
-                        <p className="text-gray-500 dark:text-gray-400 text-sm">
-                          {match.user2.position ?? "Sin posición"}°
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                <table className="w-full bg-white dark:bg-gray-900 rounded-md shadow-md mb-4 table-fixed">
+                  <tbody>
+                    {matches.map((match) => (
+                      <tr key={match.id} className="border-t">
+                        <td className="p-2 text-left w-1/4">
+                          <div className="flex items-center gap-2">
+                            <Avatar className="w-10 h-10">
+                              <AvatarImage
+                                src={
+                                  match.user1.photo
+                                    ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${match.user1.photo}.jpeg`
+                                    : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/mirankingtenis_default.png"
+                                }
+                                alt={match.user1.name.charAt(0)}
+                              />
+                              <AvatarFallback>
+                                {match.user1.name.charAt(0)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <p className="font-medium">
+                                <span className="text-gray-500 text-sm">
+                                  {" "}
+                                  {match.user1.position ?? "Sin posición"}°{" "}
+                                </span>
+                                {match.user1.name}{" "}
+                              </p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="p-2 text-center w-1/2">
+                          <p className="font-medium">vs</p>
+                          <p className="text-gray-500 dark:text-gray-400 text-sm">
+                            {match.shift === null
+                              ? ""
+                              : formatDate(match.shift)}{" "}
+                            {" - "}
+                            {match.court ? `Cancha ${match.court}` : ""}
+                          </p>
+                        </td>
+                        <td className="p-2 text-right w-1/4">
+                          <div className="flex items-center gap-2 justify-end">
+                            <div className="text-right">
+                              <p className="font-medium">
+                                <span className="text-gray-500 text-sm">
+                                  {" "}
+                                  {match.user2.position ?? "Sin posición"}°{" "}
+                                </span>
+                                {match.user2.name}{" "}
+                              </p>
+                            </div>
+                            <Avatar className="w-10 h-10">
+                              <AvatarImage
+                                src={
+                                  match.user2.photo
+                                    ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${match.user2.photo}.jpeg`
+                                    : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/mirankingtenis_default.png"
+                                }
+                                alt={match.user2.name.charAt(0)}
+                              />
+                              <AvatarFallback>
+                                {match.user2.name.charAt(0)}
+                              </AvatarFallback>
+                            </Avatar>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             ))}
           </div>

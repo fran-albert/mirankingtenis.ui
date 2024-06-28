@@ -35,7 +35,7 @@ function MasterPage() {
       try {
         setIsLoading(true);
         const groupStageId = await getGroupStagesByTournamentCategory(
-          44,
+          2,
           selectedCategory
         );
         setGroupStageId(groupStageId);
@@ -139,7 +139,7 @@ function MasterPage() {
       )}
     </div>
   );
-  <PlayOffCards />
+  <PlayOffCards />;
 }
 
 export default MasterPage;
