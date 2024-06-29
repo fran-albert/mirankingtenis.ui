@@ -73,16 +73,18 @@ export function FixtureGroupStage({
                             {match.status === "played" ? (
                               <div>
                                 <p className="font-medium">
-                                  {match.sets
-                                    .sort((a, b) => a.setNumber - b.setNumber)
-                                    .map((set, index) => (
-                                      <span key={index}>
-                                        {set.pointsPlayer1}-{set.pointsPlayer2}
-                                        {index < match.sets.length - 1
-                                          ? " "
-                                          : ""}
-                                      </span>
-                                    ))}
+                                  {match.sets &&
+                                    match.sets
+                                      .sort((a, b) => a.setNumber - b.setNumber)
+                                      .map((set, index) => (
+                                        <span key={index}>
+                                          {set.pointsPlayer1}-
+                                          {set.pointsPlayer2}
+                                          {index < match.sets.length - 1
+                                            ? " "
+                                            : ""}
+                                        </span>
+                                      ))}
                                 </p>
                                 <p className="text-gray-500 dark:text-gray-400 text-sm">
                                   {formatDateDaysMonth(match.shift)} {"  "}
@@ -182,17 +184,22 @@ export function FixtureGroupStage({
                           {match.status === "played" ? (
                             <div>
                               <p className="font-medium">
-                                {match.sets
-                                  .sort((a, b) => a.setNumber - b.setNumber)
-                                  .map((set, index) => (
-                                    <span key={index}>
-                                      {set.pointsPlayer1}-{set.pointsPlayer2}
-                                      {index < match.sets.length - 1 ? " " : ""}
-                                    </span>
-                                  ))}
+                                {match.sets && match.sets.length > 0
+                                  ? match.sets
+                                      .sort((a, b) => a.setNumber - b.setNumber)
+                                      .map((set, index) => (
+                                        <span key={index}>
+                                          {set.pointsPlayer1}-
+                                          {set.pointsPlayer2}
+                                          {index < match.sets.length - 1
+                                            ? " "
+                                            : ""}
+                                        </span>
+                                      ))
+                                  : " "}
                               </p>
                               <p className="text-gray-500 dark:text-gray-400 text-sm">
-                                {formatDate(match.shift)} {" - "}
+                                {formatDate(match.shift)} {"  "}
                                 {match.court ? `Cancha ${match.court}` : ""}
                               </p>
                             </div>
