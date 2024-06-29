@@ -54,7 +54,6 @@ export const Step2Group = ({
         selectedTournamentId,
         selectedCategoryId
       );
-      console.log("Enviando datos a la API:", payload);
       toast.promise(fixtureCreationPromise, {
         loading: "Creando fixture...",
         success: "Fixture creado con éxito!",

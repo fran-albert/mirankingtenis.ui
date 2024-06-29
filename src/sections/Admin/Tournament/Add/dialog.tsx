@@ -60,8 +60,6 @@ export default function AddTournamentDialog({
         error: "Error al crear el Torneo",
       });
 
-      console.log("data", data);
-
       specialityCreationPromise
         .then((createdTournament) => {
           setIsOpen(false);

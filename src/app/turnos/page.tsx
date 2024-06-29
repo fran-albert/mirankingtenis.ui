@@ -1,13 +1,12 @@
-"use client";
-import { ShiftManagement } from "@/sections/Shifts";
 import React from "react";
+import { Metadata } from "next";
+import ClientShiftComponent from "@/components/Client/Shift";
 
-function ShiftsPage() {
-  return (
-    <div className="container">
-      <ShiftManagement />
-    </div>
-  );
+export const metadata: Metadata = {
+  title: "Turnos",
+};
+function ShiftPage() {
+  return <ClientShiftComponent />;
 }
 
-export default ShiftsPage;
+export default ShiftPage;

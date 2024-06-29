@@ -65,7 +65,6 @@ export default function EditMatchDialog({
       idCourt: Number(data.idCourt),
       startHour: startHour,
     };
-    console.log(dataToSend);
     try {
       const shiftCreationPromise = shitForMatchFn(dataToSend, match.id);
       toast.promise(shiftCreationPromise, {

@@ -20,6 +20,16 @@ export function formatDate(dateString: string): string {
 
   return `${day}-${month}-${year} ${hours}:${minutes}`;
 }
+
+export function formatDateDaysMonth(dateString: string): string {
+  const date = new Date(dateString);
+
+  const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  const day = date.getDate().toString().padStart(2, "0");
+
+
+  return `${day}-${month}`;
+}
 export function formatDateDays(dateString: string): string {
   const date = new Date(dateString);
 

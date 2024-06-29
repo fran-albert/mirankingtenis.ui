@@ -43,11 +43,8 @@ export const Step5 = ({
       })),
     };
 
-    console.log("Enviando datos a la API:", payload);
-
     try {
       const fixtureCreationPromise = createFixtureFn(payload);
-      console.log("Enviando datos a la API:", payload);
       toast.promise(fixtureCreationPromise, {
         loading: "Creando fixture...",
         success: "Fixture creado con éxito!",

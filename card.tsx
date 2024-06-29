@@ -4,7 +4,6 @@ import React from "react";
 import { FaEdit, FaPlus } from "react-icons/fa";
 
 function MatchesDetails({ matches }: { matches: Match[] }) {
-  console.log(matches)
   return (
     <div className="flex sm:mx-auto">
       <div className="bg-white p-4 rounded-lg overflow-hidden shadow-md w-full max-w-lg">

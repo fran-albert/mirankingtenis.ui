@@ -14,8 +14,11 @@ import Loading from "@/components/Loading/loading";
 
 function TournamentPlayerPage() {
   const { id, idTournament } = useParams();
-  const { getTournamentCategoriesByUser, categoriesForTournaments, loading: isLoadingTCategories } =
-    useTournamentCategoryStore();
+  const {
+    getTournamentCategoriesByUser,
+    categoriesForTournaments,
+    loading: isLoadingTCategories,
+  } = useTournamentCategoryStore();
   const {
     getTotalPlayerTournamentMatchSummary,
     playerMatchSummary,
@@ -66,8 +69,6 @@ function TournamentPlayerPage() {
           matchingTournament.category.id
         );
         setCategories(matchingTournament.category.name);
-      } else {
-        console.log("Tournament ID does not match any category.");
       }
     }
   }, [categoriesForTournaments, idTournament]);
@@ -79,8 +80,13 @@ function TournamentPlayerPage() {
     ...validPositions.map((ranking) => ranking.position)
   );
 
-  if(isLoadingTournaments || isLoadingMatches || isLoadingPlayerMatchSummary || isLoadingTCategories) {
-    return <Loading isLoading={true} />
+  if (
+    isLoadingTournaments ||
+    isLoadingMatches ||
+    isLoadingPlayerMatchSummary ||
+    isLoadingTCategories
+  ) {
+    return <Loading isLoading={true} />;
   }
 
   return (

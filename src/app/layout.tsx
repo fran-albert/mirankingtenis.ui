@@ -14,10 +14,11 @@ const roboto = Roboto({
 });
 
 export const metadata: Metadata = {
-  title: "Mi Ranking Tenis",
-  description: "Mi Ranking Tenis - Firmat, Santa Fé",
+  title: {
+    template: "Mi Ranking Tenis - %s",
+    default: "Mi Ranking Tenis",
+  },
 };
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -40,9 +41,7 @@ export default function RootLayout({
         <ProfilePhotoProvider>
           <SessionAuthProvider>
             <Toaster richColors position="top-center" />
-            <MainContainer>
-              {children}
-            </MainContainer>
+            <MainContainer>{children}</MainContainer>
           </SessionAuthProvider>
         </ProfilePhotoProvider>
       </body>

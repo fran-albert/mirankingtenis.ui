@@ -1,15 +1,13 @@
-"use client";
-import { PlayersTable } from "@/sections/Players/Table/table";
 import React from "react";
+import ClientPlayerComponent from "@/components/Client/Players";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Jugadores",
+};
 
 const PlayersPage = () => {
-  return (
-    <div className="flex justify-center w-full px-4 lg:px-0 mt-10">
-      <div className="w-full max-w-7xl">
-        <PlayersTable />
-      </div>
-    </div>
-  );
+  return <ClientPlayerComponent />;
 };
 
 export default PlayersPage;

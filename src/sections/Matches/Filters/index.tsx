@@ -29,35 +29,33 @@ function FiltersMatches({
   jornadas,
 }: FilterMatchesProps) {
   return (
-    <>
-      <div className="container mx-auto my-8">
-        <div className="bg-background p-6 rounded-lg shadow">
-          <div className="grid grid-cols-3 gap-4">
-            <TournamentLeagueSelect
-              selected={selectedTournament}
-              onTournament={onSelectTournament}
-            />
-            <CategoryMatchesSelect
-              idTournament={Number(selectedTournament)}
-              selected={selectedCategory}
-              onCategory={onSelectCategory}
-            />
-            <Select value={selectedJornada} onValueChange={onSelectJornada}>
-              <SelectTrigger>
-                <SelectValue placeholder="Fecha" />
-              </SelectTrigger>
-              <SelectContent>
-                {jornadas.map((jornada) => (
-                  <SelectItem key={jornada} value={String(jornada)}>
-                    Fecha {jornada}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+    <div className="container mx-auto my-8 ">
+      <div className="bg-background p-6 rounded-lg shadow">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <TournamentLeagueSelect
+            selected={selectedTournament}
+            onTournament={onSelectTournament}
+          />
+          <CategoryMatchesSelect
+            idTournament={Number(selectedTournament)}
+            selected={selectedCategory}
+            onCategory={onSelectCategory}
+          />
+          <Select value={selectedJornada} onValueChange={onSelectJornada}>
+            <SelectTrigger>
+              <SelectValue placeholder="Fecha" />
+            </SelectTrigger>
+            <SelectContent>
+              {jornadas.map((jornada) => (
+                <SelectItem key={jornada} value={String(jornada)}>
+                  Fecha {jornada}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 

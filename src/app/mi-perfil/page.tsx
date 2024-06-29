@@ -1,14 +1,12 @@
-"use client";
-import Profile from "@/sections/Auth/Profile/profile";
+import React from "react";
+import { Metadata } from "next";
+import ClientProfilePage from "@/components/Client/Perfil";
 
-export default function ProfilePage() {
-  return (
-    <>
-      <div className="flex justify-center w-full px-4 lg:px-0 mt-10">
-        <div className="w-full max-w-7xl space-y-6">
-          <Profile />
-        </div>
-      </div>
-    </>
-  );
+export const metadata: Metadata = {
+  title: "Mi Perfil",
+};
+function ProfilePage() {
+  return <ClientProfilePage />;
 }
+
+export default ProfilePage;
