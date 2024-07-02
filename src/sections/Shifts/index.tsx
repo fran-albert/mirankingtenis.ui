@@ -37,9 +37,5 @@ export const ShiftManagement = () => {
     return <Loading isLoading />;
   }
 
-  return (
-    <>
-      <ShiftCalendar matches={matches} />
-    </>
-  );
+  return <ShiftCalendar matches={matches} />;
 };

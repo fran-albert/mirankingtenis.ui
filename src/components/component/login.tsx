@@ -64,7 +64,7 @@ export function Login() {
     <>
       <Loading isLoading={isLoading} />
       <div className="w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[800px]">
-        <div className="hidden lg:flex lg:items-center lg:justify-center lg:bg-white dark:lg:bg-gray-800">
+        <div className="hidden lg:flex lg:items-center lg:justify-center lg:bg-white">
           <Image
             src="https://mirankingtenis.com.ar/wp-content/uploads/2023/05/oficialLogin.png"
             alt="Your Company"

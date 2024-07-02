@@ -32,7 +32,6 @@ function MasterCategoriesCard({
     fetchGroupAndPlayersStatus();
   }, [category.id, hasGroupsForCategory, hasPlayersForCategory, idTournament]);
 
-
   return (
     <div>
       <Card>
@@ -47,7 +46,7 @@ function MasterCategoriesCard({
               idCategory={category.id}
             />
           ) : (
-            <p className="text-gray-500 dark:text-gray-400">
+            <p className="text-gray-500 ">
               Para generar un fixture, primero debes crear grupos y/o agregar
               jugadores a la categoría.
             </p>

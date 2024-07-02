@@ -34,7 +34,7 @@ export const ShiftsCount = () => {
             <CardContent>
               <div className="flex justify-between items-center max-w-full">
                 <div className="text-3xl font-bold">{totalShifts}</div>
-                <div className="text-sm text-gray-500 dark:text-gray-400"></div>
+                <div className="text-sm text-gray-500 "></div>
               </div>
             </CardContent>
           </Card>

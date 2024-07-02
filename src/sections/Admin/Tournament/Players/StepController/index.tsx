@@ -63,7 +63,6 @@ function StepControllerForTournament({
         (position) => position.isDirectlyQualified
       ),
     };
-    console.log(payload);
     try {
       const createPromise = create(
         payload.tournamentId,

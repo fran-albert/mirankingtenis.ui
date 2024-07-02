@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { getColumns } from "./columns";
 import { DataTable } from "@/components/Table/dataTable";
-import EditMatchDialog from "./Time/dialog";
+import AddShiftDialog from "./Time/dialog";
 import AddResultMatchDialog from "./AddResult/dialog";
 import DeleteMatchDialog from "./Delete/button";
 import { formatDate, formatDateComplete } from "@/lib/utils";
@@ -60,7 +60,7 @@ function MatchesIndex({
                 {m.shift === null ||
                 m.shift?.startHour === null ? (
                   <>
-                    <EditMatchDialog
+                    <AddShiftDialog
                       match={m}
                       onUpdateMatches={onUpdateMatches}
                     />

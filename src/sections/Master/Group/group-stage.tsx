@@ -8,7 +8,7 @@ export function GroupStage({
   if (groupRankings.length === 0) {
     return (
       <div className="text-center py-10">
-        <p className="text-gray-500 dark:text-gray-400">
+        <p className="text-gray-500 ">
           No hay grupos disponibles para esta categoría.
         </p>
       </div>
@@ -19,13 +19,13 @@ export function GroupStage({
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {groupRankings.map((group) => (
         <div key={group.groupId} className="border rounded-lg overflow-hidden translate-x-0">
-          <div className="bg-gray-100 dark:bg-gray-800 px-4 py-3 font-semibold">
+          <div className="bg-gray-200 px-4 py-3 font-semibold ">
             Grupo {group.groupName}
           </div>
           <div className="overflow-auto">
             <table className="w-full table-auto">
               <thead>
-                <tr className="bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-400 text-left">
+                <tr className="bg-gray-50 text-gray-500 text-left">
                   <th className="px-4 py-3"></th>
                   <th className="px-4 py-3">Jugador</th>
                   <th className="px-4 py-3">PTS</th>
@@ -38,7 +38,7 @@ export function GroupStage({
                 {group.rankings.map((ranking) => (
                   <tr
                     key={ranking.userId}
-                    className="border-b border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
+                    className="border-b border-gray-200  hover:bg-gray-50 transition-colors"
                   >
                     <td className="px-4 py-3 font-medium">
                       {ranking.position}

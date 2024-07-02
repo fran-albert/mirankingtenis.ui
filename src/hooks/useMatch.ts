@@ -13,6 +13,7 @@ interface MatchState {
     nextMatch: NextMatchDto | undefined;
     loading: boolean;
     error: string | null;
+    selectedMatch: Match | GroupFixtureDto;
     getAllMatches: () => Promise<void>;
     getAllByDate: () => Promise<void>;
     getByCategoryAndMatchday: (idCategory: number, matchDay: number) => Promise<void>;
@@ -23,12 +24,15 @@ interface MatchState {
     decideMatch: (id: number, winnerUserId: number, tournamentCategoryId: number) => Promise<void>;
     getMatchesByTournamentCategoryAndMatchday: (idTournamentCategory: number, matchDay: number) => Promise<void>;
     getNextMatch: (idTournament: number, idUser: number) => Promise<void>;
+    selectMatch: (match: Match | GroupFixtureDto) => void;
+      clearMatches: () => void;
 }
 
 export const useMatchStore = create<MatchState>((set) => ({
     matches: [],
     nextMatch: undefined,
     groupFixture: [],
+    selectedMatch: {} as Match,
     loading: false,
     error: null,
 
@@ -40,6 +44,10 @@ export const useMatchStore = create<MatchState>((set) => ({
         } catch (error: any) {
             set({ error: error.message, loading: false });
         }
+    },
+
+     clearMatches: () => {
+        set({ matches: [], groupFixture: [] });
     },
 
     getAllByDate: async () => {
@@ -92,6 +100,9 @@ export const useMatchStore = create<MatchState>((set) => ({
         }
     },
 
+    selectMatch: (match: Match | GroupFixtureDto) => {
+        set({ selectedMatch: match });
+    },
 
     deleteMatch: async (id: number) => {
         set({ loading: true, error: null });

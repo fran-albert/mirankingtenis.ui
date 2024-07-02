@@ -25,7 +25,7 @@ function CompletedTournament({
                 >
                   <div>
                     <h3 className="text-lg font-bold">{tournament.name}</h3>
-                    <p className="text-gray-500 dark:text-gray-400">
+                    <p className="text-gray-500 x">
                       {formatTournamentDates(
                         tournament.startedAt,
                         tournament.finishedAt
@@ -38,17 +38,12 @@ function CompletedTournament({
                       path="jugadores"
                       playerId={idPlayer}
                     />
-                    {/* <p className="text-gray-500 dark:text-gray-400">
-                      {tournament.result
-                        ? `Lost to ${tournament.result}`
-                        : "No result"}
-                    </p> */}
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-gray-500 dark:text-gray-400">
+            <p className="text-gray-500 ">
               No hay torneos completados.
             </p>
           )}
