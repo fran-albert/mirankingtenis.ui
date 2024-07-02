@@ -18,8 +18,9 @@ export interface GroupFixtureDto {
         photo: string;
     };
     idWinner: number;
-    shift: string;
+    shift: Shift;
     court: string;
+    tournamentCategoryId?: number;
     sets: Sets[];
     status: string;
 

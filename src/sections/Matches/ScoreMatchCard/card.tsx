@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Card,
@@ -8,9 +8,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { User } from "@/modules/users/domain/User";
 import Link from "next/link";
-import { FaPencilAlt, FaTrashAlt } from "react-icons/fa";
+import { FaPencilAlt } from "react-icons/fa";
 import useRoles from "@/hooks/useRoles";
 import DeleteMatchDialog from "../Delete/button";
 import { es } from "date-fns/locale/es";
@@ -19,6 +18,9 @@ import { formatDate } from "@/lib/utils";
 import { Match } from "@/modules/match/domain/Match";
 import { BadgeWin } from "@/components/Badge/Green/badge";
 import DecideMatchDialog from "../DecideWinner/button";
+import AddResultMatchDialog from "@/sections/Auth/Profile/Matches/AddResult/dialog";
+import UpdateMatchDialog from "../Update/dialog";
+import { useMatchStore } from "@/hooks/useMatch";
 registerLocale("es", es);
 export const ScoreMatchCard = ({
   idUser1,
@@ -36,10 +38,13 @@ export const ScoreMatchCard = ({
   onDeleteMatch: () => void;
 }) => {
   const { isAdmin } = useRoles();
-  const handleEdit = (idPlayer: number) => {
-    console.log(`Editar partido con ID: ${match}`);
-  };
+  const { selectMatch } = useMatchStore();
+  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState<boolean>(false);
 
+  const handleEdit = (match: Match) => {
+    selectMatch(match);
+    setIsUpdateDialogOpen(true);
+  };
 
   return (
     <Card className="w-full transition duration-300 ease-in-out transform hover:scale-105 shadow-lg rounded-lg ">
@@ -169,18 +174,18 @@ export const ScoreMatchCard = ({
                   onMatchDecided={onMatchDecided}
                   tournamentCategoryId={tournamentCategoryId}
                 />
-                <button onClick={() => handleEdit(idUser1)}>
+                <button onClick={() => handleEdit(match)}>
                   <FaPencilAlt className="text-slate-500 hover:text-slate-800" />
                 </button>
+                <DeleteMatchDialog onDeleteMatch={onDeleteMatch} />
               </>
-            ) : (
-              <button onClick={() => handleEdit(idUser1)}>
-                <FaPencilAlt className="text-slate-500 hover:text-slate-800" />
-              </button>
-            )}
-            <DeleteMatchDialog onDeleteMatch={onDeleteMatch} />
+            ) : null}
           </div>
         )}
+        <UpdateMatchDialog
+          isOpen={isUpdateDialogOpen}
+          onClose={() => setIsUpdateDialogOpen(false)}
+        />
       </CardFooter>
     </Card>
   );

@@ -37,7 +37,7 @@ export function PlayerComponent({
   matches: Match[];
 }) {
   return (
-    <div className=" dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen">
+    <div className="  text-gray-900 min-h-screen">
       <header className="py-8 px-4 md:px-8 flex items-center justify-center">
         <div className="flex flex-col md:flex-row items-center space-x-6">
           <img
@@ -71,7 +71,10 @@ export function PlayerComponent({
           />
         </section>
         <section className="mt-8">
-          <CompletedTournament completedTournaments={completedTournaments} idPlayer={Number(player?.id)}/>
+          <CompletedTournament
+            completedTournaments={completedTournaments}
+            idPlayer={Number(player?.id)}
+          />
         </section>
         <section className="mt-8">
           <MatchStatistics

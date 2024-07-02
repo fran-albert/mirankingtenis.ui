@@ -12,7 +12,6 @@ import { Match } from "@/modules/match/domain/Match";
 import { BadgeWin } from "@/components/Badge/Green/badge";
 import { BadgePending } from "@/components/Badge/Pending/badge";
 import DeleteShiftDialog from "./DeleteShift/dialog";
-import { NewShift } from "./NewShift/new-shift";
 export const getColumns = (onUpdateMatches: () => void): ColumnDef<Match>[] => {
   const columns: ColumnDef<Match>[] = [
     {

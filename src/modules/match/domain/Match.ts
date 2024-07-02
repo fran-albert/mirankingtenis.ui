@@ -29,5 +29,6 @@ export interface Match {
   };
   rivalName: string;
   winner: string;
+  tournamentCategoryId?: number;
   idWinner: number;
 }

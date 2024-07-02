@@ -15,6 +15,7 @@ interface GroupState {
     hasGroupsForCategory: (idTournament: number, idCategory: number) => Promise<boolean>;
     findAllByGroupStage: (groupStageId: number) => Promise<void>;
     getGroupRankings: (groupStageId: number) => Promise<void>;
+     clearRankings: () => void;
     getGroupStagesByTournamentCategory: (idTournament: number, idCategory: number) => Promise<number>;
 }
 
@@ -34,6 +35,10 @@ export const useGroupStore = create<GroupState>((set) => ({
         } catch (error: any) {
             set({ error: error.message, loading: false });
         }
+    },
+
+     clearRankings: () => {
+        set({ groupRankings: [] });
     },
 
     hasGroupsForCategory: async (idTournament: number, idCategory: number) => {

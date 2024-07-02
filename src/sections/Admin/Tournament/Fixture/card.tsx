@@ -57,7 +57,7 @@ function CategoriesCard({
               number={nextMatchDay}
             />
           ) : (
-            <p className="text-gray-500 dark:text-gray-400">
+            <p className="text-gray-500 ">
               Para generar un fixture, primero debes agregar jugadores a la
               categoría.
             </p>

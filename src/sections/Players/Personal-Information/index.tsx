@@ -29,38 +29,6 @@ function PersonalInformation({ player }: { player: User | null }) {
           </div>
         </CardContent>
       </Card>
-      {/* <div className="grid grid-cols-2 gap-4 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
-        <div>
-          <p className="text-gray-500 dark:text-gray-400 mb-1">
-            Nombre Completo
-          </p>
-          <p>
-            {player?.name} {player?.lastname}
-          </p>
-        </div>
-        <div>
-          <p className="text-gray-500 dark:text-gray-400 mb-1">Edad</p>
-          <p></p>
-        </div>
-        <div>
-          <p className="text-gray-500 dark:text-gray-400 mb-1">Ciudad</p>
-          <p>{player?.city.city}</p>
-        </div>
-        <div>
-          <p className="text-gray-500 dark:text-gray-400 mb-1">Teléfono</p>
-          <p></p>
-        </div>
-        <div>
-          <p className="text-gray-500 dark:text-gray-400 mb-1">
-            Correo Electrónico
-          </p>
-          <p>{player?.email}</p>
-        </div>
-        <div>
-          <p className="text-gray-500 dark:text-gray-400 mb-1">Sexo</p>
-          <p>{player?.gender}</p>
-        </div>
-      </div> */}
     </div>
   );
 }
