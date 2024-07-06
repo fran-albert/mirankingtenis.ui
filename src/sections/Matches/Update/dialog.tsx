@@ -131,7 +131,7 @@ export default function UpdateMatchDialog({
                   type="number"
                   {...register("sets.0.pointsPlayer1")}
                   min="0"
-                  max="6"
+                  max="7"
                   className="col-span-1"
                 />
                 <div className="col-span-1 text-center">-</div>
@@ -140,7 +140,7 @@ export default function UpdateMatchDialog({
                   type="number"
                   {...register("sets.0.pointsPlayer2")}
                   min="0"
-                  max="6"
+                  max="7"
                   className="col-span-1"
                 />
               </div>
