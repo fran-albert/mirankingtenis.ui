@@ -28,7 +28,6 @@ function ResetPasswordForm() {
   const createRequestFn = requestResetPassword(userRepository);
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    console.log(data);
     try {
       const playerCreationPromise = createRequestFn(data);
       toast.promise(playerCreationPromise, {

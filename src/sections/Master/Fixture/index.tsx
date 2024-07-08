@@ -8,6 +8,7 @@ import { FaPencilAlt } from "react-icons/fa";
 import UpdateMatchDialog from "@/sections/Matches/Update/dialog";
 import { MdOutlineScoreboard } from "react-icons/md";
 import { useMatchStore } from "@/hooks/useMatch";
+import AddShiftDialog from "@/sections/Auth/Profile/Matches/NewShift/new-shift";
 
 export function FixtureGroupStage({
   groupFixture,
@@ -188,11 +189,11 @@ export function FixtureGroupStage({
           updateMatches={updateMatches}
           onClose={() => setIsAddResultDialogOpen(false)}
         />
-        {/* <AddShiftDialog
+        <AddShiftDialog
           isOpen={isAddShiftDialogOpen}
           updateMatches={updateMatches}
           onClose={() => setIsAddShiftDialogOpen(false)}
-        /> */}
+        />
       </div>
     );
   }
@@ -322,11 +323,11 @@ export function FixtureGroupStage({
         updateMatches={updateMatches}
         onClose={() => setIsAddResultDialogOpen(false)}
       />
-      {/* <AddShiftDialog
+      <AddShiftDialog
         isOpen={isAddShiftDialogOpen}
         updateMatches={updateMatches}
         onClose={() => setIsAddShiftDialogOpen(false)}
-      /> */}
+      />
     </div>
   );
 }

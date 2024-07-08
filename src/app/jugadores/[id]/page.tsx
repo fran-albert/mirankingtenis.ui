@@ -38,7 +38,6 @@ function PlayerDetailsPage() {
   const { loading: isLoadingUser, getUser, user } = useUserStore();
   const [loading, setLoading] = useState(true);
   const currentUser = user?.name + " " + user?.lastname;
-
   useEffect(() => {
     const fetchUserAndMatches = async () => {
       try {
@@ -70,14 +69,11 @@ function PlayerDetailsPage() {
   useEffect(() => {
     const fetchNextMatch = async () => {
       try {
-        setLoading(true);
         if (currentTournaments && currentTournaments.id) {
           const activeTournamentId = currentTournaments.id;
           await getNextMatch(activeTournamentId, idUser);
         }
-        setLoading(false);
       } catch (error) {
-        setLoading(false);
         console.error("Error fetching next match:", error);
       }
     };
@@ -87,7 +83,7 @@ function PlayerDetailsPage() {
     }
   }, [idUser, currentTournaments, getNextMatch, isTournamentLoading]);
 
-  if (isLoadingUser || isMatchLoading || isLoadingSets || isTournamentLoading) {
+  if (loading) {
     return <Loading isLoading />;
   }
 
