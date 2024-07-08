@@ -8,7 +8,6 @@ import { formatDate, formatDateComplete } from "@/lib/utils";
 import { Match } from "@/modules/match/domain/Match";
 import UpdateShiftDialog from "./EditTime/dialog";
 import DeleteShiftDialog from "./DeleteShift/dialog";
-import { NewShift } from "./NewShift/new-shift";
 
 function MatchesIndex({
   match,
