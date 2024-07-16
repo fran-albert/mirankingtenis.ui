@@ -37,7 +37,20 @@ function MatchesIndex({
                 ? `Pendiente vs ${m.rivalName}`
                 : `${m.finalResult} vs ${m.rivalName}`}
             </h3>
-            <p className="text-gray-600">Fecha: {m.fixture.jornada}</p>
+            <p className="text-gray-600">
+              {m.fixture
+                ? `Fecha: ${m.fixture.jornada}`
+                : `${
+                    m.playoff.roundType === "QuarterFinals"
+                      ? "Cuartos de Final"
+                      : m.playoff.roundType === "SemiFinals"
+                      ? "Semifinal"
+                      : m.playoff.roundType === "Final"
+                      ? "Final"
+                      : m.playoff.roundType
+                  }`}
+            </p>
+
             <p className="text-gray-600">Cancha: {m.shift?.court?.name}</p>
             <p className="text-gray-600">
               Día y Hora:{" "}
@@ -56,8 +69,7 @@ function MatchesIndex({
 
             {m.status !== "played" && (
               <>
-                {m.shift === null ||
-                m.shift?.startHour === null ? (
+                {m.shift === null || m.shift?.startHour === null ? (
                   <>
                     <AddShiftDialog
                       match={m}

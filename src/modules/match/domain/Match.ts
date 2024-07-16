@@ -14,6 +14,10 @@ export interface Match {
   sets: Sets[];
   status: string;
   round: number;
+  playoff: {
+    id: number;
+    roundType: string;
+  };
   user1Name: string;
   user1position: number;
   user1photo: string;

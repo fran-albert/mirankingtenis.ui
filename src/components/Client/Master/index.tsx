@@ -1,19 +1,13 @@
 "use client";
+import React, { useEffect, useState } from "react";
 import Loading from "@/components/Loading/loading";
 import { GroupStage } from "@/sections/Master/Group/group-stage";
-import { createApiRankingRepositroy } from "@/modules/ranking/infra/ApiRankingRepository";
-import { MasterCard } from "@/sections/Master/Cards/card";
-import RankingTabs from "@/sections/Ranking/Tabs/tabs";
-import React, { useEffect, useState } from "react";
 import { useGroupStore } from "@/hooks/useGroup";
-import { Separator } from "@/components/ui/separator";
-import { FixtureGroupStage } from "@/sections/Master/Fixture";
 import { useMatchStore } from "@/hooks/useMatch";
 import { AxiosError } from "axios";
 import PlayOffCards from "@/sections/Master/PlayOffs";
-import { CategoryMatchesSelect } from "@/components/Select/Category/selectMatches";
-import FiltersRanking from "@/sections/Ranking/Filters";
 import FiltersMaster from "@/sections/Master/Filters";
+import { FixtureGroupStage } from "@/sections/Master/Fixture";
 
 function ClientMasterComponent() {
   const [selectedCategory, setSelectedCategory] = useState("1");
@@ -87,16 +81,21 @@ function ClientMasterComponent() {
       />
       <div className="flex justify-center w-full px-4 lg:px-0 mt-10">
         <div className="w-full max-w-7xl space-y-6">
-          <div className="mt-4">
+          <div>
             <GroupStage groupRankings={groupRankings} />
             <FixtureGroupStage
               groupFixture={groupFixture}
               updateMatches={() => updateMatches(groupStageId!)}
             />
           </div>
+          <div>
+            <PlayOffCards
+              idTournament={2}
+              idCategory={Number(selectedCategory)}
+            />
+          </div>
         </div>
       </div>
-      {/* <PlayOffCards /> */}
     </div>
   );
 }

@@ -36,7 +36,7 @@ export default function UpdateMatchDialog({
   const { selectedMatch: match } = useMatchStore();
   const [isConfirmOpen, setIsConfirmOpen] = useState<boolean>(false);
   const [formData, setFormData] = useState<any>(null);
-
+  console.log("match", match);
   const toggleConfirmDialog = () => setIsConfirmOpen(!isConfirmOpen);
 
   const {

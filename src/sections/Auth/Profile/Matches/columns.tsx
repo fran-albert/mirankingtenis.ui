@@ -18,7 +18,17 @@ export const getColumns = (onUpdateMatches: () => void): ColumnDef<Match>[] => {
       header: "Fecha",
       cell: ({ row }) => (
         <p className="text-sm font-medium text-center">
-          {row.original.fixture?.jornada}
+          {row.original.fixture
+            ? `${row.original.fixture.jornada}`
+            : `${
+                row.original.playoff?.roundType === "QuarterFinals"
+                  ? "Cuartos de Final"
+                  : row.original.playoff?.roundType === "SemiFinals"
+                  ? "Semifinal"
+                  : row.original.playoff?.roundType === "Final"
+                  ? "Final"
+                  : row.original.playoff?.roundType
+              }`}
         </p>
       ),
     },
