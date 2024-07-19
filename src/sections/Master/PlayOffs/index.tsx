@@ -9,6 +9,8 @@ import UpdateMatchDialog from "@/sections/Matches/Update/dialog";
 import AddShiftDialog from "@/sections/Auth/Profile/Matches/NewShift/new-shift";
 import QuarterFinalsCard from "./Quarters/card";
 import { GroupFixtureDto } from "@/common/types/group-fixture.dto";
+import SemiFinalCard from "./SemiFinal/card";
+import FinalCard from "./Final/card";
 function PlayOffCards({
   idTournament,
   idCategory,
@@ -16,13 +18,23 @@ function PlayOffCards({
   idTournament: number;
   idCategory: number;
 }) {
-  const { fetchQuarterFinals, loading, quarterFinals } = usePlayOffStore();
+  const {
+    fetchQuarterFinals,
+    finals,
+    fetchFinals,
+    loading,
+    quarterFinals,
+    fetchSemiFinals,
+    semiFinals,
+  } = usePlayOffStore();
   const { selectMatch } = useMatchStore();
   const [isAddResultDialogOpen, setIsAddResultDialogOpen] = useState(false);
   const [isAddShiftDialogOpen, setIsAddShiftDialogOpen] = useState(false);
 
   useEffect(() => {
     fetchQuarterFinals(idTournament, idCategory);
+    fetchSemiFinals(idTournament, idCategory);
+    fetchFinals(idTournament, idCategory);
   }, [idTournament, idCategory]);
 
   const handleAddResult = (match: GroupFixtureDto) => {
@@ -35,10 +47,6 @@ function PlayOffCards({
     setIsAddShiftDialogOpen(true);
   };
 
-  if (!quarterFinals || quarterFinals.length === 0) {
-    return null;
-  }
-
   return (
     <section className="w-full md:py-16 lg:py-20">
       <div className="mx-auto">
@@ -47,11 +55,27 @@ function PlayOffCards({
             Fase Final
           </h1>
         </div>
-        <QuarterFinalsCard
-          matches={quarterFinals}
-          handleAddResult={handleAddResult}
-          handleAddShift={handleAddShift}
-        />
+        {quarterFinals && quarterFinals.length > 0 && (
+          <QuarterFinalsCard
+            matches={quarterFinals}
+            handleAddResult={handleAddResult}
+            handleAddShift={handleAddShift}
+          />
+        )}
+        {semiFinals && semiFinals.length > 0 && (
+          <SemiFinalCard
+            matches={semiFinals}
+            handleAddResult={handleAddResult}
+            handleAddShift={handleAddShift}
+          />
+        )}
+        {finals && finals.length > 0 && (
+          <FinalCard
+            matches={finals}
+            handleAddResult={handleAddResult}
+            handleAddShift={handleAddShift}
+          />
+        )}
       </div>
       <UpdateMatchDialog
         isOpen={isAddResultDialogOpen}
