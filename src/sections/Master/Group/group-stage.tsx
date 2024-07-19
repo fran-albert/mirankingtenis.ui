@@ -19,7 +19,7 @@ export function GroupStage({
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {groupRankings.map((group) => (
         <div key={group.groupId} className="border rounded-lg overflow-hidden translate-x-0">
-          <div className="bg-gray-200 px-4 py-3 font-semibold ">
+          <div className="bg-slate-700 px-4 py-2 font-medium text-md text-white rounded-md">
             Grupo {group.groupName}
           </div>
           <div className="overflow-auto">

@@ -31,10 +31,14 @@ function PlayOffCards({
   const [isAddResultDialogOpen, setIsAddResultDialogOpen] = useState(false);
   const [isAddShiftDialogOpen, setIsAddShiftDialogOpen] = useState(false);
 
-  useEffect(() => {
+  const updateAllMatches = () => {
     fetchQuarterFinals(idTournament, idCategory);
     fetchSemiFinals(idTournament, idCategory);
     fetchFinals(idTournament, idCategory);
+  };
+
+  useEffect(() => {
+    updateAllMatches();
   }, [idTournament, idCategory]);
 
   const handleAddResult = (match: GroupFixtureDto) => {
@@ -76,17 +80,17 @@ function PlayOffCards({
             handleAddShift={handleAddShift}
           />
         )}
+        <UpdateMatchDialog
+          isOpen={isAddResultDialogOpen}
+          updateMatches={updateAllMatches}
+          onClose={() => setIsAddResultDialogOpen(false)}
+        />
+        <AddShiftDialog
+          isOpen={isAddShiftDialogOpen}
+          updateMatches={updateAllMatches}
+          onClose={() => setIsAddShiftDialogOpen(false)}
+        />
       </div>
-      <UpdateMatchDialog
-        isOpen={isAddResultDialogOpen}
-        updateMatches={() => fetchQuarterFinals(idTournament, idCategory)}
-        onClose={() => setIsAddResultDialogOpen(false)}
-      />
-      <AddShiftDialog
-        isOpen={isAddShiftDialogOpen}
-        updateMatches={() => fetchQuarterFinals(idTournament, idCategory)}
-        onClose={() => setIsAddShiftDialogOpen(false)}
-      />
     </section>
   );
 }

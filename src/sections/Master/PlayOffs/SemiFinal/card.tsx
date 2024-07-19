@@ -19,14 +19,13 @@ const SemiFinalCard = ({
 }) => {
   const matchLabels = ["SF1", "SF2"];
   const { isAdmin } = useRoles();
-
   return (
     <div key="quarter-finals" className="mb-6">
       <div className="px-4 py-3 font-semibold text-lg">Semifinales</div>
       <div className="grid md:grid-cols-2 md:gap-2">
         {matches.map((match, index) => (
           <div key={match.match} className="mb-4">
-            <div className="bg-gray-200 px-4 py-2 font-medium text-md">
+            <div className="bg-slate-700 px-4 py-2 font-medium text-md text-white rounded-md">
               {matchLabels[index]}
             </div>
             <div className="space-y-4">

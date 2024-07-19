@@ -60,7 +60,7 @@ export function FixtureGroupStage({
             <div className="grid grid-cols-1 gap-6">
               {Object.entries(groups).map(([groupName, matches]) => (
                 <div key={groupName} className="mb-4">
-                  <div className="bg-gray-200 px-4 py-2 font-medium text-md">
+                   <div className="bg-slate-700 px-4 py-2 font-medium text-md text-white rounded-md">
                     Grupo {groupName}
                   </div>
                   <div className="space-y-4">
@@ -206,7 +206,7 @@ export function FixtureGroupStage({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {Object.entries(groups).map(([groupName, matches]) => (
               <div key={groupName} className="mb-4">
-                <div className="bg-gray-200  px-4 py-2 font-medium">
+                <div className="bg-slate-700 px-4 py-2 font-medium text-md text-white rounded-md">
                   Grupo {groupName}
                 </div>
 
