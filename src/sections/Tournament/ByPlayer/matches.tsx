@@ -15,7 +15,7 @@ function MatchesByTournamentPlayer({ matches }: { matches: Match[] }) {
       return match.fixture.jornada;
     }
 
-    switch (match.playoff.roundType) {
+    switch (match.playoff?.roundType) {
       case "QuarterFinals":
         return "Cuartos de Final";
       case "SemiFinals":
