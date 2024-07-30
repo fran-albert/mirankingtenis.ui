@@ -10,6 +10,23 @@ import {
 } from "@/components/ui/table";
 import { Match } from "@/modules/match/domain/Match";
 function MatchesByTournamentPlayer({ matches }: { matches: Match[] }) {
+  const getMatchStageText = (match: Match) => {
+    if (match.fixture?.jornada) {
+      return match.fixture.jornada;
+    }
+
+    switch (match.playoff.roundType) {
+      case "QuarterFinals":
+        return "Cuartos de Final";
+      case "SemiFinals":
+        return "Semifinal";
+      case "Final":
+        return "Final";
+      default:
+        return match.playoff.roundType;
+    }
+  };
+
   return (
     <>
       <Card>
@@ -29,7 +46,11 @@ function MatchesByTournamentPlayer({ matches }: { matches: Match[] }) {
             <TableBody>
               {matches.map((match, index) => (
                 <TableRow key={index}>
-                  <TableCell>{match.fixture.jornada}</TableCell>
+                  <TableCell>
+                    {match.fixture
+                      ? match.fixture.jornada
+                      : getMatchStageText(match)}
+                  </TableCell>
                   <TableCell>{match.rivalName}</TableCell>
                   <TableCell>{match.finalResult}</TableCell>
                   <TableCell>
