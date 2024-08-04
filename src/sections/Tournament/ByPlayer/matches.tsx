@@ -23,7 +23,7 @@ function MatchesByTournamentPlayer({ matches }: { matches: Match[] }) {
       case "Final":
         return "Final";
       default:
-        return match.playoff.roundType;
+        return match.playoff?.roundType;
     }
   };
 
