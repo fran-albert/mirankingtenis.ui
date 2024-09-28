@@ -41,19 +41,19 @@ export const ShiftCalendar = ({ matches }: { matches: any }) => {
     const sortEvents = (events: MatchEvent[]): MatchEvent[] => {
       if (view === Views.DAY) {
         events.sort((a, b) => a.start.getTime() - b.start.getTime());
-        return events.sort((a, b) => a.shift.court.id - b.shift.court.id);
+        return events.sort((a, b) => a.shift?.court?.id - b.shift?.court?.id);
       }
       return events;
     };
 
     let myEventsList: MatchEvent[] = matches.map((match: any) => ({
       title: `${match.user1.lastname} vs ${match.user2.lastname}`,
-      start: new Date(match.shift.startHour),
-      end: new Date(match.shift.endHour),
+      start: new Date(match.shift?.startHour),
+      end: new Date(match.shift?.endHour),
       allDay: false,
       status: match.status,
       shift: match.shift,
-      resourceId: match.shift.court.id,
+      resourceId: match.shift?.court?.id,
     }));
 
     myEventsList = sortEvents(myEventsList);
