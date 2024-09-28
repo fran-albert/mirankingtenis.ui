@@ -5,30 +5,13 @@ import { getColumns } from "./columns";
 import { User } from "@/modules/users/domain/User";
 import { createApiUserRepository } from "@/modules/users/infra/ApiUserRepository";
 import { getAllUsers } from "@/modules/users/application/get-all/getAllUsers";
+import { useUsers } from "@/hooks/Users/useUsers";
 
 export const PlayersTable = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [players, setPlayers] = useState<User[]>([]);
-  const userRepository = useMemo(() => createApiUserRepository(), []);
-  const loadAllPlayers = useCallback(async () => {
-    const users = await getAllUsers(userRepository)();
-    return users;
-  }, [userRepository]);
-
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        setIsLoading(true);
-        const userData = await loadAllPlayers();
-        setPlayers(userData);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchUsers();
-  }, [loadAllPlayers]);
+  const { error, isLoading, users } = useUsers({
+    auth: true,
+    fetchUsers: true,
+  })
 
   const playersColumns = getColumns();
 
@@ -47,7 +30,7 @@ export const PlayersTable = () => {
       </h1>
       <DataTable
         columns={playersColumns}
-        data={players}
+        data={users}
         searchPlaceholder="Buscar jugadores..."
         showSearch={true}
         addLinkPath="jugadores/agregar"

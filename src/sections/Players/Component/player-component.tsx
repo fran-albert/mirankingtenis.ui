@@ -25,7 +25,7 @@ export function PlayerComponent({
   matches,
   playerInfo,
 }: {
-  player: User | null;
+  player: User;
   currentTournaments: any;
   matchSummary: MatchSummaryDto | undefined;
   nextMatch: NextMatchDto | undefined;

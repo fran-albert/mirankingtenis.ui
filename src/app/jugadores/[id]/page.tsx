@@ -8,6 +8,8 @@ import { useTournamentRankingStore } from "@/hooks/useTournamentRanking";
 import { useSetsStore } from "@/hooks/useSet";
 import { useUserStore } from "@/hooks/useUser";
 import { PlayerComponent } from "@/sections/Players/Component/player-component";
+import { useUser } from "@/hooks/Users/useUser";
+
 function PlayerDetailsPage() {
   const params = useParams();
   const idParam = params.id;
@@ -35,14 +37,18 @@ function PlayerDetailsPage() {
     setSummary,
     loading: isLoadingSets,
   } = useSetsStore();
-  const { loading: isLoadingUser, getUser, user } = useUserStore();
+  // const { loading: isLoadingUser, getUser, user } = useUserStore();
+  const { user, isLoading, error } = useUser({
+    auth: true,
+    id: idUser
+  })
   const [loading, setLoading] = useState(true);
   const currentUser = user?.name + " " + user?.lastname;
   useEffect(() => {
     const fetchUserAndMatches = async () => {
       try {
         setLoading(true);
-        await getUser(idUser);
+        // await getUser(idUser);
         await Promise.all([
           getAllMatchesByUser(idUser),
           fetchAllDataForPlayer(idUser),
@@ -59,7 +65,7 @@ function PlayerDetailsPage() {
     fetchUserAndMatches();
   }, [
     idUser,
-    getUser,
+    // getUser,
     getAllMatchesByUser,
     fetchAllDataForPlayer,
     getTotalPlayerMatchSummary,
@@ -89,18 +95,20 @@ function PlayerDetailsPage() {
 
   return (
     <div className="flex flex-col justify-center container mx-auto px-4 sm:px-6 lg:px-8">
-      <PlayerComponent
-        player={user}
-        setSummary={setSummary}
-        currentUser={currentUser}
-        matchSummary={playerMatchSummary}
-        nextMatch={nextMatch}
-        matches={matches}
-        currentTournaments={currentTournaments}
-        allTournaments={allTournaments}
-        completedTournaments={completedTournaments}
-        playerInfo={playerInfo}
-      />
+      {user && (
+        <PlayerComponent
+          player={user}
+          setSummary={setSummary}
+          currentUser={currentUser}
+          matchSummary={playerMatchSummary}
+          nextMatch={nextMatch}
+          matches={matches}
+          currentTournaments={currentTournaments}
+          allTournaments={allTournaments}
+          completedTournaments={completedTournaments}
+          playerInfo={playerInfo}
+        />
+      )}
     </div>
   );
 }
