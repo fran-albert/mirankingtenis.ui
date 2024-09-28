@@ -6,6 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { goBack } from "@/lib/utils";
 import { createUser } from "@/modules/users/application/create/createUser";
 import { User } from "@/modules/users/domain/User";
@@ -24,25 +32,30 @@ import {
 } from "@/components/ui/card";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import { capitalizeWords } from "@/common/helpers/helpers";
+import { GenderSelect } from "@/components/Select/Gender/select";
+import { UserSchema } from "@/validators/user.schema";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useUserMutations } from "@/hooks/Users/useUserMutation";
 
-interface Inputs extends User {}
+type FormValues = z.infer<typeof UserSchema>;
 
 function CreatePlayerForm() {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    setValue,
-  } = useForm<Inputs>();
-  const [selectedState, setSelectedState] = useState(0);
-  const [selectedCity, setSelectedCity] = useState(0);
+  const form = useForm<FormValues>({
+    resolver: zodResolver(UserSchema),
+  });
+  const { setValue, control } = form;
+  const [selectedState, setSelectedState] = useState(22);
+  const [selectedCity, setSelectedCity] = useState(1961);
   const [selectedCategory, setSelectedCategory] = useState("");
-  const userRepository = createApiUserRepository();
-  const createUserFn = createUser(userRepository);
+  const { addUserMutation } = useUserMutations()
 
-  const onSubmit: SubmitHandler<Inputs> = async (data) => {
+  async function onSubmit(data: z.infer<typeof UserSchema>) {
+    const payload: any = {
+      ...data
+    }
     try {
-      const playerCreationPromise = createUserFn(data);
+      const playerCreationPromise = addUserMutation.mutateAsync(payload);
       toast.promise(playerCreationPromise, {
         loading: "Creando jugador...",
         success: "Jugador creado con éxito!",
@@ -72,25 +85,26 @@ function CreatePlayerForm() {
     <>
       <div key="1" className="w-full">
         <Card>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <CardHeader>
-              <CardTitle>
-                <button
-                  className="flex items-center justify-start w-full"
-                  onClick={goBack}
-                  type="button"
-                >
-                  <IoMdArrowRoundBack className="text-black mr-2" size={25} />
-                  Agregar Jugador
-                </button>
-              </CardTitle>
-              <CardDescription>
-                Completa los campos para agregar un nuevo jugador.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="grid gap-6">
-              <div className="grid grid-cols-2 gap-6">
-                {/* <div className="col-span-2 flex flex-col items-center gap-4">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+              <CardHeader>
+                <CardTitle>
+                  <button
+                    className="flex items-center justify-start w-full"
+                    onClick={goBack}
+                    type="button"
+                  >
+                    <IoMdArrowRoundBack className="text-black mr-2" size={25} />
+                    Agregar Jugador
+                  </button>
+                </CardTitle>
+                <CardDescription>
+                  Completa los campos para agregar un nuevo jugador.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="grid gap-6">
+                <div className="grid grid-cols-2 gap-6">
+                  {/* <div className="col-span-2 flex flex-col items-center gap-4">
               <Avatar className="h-24 w-24">
                 <AvatarImage
                   alt="Patient Avatar"
@@ -100,141 +114,124 @@ function CreatePlayerForm() {
               </Avatar>
               <Button variant="outline">Upload Photo</Button>
             </div> */}
-                {/* <div className="space-y-2">
+                  {/* <div className="space-y-2">
                 <Label htmlFor="firstName">Nombre</Label>
                 
               </div> */}
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="firstName">Nombre</Label>
-                    <Input
-                      id="firstName"
-                      placeholder="Ingresar nombre"
-                      {...register("name", {
-                        required: "Este campo es obligatorio",
-                        minLength: {
-                          value: 2,
-                          message: "El nombre debe tener al menos 2 caracteres",
-                        },
-                        onChange: (e) => {
-                          const capitalized = capitalizeWords(e.target.value);
-                          setValue("name", capitalized, {
-                            shouldValidate: true,
-                          });
-                        },
-                      })}
+                  <div className="grid grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <FormField
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-black">Nombre</FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                placeholder="Ingresar nombre..."
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                    <FormField
+                      control={form.control}
+                      name="lastname"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-black">Apellido</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              placeholder="Ingresar apellido..."
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
-                    {errors.name && (
-                      <p className="text-red-500 text-xs italic">
-                        {errors.name.message}
-                      </p>
-                    )}
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="lastname">Apellido</Label>
-                    <Input
-                      id="lastname"
-                      placeholder="Ingresar apellido"
-                      {...register("lastname", {
-                        required: "Este campo es obligatorio",
-                        minLength: {
-                          value: 2,
-                          message:
-                            "El apellido debe tener al menos 2 caracteres",
-                        },
-                        onChange: (e) => {
-                          const capitalized = capitalizeWords(e.target.value);
-                          setValue("lastname", capitalized, {
-                            shouldValidate: true,
-                          });
-                        },
-                      })}
+                  <div className="grid grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-black">Correo Electrónico</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              placeholder="Ingresar correo electrónico..."
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
-                    {errors.lastname && (
-                      <p className="text-red-500 text-xs italic">
-                        {errors.lastname.message}
-                      </p>
-                    )}
+                    </div>
+                    <div className="space-y-2">
+                    <FormField
+                      control={form.control}
+                      name="phone"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-black">Teléfono</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              placeholder="Ingresar teléfono..."
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="phone">Sexo</Label>
+                      <GenderSelect control={control} />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="state">Provincia</Label>
+                      <StateSelect
+                        selected={Number(selectedState)}
+                        onStateChange={setSelectedState}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="city">Localidad</Label>
+                      <CitySelect
+                        idState={Number(selectedState)}
+                        selected={String(selectedCity)}
+                        onCityChange={(value) => {
+                          setSelectedCity(Number(value));
+                          setValue("idCity", value);
+                        }}
+                      />
+                    </div>
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="firstName">Correo Electrónico</Label>
-                    <Input
-                      id="email"
-                      placeholder="Ingresar correo electrónico"
-                      {...register("email", {
-                        required: "Este campo es obligatorio",
-                        pattern: {
-                          value:
-                            /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/,
-                          message: "Introduce un correo electrónico válido",
-                        },
-                      })}
-                      type="email"
-                    />
-                    {errors.email && (
-                      <p className="text-red-500 text-xs italic">
-                        {errors.email.message}
-                      </p>
-                    )}
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="lastname">Teléfono</Label>
-                    <Input
-                      id="phone"
-                      placeholder="Ingresar teléfono"
-                      {...register("phone", {
-                        required: "Este campo es obligatorio",
-                        pattern: {
-                          value: /^[0-9]+$/,
-                          message: "El Teléfono debe contener solo números",
-                        },
-                      })}
-                    />
-                    {errors.phone && (
-                      <p className="text-red-500 text-xs italic">
-                        {errors.phone.message}
-                      </p>
-                    )}
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">Sexo</Label>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="state">Provincia</Label>
-                    <StateSelect
-                      selected={Number(selectedState)}
-                      onStateChange={setSelectedState}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="city">Localidad</Label>
-                    <CitySelect
-                      idState={Number(selectedState)}
-                      selected={String(selectedCity)}
-                      onCityChange={(value) => {
-                        setSelectedCity(Number(value));
-                        setValue("idCity", value);
-                      }}
-                    />
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-            <CardFooter className="flex justify-end gap-2">
-              <Button variant="outline" type="button" onClick={goBack}>
-                Cancelar
-              </Button>
-              <Button variant="default" type="submit">
-                Confirmar
-              </Button>
-            </CardFooter>
-          </form>
+              </CardContent>
+              <CardFooter className="flex justify-end gap-2">
+                <Button variant="outline" type="button" onClick={goBack}>
+                  Cancelar
+                </Button>
+                <Button variant="default" type="submit">
+                  Confirmar
+                </Button>
+              </CardFooter>
+            </form>
+          </Form>
         </Card>
       </div>
     </>
