@@ -6,6 +6,7 @@ import { Toaster } from "sonner";
 import SessionAuthProvider from "@/context/SessionAuthProviders";
 import { ProfilePhotoProvider } from "@/context/ProfilePhotoContext";
 import MainContainer from "./mainContainer";
+import ClientWrapper from "@/components/Client/Wrapper";
 
 const roboto = Roboto({
   weight: ["300", "400", "500", "700"],
@@ -41,7 +42,12 @@ export default function RootLayout({
         <ProfilePhotoProvider>
           <SessionAuthProvider>
             <Toaster richColors position="top-center" />
-            <MainContainer>{children}</MainContainer>
+            <MainContainer>
+
+              <ClientWrapper>
+                {children}
+              </ClientWrapper>
+            </MainContainer>
           </SessionAuthProvider>
         </ProfilePhotoProvider>
       </body>

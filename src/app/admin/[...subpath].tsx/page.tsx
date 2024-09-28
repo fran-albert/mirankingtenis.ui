@@ -1,3 +1,4 @@
+"use client"
 import { AdminComponent } from "@/components/component/admin-component";
 import { useParams } from "next/navigation";
 import CourtPage from "../canchas/page";
