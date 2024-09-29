@@ -16,6 +16,7 @@ export const getColumns = (roles: {
     {
       accessorKey: "#",
       header: "#",
+      enableSorting: false,
       cell: ({ row }) => {
         const index = row.index;
         return <div>{index + 1}</div>;
@@ -24,13 +25,9 @@ export const getColumns = (roles: {
     {
       accessorKey: "name",
       header: "Jugador",
+      enableSorting: false,
       cell: ({ row }) => (
-        <div
-          className="flex items-center cursor-pointer"
-          // onClick={() =>
-          //   (window.location.href = `/admin/jugadores/${row.original.id}`)
-          // }
-        >
+        <div className="flex items-center cursor-pointer">
           <div className="flex flex-col ml-2">
             <p className="text-sm font-medium">
               {row.original.lastname}, {row.original.name}
@@ -40,42 +37,31 @@ export const getColumns = (roles: {
       ),
     },
     {
+      accessorKey: "email",
       header: "Correo Electronico",
+      enableSorting: false,
       cell: ({ row }) => <div>{row.original.email}</div>,
     },
     {
+      accessorKey: "registerDate",
       header: "Registro",
+      enableSorting: true,
       cell: ({ row }) => <div>{formatDate(row.original.registerDate)}</div>,
     },
     {
+      accessorKey: "lastLoginDate", 
       header: "Último Login",
+      enableSorting: true,
       cell: ({ row }) => (
         <div className="font-bold">
-          {" "}
           {row.original.lastLoginDate
             ? formatDate(row.original.lastLoginDate)
             : "Nunca"}
         </div>
       ),
     },
-    // {
-    //   header: " ",
-    //   cell: ({ row }) => (
-    //     <div className="flex items-center justify-end">
-    //       {roles.isAdmin && (
-    //         <div className="flex items-center gap-2">
-    //           <Button size="sm" variant="outline">
-    //             Ver
-    //           </Button>
-    //           <Button color="danger" size="sm" variant="outline">
-    //             Desactivar
-    //           </Button>
-    //         </div>
-    //       )}
-    //     </div>
-    //   ),
-    // },
   ];
 
   return columns;
 };
+

@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Search } from "../ui/search";
 import Link from "next/link";
+import { FaAngleDown, FaAngleUp } from "react-icons/fa";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -59,6 +60,7 @@ export function DataTable<TData, TValue>({
     }
     return data;
   }, [data, customFilter, searchInput]);
+
   const table = useReactTable({
     data: filteredData,
     columns,
@@ -97,11 +99,10 @@ export function DataTable<TData, TValue>({
           variant="outline"
           size="sm"
           onClick={() => handlePageChange(i)}
-          className={`transition duration-150 ease-in-out ${
-            pagination.pageIndex === i
-              ? "bg-slate-700 text-white"
-              : "bg-white text-slate-500"
-          } hover:bg-slate-500 hover:text-white focus:outline-none mx-1`}
+          className={`transition duration-150 ease-in-out ${pagination.pageIndex === i
+            ? "bg-slate-700 text-white"
+            : "bg-white text-slate-500"
+            } hover:bg-slate-500 hover:text-white focus:outline-none mx-1`}
         >
           {i + 1}
         </Button>
@@ -123,7 +124,7 @@ export function DataTable<TData, TValue>({
           {canAddUser && (
             <Button
               className="ml-4 bg-slate-700"
-              onClick={onAddClick ? onAddClick : () => {}}
+              onClick={onAddClick ? onAddClick : () => { }}
             >
               <Link href={addLinkPath}>{addLinkText}</Link>
             </Button>
@@ -139,27 +140,36 @@ export function DataTable<TData, TValue>({
                   {headerGroup.headers.map((header) => (
                     <th
                       key={header.id}
-                      className="py-2 px-6 text-left text-sm font-semibold text-white uppercase tracking-wider"
+                      onClick={header.column.getToggleSortingHandler()}
+                      className="py-2 px-6 text-left text-sm font-semibold text-white uppercase tracking-wider cursor-pointer"
                     >
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                      <div className="flex items-center">
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                        {header.column.getIsSorted() === "asc" ? (
+                          <FaAngleUp  className="ml-2" />
+                        ) : header.column.getIsSorted() === "desc" ? (
+                          <FaAngleDown className="ml-2" />
+                        ) : (
+                          ""
+                        )}
+                      </div>
                     </th>
                   ))}
                 </tr>
               ))}
             </thead>
+
+
             <tbody className="text-gray-700">
               {table.getRowModel().rows.length ? (
                 table.getRowModel().rows.map((row) => (
                   <tr
                     key={row.id}
-                    className={`${
-                      row.getIsSelected() ? "bg-teal-100" : "hover:bg-gray-50"
-                    } transition duration-150 ease-in-out`}
+                    className={`${row.getIsSelected() ? "bg-teal-100" : "hover:bg-gray-50"
+                      } transition duration-150 ease-in-out`}
                   >
                     {row.getVisibleCells().map((cell) => (
                       <td
