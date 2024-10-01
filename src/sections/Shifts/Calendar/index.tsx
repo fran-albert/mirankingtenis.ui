@@ -47,7 +47,7 @@ export const ShiftCalendar = ({ matches }: { matches: any }) => {
     };
 
     let myEventsList: MatchEvent[] = matches.map((match: any) => ({
-      title: `${match.user1.lastname} vs ${match.user2.lastname}`,
+      title: `${match.user1.lastname} vs ${match.user2?.lastname}`,
       start: new Date(match.shift?.startHour),
       end: new Date(match.shift?.endHour),
       allDay: false,
