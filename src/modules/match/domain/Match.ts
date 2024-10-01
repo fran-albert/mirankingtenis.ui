@@ -35,4 +35,5 @@ export interface Match {
   winner: string;
   tournamentCategoryId?: number;
   idWinner: number;
+  isBye: boolean;
 }

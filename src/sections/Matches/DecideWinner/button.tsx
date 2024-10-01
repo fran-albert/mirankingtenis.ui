@@ -126,7 +126,7 @@ export default function DecideMatchDialog({
                     : "bg-gray-300 text-gray-900 font-bold"
                 }`}
               >
-                {match?.user2.toString()}
+                {match?.user2?.toString()}
               </Badge>
             </div>
           </DialogDescription>

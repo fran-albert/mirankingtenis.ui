@@ -54,7 +54,6 @@ export const ScoreMatchCard = ({
             {match.status === "played" ? "Final" : "Pendiente"}
           </div>
         </CardTitle>
-        <CardDescription></CardDescription>
       </CardHeader>
       <CardContent>
         <form>
@@ -62,21 +61,19 @@ export const ScoreMatchCard = ({
             <div className="flex flex-col space-y-1.5">
               <div className="flex justify-between">
                 <div className="flex items-center space-x-2">
-                  <div className="text-slate-700 font-bold">
-                    <Avatar>
-                      <AvatarImage
-                        src={
-                          match.user1photo
-                            ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${match.user1photo}.jpeg`
-                            : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/mirankingtenis_default.png"
-                        }
-                        alt="@avatar"
-                      />
-                      <AvatarFallback>
-                        {match?.user1?.toString().charAt(0) || ""}
-                      </AvatarFallback>
-                    </Avatar>
-                  </div>
+                  <Avatar>
+                    <AvatarImage
+                      src={
+                        match.user1photo
+                          ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${match.user1photo}.jpeg`
+                          : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/mirankingtenis_default.png"
+                      }
+                      alt="@avatar"
+                    />
+                    <AvatarFallback>
+                      {match?.user1?.toString().charAt(0) || ""}
+                    </AvatarFallback>
+                  </Avatar>
                   <div className="text-xs font-bold text-gray-500">
                     {match.user1position ? match.user1position : "-"}
                   </div>
@@ -92,24 +89,26 @@ export const ScoreMatchCard = ({
                     )}
                   </Link>
                 </div>
-                <div className="flex items-center justify-center space-x-1">
-                  {match.sets
-                    .sort((a, b) => a.setNumber - b.setNumber)
-                    .map((set, index) => (
-                      <div
-                        key={index}
-                        className="text-xl font-bold text-gray-800 text-center min-w-[1.5rem]"
-                      >
-                        {set.pointsPlayer1}
-                      </div>
-                    ))}
-                </div>
+                {!match.isBye && (
+                  <div className="flex items-center justify-center space-x-1">
+                    {match.sets
+                      .sort((a, b) => a.setNumber - b.setNumber)
+                      .map((set, index) => (
+                        <div
+                          key={index}
+                          className="text-xl font-bold text-gray-800 text-center min-w-[1.5rem]"
+                        >
+                          {set.pointsPlayer1}
+                        </div>
+                      ))}
+                  </div>
+                )}
               </div>
             </div>
-            <div className="flex flex-col space-y-1.5">
-              <div className="flex justify-between">
-                <div className="flex items-center space-x-2">
-                  <div className="text-slate-700 font-bold">
+            {!match.isBye ? (
+              <div className="flex flex-col space-y-1.5">
+                <div className="flex justify-between">
+                  <div className="flex items-center space-x-2">
                     <Avatar>
                       <AvatarImage
                         src={
@@ -123,36 +122,40 @@ export const ScoreMatchCard = ({
                         {match?.user2?.toString().charAt(0) || ""}
                       </AvatarFallback>
                     </Avatar>
+                    <div className="text-xs font-bold text-gray-500">
+                      {match.user2position ? match.user2position : "-"}
+                    </div>
+                    <Link
+                      href={`/jugadores/${match.idUser2}`}
+                      className="font-medium text- md:text-xl lg:text-xl text-gray-900 hover:text-sky-800"
+                    >
+                      {match.user2?.toString()}
+                      {match.idWinner === idUser2 && (
+                        <span className="ml-2 text-sm font-semibold text-green-600">
+                          <BadgeWin text="Ganador" />
+                        </span>
+                      )}
+                    </Link>
                   </div>
-                  <div className="text-xs font-bold text-gray-500">
-                    {match.user2position ? match.user2position : "-"}
+                  <div className="flex items-center justify-center space-x-1">
+                    {match.sets
+                      .sort((a, b) => a.setNumber - b.setNumber)
+                      .map((set, index) => (
+                        <div
+                          key={index}
+                          className="text-xl font-bold text-gray-800 text-center min-w-[1.5rem]"
+                        >
+                          {set.pointsPlayer2}
+                        </div>
+                      ))}
                   </div>
-                  <Link
-                    href={`/jugadores/${match.idUser2}`}
-                    className="font-medium text- md:text-xl lg:text-xl text-gray-900 hover:text-sky-800"
-                  >
-                    {match.user2?.toString()}
-                    {match.idWinner === idUser2 && (
-                      <span className="ml-2 text-sm font-semibold text-green-600">
-                        <BadgeWin text="Ganador" />
-                      </span>
-                    )}
-                  </Link>
-                </div>
-                <div className="flex items-center justify-center space-x-1">
-                  {match.sets
-                    .sort((a, b) => a.setNumber - b.setNumber)
-                    .map((set, index) => (
-                      <div
-                        key={index}
-                        className="text-xl font-bold text-gray-800 text-center min-w-[1.5rem]"
-                      >
-                        {set.pointsPlayer2}
-                      </div>
-                    ))}
                 </div>
               </div>
-            </div>
+            ) : (
+              <div className="text-center text-gray-500 font-semibold">
+                Este jugador queda libre en esta fecha.
+              </div>
+            )}
           </div>
         </form>
       </CardContent>
@@ -165,7 +168,7 @@ export const ScoreMatchCard = ({
             </span>
           )}
         </div>
-        {isAdmin && (
+        {isAdmin && !match.isBye && (
           <div className="flex items-center space-x-2">
             {match.status !== "played" ? (
               <>
@@ -190,3 +193,4 @@ export const ScoreMatchCard = ({
     </Card>
   );
 };
+
