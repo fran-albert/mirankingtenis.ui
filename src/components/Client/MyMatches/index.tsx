@@ -127,7 +127,7 @@ function ClientMyMatchesComponent() {
 
   if (isLoading || isLoadingMatches) {
     return <Loading isLoading />;
-  }
+  } 
 
   return (
     <div className="container mt-4">

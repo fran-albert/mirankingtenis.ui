@@ -33,7 +33,9 @@ function MatchesIndex({
                   : " inline-flex text-sm font-bold rounded-full text-gray-800"
               }`}
             >
-              {m.finalResult === "pending"
+              {m.isBye
+                ? `Fecha Libre`
+                : m.finalResult === "pending"
                 ? `Pendiente vs ${m.rivalName}`
                 : `${m.finalResult} vs ${m.rivalName}`}
             </h3>
@@ -51,31 +53,30 @@ function MatchesIndex({
                   }`}
             </p>
 
-            <p className="text-gray-600">Cancha: {m.shift?.court?.name}</p>
-            <p className="text-gray-600">
-              Día y Hora:{" "}
-              {m.shift?.startHour && formatDateComplete(m.shift?.startHour)}
-            </p>
-            <div className="mt-4">
-              {m.sets.map((set) => (
-                <span
-                  key={set.id}
-                  className="inline-flex items-center justify-center px-3 py-1 mr-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-full"
-                >
-                  {set.pointsPlayer1} - {set.pointsPlayer2}
-                </span>
-              ))}
-            </div>
+            {!m.isBye && (
+              <>
+                <p className="text-gray-600">Cancha: {m.shift?.court?.name}</p>
+                <p className="text-gray-600">
+                  Día y Hora:{" "}
+                  {m.shift?.startHour && formatDateComplete(m.shift?.startHour)}
+                </p>
+                <div className="mt-4">
+                  {m.sets.map((set) => (
+                    <span
+                      key={set.id}
+                      className="inline-flex items-center justify-center px-3 py-1 mr-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-full"
+                    >
+                      {set.pointsPlayer1} - {set.pointsPlayer2}
+                    </span>
+                  ))}
+                </div>
+              </>
+            )}
 
-            {m.status !== "played" && (
+            {m.status !== "played" && !m.isBye && (
               <>
                 {m.shift === null || m.shift?.startHour === null ? (
-                  <>
-                    <AddShiftDialog
-                      match={m}
-                      onUpdateMatches={onUpdateMatches}
-                    />
-                  </>
+                  <AddShiftDialog match={m} onUpdateMatches={onUpdateMatches} />
                 ) : (
                   <>
                     <AddResultMatchDialog
@@ -101,16 +102,14 @@ function MatchesIndex({
   }
 
   return (
-    <>
-      <div className="flex flex-col py-2">
-        <DataTable
-          columns={playersColums}
-          data={match}
-          showSearch={false}
-          canAddUser={false}
-        />
-      </div>
-    </>
+    <div className="flex flex-col py-2">
+      <DataTable
+        columns={playersColums}
+        data={match}
+        showSearch={false}
+        canAddUser={false}
+      />
+    </div>
   );
 }
 

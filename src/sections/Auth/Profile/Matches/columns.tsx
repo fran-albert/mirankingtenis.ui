@@ -34,7 +34,14 @@ export const getColumns = (onUpdateMatches: () => void): ColumnDef<Match>[] => {
     },
     {
       header: "Rival",
-      cell: ({ row }) => <div>{row.original.rivalName}</div>,
+      cell: ({ row }) =>
+        row.original.isBye ? (
+          <div className="text-sm font-bold text-gray-600">
+            Fecha Libre
+          </div>
+        ) : (
+          <div>{row.original.rivalName}</div>
+        ),
     },
     {
       header: "Día y Hora",
@@ -75,6 +82,9 @@ export const getColumns = (onUpdateMatches: () => void): ColumnDef<Match>[] => {
             <span className="px-3 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800"></span>
           );
         }
+        if (row.original.isBye) {
+          return <div className="text-center">Libre</div>;
+        }
         return (
           <div className="flex items-center">
             {row.original.finalResult}
@@ -91,25 +101,26 @@ export const getColumns = (onUpdateMatches: () => void): ColumnDef<Match>[] => {
     },
     {
       header: "Estado",
-      cell: ({ row }) => (
-        <div className="flex items-center">
-          {row.original.status === "played" ? (
-            <span className="ml-2 text-sm font-semibold ">
-              <BadgeWin text="Jugado" />
-            </span>
-          ) : (
-            <span className="ml-2 text-sm font-semibold ">
-              <BadgePending text="Pendiente" />
-            </span>
-          )}
-        </div>
-      ),
+      cell: ({ row }) =>
+        row.original.isBye ? null : (
+          <div className="flex items-center">
+            {row.original.status === "played" ? (
+              <span className="ml-2 text-sm font-semibold ">
+                <BadgeWin text="Jugado" />
+              </span>
+            ) : (
+              <span className="ml-2 text-sm font-semibold ">
+                <BadgePending text="Pendiente" />
+              </span>
+            )}
+          </div>
+        ),
     },
     {
       header: " ",
       cell: ({ row }) => (
         <div className="flex items-center justify-end">
-          {row.original.status !== "played" && (
+          {row.original.status !== "played" && !row.original.isBye && (
             <>
               {row.original.shift === null ||
               row.original.shift?.startHour === null ? (
@@ -135,8 +146,6 @@ export const getColumns = (onUpdateMatches: () => void): ColumnDef<Match>[] => {
                   />
                 </>
               )}
-              {/* Opcionalmente, si DeleteMatchDialog debe aparecer siempre cuando el partido no está jugado, independientemente del estado del turno */
-              /* <DeleteMatchDialog match={row.original} onUpdateMatches={onUpdateMatches} /> */}
             </>
           )}
         </div>
