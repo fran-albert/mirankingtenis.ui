@@ -21,6 +21,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useMatchStore } from "@/hooks/useMatch";
 import { GiConsoleController } from "react-icons/gi";
+import { CiKeyboard } from "react-icons/ci";
 
 interface AddResultMatchDialogProps {
   updateMatches?: () => void;
@@ -114,14 +115,14 @@ export default function UpdateMatchDialog({
                   htmlFor="player1"
                   className="col-span-2 text-right text-black"
                 >
-                  {match.user1?.name}
+                  {match.user1?.toString()}
                 </Label>
                 <div className="col-span-1" />
                 <Label
                   htmlFor="player2"
                   className="col-span-2 text-left text-black"
                 >
-                   {match.user2?.name}
+                   {match.user2?.toString()}
                 </Label>
               </div>
               <div className="grid grid-cols-5 gap-4 items-center">
@@ -217,7 +218,7 @@ export default function UpdateMatchDialog({
                 <div className="mt-2">
                   <p className="text-md font-medium text-gray-800">
                     <span className="font-normal">
-                      {match.user1.name} vs {match.user2.name}
+                      {match.user1.toString()} vs {match.user2.toString()}
                     </span>
                   </p>
                   <ul className="mt-2 space-y-1">

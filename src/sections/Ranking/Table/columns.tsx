@@ -9,12 +9,14 @@ export const getColumns = (): ColumnDef<TournamentRanking>[] => {
   const columns: ColumnDef<TournamentRanking>[] = [
     {
       accessorKey: "POS",
+      enableSorting: false,
       cell: ({ row }) => {
         return <div>{row.original.position}</div>;
       },
     },
     {
       accessorKey: "name",
+      enableSorting: false,
       header: "Jugador",
       cell: ({ row }) => (
         <div
@@ -47,18 +49,22 @@ export const getColumns = (): ColumnDef<TournamentRanking>[] => {
     },
     {
       header: "PTS",
+      enableSorting: false,
       cell: ({ row }) => <div className="font-bold">{row.original.points}</div>,
     },
     {
       header: "PJ",
+      enableSorting: false,
       cell: ({ row }) => <div className="">{row.original.playedMatches}</div>,
     },
     {
       header: "PG",
+      enableSorting: false,
       cell: ({ row }) => <div className="">{row.original.wonMatches}</div>,
     },
     {
       header: "PP",
+      enableSorting: false,
       cell: ({ row }) => <div className="">{row.original.lostMatches}</div>,
     },
   ];
