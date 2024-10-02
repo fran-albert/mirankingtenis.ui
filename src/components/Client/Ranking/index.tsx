@@ -13,9 +13,9 @@ function ClientRankingComponent() {
     tournament: lastTournament,
     loading,
   } = useTournamentStore();
-
+  const initialTournamentId = process.env.NODE_ENV === 'production' ? "3" : "45";
   const [selectedCategory, setSelectedCategory] = useState("1");
-  const [selectedTournament, setSelectedTournament] = useState("");
+  const [selectedTournament, setSelectedTournament] = useState(initialTournamentId);
   const [error, setError] = useState<string | null>(null);
   const { getTournamentCategoryId, tournamentCategoryId } =
     useTournamentCategoryStore();

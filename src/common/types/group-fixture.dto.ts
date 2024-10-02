@@ -26,5 +26,6 @@ export interface GroupFixtureDto {
     sets: Sets[];
     status: string;
     match?: number
+    isBye: boolean;
 
 }
