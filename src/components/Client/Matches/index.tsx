@@ -7,9 +7,10 @@ import { useTournamentStore } from "@/hooks/useTournament";
 import { TennisScoreboard } from "@/sections/Matches/TennisScoreBoard/tennisScoreBoard";
 
 function ClientMatchesComponent() {
-  const [selectedJornada, setSelectedJornada] = useState("");
+  const [selectedJornada, setSelectedJornada] = useState("1");
   const [selectedCategory, setSelectedCategory] = useState("1");
-  const [selectedTournament, setSelectedTournament] = useState("");
+  const initialTournamentId = process.env.NODE_ENV === 'production' ? "3" : "45";
+  const [selectedTournament, setSelectedTournament] = useState(initialTournamentId);
   const [jornadas, setJornadas] = useState<number[]>([]);
   const [error, setError] = useState<string | null>(null);
   const fixtureRepository = createApiFixtureRepository();
