@@ -8,4 +8,7 @@ export interface TournamentRanking {
     wonMatches: number;
     lostMatches: number;
     playedMatches: number;
+    setsWon: number;
+    setsLost: number;
+    setsDifference: number;
 }
