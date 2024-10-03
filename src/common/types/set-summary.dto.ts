@@ -3,4 +3,5 @@ export interface SetSummaryDto {
     totalSetsWon: number;
     totalSetsLost: number;
     winRate: string;
+
 }

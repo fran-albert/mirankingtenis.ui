@@ -67,6 +67,21 @@ export const getColumns = (): ColumnDef<TournamentRanking>[] => {
       enableSorting: false,
       cell: ({ row }) => <div className="">{row.original.lostMatches}</div>,
     },
+    {
+      header: "SG",
+      enableSorting: false,
+      cell: ({ row }) => <div className="">{row.original.setsWon}</div>,
+    },
+    {
+      header: "SP",
+      enableSorting: false,
+      cell: ({ row }) => <div className="">{row.original.setsLost}</div>,
+    },
+    {
+      header: "DIF",
+      enableSorting: false,
+      cell: ({ row }) => <div className="">{row.original.setsDifference}</div>,
+    },
   ];
 
   return columns;
