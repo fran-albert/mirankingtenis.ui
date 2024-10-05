@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Select,
   SelectContent,
@@ -6,61 +5,70 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { City } from "@/modules/city/domain/City";
-import { CityRepository } from "@/modules/city/domain/CityRepository";
-import { createApiCityRepository } from "@/modules/city/infra/ApiCityRepository";
-import { useEffect, useState } from "react";
+import { useCity } from "@/hooks/City/useCity";
+import { City } from "@/types/City/City";
+import { Controller } from "react-hook-form";
 
 interface CitySelectProps {
-  selected?: string;
-  onCityChange?: (value: string) => void;
-  idState?: number;
+  control: any;
+  idState: number;
+  defaultValue?: City;
+  onCityChange?: (value: City) => void;
+  disabled?: boolean;
 }
-const cityRepository: CityRepository = createApiCityRepository();
 
 export const CitySelect = ({
-  selected,
-  onCityChange,
+  control,
   idState,
+  defaultValue,
+  onCityChange,
+  disabled,
 }: CitySelectProps) => {
-  const [cities, setCities] = useState<City[]>([]);
+  const { cities, isLoading } = useCity({ idState });
 
-  useEffect(() => {
-    if (idState) {
-      const loadCities = async () => {
-        try {
-          const loadedCities = await cityRepository.getAllByState(idState);
-          setCities(loadedCities || []);
-        } catch (error) {
-          console.error("Error al obtener las localidades:", error);
-        }
-      };
-
-      loadCities();
-    } else {
-      setCities([]);
-    }
-  }, [idState]);
-
-  const handleChange = (value: string) => {
-    const selectedCity = cities.find((city) => String(city.id) === value);
-    if (onCityChange && selectedCity) {
-      onCityChange(selectedCity.id.toString());
+  const handleValueChange = (cityId: string) => {
+    const city = cities.find((c) => String(c.id) === cityId);
+    if (city) {
+      onCityChange && onCityChange(city);
     }
   };
 
   return (
-    <Select value={selected} onValueChange={handleChange}>
-      <SelectTrigger className="w-full">
-        <SelectValue placeholder="Seleccione la localidad..." />
-      </SelectTrigger>
-      <SelectContent>
-        {cities.map((city) => (
-          <SelectItem key={city.id} value={String(city.id)}>
-            {city.city}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+    <Controller
+      name="idCity"
+      control={control}
+      defaultValue={defaultValue ? String(defaultValue.id) : ""}
+      render={({ field }) => {
+        const selectedCity = cities.find(
+          (city) => String(city.id) === String(field.value)
+        );
+
+        return (
+          <div>
+            <Select
+              value={selectedCity ? String(selectedCity.id) : ""}
+              onValueChange={(value) => {
+                field.onChange(value);
+                handleValueChange(value);
+              }}
+              disabled={disabled || isLoading}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Seleccione la localidad...">
+                  {selectedCity ? selectedCity.city : "Seleccione la localidad..."}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                {cities.map((city) => (
+                  <SelectItem key={String(city.id)} value={String(city.id)}>
+                    {city.city}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        );
+      }}
+    />
   );
 };
