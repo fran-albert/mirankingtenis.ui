@@ -1,5 +1,5 @@
-import { User } from "@/modules/users/domain/User";
 import axiosInstance from "@/services/axiosConfig";
+import { User } from "@/types/User/User";
 
 export const getUserById = async (id: number) => {
   try {

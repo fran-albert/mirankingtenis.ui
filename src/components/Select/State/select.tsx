@@ -1,4 +1,3 @@
-import React, { useEffect, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -6,52 +5,62 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { State } from "@/modules/state/domain/State";
-import { createApiStateRepository } from "@/modules/state/infra/ApiStateRepository";
+import { Controller } from "react-hook-form";
+import { useState } from "@/hooks/State/useState";
+import { State } from "@/types/State/State";
 
 interface StateSelectProps {
-  selected?: number;
-  onStateChange?: (value: number) => void;
+  control: any;
+  defaultValue?: State;
+  onStateChange?: (value: State) => void;
+  disabled?: boolean;
 }
 
-const stateRepository = createApiStateRepository();
-export const StateSelect = ({ selected, onStateChange }: StateSelectProps) => {
-  const [states, setStates] = useState<State[]>([]);
-
-  useEffect(() => {
-    const loadStates = async () => {
-      try {
-        const states = await stateRepository.getAll();
-        setStates(states);
-      } catch (error) {
-        console.error("Error al obtener los estados:", error);
-      }
-    };
-
-    loadStates();
-  }, []);
-
+export const StateSelect = ({
+  control,
+  defaultValue,
+  disabled,
+  onStateChange,
+}: StateSelectProps) => {
+  const { states } = useState();
   const handleValueChange = (selectedId: string) => {
     const selectedState = states.find(
       (state) => String(state.id) === selectedId
     );
     if (onStateChange && selectedState) {
-      onStateChange(selectedState.id);
+      onStateChange(selectedState);
     }
   };
 
   return (
-    <Select value={String(selected)} onValueChange={handleValueChange}>
-      <SelectTrigger className="w-full ">
-        <SelectValue placeholder="Seleccione la provincia..." />
-      </SelectTrigger>
-      <SelectContent>
-        {states.map((state) => (
-          <SelectItem key={state.id} value={String(state.id)}>
-            {state.state}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+    <Controller
+      name="state"
+      control={control}
+      rules={{ required: "Este campo es obligatorio" }}
+      defaultValue={defaultValue ? defaultValue.id.toString() : ""}
+      render={({ field }) => (
+        <div>
+          <Select
+            value={field.value}
+            onValueChange={(value) => {
+              field.onChange(value);
+              handleValueChange(value);
+            }}
+            disabled={disabled}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Seleccione la provincia..." />
+            </SelectTrigger>
+            <SelectContent>
+              {states.map((state) => (
+                <SelectItem key={String(state.id)} value={String(state.id)}>
+                  {state.state}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+    />
   );
 };

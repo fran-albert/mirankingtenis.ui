@@ -1,4 +1,6 @@
 import { createUser } from "@/api/Users/create";
+import { updateUser } from "@/api/Users/update-user";
+import { User } from "@/types/User/User";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export const useUserMutations = () => {
@@ -16,27 +18,27 @@ export const useUserMutations = () => {
     },
   });
 
-//   const updatePatientMutation = useMutation({
-//     mutationFn: ({ id, patient }: { id: number; patient: Patient }) => updatePatient(id, patient),
-//     onSuccess: (patient, variables, context) => {
-//       queryClient.invalidateQueries({ queryKey: ['patient', variables.id] });
-//       console.log("Patient updated", patient, variables, context);
-//     },
-//     onError: (error, variables, context) => {
-//       console.log("Error updating patient", error, variables, context);
-//     },
-//   });
+  const updateUserMutation = useMutation({
+    mutationFn: ({ user, id }: { user: User; id: number }) => updateUser(user, id),
+    onSuccess: (patient, variables, context) => {
+      queryClient.invalidateQueries({ queryKey: ['users', variables.id] });
+      console.log("Patient updated", patient, variables, context);
+    },
+    onError: (error, variables, context) => {
+      console.log("Error updating patient", error, variables, context);
+    },
+  });
 
-//   const deletePatientMutation = useMutation({
-//     mutationFn: (id: number) => deletePatient(id),
-//     onSuccess: (patient, variables, context) => {
-//       queryClient.invalidateQueries({ queryKey: ['patients'] })
-//       console.log("Patient deleted", patient, variables, context);
-//     },
-//     onError: (error, variables, context) => {
-//       console.log("Error deleting patient", error, variables, context);
-//     },
-//   });
+  //   const deletePatientMutation = useMutation({
+  //     mutationFn: (id: number) => deletePatient(id),
+  //     onSuccess: (patient, variables, context) => {
+  //       queryClient.invalidateQueries({ queryKey: ['patients'] })
+  //       console.log("Patient deleted", patient, variables, context);
+  //     },
+  //     onError: (error, variables, context) => {
+  //       console.log("Error deleting patient", error, variables, context);
+  //     },
+  //   });
 
-  return { addUserMutation };
+  return { addUserMutation, updateUserMutation };
 };

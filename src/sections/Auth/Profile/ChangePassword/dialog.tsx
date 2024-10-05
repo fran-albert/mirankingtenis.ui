@@ -22,6 +22,7 @@ import { changePassword } from "@/modules/users/application/change-password/chan
 import { User } from "@/modules/users/domain/User";
 import { toast } from "sonner";
 import axios from "axios";
+import { Lock } from "lucide-react";
 
 interface ChangePasswordDialogProps {
   id: number;
@@ -80,7 +81,8 @@ export default function ChangePasswordDialog({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button onClick={toggleDialog} variant="outline">
+        <Button onClick={toggleDialog} className="bg-slate-800">
+          <Lock className="w-5 h-5 mr-2" />
           Cambiar Contraseña
         </Button>
       </DialogTrigger>
