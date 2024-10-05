@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { User } from "@/modules/users/domain/User";
+import { User } from "@/types/User/User";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

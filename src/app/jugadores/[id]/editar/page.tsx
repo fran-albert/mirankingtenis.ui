@@ -1,9 +1,9 @@
 "use client";
 import Loading from "@/components/Loading/loading";
 import { getUser } from "@/modules/users/application/get/getUser";
-import { User } from "@/modules/users/domain/User";
+import { User } from "@/types/User/User";
 import { createApiUserRepository } from "@/modules/users/infra/ApiUserRepository";
-import EditPlayerForm from "@/sections/Players/Edit/EditPlayerForm";
+// import EditPlayerForm from "@/sections/Players/Edit/EditPlayerForm";
 // import { Patient } from "@/modules/patients/domain/Patient";
 // import { createApiPatientRepository } from "@/modules/patients/infra/ApiPatientRepository";
 // import EditPatientForm from "@/sections/users/patients/edit/EditPatientForm";
@@ -42,7 +42,7 @@ function EditPlayerPage() {
     <div className="flex flex-col md:flex-row">
       <div className="flex-grow flex justify-center items-center">
         {/* <EditPatientForm patient={patient} /> */}
-        <EditPlayerForm user={user} />
+        {/* <EditPlayerForm user={user} /> */}
       </div>
     </div>
   );

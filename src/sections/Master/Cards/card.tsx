@@ -1,6 +1,6 @@
 import { GroupRankingDto } from "@/common/types/group-ranking.dto";
 import { Ranking } from "@/modules/ranking/domain/Ranking";
-import { User } from "@/modules/users/domain/User";
+import { User } from "@/types/User/User";
 import Image from "next/image";
 import React from "react";
 

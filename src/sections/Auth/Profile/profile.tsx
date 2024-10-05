@@ -1,5 +1,5 @@
 import { useCustomSession } from "@/context/SessionAuthProviders";
-import { User } from "@/modules/users/domain/User";
+import { User } from "@/types/User/User";
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import Loading from "@/components/Loading/loading";
 import { Button } from "@/components/ui/button";

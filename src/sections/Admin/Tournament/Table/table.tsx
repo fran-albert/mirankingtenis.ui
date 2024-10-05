@@ -1,6 +1,6 @@
 "use client";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { User } from "@/modules/users/domain/User";
+import { User } from "@/types/User/User";
 import { DataTable } from "@/components/Table/dataTable";
 import { getColumns } from "./columns";
 import useRoles from "@/hooks/useRoles";

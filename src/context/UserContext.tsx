@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { User } from "@/modules/users/domain/User";
+import { User } from "@/types/User/User";
 import { createApiUserRepository } from "@/modules/users/infra/ApiUserRepository";
 
 interface UserState {

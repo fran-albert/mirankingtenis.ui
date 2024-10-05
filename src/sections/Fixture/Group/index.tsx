@@ -2,7 +2,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 
-import { User } from "@/modules/users/domain/User";
+import { User } from "@/types/User/User";
 import { createApiUserRepository } from "@/modules/users/infra/ApiUserRepository";
 import { createApiTournamentParticipantRepository } from "@/modules/tournament-participant/infra/ApiTournamentRepository";
 import { TournamentParticipant } from "@/modules/tournament-participant/domain/TournamentParticipant";

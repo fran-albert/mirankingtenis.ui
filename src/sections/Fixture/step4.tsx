@@ -1,5 +1,5 @@
 // Step3.js
-import { User } from "@/modules/users/domain/User";
+import { User } from "@/types/User/User";
 import { createApiUserRepository } from "@/modules/users/infra/ApiUserRepository";
 import React, { useState, useEffect } from "react";
 import {

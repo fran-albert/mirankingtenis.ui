@@ -1,4 +1,4 @@
-import { User } from "../../domain/User";
+import { User } from "@/types/User/User";
 import { UserRepository } from "../../domain/UserRepository";
 
 export function changePassword(userRepository: UserRepository) {

@@ -2,7 +2,7 @@ import { GetPlayerInfoDto } from "@/common/types/get-player-info.dto";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Match } from "@/modules/match/domain/Match";
-import { User } from "@/modules/users/domain/User";
+import { User } from "@/types/User/User";
 import CurrentTournament from "../Current-Tournament";
 import PersonalInformation from "../Personal-Information";
 import { Tournament } from "@/modules/tournament/domain/Tournament";

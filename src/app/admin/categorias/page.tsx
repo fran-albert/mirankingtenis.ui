@@ -6,7 +6,7 @@ import { getAllCategories } from "@/modules/category/application/get-all/getAllC
 import { Category } from "@/modules/category/domain/Category";
 import { createApiCategoryRepository } from "@/modules/category/infra/ApiCategoryRepository";
 import { getAdminUsers } from "@/modules/users/application/get-all-admin/getAdminUsers";
-import { User } from "@/modules/users/domain/User";
+import { User } from "@/types/User/User";
 import { createApiUserRepository } from "@/modules/users/infra/ApiUserRepository";
 import CategoriesTable from "@/sections/Admin/Categories/Table/table";
 import AdminPlayersTanstackTable from "@/sections/Admin/Players/Table/tanstack";

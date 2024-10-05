@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { RiLock2Fill } from "react-icons/ri";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { User } from "@/modules/users/domain/User";
+import { User } from "@/types/User/User";
 import { createApiUserRepository } from "@/modules/users/infra/ApiUserRepository";
 import { createUser } from "@/modules/users/application/create/createUser";
 import { toast } from "sonner";

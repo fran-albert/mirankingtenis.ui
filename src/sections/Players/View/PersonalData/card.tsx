@@ -1,4 +1,4 @@
-import { User } from "@/modules/users/domain/User";
+import { User } from "@/types/User/User";
 import React from "react";
 import { FaEdit, FaPhoneAlt } from "react-icons/fa";
 import { CiMail, CiCalendarDate } from "react-icons/ci";

@@ -4,7 +4,7 @@ import { useCustomSession } from "@/context/SessionAuthProviders";
 import useRoles from "@/hooks/useRoles";
 import { useUserStore } from "@/hooks/useUser";
 import { getAdminUsers } from "@/modules/users/application/get-all-admin/getAdminUsers";
-import { User } from "@/modules/users/domain/User";
+import { User } from "@/types/User/User";
 import { createApiUserRepository } from "@/modules/users/infra/ApiUserRepository";
 import AdminPlayersTanstackTable from "@/sections/Admin/Players/Table/tanstack";
 import { PlayersTable } from "@/sections/Players/Table/table";

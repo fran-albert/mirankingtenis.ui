@@ -1,4 +1,4 @@
-import { User } from "@/modules/users/domain/User";
+import { User } from "@/types/User/User";
 import React from "react";
 import { IoLocationSharp, IoMailSharp } from "react-icons/io5";
 import { FaPerson, FaPhone } from "react-icons/fa6";

@@ -1,4 +1,5 @@
-import { User } from "./User";
+import { User } from "@/types/User/User";
+
 
 export interface UserRepository {
   getUser: (id: number) => Promise<User | undefined>;

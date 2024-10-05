@@ -2,7 +2,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 
-import { User } from "@/modules/users/domain/User";
+import { User } from "@/types/User/User";
 import { createApiUserRepository } from "@/modules/users/infra/ApiUserRepository";
 import { Step2 } from "./step2";
 import { Step3 } from "./step3";

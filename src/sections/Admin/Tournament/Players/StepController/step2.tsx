@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import SelectPlayerTournamentComponent from "../Add";
-import { User } from "@/modules/users/domain/User";
+import { User } from "@/types/User/User";
 import { Button } from "@/components/ui/button";
 import { NonParticipantsDto } from "@/common/types/non-participants.dto";
 

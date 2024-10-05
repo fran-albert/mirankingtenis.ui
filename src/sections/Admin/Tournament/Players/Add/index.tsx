@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { User } from "@/modules/users/domain/User";
+import { User } from "@/types/User/User";
 import { NonParticipantsDto } from "@/common/types/non-participants.dto";
 
 export default function SelectPlayerTournamentComponent({
