@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import useRoles from "@/hooks/useRoles";
-import { User } from "@/modules/users/domain/User";
+import { User } from "@/types/User/User";
 import Image from "next/image";
 import React from "react";
 import DefaultPasswordDialog from "../DefaultPassword/dialog";

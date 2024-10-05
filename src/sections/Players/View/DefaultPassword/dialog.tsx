@@ -19,7 +19,7 @@ import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/passwordInput";
 import { createApiUserRepository } from "@/modules/users/infra/ApiUserRepository";
 import { changePassword } from "@/modules/users/application/change-password/changePassword";
-import { User } from "@/modules/users/domain/User";
+import { User } from "@/types/User/User";
 import { toast } from "sonner";
 import axios from "axios";
 import { resetUserPassword } from "@/modules/users/application/default-password/defaultPassword";

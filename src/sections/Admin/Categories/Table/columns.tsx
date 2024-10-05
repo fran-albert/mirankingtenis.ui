@@ -3,7 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { EditButton } from "@/components/Button/Edit/button";
-import { User } from "@/modules/users/domain/User";
+import { User } from "@/types/User/User";
 import { Button } from "@/components/ui/button";
 import DeletePlayerDialog from "@/sections/Players/Delete/button";
 import { formatDate } from "@/lib/utils";

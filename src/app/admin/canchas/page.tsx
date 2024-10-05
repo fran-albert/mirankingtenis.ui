@@ -9,7 +9,7 @@ import { getAll } from "@/modules/court/application/get-all/getAllCourt";
 import { Court } from "@/modules/court/domain/Court";
 import { createApiCourtRepository } from "@/modules/court/infra/ApiCourtRepository";
 import { getAdminUsers } from "@/modules/users/application/get-all-admin/getAdminUsers";
-import { User } from "@/modules/users/domain/User";
+import { User } from "@/types/User/User";
 import { createApiUserRepository } from "@/modules/users/infra/ApiUserRepository";
 import CategoriesTable from "@/sections/Admin/Categories/Table/table";
 import CourtTable from "@/sections/Admin/Courts/Table/table";

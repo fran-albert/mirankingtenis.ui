@@ -1,5 +1,5 @@
 import React from "react";
-import { User } from "@/modules/users/domain/User";
+import { User } from "@/types/User/User";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Tournament } from "@/modules/tournament/domain/Tournament";

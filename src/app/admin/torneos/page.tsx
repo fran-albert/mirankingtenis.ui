@@ -9,7 +9,7 @@ import { getAllTournaments } from "@/modules/tournament/application/get-all-tour
 import { Tournament } from "@/modules/tournament/domain/Tournament";
 import { createApiTournamentRepository } from "@/modules/tournament/infra/ApiTournamentRepository";
 import { getAdminUsers } from "@/modules/users/application/get-all-admin/getAdminUsers";
-import { User } from "@/modules/users/domain/User";
+import { User } from "@/types/User/User";
 import { createApiUserRepository } from "@/modules/users/infra/ApiUserRepository";
 import CategoriesTable from "@/sections/Admin/Categories/Table/table";
 import AdminPlayersTanstackTable from "@/sections/Admin/Players/Table/tanstack";

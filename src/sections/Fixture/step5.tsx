@@ -4,7 +4,7 @@ import { createFixture } from "@/modules/fixture/application/create/createFixtur
 import { createApiFixtureRepository } from "@/modules/fixture/infra/ApiFixtureRepository";
 import { TournamentParticipant } from "@/modules/tournament-participant/domain/TournamentParticipant";
 import { TournamentRanking } from "@/modules/tournament-ranking/domain/TournamentRanking";
-import { User } from "@/modules/users/domain/User";
+import { User } from "@/types/User/User";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";

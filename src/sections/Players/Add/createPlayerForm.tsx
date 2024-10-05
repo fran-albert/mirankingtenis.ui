@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/form";
 import { goBack } from "@/lib/utils";
 import { createUser } from "@/modules/users/application/create/createUser";
-import { User } from "@/modules/users/domain/User";
+import { User } from "@/types/User/User";
 import { createApiUserRepository } from "@/modules/users/infra/ApiUserRepository";
 import axios from "axios";
 import React, { useState } from "react";
@@ -37,6 +37,8 @@ import { UserSchema } from "@/validators/user.schema";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useUserMutations } from "@/hooks/Users/useUserMutation";
+import { State } from "@/types/State/State";
+import { City } from "@/types/City/City";
 
 type FormValues = z.infer<typeof UserSchema>;
 
@@ -45,15 +47,15 @@ function CreatePlayerForm() {
     resolver: zodResolver(UserSchema),
   });
   const { setValue, control } = form;
-  const [selectedState, setSelectedState] = useState(22);
-  const [selectedCity, setSelectedCity] = useState(1961);
+  const [selectedState, setSelectedState] = useState<State | null>(null);
+  const [selectedCity, setSelectedCity] = useState<City | null>(null);
   const [selectedCategory, setSelectedCategory] = useState("");
-  const { addUserMutation } = useUserMutations()
+  const { addUserMutation } = useUserMutations();
 
   async function onSubmit(data: z.infer<typeof UserSchema>) {
     const payload: any = {
-      ...data
-    }
+      ...data,
+    };
     try {
       const playerCreationPromise = addUserMutation.mutateAsync(payload);
       toast.promise(playerCreationPromise, {
@@ -78,6 +80,17 @@ function CreatePlayerForm() {
         });
         console.error("Error al crear el paciente", error);
       }
+    }
+  }
+
+  const handleStateChange = (state: State) => {
+    setSelectedState(state);
+  };
+
+  const handleCityChange = (city: City) => {
+    if (selectedState) {
+      setSelectedCity(city);
+      setValue("idCity", String(city.id));
     }
   };
 
@@ -138,60 +151,66 @@ function CreatePlayerForm() {
                       />
                     </div>
                     <div className="space-y-2">
-                    <FormField
-                      control={form.control}
-                      name="lastname"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-black">Apellido</FormLabel>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              placeholder="Ingresar apellido..."
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                      <FormField
+                        control={form.control}
+                        name="lastname"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-black">
+                              Apellido
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                placeholder="Ingresar apellido..."
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-6">
                     <div className="space-y-2">
-                    <FormField
-                      control={form.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-black">Correo Electrónico</FormLabel>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              placeholder="Ingresar correo electrónico..."
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                      <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-black">
+                              Correo Electrónico
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                placeholder="Ingresar correo electrónico..."
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                     </div>
                     <div className="space-y-2">
-                    <FormField
-                      control={form.control}
-                      name="phone"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-black">Teléfono</FormLabel>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              placeholder="Ingresar teléfono..."
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                      <FormField
+                        control={form.control}
+                        name="phone"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-black">
+                              Teléfono
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                placeholder="Ingresar teléfono..."
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-6">
@@ -204,19 +223,16 @@ function CreatePlayerForm() {
                     <div className="space-y-2">
                       <Label htmlFor="state">Provincia</Label>
                       <StateSelect
-                        selected={Number(selectedState)}
-                        onStateChange={setSelectedState}
+                        control={control}
+                        onStateChange={handleStateChange}
                       />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="city">Localidad</Label>
                       <CitySelect
-                        idState={Number(selectedState)}
-                        selected={String(selectedCity)}
-                        onCityChange={(value) => {
-                          setSelectedCity(Number(value));
-                          setValue("idCity", value);
-                        }}
+                        control={control}
+                        idState={selectedState ? Number(selectedState.id) : 0}
+                        onCityChange={handleCityChange}
                       />
                     </div>
                   </div>

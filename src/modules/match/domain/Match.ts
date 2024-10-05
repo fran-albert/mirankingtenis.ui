@@ -1,7 +1,7 @@
 import { Fixture } from "@/modules/fixture/domain/Fixture";
 import { Sets } from "@/modules/sets/domain/Sets";
 import { Shift } from "@/modules/shift/domain/Shift";
-import { User } from "@/modules/users/domain/User";
+import { User } from "@/types/User/User";
 export interface Match {
   id: number;
   idUser1: any;

@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { PasswordInput } from "@/components/ui/passwordInput";
 import Loading from "@/components/Loading/loading";
 import { Separator } from "@/components/ui/separator";
-import { User } from "@/modules/users/domain/User";
+import { User } from "@/types/User/User";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { useCustomSession } from "@/context/SessionAuthProviders";
 

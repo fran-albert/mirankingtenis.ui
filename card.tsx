@@ -1,5 +1,5 @@
 import { Match } from "@/modules/match/domain/Match";
-import { User } from "@/modules/users/domain/User";
+import { User } from "@/types/User/User";
 import React from "react";
 import { FaEdit, FaPlus } from "react-icons/fa";
 

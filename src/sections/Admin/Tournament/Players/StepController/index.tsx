@@ -1,4 +1,4 @@
-import { User } from "@/modules/users/domain/User";
+import { User } from "@/types/User/User";
 import React, { useEffect, useState } from "react";
 import { Step1 } from "./step1";
 import { Step2 } from "./step2";

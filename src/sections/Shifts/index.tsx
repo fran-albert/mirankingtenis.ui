@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Loading from "@/components/Loading/loading";
 import { DataTable } from "@/components/Table/dataTable";
-import { User } from "@/modules/users/domain/User";
+import { User } from "@/types/User/User";
 import { getAllUsers } from "@/modules/users/application/get-all/getAllUsers";
 import { createApiMatchRepository } from "@/modules/match/infra/ApiMatchRepository";
 import { getAllByDate } from "@/modules/match/application/get-by-date/getAllByDate";

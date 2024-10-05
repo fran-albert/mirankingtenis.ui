@@ -1,6 +1,6 @@
 import axiosInstance from "@/services/axiosConfig";
-import { User } from "../domain/User";
 import { UserRepository } from "../domain/UserRepository";
+import { User } from "@/types/User/User";
 
 export function createApiUserRepository(): UserRepository {
   async function getUser(id: number): Promise<User | undefined> {
