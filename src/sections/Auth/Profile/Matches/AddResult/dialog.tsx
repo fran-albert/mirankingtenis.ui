@@ -215,7 +215,6 @@ export default function AddResultMatchDialog({
                   type="number"
                   {...register("sets.0.pointsPlayer1")}
                   min="0"
-                  max="6"
                   className="col-span-1"
                 />
                 <div className="col-span-1 text-center">-</div>
@@ -224,7 +223,6 @@ export default function AddResultMatchDialog({
                   type="number"
                   {...register("sets.0.pointsPlayer2")}
                   min="0"
-                  max="6"
                   className="col-span-1"
                 />
               </div>
