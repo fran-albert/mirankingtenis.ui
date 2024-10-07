@@ -43,7 +43,6 @@ export default function ClientProfilePage() {
     auth: true,
     id: idUser,
   });
-  console.log(user);
   const { setValue, control } = form;
   const [selectedState, setSelectedState] = useState<State | undefined>(
     user?.state
