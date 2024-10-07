@@ -9,8 +9,10 @@ import { TennisScoreboard } from "@/sections/Matches/TennisScoreBoard/tennisScor
 function ClientMatchesComponent() {
   const [selectedJornada, setSelectedJornada] = useState("1");
   const [selectedCategory, setSelectedCategory] = useState("1");
-  const initialTournamentId = process.env.NODE_ENV === 'production' ? "3" : "45";
-  const [selectedTournament, setSelectedTournament] = useState(initialTournamentId);
+  const initialTournamentId =
+    process.env.NODE_ENV === "production" ? "3" : "45";
+  const [selectedTournament, setSelectedTournament] =
+    useState(initialTournamentId);
   const [jornadas, setJornadas] = useState<number[]>([]);
   const [error, setError] = useState<string | null>(null);
   const fixtureRepository = createApiFixtureRepository();
@@ -38,7 +40,7 @@ function ClientMatchesComponent() {
             Number(selectedCategory),
             Number(selectedTournament)
           );
-
+  
         if (numeroDeJornadas === 0) {
           setError("Esta categoría no tiene fechas disponibles.");
           setJornadas([]);
@@ -49,8 +51,9 @@ function ClientMatchesComponent() {
             (_, i) => i + 1
           );
           setJornadas(jornadasArray);
+          // Solo selecciona la jornada 1 si no hay una jornada seleccionada previamente
           if (!selectedJornada) {
-            setSelectedJornada(String(numeroDeJornadas));
+            setSelectedJornada("1");
           }
           setError(null);
         }
@@ -61,9 +64,11 @@ function ClientMatchesComponent() {
         setSelectedJornada("");
       }
     };
-
+  
     fetchJornadas();
-  }, [selectedCategory, selectedTournament, fixtureRepository]);
+  }, [selectedCategory, selectedTournament, fixtureRepository, selectedJornada]);
+  
+  
 
   useEffect(() => {
     if (selectedCategory && selectedTournament) {
