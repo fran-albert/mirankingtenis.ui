@@ -4,5 +4,5 @@ export interface Shift {
   id: number;
   startHour: string;
   date: Date;
-  court: Court;
+  court: Court | string;
 }

@@ -17,7 +17,7 @@ function MatchesIndex({
   onUpdateMatches: any;
 }) {
   const playersColums = getColumns(onUpdateMatches);
-
+  console.log(match);
   if (window.innerWidth < 768) {
     return (
       <div className="flex flex-col py-2">
@@ -55,7 +55,9 @@ function MatchesIndex({
 
             {!m.isBye && (
               <>
-                <p className="text-gray-600">Cancha: {m.shift?.court?.name}</p>
+                <p className="text-gray-600">
+                  Cancha: {m.shift?.court ? String(m.shift.court) : ""}
+                </p>
                 <p className="text-gray-600">
                   Día y Hora:{" "}
                   {m.shift?.startHour && formatDateComplete(m.shift?.startHour)}
