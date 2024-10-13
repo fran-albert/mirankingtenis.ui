@@ -39,7 +39,11 @@ export const getColumns = (totalRows: number): ColumnDef<Match>[] => {
       accessorKey: "court",
       header: () => <div className="w-10 text-center">Cancha</div>,
       cell: ({ row }) => (
-        <div className="w-10 text-center">{row.original.shift.court.toString()}</div>
+        <div className="w-10 text-center">
+          {typeof row.original.shift.court === "string"
+            ? row.original.shift.court
+            : row.original.shift.court.name}
+        </div>
       ),
     },
     {
