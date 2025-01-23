@@ -16,6 +16,14 @@ import { Button } from "@/components/ui/button";
 import { Search } from "../ui/search";
 import Link from "next/link";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "../ui/pagination";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -91,23 +99,15 @@ export function DataTable<TData, TValue>({
   };
 
   const renderPageNumbers = () => {
-    const pages = [];
-    for (let i = 0; i < pageCount; i++) {
-      pages.push(
-        <Button
-          key={i}
-          variant="outline"
-          size="sm"
-          onClick={() => handlePageChange(i)}
-          className={`transition duration-150 ease-in-out ${pagination.pageIndex === i
-            ? "bg-slate-700 text-white"
-            : "bg-white text-slate-500"
-            } hover:bg-slate-500 hover:text-white focus:outline-none mx-1`}
-        >
-          {i + 1}
-        </Button>
-      );
+    const pages: number[] = [];
+    const { pageIndex } = pagination;
+    const startPage = Math.max(0, pageIndex - 2);
+    const endPage = Math.min(pageCount - 1, pageIndex + 2);
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
     }
+
     return pages;
   };
 
@@ -124,7 +124,7 @@ export function DataTable<TData, TValue>({
           {canAddUser && (
             <Button
               className="ml-4 bg-slate-700"
-              onClick={onAddClick ? onAddClick : () => { }}
+              onClick={onAddClick ? onAddClick : () => {}}
             >
               <Link href={addLinkPath}>{addLinkText}</Link>
             </Button>
@@ -149,7 +149,7 @@ export function DataTable<TData, TValue>({
                           header.getContext()
                         )}
                         {header.column.getIsSorted() === "asc" ? (
-                          <FaAngleUp  className="ml-2" />
+                          <FaAngleUp className="ml-2" />
                         ) : header.column.getIsSorted() === "desc" ? (
                           <FaAngleDown className="ml-2" />
                         ) : (
@@ -162,14 +162,14 @@ export function DataTable<TData, TValue>({
               ))}
             </thead>
 
-
             <tbody className="text-gray-700">
               {table.getRowModel().rows.length ? (
                 table.getRowModel().rows.map((row) => (
                   <tr
                     key={row.id}
-                    className={`${row.getIsSelected() ? "bg-teal-100" : "hover:bg-gray-50"
-                      } transition duration-150 ease-in-out`}
+                    className={`${
+                      row.getIsSelected() ? "bg-teal-100" : "hover:bg-gray-50"
+                    } transition duration-150 ease-in-out`}
                   >
                     {row.getVisibleCells().map((cell) => (
                       <td
@@ -199,8 +199,55 @@ export function DataTable<TData, TValue>({
         </div>
       </div>
 
-      <div className="flex items-center justify-center space-x-2 py-4">
-        {renderPageNumbers()}
+      <div className="flex justify-between items-center mt-4">
+        <Pagination className="mt-6 justify-end px-4 py-2">
+          <PaginationContent>
+            {/* Botón para la página anterior */}
+            <PaginationPrevious
+              onClick={() => {
+                if (pagination.pageIndex > 0) {
+                  handlePageChange(pagination.pageIndex - 1);
+                }
+              }}
+              aria-disabled={pagination.pageIndex === 0}
+              className={`cursor-pointer text-slate-800 hover:text-slate-900 ${
+                pagination.pageIndex === 0
+                  ? "cursor-not-allowed opacity-50"
+                  : ""
+              }`}
+            />
+
+            {/* Números de páginas */}
+            {renderPageNumbers().map((pageNumber, index) => (
+              <PaginationItem key={index}>
+                <PaginationLink
+                  isActive={pageNumber === pagination.pageIndex}
+                  onClick={() => handlePageChange(pageNumber)}
+                  className={`cursor-pointer text-slate-800 hover:text-slate-900 ${
+                    pageNumber === pagination.pageIndex ? "font-bold" : ""
+                  }`}
+                >
+                  {pageNumber + 1}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+
+            {/* Botón para la página siguiente */}
+            <PaginationNext
+              onClick={() => {
+                if (pagination.pageIndex < pageCount - 1) {
+                  handlePageChange(pagination.pageIndex + 1);
+                }
+              }}
+              aria-disabled={pagination.pageIndex === pageCount - 1}
+              className={`cursor-pointer text-slate-800 hover:text-slate-900 ${
+                pagination.pageIndex === pageCount - 1
+                  ? "cursor-not-allowed opacity-50"
+                  : ""
+              }`}
+            />
+          </PaginationContent>
+        </Pagination>
       </div>
     </>
   );

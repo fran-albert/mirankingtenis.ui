@@ -11,7 +11,6 @@ import { useMatches } from "@/hooks/Matches/useMatches";
 
 export const ShiftManagement = () => {
   const {MatchesByDate: matches, errorMatchesByDate, isLoadingMatchesByDate: isLoading} = useMatches({})
-  console.log(matches)
   if (isLoading) {
     return <Loading isLoading />;
   }
