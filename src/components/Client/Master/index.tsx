@@ -11,6 +11,7 @@ import { FixtureGroupStage } from "@/sections/Master/Fixture";
 
 function ClientMasterComponent() {
   const [selectedCategory, setSelectedCategory] = useState("1");
+  const [selectedTournament, setSelectedTournament] = useState("2");
   const { groupFixture, findMatchesByGroupStage, clearMatches } =
     useMatchStore();
   const {
@@ -45,20 +46,20 @@ function ClientMasterComponent() {
       try {
         setIsLoading(true);
         const groupStageId = await getGroupStagesByTournamentCategory(
-          2,
+          Number(selectedTournament),
           Number(selectedCategory)
         );
         setGroupStageId(groupStageId);
         await updateMatches(groupStageId);
       } catch (error) {
-        const axiosError = error as AxiosError;
-        console.error(axiosError);
+        console.error(error);
       } finally {
         setIsLoading(false);
       }
     };
+
     fetchGroupStageId();
-  }, [selectedCategory]);
+  }, [selectedCategory, selectedTournament]);
 
   useEffect(() => {
     if (groupStageId !== null) {
@@ -75,10 +76,12 @@ function ClientMasterComponent() {
   return (
     <div>
       <FiltersMaster
+        onSelectTournament={(value) => setSelectedTournament(value)}
         onSelectCategory={(value) => setSelectedCategory(value)}
-        selectedTournament={"2"}
+        selectedTournament={selectedTournament}
         selectedCategory={selectedCategory}
       />
+
       <div className="flex justify-center w-full px-4 lg:px-0 mt-10">
         <div className="w-full max-w-7xl space-y-6">
           <div>
