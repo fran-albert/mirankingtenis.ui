@@ -27,7 +27,7 @@ export default function Home({
             Dobles Express
           </h1>
         </div>
-        {doublesMatches.length < 0 && (
+        {doublesMatches.length <= 0 && (
           <div className="space-y-4">
             <Link href="/turnos" className="w-full block">
               <Button
