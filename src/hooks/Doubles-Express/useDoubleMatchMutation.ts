@@ -30,20 +30,20 @@ export const useDoubleMatchMutations = () => {
         console.error("Error: matchId no está definido en variables.");
         return;
       }
-  
+
       // 🔥 ACTUALIZAR LA CACHÉ DE REACT QUERY
       queryClient.setQueryData(["doubleMatch", variables.matchId], updatedMatch);
-  
+
       // 🔄 Invalidar la lista global de partidos
       queryClient.invalidateQueries({ queryKey: ["doublesMatches"] });
-  
+
       // 🔄 Refetchear manualmente los datos
       queryClient.refetchQueries({ queryKey: ["doubleMatch", variables.matchId] });
     },
 
     onError: (error: unknown) => {
       const axiosError = error as AxiosError; // 🔥 Convertir error a AxiosError
-  
+
       console.error(
         "❌ Error al agregar jugadores:",
         axiosError.response?.data || axiosError.message
@@ -54,7 +54,7 @@ export const useDoubleMatchMutations = () => {
 
 
   const registerPlayerToMatchMutation = useMutation({
-    mutationFn: ({ matchId, body }: { matchId: number; body: IRegisterPlayer }) => registerPlayerToMatch(matchId, body),
+    mutationFn: ({ matchId, body }: { matchId: number; body: any }) => registerPlayerToMatch(matchId, body),
     onSuccess: (doublesMatches, variables, context) => {
       queryClient.invalidateQueries({ queryKey: ['doublesMatches'] });
       console.log("doublesMatches created", doublesMatches, variables, context);

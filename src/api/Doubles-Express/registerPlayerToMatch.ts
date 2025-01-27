@@ -6,7 +6,7 @@ export interface IRegisterPlayer {
     players: { playerId: number; slot: number }[];
 }
 
-export const registerPlayerToMatch = async (matchId: number, body: IRegisterPlayer) => {
+export const registerPlayerToMatch = async (matchId: number, body: any) => {
     try {
         const { data } = await axiosInstance.post<DoublesExhibitionMatchRequest>(`doubles-exhibition-match/${matchId}/register`, body);
         return data;

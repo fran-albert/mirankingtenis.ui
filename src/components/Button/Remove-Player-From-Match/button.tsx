@@ -20,7 +20,7 @@ function RemovePlayerFromMatchButton({
     removePlayerFromMatchMutation.mutate(
       { matchId, playerId },
       {
-        onSuccess: (response: string | DoublesExhibitionMatchResponse) => {
+        onSuccess: (response: string | any) => {
           if (typeof response === "string") {
             console.log("Player removed successfully:", response);
             return;
@@ -29,12 +29,7 @@ function RemovePlayerFromMatchButton({
           // Buscar en qué slot estaba el jugador
           const updatedPlayers = Object.keys(response)
             .filter((key) => key.startsWith("player"))
-            .map(
-              (key) =>
-                response[
-                  key as keyof DoublesExhibitionMatchResponse
-                ] as User | null
-            )
+            .map((key) => response[key as keyof any] as User | null)
             .map((player, index) => ({
               id: player ? player.id : null,
               name: player ? `${player.name} ${player.lastname}` : null,
