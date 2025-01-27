@@ -1,60 +1,142 @@
-import React from "react";
-import { Button } from "@/components/ui/button";
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import moment from "moment";
 
-interface DialogDemoProps {
-  selectedSlot: any;
+interface ReserveDialogProps {
+  open: boolean;
   onClose: () => void;
+  selectedSlot: { start: Date; end: Date } | null;
+  onReserve: () => void;
+  jugadoresDisponibles: { id: number; name: string; lastname: string }[];
+  jugadores: number[];
+  handleJugadorChange: (index: number, value: number) => void;
+  court: string;
+  sessionUser: any;
 }
+export const CreateDoubleMatch: React.FC<ReserveDialogProps> = ({
+  open,
+  onClose,
+  selectedSlot,
+  court,
+  onReserve,
+  jugadoresDisponibles,
+  jugadores,
+  handleJugadorChange,
+  sessionUser,
+}) => {
+  const [selectedPlayers, setSelectedPlayers] = useState<number[]>(jugadores);
 
-export function DialogDemo({ selectedSlot, onClose }: DialogDemoProps) {
-  const start = selectedSlot?.start ? new Date(selectedSlot.start).toLocaleString() : '';
-  const end = selectedSlot?.end ? new Date(selectedSlot.end).toLocaleString() : '';
+  useEffect(() => {
+    if (!open) {
+      setSelectedPlayers([0, 0, 0]);
+    }
+  }, [open]);
 
   return (
-    <Dialog open onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Crear Nuevo Evento</DialogTitle>
+          <DialogTitle>Crear Partido Dobles Express</DialogTitle>
           <DialogDescription>
-            Ingresa los detalles del nuevo evento y haz clic en guardar cuando hayas terminado.
+            Selecciona los jugadores para el partido (opcional).
           </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="name" className="text-right">
-              Nombre del Evento
+        <div className="grid gap-4">
+          <div className="grid grid-cols-2 items-center gap-4">
+            <Label htmlFor="fecha-hora" className="text-right mb-2 block">
+              {moment(selectedSlot?.start).format("LL")} -{" "}
+              {moment(selectedSlot?.start).format("HH:mm")}
             </Label>
-            <Input id="name" className="col-span-3" />
+            <div>
+              <Label htmlFor="court" className="text-right mb-2 block">
+                {court}
+              </Label>
+            </div>
           </div>
+
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="start" className="text-right">
-              Inicio
+            <Label htmlFor="jugador-1" className="text-right">
+              Jugador 1
             </Label>
-            <Input id="start" value={start} readOnly className="col-span-3" />
+            <div className="col-span-3 font-medium">
+              {sessionUser.lastname}, {sessionUser.name}
+            </div>
           </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="end" className="text-right">
-              Fin
-            </Label>
-            <Input id="end" value={end} readOnly className="col-span-3" />
-          </div>
+
+          {[0, 1, 2].map((index) => (
+            <div key={index} className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor={`jugador-${index + 2}`} className="text-right">
+                Jugador {index + 2}
+              </Label>
+              <Select
+                onValueChange={(value) => {
+                  const newPlayers = [...selectedPlayers];
+                  newPlayers[index] = Number(value);
+                  setSelectedPlayers(newPlayers);
+                  handleJugadorChange(index, Number(value));
+                }}
+                value={
+                  selectedPlayers[index] ? String(selectedPlayers[index]) : ""
+                }
+              >
+                <SelectTrigger className="col-span-3">
+                  <SelectValue
+                    placeholder={`Seleccionar jugador ${index + 1}`}
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {jugadoresDisponibles.length > 0 ? (
+                    jugadoresDisponibles
+                      .filter(
+                        (jugador) =>
+                          jugador.id === selectedPlayers[index] ||
+                          (jugador.id !== sessionUser.id &&
+                            !selectedPlayers.includes(jugador.id))
+                      )
+                      .map((jugador) => (
+                        <SelectItem
+                          key={jugador.id}
+                          value={jugador.id.toString()}
+                        >
+                          {jugador.lastname}, {jugador.name}
+                        </SelectItem>
+                      ))
+                  ) : (
+                    <p>No hay jugadores disponibles</p>
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+          ))}
         </div>
         <DialogFooter>
-          <Button type="submit" onClick={onClose}>
-            Guardar Evento
+          <Button
+            type="submit"
+            onClick={() => {
+              onReserve();
+              onClose();
+            }}
+          >
+            Crear Partido
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
   );
-}
+};

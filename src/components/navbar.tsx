@@ -28,6 +28,7 @@ export default function Navbar() {
     { name: "Jugadores", href: "/jugadores", current: false },
     { name: "Ranking", href: "/ranking", current: false },
     { name: "Partidos", href: "/partidos", current: false },
+    { name: "Dobles Express", href: "/dobles-express", current: false },
     { name: "Turnos", href: "/turnos", current: false },
   ]);
 
@@ -37,6 +38,7 @@ export default function Navbar() {
       { name: "Jugadores", href: "/jugadores", current: false },
       { name: "Ranking", href: "/ranking", current: false },
       { name: "Partidos", href: "/partidos", current: false },
+      { name: "Dobles Express", href: "/dobles-express", current: false },
       { name: "Turnos", href: "/turnos", current: false },
     ];
 

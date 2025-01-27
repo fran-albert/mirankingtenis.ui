@@ -7,7 +7,7 @@ const useRoles = () => {
   const isPlayer = session?.user?.roles?.includes(Role.JUGADOR);
   const isAdmin = session?.user?.roles?.includes(Role.ADMINISTRADOR);
 
-  return { isPlayer, isAdmin };
+  return { isPlayer, isAdmin, session };
 };
 
 export default useRoles;

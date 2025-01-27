@@ -8,13 +8,31 @@ import { getAllByDate } from "@/modules/match/application/get-by-date/getAllByDa
 import { Match } from "@/modules/match/domain/Match";
 import { ShiftCalendar } from "./Calendar";
 import { useMatches } from "@/hooks/Matches/useMatches";
+import { useUser } from "@/hooks/Users/useUser";
+import { useUsers } from "@/hooks/Users/useUsers";
+import { useDoublesMatches } from "@/hooks/Doubles-Express/useDoublesMatches";
 
 export const ShiftManagement = () => {
-  const {MatchesByDate: matches, errorMatchesByDate, isLoadingMatchesByDate: isLoading} = useMatches({})
-  console.log(matches)
-  if (isLoading) {
+  const {
+    MatchesByDate: matches,
+    errorMatchesByDate,
+    isLoadingMatchesByDate: isLoading,
+  } = useMatches({});
+  const { doublesMatches, isLoading: isLoadingDoubleMatches } =
+    useDoublesMatches({ auth: true, fetchMatches: true });
+  const { isLoading: isLoadingUsers, users } = useUsers({
+    auth: true,
+    fetchUsers: true,
+  });
+  if (isLoading || isLoadingUsers || isLoadingDoubleMatches) {
     return <Loading isLoading />;
   }
 
-  return <ShiftCalendar matches={matches} />;
+  return (
+    <ShiftCalendar
+      matches={matches}
+      players={users}
+      doublesMatches={doublesMatches}
+    />
+  );
 };
