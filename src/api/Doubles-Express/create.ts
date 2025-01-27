@@ -1,9 +1,9 @@
 import axiosInstance from "@/services/axiosConfig";
-import { DoublesExhibitionMatch } from "@/types/Double-Match/DoublesExhibitionMatch";
+import { DoublesExhibitionMatchRequest } from "@/types/Double-Match/DoublesExhibitionMatch";
 
-export const create = async (match: DoublesExhibitionMatch) => {
+export const create = async (match: DoublesExhibitionMatchRequest) => {
     try {
-        const { data } = await axiosInstance.post<DoublesExhibitionMatch>(`doubles-exhibition-match`, match);
+        const { data } = await axiosInstance.post<DoublesExhibitionMatchRequest>(`doubles-exhibition-match`, match);
         return data;
     } catch (error: any) {
         throw error || "Error desconocido";
