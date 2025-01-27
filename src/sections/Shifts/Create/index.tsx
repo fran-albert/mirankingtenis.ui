@@ -5,7 +5,6 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-  DialogTrigger,
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";

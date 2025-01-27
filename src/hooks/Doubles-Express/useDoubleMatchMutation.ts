@@ -1,7 +1,9 @@
+import { addPlayerToDoublesMatch } from "@/api/Doubles-Express/addPlayersToDoublesMatch";
 import { create } from "@/api/Doubles-Express/create";
 import { IRegisterPlayer, registerPlayerToMatch } from "@/api/Doubles-Express/registerPlayerToMatch";
 import { removePlayerMatch } from "@/api/Doubles-Express/removePlayerMatch";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { AxiosError } from "axios";
 
 
 export const useDoubleMatchMutations = () => {
@@ -18,6 +20,38 @@ export const useDoubleMatchMutations = () => {
       console.log("Error details:", error.response?.data || error.message, variables, context);
     },
   });
+
+  const addPlayerToDoublesMatchesMutation = useMutation({
+    mutationFn: ({ matchId, players }: { matchId: number; players: any }) =>
+      addPlayerToDoublesMatch(matchId, players),
+
+    onSuccess: (updatedMatch, variables) => {
+      if (!variables?.matchId) {
+        console.error("Error: matchId no está definido en variables.");
+        return;
+      }
+  
+      // 🔥 ACTUALIZAR LA CACHÉ DE REACT QUERY
+      queryClient.setQueryData(["doubleMatch", variables.matchId], updatedMatch);
+  
+      // 🔄 Invalidar la lista global de partidos
+      queryClient.invalidateQueries({ queryKey: ["doublesMatches"] });
+  
+      // 🔄 Refetchear manualmente los datos
+      queryClient.refetchQueries({ queryKey: ["doubleMatch", variables.matchId] });
+    },
+
+    onError: (error: unknown) => {
+      const axiosError = error as AxiosError; // 🔥 Convertir error a AxiosError
+  
+      console.error(
+        "❌ Error al agregar jugadores:",
+        axiosError.response?.data || axiosError.message
+      );
+    },
+  });
+
+
 
   const registerPlayerToMatchMutation = useMutation({
     mutationFn: ({ matchId, body }: { matchId: number; body: IRegisterPlayer }) => registerPlayerToMatch(matchId, body),
@@ -45,5 +79,5 @@ export const useDoubleMatchMutations = () => {
 
 
 
-  return { addDoublesMatchesMutation, registerPlayerToMatchMutation, removePlayerFromMatchMutation };
+  return { addDoublesMatchesMutation, registerPlayerToMatchMutation, removePlayerFromMatchMutation, addPlayerToDoublesMatchesMutation };
 };

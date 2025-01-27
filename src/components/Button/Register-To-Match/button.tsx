@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useDoubleMatchMutations } from "@/hooks/Doubles-Express/useDoubleMatchMutation";
+import { useQueryClient } from "@tanstack/react-query";
 import { User } from "@/types/User/User";
 
 interface RegisterToMatchButtonProps {
@@ -15,6 +16,7 @@ function RegisterToMatchButton({
   playerId,
   setPlayers,
 }: RegisterToMatchButtonProps) {
+  const queryClient = useQueryClient();
   const { registerPlayerToMatchMutation } = useDoubleMatchMutations();
 
   const handleRegister = () => {
@@ -22,9 +24,8 @@ function RegisterToMatchButton({
       { matchId, body: { playerId, slot } },
       {
         onSuccess: (updatedMatch: any) => {
-          // Accedemos dinámicamente al jugador usando `as keyof`
           const playerKey = `player${slot}` as keyof any;
-          const updatedPlayer = updatedMatch[playerKey] as User | null; // Hacemos un type assertion
+          const updatedPlayer = updatedMatch[playerKey] as User | null;
 
           if (
             updatedPlayer &&
@@ -43,6 +44,9 @@ function RegisterToMatchButton({
               )
             );
           }
+
+          // 🔥 Invalidamos y refetcheamos la consulta para actualizar `doubleMatch`
+          queryClient.invalidateQueries({ queryKey: ["doubleMatch", matchId] });
         },
       }
     );
