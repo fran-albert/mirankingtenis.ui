@@ -21,6 +21,7 @@ import moment from "moment";
 import { useDoubleMatchMutations } from "@/hooks/Doubles-Express/useDoubleMatchMutation";
 import { useQueryClient } from "@tanstack/react-query";
 import "moment/locale/es";
+import { toast } from "sonner";
 moment.locale("es");
 interface Props {
   matchId: number;
@@ -74,8 +75,9 @@ export const AddPlayersToMatchButton: React.FC<Props> = ({
     if (playersToSend.length > 0) {
       const payload = { matchId, players: { players: playersToSend } };
 
-      addPlayerToDoublesMatchesMutation.mutate(payload, {
-        onSuccess: (updatedMatch) => {
+      toast.promise(addPlayerToDoublesMatchesMutation.mutateAsync(payload), {
+        loading: "Agregando jugadores al partido...",
+        success: (updatedMatch) => {
           setSelectedPlayers([
             updatedMatch.player1Id || 0,
             updatedMatch.player2Id || 0,
@@ -86,7 +88,10 @@ export const AddPlayersToMatchButton: React.FC<Props> = ({
           queryClient.refetchQueries({ queryKey: ["doubleMatch", matchId] });
 
           onClose();
+
+          return "Jugadores agregados correctamente 🎾";
         },
+        error: "Hubo un error al agregar los jugadores. Intenta de nuevo.",
       });
     }
   };
@@ -137,12 +142,14 @@ export const AddPlayersToMatchButton: React.FC<Props> = ({
                 <Select
                   onValueChange={(value) => {
                     const newPlayers = [...selectedPlayers];
-                    newPlayers[index] = Number(value);
+                    newPlayers[index] = Number(value); 
                     setSelectedPlayers(newPlayers);
                     handleJugadorChange(index, Number(value));
                   }}
                   value={
-                    selectedPlayers[index] ? String(selectedPlayers[index]) : ""
+                    selectedPlayers[index]
+                      ? String(selectedPlayers[index])
+                      : "0"
                   }
                   disabled={isDisabled}
                 >
@@ -157,6 +164,7 @@ export const AddPlayersToMatchButton: React.FC<Props> = ({
                   </SelectTrigger>
 
                   <SelectContent>
+                    <SelectItem value="0">Ninguno</SelectItem>
                     {getAvailablePlayers(index).map((jugador) => (
                       <SelectItem
                         key={jugador.id}
