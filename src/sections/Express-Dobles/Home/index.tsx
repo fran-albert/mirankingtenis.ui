@@ -26,6 +26,14 @@ export default function Home({
           <h1 className="text-4xl font-semibold text-foreground">
             Dobles Express
           </h1>
+          <Link href="/turnos" className=" block">
+            <Button
+              className="mt-6 text-sm bg-slate-800 hover:bg-slate-900"
+              size="sm"
+            >
+              Nuevo partido
+            </Button>
+          </Link>
         </div>
         {doublesMatches.length <= 0 && (
           <div className="space-y-4">

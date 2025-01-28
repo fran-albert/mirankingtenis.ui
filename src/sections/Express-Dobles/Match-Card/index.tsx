@@ -6,6 +6,7 @@ import RemovePlayerFromMatchButton from "@/components/Button/Remove-Player-From-
 import { AddPlayersToMatchButton } from "@/components/Button/Add-Players-To-Match/button";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import useRoles from "@/hooks/useRoles";
 
 interface Player {
   category: string;
@@ -125,7 +126,7 @@ export default function MatchCard({
               setJugadoresSeleccionados(
                 players
                   .map((p) => p.id)
-                  .filter((id): id is number => id !== null) 
+                  .filter((id): id is number => id !== null)
               );
               setShowDialog(true);
             }}
@@ -178,7 +179,7 @@ function PlayerRow({
   const canSignOff = isAdmin || isCurrentUser;
   const isAlreadyInMatch = matchPlayers.includes(authenticatedUserId);
   const isSlotAvailable = !player.name;
-
+  const { session } = useRoles();
   return (
     <div className="flex justify-between items-center gap-2">
       <div className="flex items-center gap-2">
@@ -197,7 +198,7 @@ function PlayerRow({
               setPlayers={setPlayers}
             />
           ) : null
-        ) : !isAlreadyInMatch ? (
+        ) : !isAlreadyInMatch && session ? (
           <RegisterToMatchButton
             matchId={matchId}
             slot={slot}
