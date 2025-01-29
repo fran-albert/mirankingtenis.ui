@@ -7,6 +7,10 @@ import { AddPlayersToMatchButton } from "@/components/Button/Add-Players-To-Matc
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import useRoles from "@/hooks/useRoles";
+import { Pencil } from "lucide-react";
+import { EditDoubleMatchDialog } from "../Edit-Shift/button";
+import { useDoubleMatch } from "@/hooks/Doubles-Express/useDoubleMatch";
+import { DoublesExhibitionMatchResponse } from "@/types/Double-Match/DoublesExhibitionMatch";
 
 interface Player {
   category: string;
@@ -38,14 +42,18 @@ export default function MatchCard({
 }: MatchCardProps) {
   const [showDialog, setShowDialog] = useState(false);
   const matchId = parseInt(id.substring(1));
+  const [selectedDoubleMatch, setSelectedDoubleMatch] =
+    useState<DoublesExhibitionMatchResponse | null>(null);
   const [selectedMatchId, setSelectedMatchId] = useState<number | null>(null);
   const [localPlayers, setPlayers] = useState(players);
+  const [showEditDialog, setShowEditDialog] = useState(false);
   const matchPlayers = players
     .map((player) => player.id)
     .filter((id): id is number => id !== null);
   const [jugadoresSeleccionados, setJugadoresSeleccionados] = useState<
     number[]
   >([]);
+  const { doubleMatch } = useDoubleMatch({ auth: true, id: matchId });
   const isUserRegistered = matchPlayers.includes(authenticatedUserId);
   const registeredPlayersCount = localPlayers.filter(
     (player) => player.name !== null
@@ -57,6 +65,13 @@ export default function MatchCard({
       return newJugadores;
     });
   };
+
+  const handleOpenEditDialog = () => {
+    if (doubleMatch) {
+      setSelectedDoubleMatch(doubleMatch); // Guardar el partido que se quiere editar
+      setShowEditDialog(true);
+    }
+  };
   useEffect(() => {
     setPlayers(players);
   }, [players]);
@@ -64,8 +79,18 @@ export default function MatchCard({
   return (
     <Card className="w-full max-w-sm overflow-hidden">
       <CardContent className="p-0">
-        <div className="bg-slate-700 text-white p-3 text-center font-bold border-b">
-          PARTIDO {id}
+        <div className="bg-slate-700 text-white p-3 text-center font-bold border-b flex justify-between items-center">
+          <span>PARTIDO {id}</span>
+          {(isAdmin || isUserRegistered) && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-white"
+              onClick={handleOpenEditDialog}
+            >
+              <Pencil size={16} />
+            </Button>
+          )}
         </div>
         <div className="grid divide-y divide-gray-200">
           <div className="grid grid-cols-[auto,1fr]">
@@ -81,7 +106,6 @@ export default function MatchCard({
             <div className="p-2">{court}</div>
           </div>
           <div className="grid grid-cols-[auto,1fr]">
-            <div className="p-2 font-bold border-r border-gray-200">CAT</div>
             <div className="p-2">Nombre y Apellido</div>
           </div>
           <div className="grid grid-cols-1 divide-y divide-gray-200">
@@ -154,6 +178,13 @@ export default function MatchCard({
           </Button>
         </CardFooter>
       )}
+      {selectedDoubleMatch && (
+        <EditDoubleMatchDialog
+          open={showEditDialog}
+          onClose={() => setShowEditDialog(false)}
+          doubleMatch={selectedDoubleMatch}
+        />
+      )}
     </Card>
   );
 }
@@ -183,9 +214,6 @@ function PlayerRow({
   return (
     <div className="flex justify-between items-center gap-2">
       <div className="flex items-center gap-2">
-        {!isSlotAvailable && (
-          <span className="font-bold">{player.category}</span>
-        )}
         <span>{player.name || "Disponible"}</span>
       </div>
 
