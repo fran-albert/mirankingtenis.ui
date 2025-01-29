@@ -80,11 +80,11 @@ export default function MatchCard({
     <Card className="w-full max-w-sm overflow-hidden">
       <CardContent className="p-0">
         <div className="bg-slate-700 text-white p-3 text-center font-bold border-b flex justify-between items-center">
-          <span>PARTIDO {id}</span>
+          <span>PARTIDO {matchId}D</span>
           {(isAdmin || isUserRegistered) && (
             <Button
               variant="ghost"
-              size="sm"
+              size="default"
               className="text-white"
               onClick={handleOpenEditDialog}
             >
