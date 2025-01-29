@@ -34,30 +34,18 @@ export const EditDoubleMatchDialog: React.FC<EditMatchDialogProps> = ({
 }) => {
   const { handleSubmit, setValue } = useForm();
   const { updateShiftDoubleMatch } = useShiftMutation();
-
   const [selectedCourt, setSelectedCourt] = useState<string>(
-    doubleMatch.shift.court.id.toString()
+    doubleMatch?.shift?.court?.id?.toString() || "1"
   );
+  
   const [newDate, setNewDate] = useState<string>(
-    doubleMatch.shift.startHour.split("T")[0]
+    doubleMatch?.shift?.startHour ? doubleMatch.shift.startHour.split(" ")[0] : ""
   );
+  
   const [newTime, setNewTime] = useState<string>(
-    doubleMatch.shift.startHour.split("T")[1].substring(0, 5)
+    doubleMatch?.shift?.startHour ? doubleMatch.shift.startHour.split(" ")[1].substring(0, 5) : ""
   );
-
-  useEffect(() => {
-    setSelectedCourt(doubleMatch.shift.court.id.toString());
-    setNewDate(doubleMatch.shift.startHour.split("T")[0]);
-    setNewTime(doubleMatch.shift.startHour.split("T")[1].substring(0, 5));
-  }, [doubleMatch]);
-
-  useEffect(() => {
-    if (doubleMatch) {
-      setSelectedCourt(doubleMatch.shift.court.id.toString());
-      setNewDate(doubleMatch.shift.startHour.split("T")[0]);
-      setNewTime(doubleMatch.shift.startHour.split("T")[1].substring(0, 5));
-    }
-  }, [doubleMatch]);
+  
   const handleCourtSelection = (value: string) => {
     if (selectedCourt !== value) {
       setSelectedCourt(value);
