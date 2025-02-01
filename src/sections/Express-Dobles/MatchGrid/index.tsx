@@ -19,13 +19,14 @@ import { User } from "@/types/User/User";
 
 const transformMatches = (apiMatches: DoublesExhibitionMatchResponse[]) => {
   return apiMatches.map((match) => {
-    const startDate = new Date(match.shift.startHour);
-    const formattedDate = format(startDate, "EEEE, d 'de' MMMM", {
-      locale: es,
-    });
-    const formattedTime = format(startDate, "HH:mm 'horas'");
+    const startDate = match.shift ? new Date(match.shift.startHour) : null;
+    const formattedDate = startDate
+      ? format(startDate, "EEEE, d 'de' MMMM", { locale: es })
+      : "Fecha desconocida";
+    const formattedTime = startDate ? format(startDate, "HH:mm 'horas'") : "Hora desconocida";
+
     const courtName =
-      typeof match.shift.court === "object" && match.shift.court !== null
+      match.shift && typeof match.shift.court === "object"
         ? `Cancha ${match.shift.court.name}`
         : "Cancha Desconocida";
 
@@ -38,35 +39,28 @@ const transformMatches = (apiMatches: DoublesExhibitionMatchResponse[]) => {
         {
           id: match.player1 ? match.player1.id : null,
           category: "A",
-          name: match.player1
-            ? `${match.player1.name} ${match.player1.lastname}`
-            : null,
+          name: match.player1 ? `${match.player1.name} ${match.player1.lastname}` : null,
         },
         {
           id: match.player2 ? match.player2.id : null,
           category: "B",
-          name: match.player2
-            ? `${match.player2.name} ${match.player2.lastname}`
-            : null,
+          name: match.player2 ? `${match.player2.name} ${match.player2.lastname}` : null,
         },
         {
           id: match.player3 ? match.player3.id : null,
           category: "C",
-          name: match.player3
-            ? `${match.player3.name} ${match.player3.lastname}`
-            : null,
+          name: match.player3 ? `${match.player3.name} ${match.player3.lastname}` : null,
         },
         {
           id: match.player4 ? match.player4.id : null,
           category: "D",
-          name: match.player4
-            ? `${match.player4.name} ${match.player4.lastname}`
-            : null,
+          name: match.player4 ? `${match.player4.name} ${match.player4.lastname}` : null,
         },
       ],
     };
   });
 };
+
 
 const MATCHES_PER_PAGE = 6;
 
