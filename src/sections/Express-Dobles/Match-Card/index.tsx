@@ -7,10 +7,11 @@ import { AddPlayersToMatchButton } from "@/components/Button/Add-Players-To-Matc
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import useRoles from "@/hooks/useRoles";
-import { Pencil } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import { EditDoubleMatchDialog } from "../Edit-Shift/button";
 import { useDoubleMatch } from "@/hooks/Doubles-Express/useDoubleMatch";
 import { DoublesExhibitionMatchResponse } from "@/types/Double-Match/DoublesExhibitionMatch";
+import { DeleteDoubleMatchDialog } from "../Delete-Match/button";
 
 interface Player {
   category: string;
@@ -47,6 +48,7 @@ export default function MatchCard({
   const [selectedMatchId, setSelectedMatchId] = useState<number | null>(null);
   const [localPlayers, setPlayers] = useState(players);
   const [showEditDialog, setShowEditDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const matchPlayers = players
     .map((player) => player.id)
     .filter((id): id is number => id !== null);
@@ -68,8 +70,15 @@ export default function MatchCard({
 
   const handleOpenEditDialog = () => {
     if (doubleMatch) {
-      setSelectedDoubleMatch(doubleMatch); // Guardar el partido que se quiere editar
+      setSelectedDoubleMatch(doubleMatch);
       setShowEditDialog(true);
+    }
+  };
+
+  const handleOpenDeleteDialog = () => {
+    if (doubleMatch) {
+      setSelectedDoubleMatch(doubleMatch);
+      setShowDeleteDialog(true);
     }
   };
   useEffect(() => {
@@ -82,14 +91,24 @@ export default function MatchCard({
         <div className="bg-slate-700 text-white p-3 text-center font-bold border-b flex justify-between items-center">
           <span>PARTIDO {matchId}D</span>
           {(isAdmin || isUserRegistered) && (
-            <Button
-              variant="ghost"
-              size="default"
-              className="text-white"
-              onClick={handleOpenEditDialog}
-            >
-              <Pencil size={16} />
-            </Button>
+            <div className="flex space-x-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-white"
+                onClick={handleOpenEditDialog}
+              >
+                <Pencil size={16} />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleOpenDeleteDialog}
+                className="text-red-500 hover:text-red-700"
+              >
+                <Trash2 size={16} />
+              </Button>
+            </div>
           )}
         </div>
         <div className="grid divide-y divide-gray-200">
@@ -179,11 +198,18 @@ export default function MatchCard({
         </CardFooter>
       )}
       {selectedDoubleMatch && (
-        <EditDoubleMatchDialog
-          open={showEditDialog}
-          onClose={() => setShowEditDialog(false)}
-          doubleMatch={selectedDoubleMatch}
-        />
+        <>
+          <EditDoubleMatchDialog
+            open={showEditDialog}
+            onClose={() => setShowEditDialog(false)}
+            doubleMatch={selectedDoubleMatch}
+          />
+          <DeleteDoubleMatchDialog
+            open={showDeleteDialog}
+            onClose={() => setShowDeleteDialog(false)}
+            doubleMatch={selectedDoubleMatch}
+          />
+        </>
       )}
     </Card>
   );

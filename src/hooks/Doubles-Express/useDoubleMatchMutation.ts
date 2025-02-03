@@ -1,5 +1,6 @@
 import { addPlayerToDoublesMatch } from "@/api/Doubles-Express/addPlayersToDoublesMatch";
 import { create } from "@/api/Doubles-Express/create";
+import { deleteDoubleMatch } from "@/api/Doubles-Express/delete";
 import { IRegisterPlayer, registerPlayerToMatch } from "@/api/Doubles-Express/registerPlayerToMatch";
 import { removePlayerMatch } from "@/api/Doubles-Express/removePlayerMatch";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -77,7 +78,22 @@ export const useDoubleMatchMutations = () => {
     },
   });
 
+  const deleteDoubleMatchFn = useMutation({
+    mutationFn: ({ matchId }: { matchId: number }) => deleteDoubleMatch(matchId),
+    onSuccess: (_, variables) => {
+      // 🔥 Eliminar el partido de la lista sin recargar la página
+      queryClient.setQueryData(['doublesMatches'], (oldMatches: any) => {
+        return oldMatches ? oldMatches.filter((match: any) => match.id !== variables.matchId) : [];
+      });
 
+      queryClient.invalidateQueries({ queryKey: ['doublesMatches'] });
 
-  return { addDoublesMatchesMutation, registerPlayerToMatchMutation, removePlayerFromMatchMutation, addPlayerToDoublesMatchesMutation };
+      console.log(`Partido con ID ${variables.matchId} eliminado correctamente.`);
+    },
+    onError: (error: any) => {
+      console.log("Error al eliminar el partido:", error.response?.data || error.message);
+    },
+  });
+
+  return { addDoublesMatchesMutation, registerPlayerToMatchMutation, removePlayerFromMatchMutation, addPlayerToDoublesMatchesMutation, deleteDoubleMatchFn };
 };
