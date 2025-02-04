@@ -1,12 +1,11 @@
 import { getTotalPoints } from "@/api/User-Double-Express-Points-History/get-total-points";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
 interface Props {
   auth: boolean;
-  id?: number;
 }
 
-export const useUserDoubleExpressPointHistory = ({ auth, id }: Props) => {
+export const useUserDoubleExpressPointHistory = ({ auth }: Props) => {
   const {
     isLoading,
     isError,
@@ -16,7 +15,7 @@ export const useUserDoubleExpressPointHistory = ({ auth, id }: Props) => {
     queryKey: ["points"],
     queryFn: () => getTotalPoints(),
     staleTime: 1000 * 60,
-    enabled: auth && id !== undefined,
+    enabled: auth,
   });
 
   return {
