@@ -4,6 +4,8 @@ import Link from "next/link";
 import MatchGrid from "../MatchGrid";
 import { DoublesExhibitionMatchResponse } from "@/types/Double-Match/DoublesExhibitionMatch";
 import { User } from "@/types/User/User";
+import { useUser } from "@/hooks/Users/useUser";
+import useRoles from "@/hooks/useRoles";
 
 export default function Home({
   doublesMatches,
@@ -14,6 +16,7 @@ export default function Home({
   users: User[];
   points: number;
 }) {
+  const { session } = useRoles();
   return (
     <div className="mx-auto p-4">
       <header className="mb-8">
@@ -30,9 +33,11 @@ export default function Home({
           </h1>
         </div>
         <div className="flex justify-end">
-          <div className="bg-secondary text-secondary-foreground px-4 py-2 rounded-full">
-            Mis Puntos: <span className="font-bold">{points}</span>
-          </div>
+          {session && (
+            <div className="bg-secondary text-secondary-foreground px-4 py-2 rounded-full">
+              Mis Puntos: <span className="font-bold">{points}</span>
+            </div>
+          )}
         </div>
         <div className="h-1 bg-slate-700 mt-4"></div>
       </header>
