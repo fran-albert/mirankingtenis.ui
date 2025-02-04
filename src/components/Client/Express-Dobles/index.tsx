@@ -8,7 +8,7 @@ import Home from "@/sections/Express-Dobles/Home";
 import React from "react";
 
 function ClientExpressDoblesComponent() {
-  const { session } = useRoles();
+  const { isUserLoggedIn } = useRoles();
   const { doublesMatches, error, isLoading } = useDoublesMatches({
     auth: true,
     fetchMatches: true,
@@ -16,8 +16,7 @@ function ClientExpressDoblesComponent() {
 
   const { isLoading: isLoadingPoints, points } =
     useUserDoubleExpressPointHistory({
-      auth: true,
-      id: Number(session?.user.id),
+      auth: isUserLoggedIn,
     });
   const { isLoading: isLoadingUsers, users } = useUsers({
     auth: true,
