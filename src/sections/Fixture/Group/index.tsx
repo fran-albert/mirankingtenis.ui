@@ -6,7 +6,7 @@ import { User } from "@/types/User/User";
 import { createApiUserRepository } from "@/modules/users/infra/ApiUserRepository";
 import { createApiTournamentParticipantRepository } from "@/modules/tournament-participant/infra/ApiTournamentRepository";
 import { TournamentParticipant } from "@/modules/tournament-participant/domain/TournamentParticipant";
-import { TournamentRanking } from "@/modules/tournament-ranking/domain/TournamentRanking";
+import { TournamentRanking } from "@/types/Tournament-Ranking/TournamentRanking";
 import { Step4 } from "../step4";
 import { Step5 } from "../step5";
 import { GroupRankingDto } from "@/common/types/group-ranking.dto";

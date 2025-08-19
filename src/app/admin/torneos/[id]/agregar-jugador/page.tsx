@@ -3,7 +3,7 @@ import { useUserStore } from "@/hooks/useUser";
 import { useParams } from "next/navigation";
 import StepControllerForTournament from "@/sections/Admin/Tournament/Players/StepController";
 import React from "react";
-import { useTournamentParticipantStore } from "@/hooks/useTournamentParticipant";
+import { useNonParticipants } from "@/hooks/Tournament-Participant/useTournamentParticipant";
 import { useTournament } from "@/hooks/Tournament/useTournament";
 
 function AddPlayerTournament() {
@@ -16,18 +16,11 @@ function AddPlayerTournament() {
     enabled: !!idTournament 
   });
   
-  // Mantener el hook de participantes (no migrado aún)
-  const { nonParticipants, findNonParticipants } = useTournamentParticipantStore();
+  // Usar React Query hook para obtener no participantes
+  const { data: nonParticipants = [], isLoading: isNonParticipantsLoading } = useNonParticipants(idTournament, !!idTournament);
 
-  // Solo llamar findNonParticipants cuando sea necesario
-  React.useEffect(() => {
-    if (idTournament) {
-      findNonParticipants(idTournament);
-    }
-  }, [idTournament, findNonParticipants]);
-
-  if (isTournamentLoading || !tournament) {
-    return <div>Cargando torneo...</div>;
+  if (isTournamentLoading || isNonParticipantsLoading || !tournament) {
+    return <div>Cargando...</div>;
   }
 
   return (

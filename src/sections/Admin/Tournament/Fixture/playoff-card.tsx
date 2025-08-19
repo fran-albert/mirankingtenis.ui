@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { CardTitle, CardHeader, CardContent, Card } from "@/components/ui/card";
 import CreateFixtureForGroup from "./dialog";
 import { useHasGroupsForCategory } from "@/hooks/Group/useGroup";
-import { useTournamentParticipantStore } from "@/hooks/useTournamentParticipant";
+import { useHasPlayersForCategory } from "@/hooks/Tournament-Participant/useTournamentParticipant";
 import { TournamentCategory } from "@/types/Tournament-Category/TournamentCategory";
 import Loading from "@/components/Loading/loading";
 import CreatePlayOffForCategory from "./playoffdialog";
@@ -18,23 +18,7 @@ function PlayOffCategoriesCard({
 }) {
   // Usar React Query hooks
   const { hasGroups, isLoading: isLoadingGroups } = useHasGroupsForCategory(idTournament, category.id);
-  const { hasPlayersForCategory } = useTournamentParticipantStore();
-
-  const [hasParticipants, setHasParticipants] = useState(false);
-  const [isLoadingParticipants, setIsLoadingParticipants] = useState(true);
-  
-  useEffect(() => {
-    const fetchPlayersStatus = async () => {
-      setIsLoadingParticipants(true);
-      const playersStatus = await hasPlayersForCategory(
-        idTournament,
-        category.id
-      );
-      setHasParticipants(playersStatus);
-      setIsLoadingParticipants(false);
-    };
-    fetchPlayersStatus();
-  }, [category.id, hasPlayersForCategory, idTournament]);
+  const { data: hasParticipants = false, isLoading: isLoadingParticipants } = useHasPlayersForCategory(idTournament, category.id, !!idTournament && !!category.id);
 
   const isLoading = isLoadingGroups || isLoadingParticipants;
 

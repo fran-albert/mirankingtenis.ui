@@ -8,7 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { TournamentRanking } from "@/modules/tournament-ranking/domain/TournamentRanking";
+import { TournamentRanking } from "@/types/Tournament-Ranking/TournamentRanking";
 import { GroupRankingDto } from "@/common/types/group-ranking.dto";
 
 interface Step1GroupsProps {

@@ -9,7 +9,7 @@ import {
   usePlayerInfo
 } from "@/hooks/Tournament/useTournament";
 import { useMatchStore } from "@/hooks/useMatch";
-import { useSetsStore } from "@/hooks/useSet";
+import { usePlayerSetSummary } from "@/hooks/Sets/useSet";
 import { useUserStore } from "@/hooks/useUser";
 import { PlayerComponent } from "@/sections/Players/Component/player-component";
 import { useUser } from "@/hooks/Users/useUser";
@@ -54,11 +54,8 @@ function PlayerDetailsPage() {
     getNextMatch,
     loading: isMatchLoading,
   } = useMatchStore();
-  const {
-    getTotalPlayerSetSummary,
-    setSummary,
-    loading: isLoadingSets,
-  } = useSetsStore();
+  // Usar React Query hook para el resumen de sets del jugador
+  const { data: setSummary, isLoading: isLoadingSets } = usePlayerSetSummary(idUser, !!idUser);
   // const { loading: isLoadingUser, getUser, user } = useUserStore();
   const { user, isLoading, error } = useUser({
     auth: true,
@@ -66,7 +63,7 @@ function PlayerDetailsPage() {
   });
   const currentUser = user?.name + " " + user?.lastname;
 
-  if (isTournamentLoading || isLoading) {
+  if (isTournamentLoading || isLoading || isLoadingSets) {
     return <Loading isLoading />;
   }
 

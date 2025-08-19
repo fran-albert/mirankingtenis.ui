@@ -1,7 +1,8 @@
+import { getFinals } from "@/api/Playoff/get-finals.action";
+import { getQuarterFinals } from "@/api/Playoff/get-quarter-finals.action";
+import { getSemifinals } from "@/api/Playoff/get-semifinals.action";
 import { useQuery } from "@tanstack/react-query";
-import { getQuarterFinals } from "@/api/PlayOff/get-quarter-finals.action";
-import { getSemifinals } from "@/api/PlayOff/get-semifinals.action";
-import { getFinals } from "@/api/PlayOff/get-finals.action";
+
 
 export function useQuarterFinals(idTournament: number, idCategory: number, enabled = true) {
   return useQuery({
