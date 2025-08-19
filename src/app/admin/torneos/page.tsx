@@ -2,57 +2,41 @@
 import Loading from "@/components/Loading/loading";
 import { useCustomSession } from "@/context/SessionAuthProviders";
 import useRoles from "@/hooks/useRoles";
-import { getAllCategories } from "@/modules/category/application/get-all/getAllCategories";
-import { Category } from "@/modules/category/domain/Category";
-import { createApiCategoryRepository } from "@/modules/category/infra/ApiCategoryRepository";
-import { getAllTournaments } from "@/modules/tournament/application/get-all-tournaments/getAllTournaments";
-import { Tournament } from "@/modules/tournament/domain/Tournament";
-import { createApiTournamentRepository } from "@/modules/tournament/infra/ApiTournamentRepository";
-import { getAdminUsers } from "@/modules/users/application/get-all-admin/getAdminUsers";
-import { User } from "@/types/User/User";
-import { createApiUserRepository } from "@/modules/users/infra/ApiUserRepository";
-import CategoriesTable from "@/sections/Admin/Categories/Table/table";
-import AdminPlayersTanstackTable from "@/sections/Admin/Players/Table/tanstack";
+import { useAllTournaments } from "@/hooks/Tournament/useTournament";
+import { Tournament } from "@/types/Tournament/Tournament";
 import TournamentTable from "@/sections/Admin/Tournament/Table/table";
-import { PlayersTable } from "@/sections/Players/Table/table";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useState, useEffect } from "react";
 
 function TournamentPage() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [tournament, setTournament] = useState<Tournament[]>([]);
-  const tournamentRepository = useMemo(() => createApiTournamentRepository(), []);
-  const loadAllTournament = useCallback(async () => {
-    const tournaments = await getAllTournaments(tournamentRepository)();
-    return tournaments;
-  }, [tournamentRepository]);
   const { isAdmin } = useRoles();
   const { session } = useCustomSession();
   const canAddUser = !!session && isAdmin;
-
+  
+  // Usar React Query hook para torneos
+  const { tournaments, isLoading } = useAllTournaments();
+  
+  // Estado local para manejar actualizaciones de la tabla
+  const [localTournaments, setLocalTournaments] = useState<Tournament[]>([]);
+  
+  // Inicializar local tournaments cuando lleguen los datos de React Query
   useEffect(() => {
-    const fetchTournaments = async () => {
-      try {
-        setIsLoading(true);
-        const tournamentData = await loadAllTournament();
-        setTournament(tournamentData);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchTournaments();
-  }, [loadAllTournament]);
+    if (tournaments.length > 0 && localTournaments.length === 0) {
+      setLocalTournaments(tournaments);
+    }
+  }, [tournaments, localTournaments.length]);
+
+  // Usar la data de React Query, con fallback a estado local para actualizaciones optimistas
+  const displayTournaments = localTournaments.length > 0 ? localTournaments : tournaments;
 
   const addTournamentToList = (newTournament: Tournament) => {
-    setTournament((currentTournaments) => [
+    setLocalTournaments((currentTournaments) => [
       ...currentTournaments,
       newTournament,
     ]);
   };
 
   const updateTournamentOnList = (updatedTournament: Tournament) => {
-    setTournament((currentTournaments) =>
+    setLocalTournaments((currentTournaments) =>
       currentTournaments.map((tournament) =>
         tournament.id === updatedTournament.id ? updatedTournament : tournament
       )
@@ -66,7 +50,7 @@ function TournamentPage() {
   return (
     <div>
       <TournamentTable
-        tournament={tournament}
+        tournament={displayTournaments}
         addTournamentToList={addTournamentToList}
         onUpdateTournamentOnList={updateTournamentOnList}
       />

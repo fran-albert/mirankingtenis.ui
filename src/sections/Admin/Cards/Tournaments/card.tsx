@@ -1,7 +1,5 @@
 "use client";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { FaUser } from "react-icons/fa";
 import {
   CardTitle,
   CardDescription,
@@ -9,21 +7,11 @@ import {
   CardContent,
   Card,
 } from "@/components/ui/card";
-import { createApiUserRepository } from "@/modules/users/infra/ApiUserRepository";
 import { GiTrophyCup } from "react-icons/gi";
-import { createApiTournamentRepository } from "@/modules/tournament/infra/ApiTournamentRepository";
+import { useTotalTournaments } from "@/hooks/Tournament/useTournament";
 export const TournamentsCount = () => {
-  const [totalTournaments, setTotalTournaments] = useState(0);
-
-  useEffect(() => {
-    const fetchTotal = async () => {
-      const userRepository = createApiTournamentRepository();
-      const total = await userRepository.getTotalTournaments();
-      setTotalTournaments(total);
-    };
-
-    fetchTotal().catch(console.error);
-  }, []);
+  // Usar React Query hook
+  const { total: totalTournaments = 0 } = useTotalTournaments();
   return (
     <>
       <div className="rounded-lg w-96 sm:transition sm:duration-300 sm:ease-in-out sm:transform sm:hover:-translate-y-2 hover:shadow-2xl cursor-pointer">

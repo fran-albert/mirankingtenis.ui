@@ -13,7 +13,6 @@ import {
 import ActionIcon from "@/components/ui/actionIcon";
 import { FaPowerOff } from "react-icons/fa6";
 import { toast } from "sonner";
-import { createApiTournamentRepository } from "@/modules/tournament/infra/ApiTournamentRepository";
 import { createApiTournamentParticipantRepository } from "@/modules/tournament-participant/infra/ApiTournamentRepository";
 import { desactivatePlayer } from "@/modules/tournament-participant/application/desactivate-player/desactivatePlayer";
 

@@ -9,7 +9,7 @@ import { useTournamentParticipantStore } from "@/hooks/useTournamentParticipant"
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { NonParticipantsDto } from "@/common/types/non-participants.dto";
-import { Tournament } from "@/modules/tournament/domain/Tournament";
+import { Tournament } from "@/types/Tournament/Tournament";
 
 function StepControllerForTournament({
   users,

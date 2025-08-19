@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/card";
 import { Create } from "@/components/Button/Create/button";
 import { Category } from "@/modules/category/domain/Category";
-import { TournamentCategory } from "@/modules/tournament-category/domain/TournamentCategory";
+import { TournamentCategory } from "@/types/Tournament-Category/TournamentCategory";
 import { useTournamentParticipantStore } from "@/hooks/useTournamentParticipant";
 import Loading from "@/components/Loading/loading";
 function CategoriesCard({

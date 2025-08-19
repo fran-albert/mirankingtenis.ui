@@ -5,9 +5,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useTournamentStore } from "@/hooks/useTournament";
+import { useAllTournaments, useAllTournamentsByPlayer } from "@/hooks/Tournament/useTournament";
 import { useEffect, useState } from "react";
-import { Tournament } from "@/modules/tournament/domain/Tournament";
+import { Tournament } from "@/types/Tournament/Tournament";
 
 interface TournamentSelectProps {
   selected?: Tournament;
@@ -24,23 +24,23 @@ export const TournamentSelect = ({
   currentTournamentByPlayer,
   lastTournament,
 }: TournamentSelectProps) => {
-  const {
-    getAllTournaments,
-    getAllTournamentsByPlayer,
-    allTournaments,
-    loading,
-  } = useTournamentStore();
+  // Usar React Query hooks condicionalmente
+  const { tournaments: allTournamentsData, isLoading: isAllTournamentsLoading } = useAllTournaments({ 
+    enabled: !userId 
+  });
+  
+  const { tournaments: playerTournamentsData, isLoading: isPlayerTournamentsLoading } = useAllTournamentsByPlayer({ 
+    idPlayer: userId || 0,
+    enabled: !!userId 
+  });
+
+  // Determinar qué datos usar
+  const allTournaments = userId ? playerTournamentsData : allTournamentsData;
+  const loading = userId ? isPlayerTournamentsLoading : isAllTournamentsLoading;
+
   const [initialSelection, setInitialSelection] = useState<
     Tournament | undefined
   >(undefined);
-
-  useEffect(() => {
-    if (userId) {
-      getAllTournamentsByPlayer(userId);
-    } else {
-      getAllTournaments();
-    }
-  }, [getAllTournaments, getAllTournamentsByPlayer, userId]);
 
   useEffect(() => {
     if (!selected) {

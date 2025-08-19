@@ -5,10 +5,7 @@ import {
     SelectTrigger,
     SelectValue,
   } from "@/components/ui/select";
-  import { useTournamentStore } from "@/hooks/useTournament";
-  import { Tournament } from "@/modules/tournament/domain/Tournament";
-  import { createApiTournamentRepository } from "@/modules/tournament/infra/ApiTournamentRepository";
-  import { useEffect, useState } from "react";
+  import { useAllTournaments } from "@/hooks/Tournament/useTournament";
   
   interface TournamentMasterSelectProps {
     selected?: string;
@@ -19,15 +16,14 @@ import {
     selected,
     onTournament,
   }: TournamentMasterSelectProps) => {
-    const { getAllTournaments, tournaments } = useTournamentStore();
+    // Usar React Query hook
+    const { tournaments } = useAllTournaments();
   
-    useEffect(() => {
-      getAllTournaments();
-    }, [getAllTournaments]);
+    // Ya no es necesario useEffect - React Query maneja la carga automáticamente
   
-    const tournamentLeague = tournaments.filter(
+    const tournamentLeague = tournaments?.filter(
       (tournament) => tournament.type === "master"
-    );
+    ) || [];
   
     return (
       <Select value={selected} onValueChange={onTournament}>

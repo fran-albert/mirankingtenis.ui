@@ -1,7 +1,7 @@
 "use client";
 import Loading from "@/components/Loading/loading";
-import { useTournamentStore } from "@/hooks/useTournament";
-import { useTournamentCategoryStore } from "@/hooks/useTournamentCategory";
+import { useTournament } from "@/hooks/Tournament/useTournament";
+import { useCategoriesForTournament } from "@/hooks/Tournament-Category/useTournamentCategory";
 import { getFixtureByCategoryAndTournament } from "@/modules/fixture/application/get-fixture-by-category-and-tournament/getFixtureByCategoryAndTournament";
 import { createApiFixtureRepository } from "@/modules/fixture/infra/ApiFixtureRepository";
 import DetailsTournament from "@/sections/Admin/Tournament/Details/page";
@@ -14,11 +14,18 @@ function TournamentDetailsPage() {
   const [categoryDates, setCategoryDates] = useState<{ [key: number]: any }>(
     {}
   );
-  const [isLoading, setIsLoading] = useState<boolean>(true);
   const fixtureRepository = useMemo(() => createApiFixtureRepository(), []);
-  const { tournament, getTournament } = useTournamentStore();
-  const { categoriesForTournaments, getCategoriesForTournament } =
-    useTournamentCategoryStore();
+  
+  // Usar React Query hooks
+  const { tournament, isLoading: isTournamentLoading } = useTournament({ 
+    idTournament, 
+    enabled: !!idTournament 
+  });
+  
+  const { categories: categoriesForTournaments, isLoading: isCategoriesLoading } = useCategoriesForTournament({ 
+    idTournament, 
+    enabled: !!idTournament 
+  });
   const loadFixture = useCallback(
     (idCategory: number, idTournament: number) =>
       getFixtureByCategoryAndTournament(fixtureRepository)(
@@ -29,14 +36,13 @@ function TournamentDetailsPage() {
   );
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchFixtures = async () => {
+      if (!categoriesForTournaments || categoriesForTournaments.length === 0) return;
+      
       try {
-        setIsLoading(true);
-        const categoriesData = await getCategoriesForTournament(idTournament);
         const dates: { [key: number]: any } = {};
-        getTournament(idTournament);
         await Promise.all(
-          categoriesData.map(async (category) => {
+          categoriesForTournaments.map(async (category) => {
             const numberOfFixtures = await loadFixture(
               category.id,
               idTournament
@@ -45,17 +51,15 @@ function TournamentDetailsPage() {
           })
         );
         setCategoryDates(dates);
-        setIsLoading(false);
       } catch (error) {
         console.error(error);
-        setIsLoading(false);
       }
     };
 
-    fetchData();
-  }, [idTournament, getTournament, getCategoriesForTournament, loadFixture]);
+    fetchFixtures();
+  }, [categoriesForTournaments, idTournament, loadFixture]);
 
-  if (isLoading) {
+  if (isTournamentLoading || isCategoriesLoading || !tournament || !categoriesForTournaments) {
     return <Loading isLoading />;
   }
 

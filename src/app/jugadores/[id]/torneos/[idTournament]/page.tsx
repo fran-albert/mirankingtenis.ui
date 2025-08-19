@@ -3,67 +3,68 @@ import React, { useEffect, useState } from "react";
 import MatchesByTournamentPlayer from "@/sections/Tournament/ByPlayer/matches";
 import ChartRankingByPlayer from "@/sections/Tournament/ByPlayer/ranking";
 import StatisticsByPlayer from "@/sections/Tournament/ByPlayer/statistics";
-import { useTournamentCategoryStore } from "@/hooks/useTournamentCategory";
+import { useTournamentCategoriesByUser } from "@/hooks/Tournament-Category/useTournamentCategory";
 import { useParams } from "next/navigation";
 import { useMatchStore } from "@/hooks/useMatch";
-import { useTournamentRankingStore } from "@/hooks/useTournamentRanking";
-import { useTournamentStore } from "@/hooks/useTournament";
+import { useTournamentRankingPlayerTournamentSummary } from "@/hooks/Tournament-Ranking/useTournamentRankingPlayerTournamentSummary";
+import { useTournamentRankingHistory } from "@/hooks/Tournament-Ranking/useTournamentRankingHistory";
+import { useTournament } from "@/hooks/Tournament/useTournament";
 import { formatDate } from "@/lib/utils";
 import { formatTournamentDates } from "@/common/helpers/helpers";
 import Loading from "@/components/Loading/loading";
 
 function TournamentPlayerPage() {
   const { id, idTournament } = useParams();
-  const {
-    getTournamentCategoriesByUser,
-    categoriesForTournaments,
-    loading: isLoadingTCategories,
-  } = useTournamentCategoryStore();
-  const {
-    getTotalPlayerTournamentMatchSummary,
-    playerMatchSummary,
-    loading: isLoadingPlayerMatchSummary,
-    getHistoryRanking,
-    historyRanking,
-  } = useTournamentRankingStore();
-  const {
-    getTournament,
-    tournament,
-    loading: isLoadingTournaments,
-  } = useTournamentStore();
+  const idUser = Number(id);
+  // Usar React Query hook para tournament categories
+  const { categoriesForTournaments, isLoading: isLoadingTCategories } = useTournamentCategoriesByUser({ 
+    idUser: idUser, 
+    enabled: !!idUser 
+  });
+  // Obtener la categoría del torneo actual
+  const matchingTournament = categoriesForTournaments?.find(
+    (category) => category.tournament.id === Number(idTournament)
+  );
+  
+  // Usar React Query hooks para tournament ranking
+  const { playerMatchSummary, isLoading: isLoadingPlayerMatchSummary } = useTournamentRankingPlayerTournamentSummary({
+    idPlayer: idUser,
+    idTournament: Number(idTournament),
+    idCategory: matchingTournament?.category.id || 0,
+    enabled: !!idUser && !!idTournament && !!matchingTournament?.category.id
+  });
+  
+  const { historyRanking = [], isLoading: isLoadingHistoryRanking } = useTournamentRankingHistory({
+    idPlayer: idUser,
+    idTournament: Number(idTournament),
+    idCategory: matchingTournament?.category.id || 0,
+    enabled: !!idUser && !!idTournament && !!matchingTournament?.category.id
+  });
+  
+  // Usar React Query hook para obtener el torneo
+  const { tournament, isLoading: isLoadingTournaments } = useTournament({ 
+    idTournament: Number(idTournament), 
+    enabled: !!idTournament 
+  });
+  
   const {
     getMatchesByUser,
     matches,
     loading: isLoadingMatches,
   } = useMatchStore();
-  const idUser = Number(id);
 
   const [categories, setCategories] = useState("");
-  useEffect(() => {
-    if (idUser) {
-      getTournamentCategoriesByUser(idUser);
-      getTournament(Number(idTournament));
-    }
-  }, [getTournamentCategoriesByUser, idUser]);
+  // Ya no es necesario - React Query maneja la carga automáticamente
 
   useEffect(() => {
-    if (categoriesForTournaments.length > 0) {
+    if (categoriesForTournaments && categoriesForTournaments.length > 0) {
       const matchingTournament = categoriesForTournaments.find(
         (category) => category.tournament.id === Number(idTournament)
       );
 
       if (matchingTournament) {
+        // Solo llamar getMatchesByUser - los otros hooks de React Query se manejan automáticamente
         getMatchesByUser(
-          idUser,
-          matchingTournament.tournament.id,
-          matchingTournament.category.id
-        );
-        getTotalPlayerTournamentMatchSummary(
-          idUser,
-          matchingTournament.tournament.id,
-          matchingTournament.category.id
-        );
-        getHistoryRanking(
           idUser,
           matchingTournament.tournament.id,
           matchingTournament.category.id
@@ -71,7 +72,7 @@ function TournamentPlayerPage() {
         setCategories(matchingTournament.category.name);
       }
     }
-  }, [categoriesForTournaments, idTournament]);
+  }, [categoriesForTournaments, idTournament, getMatchesByUser, idUser]);
 
   const validPositions = historyRanking.filter(
     (ranking) => ranking.position !== null
@@ -84,7 +85,10 @@ function TournamentPlayerPage() {
     isLoadingTournaments ||
     isLoadingMatches ||
     isLoadingPlayerMatchSummary ||
-    isLoadingTCategories
+    isLoadingHistoryRanking ||
+    isLoadingTCategories ||
+    !tournament ||
+    !categoriesForTournaments
   ) {
     return <Loading isLoading={true} />;
   }

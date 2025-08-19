@@ -19,9 +19,8 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import { Tournament } from "@/modules/tournament/domain/Tournament";
-import { createApiTournamentRepository } from "@/modules/tournament/infra/ApiTournamentRepository";
-import { createTournament } from "@/modules/tournament/application/create/createTournament";
+import { Tournament } from "@/types/Tournament/Tournament";
+import { useTournamentMutations } from "@/hooks/Tournament/useTournament";
 
 interface AddTournamentDialogProps {
   isOpen: boolean;
@@ -30,13 +29,14 @@ interface AddTournamentDialogProps {
 }
 
 interface Inputs extends Tournament {}
-const tournamentRepository = createApiTournamentRepository();
 
 export default function AddTournamentDialog({
   isOpen,
   addTournamentToList,
   setIsOpen,
 }: AddTournamentDialogProps) {
+  // Usar React Query mutation hook
+  const { createTournamentMutation } = useTournamentMutations();
   const toggleDialog = () => {
     setIsOpen(!isOpen);
     reset();
@@ -51,16 +51,15 @@ export default function AddTournamentDialog({
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
-      const createCatFn = createTournament(tournamentRepository);
-      const specialityCreationPromise = createCatFn(data);
+      const creationPromise = createTournamentMutation.mutateAsync(data);
 
-      toast.promise(specialityCreationPromise, {
+      toast.promise(creationPromise, {
         loading: "Creando torneo...",
         success: "Torneo creado con éxito!",
         error: "Error al crear el Torneo",
       });
 
-      specialityCreationPromise
+      creationPromise
         .then((createdTournament) => {
           setIsOpen(false);
           reset();
