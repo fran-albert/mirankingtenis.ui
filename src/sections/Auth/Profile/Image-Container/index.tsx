@@ -70,6 +70,16 @@ function ImageContainer({ user }: { user: User }) {
       setImageSrc(reader.result as string); 
       setOpenCrop(true);
     };
+    
+    // Limpiar el input para permitir seleccionar el mismo archivo nuevamente
+    event.target.value = '';
+  };
+
+  const resetCropState = () => {
+    setImageSrc(null);
+    setCrop({ x: 0, y: 0 });
+    setZoom(1);
+    setCroppedAreaPixels(null);
   };
 
   const onCropComplete = useCallback(
@@ -103,7 +113,8 @@ function ImageContainer({ user }: { user: User }) {
       console.error("Error updating photo: ", error);
     } finally {
       setIsLoading(false);
-      setOpenCrop(false); 
+      setOpenCrop(false);
+      resetCropState(); // Limpiar estados después de confirmar
     }
   };
 
@@ -153,7 +164,12 @@ function ImageContainer({ user }: { user: User }) {
 
       {/* Modal de recorte */}
       {openCrop && (
-        <Dialog open={openCrop} onOpenChange={setOpenCrop}>
+        <Dialog open={openCrop} onOpenChange={(open) => {
+          if (!open) {
+            resetCropState(); // Limpiar estados cuando se cierra el modal
+          }
+          setOpenCrop(open);
+        }}>
           <DialogOverlay />
           <DialogContent>
             {/* Header del modal */}
@@ -190,7 +206,10 @@ function ImageContainer({ user }: { user: User }) {
               <Button
                 className="mb-4 rounded-md"
                 variant={"outline"}
-                onClick={() => setOpenCrop(false)}
+                onClick={() => {
+                  resetCropState(); // Limpiar estados al cancelar
+                  setOpenCrop(false);
+                }}
               >
                 Cancelar
               </Button>
