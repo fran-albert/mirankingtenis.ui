@@ -1,7 +1,7 @@
 "use client";
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { Sets } from "@/modules/sets/domain/Sets";
+import { Sets } from "@/types/Set/Sets";
 import { IoTimeOutline } from "react-icons/io5";
 import DeleteMatchDialog from "./Delete/button";
 import AddResultMatchDialog from "./AddResult/dialog";

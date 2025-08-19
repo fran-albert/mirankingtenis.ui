@@ -4,7 +4,7 @@ import { DataTable } from "@/components/Table/dataTable";
 import { getColumns } from "./columns";
 import useRoles from "@/hooks/useRoles";
 import { useCustomSession } from "@/context/SessionAuthProviders";
-import { TournamentParticipant } from "@/modules/tournament-participant/domain/TournamentParticipant";
+import { TournamentParticipant } from "@/types/Tournament-Participant/TournamentParticipant";
 import { usePlayersByTournament, useDesactivatePlayer } from "@/hooks/Tournament-Participant/useTournamentParticipant";
 import { ColumnDef } from "@tanstack/react-table";
 function PlayersTournamentTable({ idTournament }: { idTournament: number }) {

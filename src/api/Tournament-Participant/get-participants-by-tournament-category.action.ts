@@ -1,5 +1,5 @@
 import axiosInstance from "@/services/axiosConfig";
-import { TournamentParticipant } from "@/modules/tournament-participant/domain/TournamentParticipant";
+import { TournamentParticipant } from "@/types/Tournament-Participant/TournamentParticipant";
 
 export async function getParticipantsByTournamentCategory(idTournament: number, idCategory: number): Promise<TournamentParticipant[]> {
     try {
