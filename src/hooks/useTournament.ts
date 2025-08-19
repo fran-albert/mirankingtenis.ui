@@ -1,4 +1,4 @@
-import create from 'zustand';
+import { create } from 'zustand';
 import { createApiTournamentRepository } from '@/modules/tournament/infra/ApiTournamentRepository';
 import { Tournament } from '@/modules/tournament/domain/Tournament';
 import { getAllTournaments } from '@/modules/tournament/application/get-all-tournaments/getAllTournaments';

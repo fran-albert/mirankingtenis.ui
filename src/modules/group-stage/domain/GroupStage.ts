@@ -1,4 +1,4 @@
-import { Group } from "@/modules/group/domain/Group";
+import { Group } from "@/types/Group/Group";
 
 export interface GroupStage {
     id: number;
