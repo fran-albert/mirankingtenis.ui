@@ -7,6 +7,7 @@ const nextConfig = {
       "incor-ranking.s3.us-east-1.amazonaws.com",
       "https://mirankingtenis.s3.us-east-1.amazonaws.com",
       "mirankingtenis.s3.us-east-1.amazonaws.com",
+      "res.cloudinary.com"
     ],
   },
 };
