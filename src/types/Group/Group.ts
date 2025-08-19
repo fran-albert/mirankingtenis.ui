@@ -1,4 +1,4 @@
-import { GroupParticipant } from "@/modules/group-participant/domain/GroupParticipant";
+import { GroupParticipant } from "@/types/Group-Participant/GroupParticipant";
 
 export interface Group {
     id: number;

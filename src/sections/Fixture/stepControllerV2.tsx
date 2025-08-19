@@ -7,7 +7,7 @@ import { Step2 } from "./step2";
 import { Step3 } from "./step3";
 import { Step4 } from "./step4";
 import { Step5 } from "./step5";
-import { TournamentParticipant } from "@/modules/tournament-participant/domain/TournamentParticipant";
+import { TournamentParticipant } from "@/types/Tournament-Participant/TournamentParticipant";
 import { TournamentRanking } from "@/types/Tournament-Ranking/TournamentRanking";
 import { useTournamentRanking } from "@/hooks/Tournament-Ranking/useTournamentRanking";
 

@@ -2,7 +2,7 @@ import { FixtureType } from "@/common/types/fixture-type.dto";
 import { Button } from "@/components/ui/button";
 import { createFixture } from "@/modules/fixture/application/create/createFixture";
 import { createApiFixtureRepository } from "@/modules/fixture/infra/ApiFixtureRepository";
-import { TournamentParticipant } from "@/modules/tournament-participant/domain/TournamentParticipant";
+import { TournamentParticipant } from "@/types/Tournament-Participant/TournamentParticipant";
 import { TournamentRanking } from "@/types/Tournament-Ranking/TournamentRanking";
 import { User } from "@/types/User/User";
 import axios from "axios";

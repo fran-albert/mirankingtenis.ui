@@ -13,8 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { createApiSetsRepository } from "@/modules/sets/infra/ApiSetsRepository";
-import { createSets } from "@/modules/sets/application/create/createSets";
+import { useCreateSets } from "@/hooks/Sets/useSet";
 import axios from "axios";
 import { MdScoreboard } from "react-icons/md";
 import ActionIcon from "@/components/ui/actionIcon";
@@ -44,8 +43,7 @@ export default function AddResultMatchDialog({
     reset,
     setValue,
   } = useForm();
-  const setRepository = createApiSetsRepository();
-  const createSetFn = createSets(setRepository);
+  const createSetsMutation = useCreateSets();
 
   const onSubmit: SubmitHandler<any> = async (formData) => {
     setFormData(formData);
@@ -62,7 +60,7 @@ export default function AddResultMatchDialog({
       tournamentCategoryId: match.fixture.tournamentCategories.id,
     };
     try {
-      const setCreationPromise = createSetFn(dataToSend);
+      const setCreationPromise = createSetsMutation.mutateAsync(dataToSend);
       toast.promise(setCreationPromise, {
         loading: "Actualizando partido...",
         success: "Partido actualizado con éxito!",
