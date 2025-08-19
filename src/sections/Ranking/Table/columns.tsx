@@ -3,7 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Ranking } from "@/modules/ranking/domain/Ranking";
-import { TournamentRanking } from "@/modules/tournament-ranking/domain/TournamentRanking";
+import { TournamentRanking } from "@/types/Tournament-Ranking/TournamentRanking";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 
 export const getColumns = (): ColumnDef<TournamentRanking>[] => {
