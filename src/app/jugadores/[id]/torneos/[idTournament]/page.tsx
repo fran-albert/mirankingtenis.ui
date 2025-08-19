@@ -1,17 +1,17 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import MatchesByTournamentPlayer from "@/sections/Tournament/ByPlayer/matches";
 import ChartRankingByPlayer from "@/sections/Tournament/ByPlayer/ranking";
 import StatisticsByPlayer from "@/sections/Tournament/ByPlayer/statistics";
 import { useTournamentCategoriesByUser } from "@/hooks/Tournament-Category/useTournamentCategory";
 import { useParams } from "next/navigation";
-import { useMatchStore } from "@/hooks/useMatch";
 import { useTournamentRankingPlayerTournamentSummary } from "@/hooks/Tournament-Ranking/useTournamentRankingPlayerTournamentSummary";
 import { useTournamentRankingHistory } from "@/hooks/Tournament-Ranking/useTournamentRankingHistory";
 import { useTournament } from "@/hooks/Tournament/useTournament";
 import { formatDate } from "@/lib/utils";
 import { formatTournamentDates } from "@/common/helpers/helpers";
 import Loading from "@/components/Loading/loading";
+import { useMatchesByUser } from "@/hooks/Matches/useMatches";
 
 function TournamentPlayerPage() {
   const { id, idTournament } = useParams();
@@ -47,32 +47,16 @@ function TournamentPlayerPage() {
     enabled: !!idTournament 
   });
   
-  const {
-    getMatchesByUser,
-    matches,
-    loading: isLoadingMatches,
-  } = useMatchStore();
+  // Usar React Query hook para obtener partidos del usuario
+  const { data: matches = [], isLoading: isLoadingMatches } = useMatchesByUser(
+    idUser, 
+    Number(idTournament), 
+    matchingTournament?.category.id || 0, 
+    !!idUser && !!idTournament && !!matchingTournament?.category.id
+  );
 
-  const [categories, setCategories] = useState("");
-  // Ya no es necesario - React Query maneja la carga automáticamente
-
-  useEffect(() => {
-    if (categoriesForTournaments && categoriesForTournaments.length > 0) {
-      const matchingTournament = categoriesForTournaments.find(
-        (category) => category.tournament.id === Number(idTournament)
-      );
-
-      if (matchingTournament) {
-        // Solo llamar getMatchesByUser - los otros hooks de React Query se manejan automáticamente
-        getMatchesByUser(
-          idUser,
-          matchingTournament.tournament.id,
-          matchingTournament.category.id
-        );
-        setCategories(matchingTournament.category.name);
-      }
-    }
-  }, [categoriesForTournaments, idTournament, getMatchesByUser, idUser]);
+  // Obtener nombre de categoría directamente de los datos
+  const categoryName = matchingTournament?.category.name || "";
 
   const validPositions = historyRanking.filter(
     (ranking) => ranking.position !== null
@@ -110,7 +94,7 @@ function TournamentPlayerPage() {
       </div>
       <StatisticsByPlayer
         matchSummary={playerMatchSummary}
-        category={categories}
+        category={categoryName}
         initialPosition={historyRanking[0]?.position || 0}
         bestPosition={bestPosition}
       />

@@ -8,12 +8,12 @@ import {
   useCompletedTournamentsByPlayer,
   usePlayerInfo
 } from "@/hooks/Tournament/useTournament";
-import { useMatchStore } from "@/hooks/useMatch";
 import { usePlayerSetSummary } from "@/hooks/Sets/useSet";
 import { useUserStore } from "@/hooks/useUser";
 import { PlayerComponent } from "@/sections/Players/Component/player-component";
 import { useUser } from "@/hooks/Users/useUser";
 import { useTournamentRankingPlayerSummary } from "@/hooks/Tournament-Ranking/useTournamentRankingPlayerSummary";
+import { useAllMatchesByUser, useNextMatch } from "@/hooks/Matches/useMatches";
 
 function PlayerDetailsPage() {
   const params = useParams();
@@ -47,13 +47,13 @@ function PlayerDetailsPage() {
     idPlayer: idUser,
     enabled: !!!idUser,
   });
-  const {
-    getAllMatchesByUser,
-    matches,
-    nextMatch,
-    getNextMatch,
-    loading: isMatchLoading,
-  } = useMatchStore();
+  // Usar React Query hooks para obtener partidos y próximo partido
+  const { data: matches = [], isLoading: isMatchLoading } = useAllMatchesByUser(idUser, !!idUser);
+  const { data: nextMatch } = useNextMatch(
+    currentTournaments?.id || 0, 
+    idUser, 
+    !!currentTournaments?.id && !!idUser
+  );
   // Usar React Query hook para el resumen de sets del jugador
   const { data: setSummary, isLoading: isLoadingSets } = usePlayerSetSummary(idUser, !!idUser);
   // const { loading: isLoadingUser, getUser, user } = useUserStore();

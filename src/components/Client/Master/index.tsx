@@ -34,11 +34,7 @@ function ClientMasterComponent() {
     useGroupRankings(groupStageId, !!groupStageId);
 
   // Hook para obtener matches por groupStage
-  const {
-    groupFixture,
-    isLoading: matchesLoading,
-    refetch: refetchMatches,
-  } = useMatchesByGroupStage(groupStageId, !!groupStageId);
+  const { data: groupFixture = [], isLoading: matchesLoading, refetch: refetchMatches } = useMatchesByGroupStage(groupStageId, !!groupStageId);
 
   const updateMatches = async () => {
     await refetchMatches();

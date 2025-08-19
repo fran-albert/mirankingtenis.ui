@@ -8,7 +8,7 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
-import { Match } from "@/modules/match/domain/Match";
+import { Match } from "@/types/Match/Match";
 function MatchesByTournamentPlayer({ matches }: { matches: Match[] }) {
   const getMatchStageText = (match: Match) => {
     if (match.fixture?.jornada) {

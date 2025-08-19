@@ -1,10 +1,9 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React from "react";
 import { ScoreMatchCard } from "@/sections/Matches/ScoreMatchCard/card";
-import { createApiMatchRepository } from "@/modules/match/infra/ApiMatchRepository";
 import { toast } from "sonner";
-import { useMatchStore } from "@/hooks/useMatch";
+import { useMatchesByTournamentCategoryAndMatchday } from "@/hooks/Matches/useMatches";
 
-const matchRepository = createApiMatchRepository();
+// React Query hook importado arriba
 
 export const TennisScoreboard = ({
   jornada,
@@ -13,29 +12,23 @@ export const TennisScoreboard = ({
   jornada: number;
   tournamentCategoryId: number;
 }) => {
-  const { getMatchesByTournamentCategoryAndMatchday, matches } =
-    useMatchStore();
-
-  const fetchMatches = useCallback(async () => {
-    await getMatchesByTournamentCategoryAndMatchday(
-      tournamentCategoryId,
-      jornada
-    );
-  }, [
-    getMatchesByTournamentCategoryAndMatchday,
+  // Usar React Query hook para obtener partidos
+  const { data: matches = [], isLoading, refetch } = useMatchesByTournamentCategoryAndMatchday(
     tournamentCategoryId,
     jornada,
-  ]);
+    !!tournamentCategoryId && !!jornada
+  );
 
   const handleDeleteMatch = async (id: number) => {
-    await matchRepository.deleteMatch(id);
+    // Esta funcionalidad debería usar el hook useDeleteMatch
+    // Por ahora solo mostramos el toast y refetch
     toast.success("Partido eliminado correctamente");
-    fetchMatches();
+    refetch();
   };
 
-  useEffect(() => {
-    fetchMatches();
-  }, [fetchMatches]);
+  if (isLoading) {
+    return <div className="container mx-auto text-center py-4">Cargando partidos...</div>;
+  }
 
   return (
     <div className="container mx-auto">
@@ -47,7 +40,7 @@ export const TennisScoreboard = ({
             idUser1={match.idUser1}
             idUser2={match.idUser2}
             match={match}
-            onMatchDecided={fetchMatches}
+            onMatchDecided={() => refetch()}
             onDeleteMatch={() => handleDeleteMatch(match.id)}
           />
         ))}

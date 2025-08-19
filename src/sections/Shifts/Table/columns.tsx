@@ -1,7 +1,7 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { Match } from "@/modules/match/domain/Match";
+import { Match } from "@/types/Match/Match";
 import { formatDateComplete } from "@/lib/utils";
 import { BadgeWin } from "@/components/Badge/Green/badge";
 import { BadgePending } from "@/components/Badge/Pending/badge";
