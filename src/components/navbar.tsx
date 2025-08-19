@@ -1,7 +1,6 @@
 "use client";
 import { Fragment, useEffect, useState } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
-import { FaBell } from "react-icons/fa";
 import { FaGripLines } from "react-icons/fa6";
 import { IoClose } from "react-icons/io5";
 import Link from "next/link";
@@ -28,7 +27,7 @@ export default function Navbar() {
     { name: "Jugadores", href: "/jugadores", current: false },
     { name: "Ranking", href: "/ranking", current: false },
     { name: "Partidos", href: "/partidos", current: false },
-    { name: "Dobles Express", href: "/dobles-express", current: false },
+    // { name: "Dobles Express", href: "/dobles-express", current: false },
     { name: "Turnos", href: "/turnos", current: false },
   ]);
 
@@ -38,7 +37,7 @@ export default function Navbar() {
       { name: "Jugadores", href: "/jugadores", current: false },
       { name: "Ranking", href: "/ranking", current: false },
       { name: "Partidos", href: "/partidos", current: false },
-      { name: "Dobles Express", href: "/dobles-express", current: false },
+      // { name: "Dobles Express", href: "/dobles-express", current: false },
       { name: "Turnos", href: "/turnos", current: false },
     ];
 
@@ -52,7 +51,9 @@ export default function Navbar() {
 
     const updatedNavigation = [
       ...baseNavigation,
-      ...(isAdmin ? [{ name: "Admin", href: "/admin/inicio", current: false }] : []),
+      ...(isAdmin
+        ? [{ name: "Admin", href: "/admin/inicio", current: false }]
+        : []),
     ].map((item) => ({
       ...item,
       current: pathname === item.href,
@@ -85,7 +86,7 @@ export default function Navbar() {
                     <Image
                       width={171}
                       height={172}
-                      src="https://mirankingtenis.com.ar/wp-content/uploads/2023/05/cropped-cropped-LOGOTENIS-171x172.png"
+                      src="/LOGOTENIS.png"
                       alt="Your Company"
                       className="h-10 w-auto"
                     />
@@ -114,15 +115,6 @@ export default function Navbar() {
               <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
                 {session ? (
                   <>
-                    <button
-                      type="button"
-                      className="relative rounded-full bg-slate-700 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
-                    >
-                      <span className="absolute -inset-1.5" />
-                      <span className="sr-only">View notifications</span>
-                      <FaBell className="h-6 w-6" aria-hidden="true" />
-                    </button>
-
                     {/* Profile dropdown */}
                     <Menu as="div" className="relative ml-3">
                       <div>
@@ -168,19 +160,6 @@ export default function Navbar() {
                               >
                                 Mi Perfil
                               </Link>
-                            )}
-                          </Menu.Item>
-                          <Menu.Item>
-                            {({ active }) => (
-                              <a
-                                href="#"
-                                className={classNames(
-                                  active ? "bg-gray-100" : "",
-                                  "block px-4 py-2 text-sm text-gray-700"
-                                )}
-                              >
-                                Ajustes
-                              </a>
                             )}
                           </Menu.Item>
                           <Menu.Item>

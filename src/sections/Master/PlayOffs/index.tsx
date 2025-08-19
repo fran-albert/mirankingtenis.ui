@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { usePlayOffStore } from "@/hooks/usePlayoff";
-import { ResponsePlayOffDto } from "@/modules/playoff/domain/PlayOff";
+import { ResponsePlayOffDto } from "@/types/PlayOff/PlayOff";
 import useRoles from "@/hooks/useRoles";
 import { useMatchStore } from "@/hooks/useMatch";
 import { Match } from "@/modules/match/domain/Match";
@@ -31,15 +31,15 @@ function PlayOffCards({
   const [isAddResultDialogOpen, setIsAddResultDialogOpen] = useState(false);
   const [isAddShiftDialogOpen, setIsAddShiftDialogOpen] = useState(false);
 
-  const updateAllMatches = () => {
+  const updateAllMatches = useCallback(() => {
     fetchQuarterFinals(idTournament, idCategory);
     fetchSemiFinals(idTournament, idCategory);
     fetchFinals(idTournament, idCategory);
-  };
+  }, [idTournament, idCategory, fetchQuarterFinals, fetchSemiFinals, fetchFinals]);
 
   useEffect(() => {
     updateAllMatches();
-  }, [idTournament, idCategory]);
+  }, [updateAllMatches]);
 
   const handleAddResult = (match: GroupFixtureDto) => {
     selectMatch(match);

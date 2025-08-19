@@ -3,15 +3,13 @@
 import React, { useEffect, useState } from "react";
 
 import { User } from "@/types/User/User";
-import { createApiUserRepository } from "@/modules/users/infra/ApiUserRepository";
 import { Step2 } from "./step2";
 import { Step3 } from "./step3";
 import { Step4 } from "./step4";
 import { Step5 } from "./step5";
-import { createApiTournamentParticipantRepository } from "@/modules/tournament-participant/infra/ApiTournamentRepository";
 import { TournamentParticipant } from "@/modules/tournament-participant/domain/TournamentParticipant";
-import { createApiTournamentRankingRepository } from "@/modules/tournament-ranking/infra/ApiTournamentRankingRepository";
 import { TournamentRanking } from "@/modules/tournament-ranking/domain/TournamentRanking";
+import { useTournamentRanking } from "@/hooks/Tournament-Ranking/useTournamentRanking";
 
 export const StepsControllerV2 = ({
   idTournament,
@@ -33,17 +31,12 @@ export const StepsControllerV2 = ({
   const [selectedMatches, setSelectedMatches] = useState<
     { idUser1: number | null; idUser2: number | null }[]
   >([]);
-  const [players, setPlayers] = useState<TournamentRanking[]>([]);
-
-  useEffect(() => {
-    if (idCategory) {
-      const userRepository = createApiTournamentRankingRepository();
-      userRepository
-        .getAllRankingsByTournamentCategory(idTournament, idCategory)
-        .then(setPlayers)
-        .catch((error) => console.error("Error fetching players:", error));
-    }
-  }, [idCategory, idTournament]);
+  // Usar React Query hook para rankings
+  const { rankings: players = [] } = useTournamentRanking({
+    idTournament,
+    idCategory,
+    enabled: !!idTournament && !!idCategory
+  });
 
 
   switch (currentStep) {

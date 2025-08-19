@@ -1,6 +1,6 @@
 "use client";
-import { useTournamentStore } from "@/hooks/useTournament";
-import { useTournamentCategoryStore } from "@/hooks/useTournamentCategory";
+import { useLastFinishedLeagueTournament } from "@/hooks/Tournament/useTournament";
+import { useTournamentCategoryId } from "@/hooks/Tournament-Category/useTournamentCategory";
 import FiltersRanking from "@/sections/Ranking/Filters";
 import { RankingTable } from "@/sections/Ranking/Table/table";
 import RankingTabs from "@/sections/Ranking/Tabs/tabs";
@@ -8,21 +8,21 @@ import TournamentTabs from "@/sections/Tournament/Tabs/tabs";
 import React, { useEffect, useState } from "react";
 
 function ClientRankingComponent() {
-  const {
-    findLastFinishedLeagueTournament,
-    tournament: lastTournament,
-    loading,
-  } = useTournamentStore();
-  const initialTournamentId = process.env.NODE_ENV === 'production' ? "3" : "45";
+  // Usar React Query hooks
+  const { tournament: lastTournament } = useLastFinishedLeagueTournament({ enabled: true });
+  
+  const initialTournamentId = process.env.NODE_ENV === 'production' ? "6" : "45";
   const [selectedCategory, setSelectedCategory] = useState("1");
   const [selectedTournament, setSelectedTournament] = useState(initialTournamentId);
   const [error, setError] = useState<string | null>(null);
-  const { getTournamentCategoryId, tournamentCategoryId } =
-    useTournamentCategoryStore();
+  
+  const { tournamentCategoryId } = useTournamentCategoryId({
+    idTournament: Number(selectedTournament),
+    idCategory: Number(selectedCategory),
+    enabled: !!selectedTournament && !!selectedCategory
+  });
 
-  useEffect(() => {
-    findLastFinishedLeagueTournament();
-  }, [findLastFinishedLeagueTournament]);
+  // Ya no es necesario - React Query maneja la carga automáticamente
 
   useEffect(() => {
     if (lastTournament && !selectedTournament) {
@@ -30,14 +30,7 @@ function ClientRankingComponent() {
     }
   }, [lastTournament, selectedTournament]);
 
-  useEffect(() => {
-    if (selectedCategory && selectedTournament) {
-      getTournamentCategoryId(
-        Number(selectedTournament),
-        Number(selectedCategory)
-      );
-    }
-  }, [selectedCategory, selectedTournament, getTournamentCategoryId]);
+  // Ya no es necesario - React Query hook maneja esto automáticamente
 
   const isSelectionComplete = selectedCategory && selectedTournament;
 
@@ -58,7 +51,7 @@ function ClientRankingComponent() {
             <div className="lg:px-0 m-2">
               <div className="mt-4">
                 <RankingTable
-                  tournamentCategoryId={tournamentCategoryId}
+                  tournamentCategoryId={tournamentCategoryId!}
                   idCategory={Number(selectedCategory)}
                   idTournament={Number(selectedTournament)}
                 />

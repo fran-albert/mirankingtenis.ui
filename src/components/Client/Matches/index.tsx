@@ -1,9 +1,9 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { createApiFixtureRepository } from "@/modules/fixture/infra/ApiFixtureRepository";
-import { useTournamentCategoryStore } from "@/hooks/useTournamentCategory";
+import { useTournamentCategoryId } from "@/hooks/Tournament-Category/useTournamentCategory";
 import FiltersMatches from "@/sections/Matches/Filters";
-import { useTournamentStore } from "@/hooks/useTournament";
+import { useLastFinishedLeagueTournament } from "@/hooks/Tournament/useTournament";
 import { TennisScoreboard } from "@/sections/Matches/TennisScoreBoard/tennisScoreBoard";
 
 function ClientMatchesComponent() {
@@ -16,14 +16,16 @@ function ClientMatchesComponent() {
   const [jornadas, setJornadas] = useState<number[]>([]);
   const [error, setError] = useState<string | null>(null);
   const fixtureRepository = createApiFixtureRepository();
-  const { getTournamentCategoryId, tournamentCategoryId } =
-    useTournamentCategoryStore();
-  const { findLastFinishedLeagueTournament, tournament: lastTournament } =
-    useTournamentStore();
+  // Usar React Query hooks
+  const { tournament: lastTournament } = useLastFinishedLeagueTournament({ enabled: true });
+  
+  const { tournamentCategoryId } = useTournamentCategoryId({
+    idTournament: Number(selectedTournament),
+    idCategory: Number(selectedCategory),
+    enabled: !!selectedTournament && !!selectedCategory
+  });
 
-  useEffect(() => {
-    findLastFinishedLeagueTournament();
-  }, [findLastFinishedLeagueTournament]);
+  // Ya no es necesario - React Query maneja la carga automáticamente
 
   useEffect(() => {
     if (lastTournament && !selectedTournament) {
@@ -70,14 +72,7 @@ function ClientMatchesComponent() {
   
   
 
-  useEffect(() => {
-    if (selectedCategory && selectedTournament) {
-      getTournamentCategoryId(
-        Number(selectedTournament),
-        Number(selectedCategory)
-      );
-    }
-  }, [selectedCategory, selectedTournament, getTournamentCategoryId]);
+  // Ya no es necesario - React Query hook maneja esto automáticamente
 
   const isSelectionComplete =
     selectedCategory && selectedTournament && selectedJornada;
@@ -110,7 +105,7 @@ function ClientMatchesComponent() {
               <div className="w-full">
                 <TennisScoreboard
                   jornada={Number(selectedJornada)}
-                  tournamentCategoryId={tournamentCategoryId}
+                  tournamentCategoryId={tournamentCategoryId!}
                 />
               </div>
             </div>

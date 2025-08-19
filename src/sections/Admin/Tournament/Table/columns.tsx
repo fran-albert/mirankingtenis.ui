@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import DeletePlayerDialog from "@/sections/Players/Delete/button";
 import { formatDate } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { Tournament } from "@/modules/tournament/domain/Tournament";
+import { Tournament } from "@/types/Tournament/Tournament";
 import { TournamentStatus } from "@/common/enum/tournamentStatus.enum";
 import { ViewButton } from "@/components/Button/View/button";
 import StartTournamentDialog from "../Start/dialog";

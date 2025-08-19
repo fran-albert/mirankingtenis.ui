@@ -4,6 +4,7 @@ import "react-image-crop/dist/ReactCrop.css";
 import { Camera, Upload, Check, X, Crop as CropIcon, Undo } from "lucide-react";
 import { Button } from "../ui/button";
 import { Label } from "../ui/label";
+import Image from "next/image";
 
 interface CropWithAspect extends Crop {
   aspect?: number;
@@ -237,7 +238,7 @@ const ImagePicker: React.FC<ImagePickerProps> = ({ onImageSelect }) => {
                 onChange={(newCrop: CropWithAspect) => setCrop(newCrop)}
                 className="max-h-[400px] overflow-auto"
               >
-                <img
+                <Image
                   src={selectedImage || "/placeholder.svg"}
                   onLoad={onImageLoaded}
                   alt="Imagen para recortar"
@@ -263,7 +264,7 @@ const ImagePicker: React.FC<ImagePickerProps> = ({ onImageSelect }) => {
             <div className="p-4 rounded-md border border-gray-200 bg-gray-50">
               <p className="text-sm text-gray-500 mb-2">Vista previa:</p>
               <div className="flex justify-center">
-                <img
+                <Image
                   src={croppedImage || "/placeholder.svg"}
                   alt="Imagen recortada"
                   className="max-w-full h-auto rounded-md shadow-sm"

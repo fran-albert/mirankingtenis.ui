@@ -8,7 +8,6 @@ import {
   Tooltip,
   ResponsiveContainer,
   Legend,
-  TooltipProps,
   Dot,
 } from "recharts";
 import {
@@ -24,6 +23,15 @@ type DataType = {
   date: string;
   position: number;
 };
+
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: Array<{
+    value: number;
+    payload: DataType;
+  }>;
+  label?: string;
+}
 
 function PlayerChart({
   player,
@@ -56,7 +64,7 @@ function PlayerChart({
     active,
     payload,
     label,
-  }: TooltipProps<number, string>) => {
+  }: CustomTooltipProps) => {
     if (active && payload && payload.length) {
       return (
         <div

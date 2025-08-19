@@ -1,5 +1,5 @@
-import { useTournamentStore } from "@/hooks/useTournament";
-import React, { useEffect } from "react";
+import { useAllTournaments } from "@/hooks/Tournament/useTournament";
+import React, { useEffect, useState } from "react";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 
 function TournamentTabs({
@@ -7,27 +7,33 @@ function TournamentTabs({
 }: {
   onSelectTournament: (idTournament: number) => void;
 }) {
-  const {
-    getAllTournaments,
-    tournaments,
-    activeTournament,
-    setActiveTournament,
-  } = useTournamentStore();
-
+  // Usar React Query hook para torneos
+  const { tournaments } = useAllTournaments();
+  
+  // Estado local para el torneo activo
+  const [activeTournament, setActiveTournament] = useState<number>(0);
+  
+  // Inicializar con el primer torneo league cuando se cargan los datos
   useEffect(() => {
-    if (tournaments.length === 0) {
-      getAllTournaments();
+    if (tournaments.length > 0 && activeTournament === 0) {
+      const firstLeagueTournament = tournaments.find(t => t.type === "league");
+      if (firstLeagueTournament) {
+        setActiveTournament(firstLeagueTournament.id);
+      }
     }
-  }, [getAllTournaments, tournaments.length]);
+  }, [tournaments, activeTournament]);
 
   const handleSelectTournament = (idTournament: number) => {
     setActiveTournament(idTournament);
     onSelectTournament(idTournament);
   };
 
+  const leagueTournaments = tournaments.filter(tournament => tournament.type === "league");
+  
   const scrollLeft = () => {
-    const prevIndex = Math.max(0, activeTournament - 1);
-    const prevTournament = tournaments.filter(t => t.type === "league")[prevIndex];
+    const currentIndex = leagueTournaments.findIndex(t => t.id === activeTournament);
+    const prevIndex = Math.max(0, currentIndex - 1);
+    const prevTournament = leagueTournaments[prevIndex];
     if (prevTournament) {
       setActiveTournament(prevTournament.id);
       onSelectTournament(prevTournament.id);
@@ -35,15 +41,14 @@ function TournamentTabs({
   };
 
   const scrollRight = () => {
-    const nextIndex = Math.min(tournaments.filter(t => t.type === "league").length - 1, activeTournament + 1);
-    const nextTournament = tournaments.filter(t => t.type === "league")[nextIndex];
+    const currentIndex = leagueTournaments.findIndex(t => t.id === activeTournament);
+    const nextIndex = Math.min(leagueTournaments.length - 1, currentIndex + 1);
+    const nextTournament = leagueTournaments[nextIndex];
     if (nextTournament) {
       setActiveTournament(nextTournament.id);
       onSelectTournament(nextTournament.id);
     }
   };
-
-  const leagueTournaments = tournaments.filter(tournament => tournament.type === "league");
 
   return (
     <div className="flex items-center justify-center py-2 px-4 bg-white rounded-lg shadow-md">

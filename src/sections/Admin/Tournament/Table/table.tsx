@@ -6,7 +6,7 @@ import { getColumns } from "./columns";
 import useRoles from "@/hooks/useRoles";
 import { useCustomSession } from "@/context/SessionAuthProviders";
 import { Category } from "@/modules/category/domain/Category";
-import { Tournament } from "@/modules/tournament/domain/Tournament";
+import { Tournament } from "@/types/Tournament/Tournament";
 import AddTournamentDialog from "../Add/dialog";
 
 function TournamentTable({
