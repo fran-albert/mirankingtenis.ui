@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { createSets } from "@/api/Sets/create-sets.action";
 import { getTotalPlayerSetSummary } from "@/api/Sets/get-player-set-summary.action";
-import { Match } from "@/modules/match/domain/Match";
+import { Match } from "@/types/Match/Match";
 
 // Hook para obtener el resumen de sets de un jugador
 export function usePlayerSetSummary(playerId: number, enabled = true) {

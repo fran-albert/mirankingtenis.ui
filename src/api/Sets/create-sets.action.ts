@@ -1,5 +1,5 @@
 import axiosInstance from "@/services/axiosConfig";
-import { Match } from "@/modules/match/domain/Match";
+import { Match } from "@/types/Match/Match";
 
 export async function createSets(sets: Match): Promise<Match> {
     try {
