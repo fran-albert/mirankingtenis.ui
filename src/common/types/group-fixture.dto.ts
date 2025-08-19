@@ -1,4 +1,4 @@
-import { Sets } from "@/modules/sets/domain/Sets";
+import { Sets } from "@/types/Set/Sets";
 import { Shift } from "@/modules/shift/domain/Shift";
 
 export interface GroupFixtureDto {
