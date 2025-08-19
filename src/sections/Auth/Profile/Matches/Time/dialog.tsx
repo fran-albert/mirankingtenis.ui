@@ -34,7 +34,7 @@ import { createApiShiftRepository } from "@/modules/shift/infra/ApiShiftReposito
 import { shiftForMatch } from "@/modules/shift/application/shift-for-match/shiftForMatch";
 registerLocale("es", es);
 import moment from "moment-timezone";
-import { Match } from "@/modules/match/domain/Match";
+import { Match } from "@/types/Match/Match";
 interface EidtMatchDialogProps {
   onUpdateMatches?: () => void;
   match: Match;

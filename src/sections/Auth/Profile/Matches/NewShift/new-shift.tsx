@@ -23,7 +23,7 @@ import { es } from "date-fns/locale/es";
 import { CourtSelect } from "@/components/Select/Court/select";
 import { createApiShiftRepository } from "@/modules/shift/infra/ApiShiftRepository";
 import { shiftForMatch } from "@/modules/shift/application/shift-for-match/shiftForMatch";
-import { useMatchStore } from "@/hooks/useMatch";
+import { useMatchStore } from "@/hooks/useMatchStore";
 
 interface EidtMatchDialogProps {
   updateMatches?: () => void;

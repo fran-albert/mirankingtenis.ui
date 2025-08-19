@@ -5,7 +5,7 @@ import AddShiftDialog from "./Time/dialog";
 import AddResultMatchDialog from "./AddResult/dialog";
 import DeleteMatchDialog from "./Delete/button";
 import { formatDate, formatDateComplete } from "@/lib/utils";
-import { Match } from "@/modules/match/domain/Match";
+import { Match } from "@/types/Match/Match";
 import UpdateShiftDialog from "./EditTime/dialog";
 import DeleteShiftDialog from "./DeleteShift/dialog";
 

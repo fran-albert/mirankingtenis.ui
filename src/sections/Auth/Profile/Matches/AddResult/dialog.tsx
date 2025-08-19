@@ -17,7 +17,7 @@ import { useCreateSets } from "@/hooks/Sets/useSet";
 import axios from "axios";
 import { MdScoreboard } from "react-icons/md";
 import ActionIcon from "@/components/ui/actionIcon";
-import { Match } from "@/modules/match/domain/Match";
+import { Match } from "@/types/Match/Match";
 import "./dialog.style.css";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";

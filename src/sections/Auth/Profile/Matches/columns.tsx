@@ -8,7 +8,7 @@ import AddResultMatchDialog from "./AddResult/dialog";
 import EditMatchDialog from "./Time/dialog";
 import { formatDate, formatDateComplete } from "@/lib/utils";
 import UpdateShiftDialog from "./EditTime/dialog";
-import { Match } from "@/modules/match/domain/Match";
+import { Match } from "@/types/Match/Match";
 import { BadgeWin } from "@/components/Badge/Green/badge";
 import { BadgePending } from "@/components/Badge/Pending/badge";
 import DeleteShiftDialog from "./DeleteShift/dialog";

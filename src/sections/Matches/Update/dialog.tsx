@@ -15,10 +15,9 @@ import { toast } from "sonner";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useCreateSets } from "@/hooks/Sets/useSet";
 import axios from "axios";
-import { Match } from "@/modules/match/domain/Match";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { useMatchStore } from "@/hooks/useMatch";
+import { useMatchStore } from "@/hooks/useMatchStore";
 import { GiConsoleController } from "react-icons/gi";
 import { CiKeyboard } from "react-icons/ci";
 

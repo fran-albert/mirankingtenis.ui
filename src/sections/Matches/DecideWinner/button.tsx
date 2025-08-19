@@ -12,13 +12,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import ActionIcon from "@/components/ui/actionIcon";
-import { Match } from "@/modules/match/domain/Match";
+import { Match } from "@/types/Match/Match";
 import { IoTennisballSharp } from "react-icons/io5";
-import { createApiMatchRepository } from "@/modules/match/infra/ApiMatchRepository";
-import { decideMatch } from "@/modules/match/application/decide-match/decideMatch";
+// React Query hook is imported above
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
-import { useMatchStore } from "@/hooks/useMatch";
+import { useDecideMatch } from "@/hooks/Matches/useMatches";
 import { isAxiosError } from "axios";
 
 interface DecideMatchDialogProps {
@@ -33,7 +32,7 @@ export default function DecideMatchDialog({
   onMatchDecided,
 }: DecideMatchDialogProps) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const { decideMatch } = useMatchStore();
+  const { mutate: decideMatchMutation } = useDecideMatch();
   const [selectedPlayer, setSelectedPlayer] = useState<number | null>(null);
   const toggleDialog = () => setIsOpen(!isOpen);
 
@@ -54,29 +53,43 @@ export default function DecideMatchDialog({
     }
 
     try {
-      const matchPromise = decideMatch(
-        match.id,
-        winnerUserId,
-        tournamentCategoryId
-      );
+      const matchPromise = new Promise((resolve, reject) => {
+        decideMatchMutation(
+          {
+            id: match.id,
+            winnerUserId,
+            tournamentCategoryId
+          },
+          {
+            onSuccess: () => {
+              if (onMatchDecided) {
+                onMatchDecided();
+              }
+              setIsOpen(false);
+              resolve(true);
+            },
+            onError: (error) => {
+              reject(error);
+            }
+          }
+        );
+      });
+      
       toast.promise(matchPromise, {
         loading: "Decidiendo...",
         success: "Partido decidido con éxito!",
         error: (err) => {
           if (isAxiosError(err)) {
-            return err?.response?.data.message || "Error al crear el PlayOff";
+            return err?.response?.data.message || "Error al decidir partido";
           }
-          return "Error al crear el PlayOff";
+          return "Error al decidir partido";
         },
         duration: 3000,
       });
+      
       await matchPromise;
-      if (onMatchDecided) {
-        onMatchDecided();
-      }
-      setIsOpen(false);
     } catch (error) {
-      console.error("Error al crear el PlayOff", error);
+      console.error("Error al decidir partido", error);
     }
   };
 

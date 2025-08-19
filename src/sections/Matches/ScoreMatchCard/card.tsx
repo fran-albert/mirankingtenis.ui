@@ -15,12 +15,12 @@ import DeleteMatchDialog from "../Delete/button";
 import { es } from "date-fns/locale/es";
 import { registerLocale } from "react-datepicker";
 import { formatDate } from "@/lib/utils";
-import { Match } from "@/modules/match/domain/Match";
+import { Match } from "@/types/Match/Match";
 import { BadgeWin } from "@/components/Badge/Green/badge";
 import DecideMatchDialog from "../DecideWinner/button";
 import AddResultMatchDialog from "@/sections/Auth/Profile/Matches/AddResult/dialog";
 import UpdateMatchDialog from "../Update/dialog";
-import { useMatchStore } from "@/hooks/useMatch";
+import { useMatchStore } from "@/hooks/useMatchStore";
 registerLocale("es", es);
 export const ScoreMatchCard = ({
   idUser1,

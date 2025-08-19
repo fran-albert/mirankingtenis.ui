@@ -1,5 +1,6 @@
-import { Match } from "@/modules/match/domain/Match";
+
 import axiosInstance from "@/services/axiosConfig";
+import { Match } from "@/types/Match/Match";
 
 export const getAllMatches = async () => {
   try {
