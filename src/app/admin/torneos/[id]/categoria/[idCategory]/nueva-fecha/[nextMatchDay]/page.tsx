@@ -1,11 +1,12 @@
 "use client";
 import { StepsControllerV2 } from "@/sections/Fixture/stepControllerV2";
-import React, { useEffect } from "react";
+import React from "react";
 import { useParams } from "next/navigation";
-import { useTournamentStore } from "@/hooks/useTournament";
+import { useTournament } from "@/hooks/Tournament/useTournament";
+import { useTournamentCategoryId } from "@/hooks/Tournament-Category/useTournamentCategory";
 import { StepsControllerGroup } from "@/sections/Fixture/Group";
-import { useGroupStore } from "@/hooks/useGroup";
-import { useTournamentCategoryStore } from "@/hooks/useTournamentCategory";
+import { useGroupsStageByTournamentCategory } from "@/hooks/Group-Stage/useGroupStage";
+import { useGroupRankings } from "@/hooks/Group/useGroup";
 function NewMatchDay() {
   const params = useParams<{
     id: string;
@@ -15,38 +16,44 @@ function NewMatchDay() {
   const idTournament = Number(params.id);
   const idCategory = Number(params.idCategory);
   const nextMatchDay = Number(params.nextMatchDay);
-  const { getTournament, tournament } = useTournamentStore();
-  const {
-    getGroupRankings,
-    groupRankings,
-    getGroupStagesByTournamentCategory,
-    groupStageId,
-  } = useGroupStore();
-  const { getTournamentCategoryId, tournamentCategoryId } =
-    useTournamentCategoryStore();
-
-  useEffect(() => {
-    getTournament(idTournament);
-    getTournamentCategoryId(idTournament, idCategory);
-
-    if (tournament?.type === "master") {
-      getGroupStagesByTournamentCategory(idTournament, idCategory);
-      getGroupRankings(Number(groupStageId));
-    }
-  }, [
+  
+  // Usar React Query hooks
+  const { tournament, isLoading: isTournamentLoading } = useTournament({ 
+    idTournament, 
+    enabled: !!idTournament 
+  });
+  
+  const { tournamentCategoryId, isLoading: isTournamentCategoryLoading } = useTournamentCategoryId({
     idTournament,
     idCategory,
-    groupStageId,
-    tournament?.type,
-    getTournament,
-    getTournamentCategoryId,
-    getGroupStagesByTournamentCategory,
-    getGroupRankings,
-  ]);
+    enabled: !!idTournament && !!idCategory
+  });
+  
+  // Usar React Query hooks para Group Stage
+  const { groups: groupStageId, isLoading: isGroupStagesLoading } = useGroupsStageByTournamentCategory(
+    idTournament, 
+    idCategory, 
+    !!idTournament && !!idCategory && tournament?.type === "master"
+  );
+  
+  // Usar React Query hook para Group Rankings
+  const { rankings: groupRankings, isLoading: isGroupRankingsLoading } = useGroupRankings(
+    groupStageId || 0,
+    !!groupStageId && tournament?.type === "master"
+  );
+
+  // Ya no necesitamos useEffect - React Query maneja toda la carga de datos automáticamente
+
+  const isLoading = isTournamentLoading || isTournamentCategoryLoading || 
+    (tournament?.type === "master" && (isGroupStagesLoading || isGroupRankingsLoading));
+
+  if (isLoading || !tournament || !tournamentCategoryId) {
+    return <div>Cargando...</div>;
+  }
 
   return (
     <div>
-      {tournament?.type === "master" && (
+      {tournament.type === "master" && (
         <StepsControllerGroup
           idTournament={idTournament}
           idCategory={idCategory}
@@ -55,7 +62,7 @@ function NewMatchDay() {
           groupRankings={groupRankings}
         />
       )}
-      {tournament?.type === "league" && (
+      {tournament.type === "league" && (
         <StepsControllerV2
           idTournament={idTournament}
           tournamentCategoryId={tournamentCategoryId}
