@@ -1,6 +1,7 @@
 "use client"
 import { getAllMatches } from "@/api/Matches/get-all-matches";
 import { getMatchesByDate } from "@/api/Matches/get-matches-by-date";
+import { findMatchesByGroupStage } from "@/api/Matches/findMatchesByGroupStage";
 import { useQuery } from "@tanstack/react-query"
 
 
@@ -27,3 +28,21 @@ export const useMatches = ({}) => {
     }
 
 }
+
+export const useMatchesByGroupStage = (groupStageId: number, enabled: boolean = true) => {
+    const { isLoading, isError, error, data: groupFixture = [], isFetching, refetch } = useQuery({
+        queryKey: ['matches', 'byGroupStage', groupStageId],
+        queryFn: () => findMatchesByGroupStage(groupStageId),
+        staleTime: 1000 * 60 * 5,
+        enabled: enabled && !!groupStageId
+    });
+
+    return {
+        groupFixture,
+        error,
+        isLoading,
+        isError,
+        isFetching,
+        refetch
+    };
+};
