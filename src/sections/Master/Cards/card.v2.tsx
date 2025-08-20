@@ -94,6 +94,8 @@ export default function TournamentPlayers() {
                     <Image
                       src={player.image || "/placeholder.svg"}
                       alt={player.name}
+                      height={32}
+                      width={32}
                       className="w-32 h-32 rounded-full object-cover border-4 border-gray-200 group-hover:border-blue-400 transition-colors duration-300"
                     />
                     <div className="absolute inset-0 rounded-full bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
