@@ -8,9 +8,11 @@
   },
   "scripts": {
     "dev": "next dev",
+    "dev-turbo": "next dev --turbo",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "clean": "rm -rf .next node_modules/.cache"
   },
   "dependencies": {
     "@faker-js/faker": "^9.9.0",
@@ -42,13 +44,12 @@
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.540.0",
     "moment-timezone": "^0.6.0",
-    "next": "^15.4.6",
-    "next-auth": "^5.0.0-beta.29",
-    "react": "^19",
+    "next": "^15.5.0",
+    "react": "^19.1.1",
     "react-big-calendar": "^1.19.4",
     "react-chartjs-2": "^5.3.0",
     "react-datepicker": "^8.5.0",
-    "react-dom": "^19",
+    "react-dom": "^19.1.1",
     "react-easy-crop": "^5.5.0",
     "react-hook-form": "^7.62.0",
     "react-icons": "^5.5.0",
@@ -63,6 +64,7 @@
     "zustand": "^5.0.7"
   },
   "devDependencies": {
+    "@playwright/test": "^1.54.2",
     "@tailwindcss/nesting": "^0.0.0-insiders.565cd3e",
     "@types/node": "^24",
     "@types/react": "^19",
@@ -72,6 +74,7 @@
     "autoprefixer": "^10.4.21",
     "eslint": "^9",
     "eslint-config-next": "15.4.6",
+    "playwright": "^1.54.2",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
