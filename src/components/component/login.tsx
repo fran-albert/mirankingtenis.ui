@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect } from "react";
-import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -13,6 +12,7 @@ import Image from "next/image";
 import { User } from "@/types/User/User";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { useCustomSession } from "@/context/SessionAuthProviders";
+import { useAuth } from "@/context/AuthProvider";
 
 interface Inputs extends User {}
 
@@ -27,30 +27,22 @@ export function Login() {
   } = useForm<Inputs>();
   const router = useRouter();
   const { session } = useCustomSession();
+  const { login } = useAuth();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [loginError, setLoginError] = useState<string>("");
-  useEffect(() => {
-    if (session) {
-      router.push("/mi-perfil");
-    }
-  }, [session, router]);
+  
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    const { email, password } = data;
     setIsLoading(true);
-    const result = await signIn("credentials", {
-      redirect: false,
-      email,
-      password,
-    });
-
-    setIsLoading(false);
-
-    if (result?.error) {
-      if (result.error === "No user found") {
-        setLoginError("Usuario no encontrado.");
-      } else {
-        setLoginError("Error al iniciar sesión: " + result.error);
-      }
+    setLoginError("");
+    
+    try {
+      const { email, password } = data;
+      await login(email, password);
+      // La redirección se maneja en el useEffect
+    } catch (error: any) {
+      setLoginError(error.message || "Error al iniciar sesión");
+    } finally {
+      setIsLoading(false);
     }
   };
 

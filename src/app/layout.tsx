@@ -3,6 +3,7 @@ import { Roboto } from "next/font/google";
 import "@/styles/globals.css";
 import { cn } from "@/lib/utils";
 import { Toaster } from "sonner";
+import { AuthProvider } from "@/context/AuthProvider";
 import SessionAuthProvider from "@/context/SessionAuthProviders";
 import { ProfilePhotoProvider } from "@/context/ProfilePhotoContext";
 import MainContainer from "./mainContainer";
@@ -39,17 +40,19 @@ export default function RootLayout({
           roboto.className
         )}
       >
-        <ProfilePhotoProvider>
-          <SessionAuthProvider>
-            <Toaster richColors position="top-center" />
-            <MainContainer>
+        <AuthProvider>
+          <ProfilePhotoProvider>
+            <SessionAuthProvider>
+              <Toaster richColors position="top-center" />
+              <MainContainer>
 
               <ClientWrapper>
                 {children}
               </ClientWrapper>
-            </MainContainer>
-          </SessionAuthProvider>
-        </ProfilePhotoProvider>
+              </MainContainer>
+            </SessionAuthProvider>
+          </ProfilePhotoProvider>
+        </AuthProvider>
       </body>
     </html>
   );

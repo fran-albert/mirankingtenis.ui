@@ -7,17 +7,18 @@ import {
   FaFileMedicalAlt,
   FaFilePdf,
 } from "react-icons/fa";
-import { signOut } from "next-auth/react";
 import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
 import { FiLogOut } from "react-icons/fi";
 import { FaUserDoctor } from "react-icons/fa6";
 import Link from "next/link";
 import { useCustomSession } from "@/context/SessionAuthProviders";
+import { useAuth } from "@/context/AuthProvider";
 import { GiHospitalCross } from "react-icons/gi";
 
 export default function SideBar() {
   const router = useRouter();
+  const { logout } = useAuth();
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [isDropdownOpenSecretary, setDropdownOpenSecretary] = useState(false);
@@ -188,7 +189,8 @@ export default function SideBar() {
             <li>
               <a
                 onClick={() => {
-                  signOut();
+                  logout();
+                  router.push("/");
                 }}
                 className="flex items-center p-2 text-gray-900 rounded-lg  hover:bg-red-100  group cursor-pointer"
               >

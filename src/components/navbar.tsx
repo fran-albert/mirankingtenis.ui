@@ -4,13 +4,13 @@ import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { FaGripLines } from "react-icons/fa6";
 import { IoClose } from "react-icons/io5";
 import Link from "next/link";
-import { signOut } from "next-auth/react";
 import { useCustomSession } from "@/context/SessionAuthProviders";
+import { useAuth } from "@/context/AuthProvider";
 import { usePathname, useRouter } from "next/navigation";
 import useRoles from "@/hooks/useRoles";
 import Image from "next/image";
 import { useProfilePhoto } from "@/context/ProfilePhotoContext";
-import AutoSignOut from "./autoSignOut";
+// import AutoSignOut from "./autoSignOut";
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
@@ -19,6 +19,7 @@ function classNames(...classes: string[]) {
 export default function Navbar() {
   const { session } = useCustomSession();
   const { isAdmin } = useRoles();
+  const { logout } = useAuth();
   const pathname = usePathname();
   const { profilePhoto } = useProfilePhoto();
 
@@ -166,10 +167,8 @@ export default function Navbar() {
                             {({ active }) => (
                               <a
                                 onClick={() => {
-                                  signOut({
-                                    callbackUrl:
-                                      process.env.NEXT_PUBLIC_BASE_URL,
-                                  });
+                                  logout();
+                                  window.location.href = "/";
                                 }}
                                 className={classNames(
                                   active ? "bg-red-100" : "",

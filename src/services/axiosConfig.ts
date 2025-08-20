@@ -1,5 +1,4 @@
 import axios from "axios";
-import { getSession } from "next-auth/react";
 
 const axiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
@@ -10,8 +9,8 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
   async (config) => {
-    const session = await getSession();
-    const token = session?.user.token;
+    // Obtener token de localStorage en lugar de Next-Auth
+    const token = localStorage.getItem("auth_token");
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -20,6 +19,25 @@ axiosInstance.interceptors.request.use(
     return config;
   },
   (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Interceptor para manejar respuestas 401 (token expirado)
+axiosInstance.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  (error) => {
+    if (error.response?.status === 401) {
+      // Token expirado o inválido, limpiar localStorage
+      localStorage.removeItem("auth_token");
+      localStorage.removeItem("user_photo");
+      // Opcional: redirigir a login
+      if (typeof window !== "undefined") {
+        window.location.href = "/iniciar-sesion";
+      }
+    }
     return Promise.reject(error);
   }
 );

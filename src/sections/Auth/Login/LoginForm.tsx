@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect } from "react";
-import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -12,6 +11,7 @@ import { Separator } from "@/components/ui/separator";
 import { User } from "@/types/User/User";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { useCustomSession } from "@/context/SessionAuthProviders";
+import { useAuth } from "@/context/AuthProvider";
 
 interface Inputs extends User {}
 
@@ -26,26 +26,22 @@ function LoginForm() {
   } = useForm<Inputs>();
   const router = useRouter();
   const { session } = useCustomSession();
+  const { login } = useAuth();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [loginError, setLoginError] = useState<string>("");
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     setIsLoading(true);
-    const { email, password } = data;
-    const result = await signIn("credentials", {
-      redirect: false,
-      email,
-      password,
-    });
-
-    setIsLoading(false);
-
-    if (result?.error) {
-      if (result.error === "No user found") {
-        setLoginError("Usuario no encontrado.");
-      } else {
-        setLoginError("Error al iniciar sesión: " + result.error);
-      }
+    setLoginError("");
+    
+    try {
+      const { email, password } = data;
+      await login(email, password);
+      // El router.push se maneja en el useEffect cuando session cambie
+    } catch (error: any) {
+      setLoginError(error.message || "Error al iniciar sesión");
+    } finally {
+      setIsLoading(false);
     }
   };
 
