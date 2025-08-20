@@ -18,12 +18,16 @@ import {
 import { Button } from "@/components/ui/button";
 import moment from "moment";
 
+import { MatchByUserResponseDto } from "@/types/Match/MatchByUser.dto";
+
+interface PendingMatch extends MatchByUserResponseDto {}
+
 interface CreateSingleMatchProps {
   open: boolean;
   onClose: () => void;
   selectedSlot: { start: Date; end: Date } | null;
-  onReserve: (rivalId: number | null) => void;
-  availableRivals: { id: number; name: string; lastname: string }[];
+  onReserve: (matchId: number) => void;
+  pendingMatches: PendingMatch[];
   court: string;
   sessionUser: any;
 }
@@ -34,14 +38,14 @@ export const CreateSingleMatch: React.FC<CreateSingleMatchProps> = React.memo(({
   selectedSlot,
   court,
   onReserve,
-  availableRivals,
+  pendingMatches,
   sessionUser,
 }) => {
-  const [selectedRival, setSelectedRival] = useState<number | null>(null);
+  const [selectedMatchId, setSelectedMatchId] = useState<number | null>(null);
 
   useEffect(() => {
     if (!open) {
-      setSelectedRival(null);
+      setSelectedMatchId(null);
     }
   }, [open]);
 
@@ -56,35 +60,42 @@ export const CreateSingleMatch: React.FC<CreateSingleMatchProps> = React.memo(({
     [selectedSlot]
   );
 
-  // Optimizar el cambio de rival
-  const handleRivalChange = useCallback((value: string) => {
-    setSelectedRival(Number(value));
+  // Optimizar el cambio de partido
+  const handleMatchChange = useCallback((value: string) => {
+    setSelectedMatchId(Number(value));
   }, []);
 
   // Optimizar el submit del modal
   const handleSubmit = useCallback(() => {
-    if (!selectedRival) {
-      alert("Por favor selecciona un rival");
+    if (!selectedMatchId) {
+      alert("Por favor selecciona un partido");
       return;
     }
-    onReserve(selectedRival);
+    onReserve(selectedMatchId);
     onClose();
-  }, [onReserve, onClose, selectedRival]);
+  }, [onReserve, onClose, selectedMatchId]);
 
   const handleCancel = useCallback(() => {
-    setSelectedRival(null);
+    setSelectedMatchId(null);
     onClose();
   }, [onClose]);
+
+  // Obtener el rival del partido seleccionado
+  const getRivalName = useCallback((match: PendingMatch) => {
+    const rival = match.user1.id === sessionUser.id ? match.user2 : match.user1;
+    if (!rival) return "Sin rival asignado";
+    return `${rival.lastname}, ${rival.name}`;
+  }, [sessionUser.id]);
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="w-[95vw] max-w-md mx-auto sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
         <DialogHeader className="space-y-3">
           <DialogTitle className="text-lg sm:text-xl font-semibold text-center">
-            Crear Partido Individual
+            Asignar Turno a Partido
           </DialogTitle>
           <DialogDescription className="text-sm text-center px-2">
-            Selecciona uno de tus rivales programados para crear un turno.
+            Selecciona uno de tus partidos pendientes para asignarle un turno.
           </DialogDescription>
         </DialogHeader>
         
@@ -119,33 +130,36 @@ export const CreateSingleMatch: React.FC<CreateSingleMatchProps> = React.memo(({
             </div>
           </div>
 
-          {/* Selector de rival */}
+          {/* Selector de partido */}
           <div className="space-y-2">
-            <Label className="text-sm font-medium">Rival *</Label>
+            <Label className="text-sm font-medium">Partido Pendiente *</Label>
             <Select
-              onValueChange={handleRivalChange}
-              value={selectedRival ? String(selectedRival) : ""}
+              onValueChange={handleMatchChange}
+              value={selectedMatchId ? String(selectedMatchId) : ""}
             >
               <SelectTrigger className="w-full h-12">
-                <SelectValue placeholder="Elegir rival de mis partidos" />
+                <SelectValue placeholder="Elegir partido pendiente" />
               </SelectTrigger>
               <SelectContent className="max-h-60">
-                {availableRivals.length > 0 ? (
-                  availableRivals
-                    .filter(rival => rival.id !== sessionUser.id)
-                    .map((rival) => (
+                {pendingMatches.length > 0 ? (
+                  pendingMatches
+                    .filter(match => !match.shift?.startHour) // Solo partidos sin turno asignado
+                    .map((match) => (
                       <SelectItem
-                        key={rival.id}
-                        value={rival.id.toString()}
+                        key={match.id}
+                        value={match.id.toString()}
                       >
                         <div className="flex flex-col">
-                          <span>{rival.lastname}, {rival.name}</span>
+                          <span className="font-medium">vs {getRivalName(match)}</span>
+                          <span className="text-xs text-gray-500">
+                            {match.fixture ? `Jornada ${match.fixture.jornada}` : 'Partido especial'}
+                          </span>
                         </div>
                       </SelectItem>
                     ))
                 ) : (
-                  <SelectItem value="no-players" disabled>
-                    No tienes rivales programados
+                  <SelectItem value="no-matches" disabled>
+                    No tienes partidos pendientes
                   </SelectItem>
                 )}
               </SelectContent>
@@ -164,10 +178,10 @@ export const CreateSingleMatch: React.FC<CreateSingleMatchProps> = React.memo(({
           <Button
             type="submit"
             onClick={handleSubmit}
-            disabled={!selectedRival}
+            disabled={!selectedMatchId}
             className="w-full sm:w-auto order-1 sm:order-2"
           >
-            Crear Partido
+            Asignar Turno
           </Button>
         </DialogFooter>
       </DialogContent>

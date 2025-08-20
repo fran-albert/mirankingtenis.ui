@@ -21,9 +21,8 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { es } from "date-fns/locale/es";
 import { CourtSelect } from "@/components/Select/Court/select";
-import { createApiShiftRepository } from "@/modules/shift/infra/ApiShiftRepository";
-import { shiftForMatch } from "@/modules/shift/application/shift-for-match/shiftForMatch";
 import { useMatchStore } from "@/hooks/useMatchStore";
+import { useShiftMutation } from "@/hooks/Shift/useShiftMutation";
 
 interface EidtMatchDialogProps {
   updateMatches?: () => void;
@@ -43,8 +42,7 @@ export default function AddShiftDialog({
     formState: { errors },
     setValue,
   } = useForm();
-  const shiftRepository = createApiShiftRepository();
-  const shiftForMatchFn = shiftForMatch(shiftRepository);
+  const { shiftForMatchMutation } = useShiftMutation();
   const [selectedCourt, setSelectedCourt] = useState<string>();
 
   const onSubmit = async (data: any, event?: React.BaseSyntheticEvent) => {
@@ -57,34 +55,27 @@ export default function AddShiftDialog({
       idCourt: Number(data.idCourt),
       startHour: startHour,
     };
-    try {
-      const shiftCreationPromise = shiftForMatchFn(dataToSend, match.id);
-      toast.promise(shiftCreationPromise, {
-        loading: "Reservando turno para el partido...",
-        success: "Turno reservado con éxito!",
-        duration: 3000,
-      });
-      await shiftCreationPromise;
-      if (updateMatches) {
-        updateMatches();
+    shiftForMatchMutation.mutate(
+      { shift: dataToSend, idMatch: match.id },
+      {
+        onSuccess: () => {
+          toast.success("Turno reservado con éxito!", { duration: 3000 });
+          if (updateMatches) {
+            updateMatches();
+          }
+          onClose?.();
+        },
+        onError: (error: any) => {
+          const errorMessage =
+            error.response?.data?.message ||
+            "Error desconocido al reservar el partido";
+          toast.error(`Error al reservar el partido: ${errorMessage}`, {
+            duration: 3000,
+          });
+          console.error("Error al reservar el partido", error);
+        }
       }
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        const errorMessage =
-          error.response?.data?.message ||
-          "Error desconocido al reservar el partido";
-        toast.error(`Error al reservar el partido: ${errorMessage}`, {
-          duration: 3000,
-        });
-        console.error("Error al reservar el partido", errorMessage);
-      } else {
-        toast.error("Error al reservar el partido: Error desconocido", {
-          duration: 3000,
-        });
-        console.error("Error al reservar el partido", error);
-      }
-    }
-    onClose?.();
+    );
   };
 
   const handleCourtSelection = (value: string) => {

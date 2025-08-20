@@ -26,7 +26,8 @@ import {
   useLastTournamentByPlayer,
 } from "@/hooks/Tournament/useTournament";
 import { useTournamentCategoriesByUser } from "@/hooks/Tournament-Category/useTournamentCategory";
-import { createSingleMatch } from "@/api/Shift/create-single-match";
+import { createSingleMatch, createShiftForMatch } from "@/api/Shift/create-single-match";
+import { useShiftMutation } from "@/hooks/Shift/useShiftMutation";
 import { MatchByUserResponseDto } from "@/types/Match/MatchByUser.dto";
 
 moment.locale("es");
@@ -77,7 +78,9 @@ export const ShiftCalendar = ({
   >([]);
   const [selectedRival, setSelectedRival] = useState<number | null>(null);
   const [showSingleMatchDialog, setShowSingleMatchDialog] = useState(false);
+  const [selectedMatchId, setSelectedMatchId] = useState<number | undefined>(undefined);
   const { addDoublesMatchesMutation } = useDoubleMatchMutations();
+  const { shiftForMatchMutation } = useShiftMutation();
 
   const idUser = session?.user?.id ? Number(session.user.id) : 0;
 
@@ -285,34 +288,33 @@ export const ShiftCalendar = ({
     setShowDialog(false);
   };
 
-  // Nueva función para reservar partido individual
-  const handleSingleMatchReserve = async (rivalId: number | null) => {
-    if (!session || !selectedSlot) return;
+  // Función para asignar turno a partido existente
+  const handleSingleMatchReserve = async (matchId: number) => {
+    if (!session || !selectedSlot || !matchId) return;
 
-    const singleMatchData = {
-      createdBy: Number(session.user.id),
-      player1Id: Number(session.user.id),
-      player2Id: rivalId,
+    const courtId = resourceMap.find((court) => court.resourceTitle === selectedCourt)
+      ?.resourceId || 0;
+
+    const shiftData = {
+      idCourt: courtId,
       startHour: moment(selectedSlot.start).toISOString(),
-      idCourt:
-        resourceMap.find((court) => court.resourceTitle === selectedCourt)
-          ?.resourceId || 0,
     };
-
-    try {
-      await toast.promise(createSingleMatch(singleMatchData), {
-        loading: "Creando partido individual...",
-        success: "Partido creado con éxito!",
-        error: (err) => {
-          console.error("Error al crear el partido:", err);
-          return err.response?.data?.message || "Ocurrió un error inesperado.";
+    
+    shiftForMatchMutation.mutate(
+      { shift: shiftData, idMatch: matchId },
+      {
+        onSuccess: () => {
+          toast.success("Turno asignado con éxito!");
+          setShowSingleMatchDialog(false);
         },
-      });
-      setShowSingleMatchDialog(false);
-      // Aquí podrías actualizar la lista de partidos si tienes un callback
-    } catch (error) {
-      console.error("Error al crear partido individual:", error);
-    }
+        onError: (error: any) => {
+          const errorMessage =
+            error.response?.data?.message || "Ocurrió un error inesperado.";
+          toast.error(`Error al asignar turno: ${errorMessage}`);
+          console.error("Error al asignar turno:", error);
+        }
+      }
+    );
   };
 
   return (
@@ -360,10 +362,13 @@ export const ShiftCalendar = ({
       </div>
       <CreateSingleMatch
         open={showSingleMatchDialog}
-        onClose={() => setShowSingleMatchDialog(false)}
+        onClose={() => {
+          setShowSingleMatchDialog(false);
+          setSelectedMatchId(undefined); // Reset match ID when closing
+        }}
         selectedSlot={selectedSlot}
         onReserve={handleSingleMatchReserve}
-        availableRivals={availableRivals}
+        pendingMatches={userMatches || []}
         sessionUser={{
           id: session?.user?.id || 0,
           name: session?.user?.name || "Desconocido",

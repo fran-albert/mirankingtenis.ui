@@ -11,8 +11,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { createApiShiftRepository } from "@/modules/shift/infra/ApiShiftRepository";
 import { toast } from "sonner";
+import { useShiftMutation } from "@/hooks/Shift/useShiftMutation";
 
 interface DeleteShiftDialogProps {
   idShift: number;
@@ -24,18 +24,22 @@ export default function DeleteShiftDialog({
   onUpdateMatches,
 }: DeleteShiftDialogProps) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const shiftRepository = createApiShiftRepository();
-  const handleDeleteShift = async () => {
-    try {
-      await shiftRepository.deleteShift(idShift);
-      toast.success("Turno eliminado con éxito");
-      if (onUpdateMatches) {
-        onUpdateMatches();
+  const { deleteShiftMutation } = useShiftMutation();
+  
+  const handleDeleteShift = () => {
+    deleteShiftMutation.mutate(idShift, {
+      onSuccess: () => {
+        toast.success("Turno eliminado con éxito");
+        if (onUpdateMatches) {
+          onUpdateMatches();
+        }
+        toggleDialog();
+      },
+      onError: (error: any) => {
+        toast.error("Ocurrió un error al eliminar el turno");
+        console.error("Error al eliminar turno:", error);
       }
-      toggleDialog();
-    } catch (error) {
-      toast.error("Ocurrió un error al eliminar el turno");
-    }
+    });
   };
 
   const toggleDialog = () => setIsOpen(!isOpen);
