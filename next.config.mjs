@@ -10,24 +10,25 @@ const nextConfig = {
     ],
   },
   
-  // Optimizaciones básicas compatibles con Turbopack
+  // Optimizaciones básicas
   reactStrictMode: true,
-  swcMinify: true,
   
   // Optimización de compilación
   compiler: {
     removeConsole: process.env.NODE_ENV === "production",
   },
   
-  // Experimental features optimizadas para Turbopack
+  // Experimental features
   experimental: {
     optimizeCss: true,
-    turbo: {
-      rules: {
-        '*.svg': {
-          loaders: ['@svgr/webpack'],
-          as: '*.js',
-        },
+  },
+  
+  // Turbopack configuration (moved from experimental.turbo)
+  turbopack: {
+    rules: {
+      '*.svg': {
+        loaders: ['@svgr/webpack'],
+        as: '*.js',
       },
     },
   },
