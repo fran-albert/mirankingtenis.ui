@@ -34,10 +34,10 @@ import { createApiShiftRepository } from "@/modules/shift/infra/ApiShiftReposito
 import { shiftForMatch } from "@/modules/shift/application/shift-for-match/shiftForMatch";
 registerLocale("es", es);
 import moment from "moment-timezone";
-import { Match } from "@/types/Match/Match";
+import { MatchByUserWithRival } from "@/types/Match/MatchByUser.dto";
 interface EidtMatchDialogProps {
   onUpdateMatches?: () => void;
-  match: Match;
+  match: MatchByUserWithRival;
 }
 
 export default function EditMatchDialog({

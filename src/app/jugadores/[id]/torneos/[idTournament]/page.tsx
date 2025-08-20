@@ -48,12 +48,37 @@ function TournamentPlayerPage() {
   });
   
   // Usar React Query hook para obtener partidos del usuario
-  const { data: matches = [], isLoading: isLoadingMatches } = useMatchesByUser(
+  const { data: rawMatches = [], isLoading: isLoadingMatches } = useMatchesByUser(
     idUser, 
     Number(idTournament), 
     matchingTournament?.category.id || 0, 
     !!idUser && !!idTournament && !!matchingTournament?.category.id
   );
+
+  // Procesar matches para agregar rivalName calculado
+  const matches = React.useMemo(() => {
+    return rawMatches.map((match) => {
+      if (match.isBye) {
+        return { ...match, rivalName: "Fecha Libre" };
+      }
+
+      // Determinar quién es el rival basándose en user1 y user2
+      let rivalName = "";
+      if (match.user1 && match.user1.id !== idUser) {
+        rivalName = `${match.user1.lastname}, ${match.user1.name}`;
+      } else if (match.user2 && match.user2.id !== idUser) {
+        rivalName = `${match.user2.lastname}, ${match.user2.name}`;
+      } else {
+        rivalName = "Rival desconocido";
+      }
+
+      return { 
+        ...match, 
+        rivalName,
+        tournamentCategoryId: matchingTournament?.category.id || 0
+      };
+    });
+  }, [rawMatches, idUser, matchingTournament?.category.id]);
 
   // Obtener nombre de categoría directamente de los datos
   const categoryName = matchingTournament?.category.name || "";

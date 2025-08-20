@@ -5,7 +5,7 @@ import AddShiftDialog from "./Time/dialog";
 import AddResultMatchDialog from "./AddResult/dialog";
 import DeleteMatchDialog from "./Delete/button";
 import { formatDate, formatDateComplete } from "@/lib/utils";
-import { Match } from "@/types/Match/Match";
+import { MatchByUserWithRival } from "@/types/Match/MatchByUser.dto";
 import UpdateShiftDialog from "./EditTime/dialog";
 import DeleteShiftDialog from "./DeleteShift/dialog";
 
@@ -13,15 +13,15 @@ function MatchesIndex({
   match,
   onUpdateMatches,
 }: {
-  match: any | undefined;
-  onUpdateMatches: any;
+  match: MatchByUserWithRival[];
+  onUpdateMatches: () => void;
 }) {
   const playersColums = getColumns(onUpdateMatches);
   console.log(match);
   if (window.innerWidth < 768) {
     return (
       <div className="flex flex-col py-2">
-        {match.map((m: Match) => (
+        {match.map((m: MatchByUserWithRival) => (
           <div
             key={m.id}
             className="p-6 shadow-lg rounded-2xl bg-white mb-6 border border-gray-200 hover:shadow-lg transition-shadow duration-300 ease-in-out"
@@ -42,7 +42,8 @@ function MatchesIndex({
             <p className="text-gray-600">
               {m.fixture
                 ? `Fecha: ${m.fixture.jornada}`
-                : `${
+                : m.playoff
+                ? `${
                     m.playoff.roundType === "QuarterFinals"
                       ? "Cuartos de Final"
                       : m.playoff.roundType === "SemiFinals"
@@ -50,7 +51,8 @@ function MatchesIndex({
                       : m.playoff.roundType === "Final"
                       ? "Final"
                       : m.playoff.roundType
-                  }`}
+                  }`
+                : "Partido regular"}
             </p>
 
             {!m.isBye && (
@@ -90,7 +92,7 @@ function MatchesIndex({
                       onUpdateMatches={onUpdateMatches}
                     />
                     <DeleteShiftDialog
-                      idShift={Number(m.shift.id)}
+                      idShift={Number(m.shift?.id)}
                       onUpdateMatches={onUpdateMatches}
                     />
                   </>

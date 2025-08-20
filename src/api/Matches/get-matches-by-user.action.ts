@@ -1,12 +1,12 @@
 import axiosInstance from "@/services/axiosConfig";
-import { Match } from "@/types/Match/Match";
+import { MatchByUserResponseDto } from "@/types/Match/MatchByUser.dto";
 
-export async function getMatchesByUser(idUser: number, idTournament: number, idCategory: number): Promise<Match[]> {
+export async function getMatchesByUser(idUser: number, idTournament: number, idCategory: number): Promise<MatchByUserResponseDto[]> {
     try {
         const response = await axiosInstance.get(
             `matches/by-user/${idUser}/tournament/${idTournament}/category/${idCategory}`
         );
-        const matches = response.data as Match[];
+        const matches = response.data as MatchByUserResponseDto[];
         return matches;
     } catch (error: any) {
         if (error?.response?.status === 404) {

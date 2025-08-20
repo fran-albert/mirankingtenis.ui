@@ -17,14 +17,14 @@ import { useCreateSets } from "@/hooks/Sets/useSet";
 import axios from "axios";
 import { MdScoreboard } from "react-icons/md";
 import ActionIcon from "@/components/ui/actionIcon";
-import { Match } from "@/types/Match/Match";
+import { MatchByUserWithRival } from "@/types/Match/MatchByUser.dto";
 import "./dialog.style.css";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 
 interface AddResultMatchDialogProps {
   onUpdateMatches?: () => void;
-  match: Match;
+  match: MatchByUserWithRival;
 }
 
 export default function AddResultMatchDialog({
@@ -57,7 +57,7 @@ export default function AddResultMatchDialog({
         pointsPlayer2: parseInt(set.pointsPlayer2, 10),
         setNumber: index + 1,
       })),
-      tournamentCategoryId: match.fixture.tournamentCategories.id,
+      tournamentCategoryId: match.tournamentCategoryId || match.fixture?.tournamentCategories?.id || 0,
     };
     try {
       const setCreationPromise = createSetsMutation.mutateAsync(dataToSend);

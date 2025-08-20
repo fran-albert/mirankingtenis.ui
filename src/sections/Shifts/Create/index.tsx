@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import {
   Dialog,
   DialogContent,
@@ -29,7 +29,7 @@ interface ReserveDialogProps {
   court: string;
   sessionUser: any;
 }
-export const CreateDoubleMatch: React.FC<ReserveDialogProps> = ({
+export const CreateDoubleMatch: React.FC<ReserveDialogProps> = React.memo(({
   open,
   onClose,
   selectedSlot,
@@ -48,6 +48,31 @@ export const CreateDoubleMatch: React.FC<ReserveDialogProps> = ({
     }
   }, [open]);
 
+  // Memoizar cálculos costosos
+  const formattedDate = useMemo(() => 
+    selectedSlot ? moment(selectedSlot.start).format("LL") : "", 
+    [selectedSlot]
+  );
+  
+  const formattedTime = useMemo(() => 
+    selectedSlot ? moment(selectedSlot.start).format("HH:mm") : "", 
+    [selectedSlot]
+  );
+
+  // Optimizar el cambio de jugador
+  const handlePlayerChange = useCallback((index: number, value: number) => {
+    const newPlayers = [...selectedPlayers];
+    newPlayers[index] = Number(value);
+    setSelectedPlayers(newPlayers);
+    handleJugadorChange(index, Number(value));
+  }, [selectedPlayers, handleJugadorChange]);
+
+  // Optimizar el submit del modal
+  const handleSubmit = useCallback(() => {
+    onReserve();
+    onClose();
+  }, [onReserve, onClose]);
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
@@ -60,8 +85,7 @@ export const CreateDoubleMatch: React.FC<ReserveDialogProps> = ({
         <div className="grid gap-4">
           <div className="grid grid-cols-2 items-center gap-4">
             <Label htmlFor="fecha-hora" className="text-right mb-2 block">
-              {moment(selectedSlot?.start).format("LL")} -{" "}
-              {moment(selectedSlot?.start).format("HH:mm")}
+              {formattedDate} - {formattedTime}
             </Label>
             <div>
               <Label htmlFor="court" className="text-right mb-2 block">
@@ -85,12 +109,7 @@ export const CreateDoubleMatch: React.FC<ReserveDialogProps> = ({
                 Jugador {index + 2}
               </Label>
               <Select
-                onValueChange={(value) => {
-                  const newPlayers = [...selectedPlayers];
-                  newPlayers[index] = Number(value);
-                  setSelectedPlayers(newPlayers);
-                  handleJugadorChange(index, Number(value));
-                }}
+                onValueChange={(value) => handlePlayerChange(index, Number(value))}
                 value={
                   selectedPlayers[index] ? String(selectedPlayers[index]) : ""
                 }
@@ -128,10 +147,7 @@ export const CreateDoubleMatch: React.FC<ReserveDialogProps> = ({
         <DialogFooter>
           <Button
             type="submit"
-            onClick={() => {
-              onReserve();
-              onClose();
-            }}
+            onClick={handleSubmit}
           >
             Crear Partido
           </Button>
@@ -139,4 +155,6 @@ export const CreateDoubleMatch: React.FC<ReserveDialogProps> = ({
       </DialogContent>
     </Dialog>
   );
-};
+});
+
+CreateDoubleMatch.displayName = "CreateDoubleMatch";

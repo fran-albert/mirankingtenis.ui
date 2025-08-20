@@ -6,7 +6,7 @@ import PerfilPage from "@/sections/Auth/Profile/Card";
 
 export default function ClientProfilePage() {
   const { session } = useCustomSession();
-  const idUser = session?.user.id as number;
+  const idUser = Number(session?.user.id);
   const { user, isLoading } = useUser({
     auth: true,
     id: idUser,

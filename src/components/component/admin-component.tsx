@@ -31,10 +31,12 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { IoMenu } from "react-icons/io5";
-import { signOut } from "next-auth/react";
+import { useAuth } from "@/context/AuthProvider";
 import SideBarV3 from "./sideBarV2";
 
 export function AdminComponent({ children }: { children: React.ReactNode }) {
+  const { logout } = useAuth();
+  
   return (
     <div className="grid min-h-screen w-full lg:grid-cols-[280px_1fr]">
       <SideBarV3 />
@@ -57,7 +59,8 @@ export function AdminComponent({ children }: { children: React.ReactNode }) {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onClick={() => {
-                    signOut();
+                    logout();
+                    window.location.href = "/";
                   }}
                 >
                   Logout

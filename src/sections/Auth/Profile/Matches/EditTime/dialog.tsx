@@ -30,11 +30,11 @@ import { createApiShiftRepository } from "@/modules/shift/infra/ApiShiftReposito
 registerLocale("es", es);
 import moment from "moment-timezone";
 import { updateShift } from "@/modules/shift/application/update/updateShift";
-import { Match } from "@/types/Match/Match";
+import { MatchByUserWithRival } from "@/types/Match/MatchByUser.dto";
 
 interface UpdateShiftDialogProps {
   onUpdateMatches?: () => void;
-  match: Match;
+  match: MatchByUserWithRival;
 }
 
 export default function UpdateShiftDialog({

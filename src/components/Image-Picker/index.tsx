@@ -242,6 +242,8 @@ const ImagePicker: React.FC<ImagePickerProps> = ({ onImageSelect }) => {
                   src={selectedImage || "/placeholder.svg"}
                   onLoad={onImageLoaded}
                   alt="Imagen para recortar"
+                  width={400}
+                  height={400}
                   className="max-w-full"
                 />
               </ReactCrop>
@@ -268,6 +270,8 @@ const ImagePicker: React.FC<ImagePickerProps> = ({ onImageSelect }) => {
                   src={croppedImage || "/placeholder.svg"}
                   alt="Imagen recortada"
                   className="max-w-full h-auto rounded-md shadow-sm"
+                  width={400}
+                  height={400}
                 />
               </div>
             </div>

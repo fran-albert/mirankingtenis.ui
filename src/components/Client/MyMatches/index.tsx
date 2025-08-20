@@ -8,6 +8,7 @@ import {
 } from "@/hooks/Tournament/useTournament";
 import { useTournamentRankingHistory } from "@/hooks/Tournament-Ranking/useTournamentRankingHistory";
 import { useUserStore } from "@/hooks/useUser";
+import { useMatchesByUser } from "@/hooks/Matches/useMatches";
 import MatchesIndex from "@/sections/Auth/Profile/Matches";
 import PlayerChart from "@/sections/Players/View/HistoryRanking/chart";
 import React, { useState } from "react";
@@ -17,6 +18,7 @@ import {
   useTournamentCategoryId,
 } from "@/hooks/Tournament-Category/useTournamentCategory";
 import { Tournament } from "@/types/Tournament/Tournament";
+import { MatchByUserResponseDto, MatchByUserWithRival } from "@/types/Match/MatchByUser.dto";
 
 function ClientMyMatchesComponent() {
   const { session } = useCustomSession();
@@ -46,11 +48,6 @@ function ClientMyMatchesComponent() {
     idUser: idUser,
     enabled: isValidIdUser,
   });
-  // Estado local para matches (se actualizará con diferentes parámetros)
-  const [matches, setMatches] = useState([]);
-  const [isLoadingMatches, setIsLoadingMatches] = useState(false);
-
-  // React Query hooks manejan automáticamente la carga de datos
 
   const [selectedTournament, setSelectedTournament] = useState<
     Tournament | undefined
@@ -83,22 +80,62 @@ function ClientMyMatchesComponent() {
       isValidIdUser && !!activeTournament && !!firstCategory?.category.id,
   });
 
-  // React Query maneja automáticamente la configuración inicial
+  // Hook para obtener los partidos del usuario en el torneo y categoría seleccionados
+  const { 
+    data: rawMatches = [], 
+    isLoading: isLoadingMatches,
+    error: matchesError,
+    refetch: refetchMatches
+  } = useMatchesByUser(
+    idUser,
+    activeTournament?.id || 0,
+    firstCategory?.category.id || 0,
+    isValidIdUser && !!activeTournament && !!firstCategory?.category.id
+  );
 
-  // React Query hooks manejan automáticamente la carga de partidos
+  // Procesar matches para agregar rivalName calculado
+  const matches: MatchByUserWithRival[] = React.useMemo(() => {
+    return rawMatches.map((match: MatchByUserResponseDto): MatchByUserWithRival => {
+      if (match.isBye) {
+        return { ...match, rivalName: "Fecha Libre" };
+      }
+
+      // Determinar quién es el rival basándose en user1 y user2
+      let rivalName = "";
+      if (match.user1 && match.user1.id !== idUser) {
+        rivalName = `${match.user1.lastname}, ${match.user1.name}`;
+      } else if (match.user2 && match.user2.id !== idUser) {
+        rivalName = `${match.user2.lastname}, ${match.user2.name}`;
+      } else {
+        rivalName = "Rival desconocido";
+      }
+
+      return { 
+        ...match, 
+        rivalName,
+        tournamentCategoryId: firstCategory?.category.id || 0
+      };
+    });
+  }, [rawMatches, idUser, firstCategory?.category.id]);
 
   const handleTournamentChange = (tournament: Tournament) => {
     setSelectedTournament(tournament);
     // React Query hooks se actualizarán automáticamente cuando cambie el torneo
+    // Los partidos se recargarán automáticamente con el nuevo torneo y categoría
   };
 
   const handleUpdateMatches = () => {
-    // React Query maneja automáticamente las actualizaciones
-    // Esta función puede ser simplificada o eliminada en el futuro
+    // Refrescar los partidos cuando se actualice algo
+    refetchMatches();
   };
 
   if (isLoadingMatches) {
     return <Loading isLoading />;
+  }
+
+  // Mostrar error si hay problemas cargando los partidos
+  if (matchesError) {
+    console.error("Error cargando partidos:", matchesError);
   }
 
   return (
@@ -107,8 +144,7 @@ function ClientMyMatchesComponent() {
         <div className="space-y-2">
           <h2 className="text-3xl font-bold tracking-tight">Mis Partidos</h2>
           <p className="text-muted-foreground">
-            Aquí puedes ver el historial de ranking y los próximos partidos de
-            tu equipo favorito.
+            Aquí puedes ver el historial de ranking y tus próximos partidos.
           </p>
         </div>
         <div className="w-full relative">
@@ -134,10 +170,22 @@ function ClientMyMatchesComponent() {
                 tournamentCategoryId={tournamentCategoryId!}
               />
             )}
-            <MatchesIndex
-              match={matches}
-              onUpdateMatches={handleUpdateMatches}
-            />
+            {matches.length > 0 ? (
+              <MatchesIndex
+                match={matches}
+                onUpdateMatches={handleUpdateMatches}
+              />
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                <p className="text-lg">No tienes partidos en este torneo y categoría.</p>
+                <p className="text-sm mt-2">
+                  {firstCategory ? 
+                    `Categoría: ${firstCategory.category.name}` : 
+                    "Selecciona un torneo para ver tus partidos"
+                  }
+                </p>
+              </div>
+            )}
           </div>
         </div>
       )}

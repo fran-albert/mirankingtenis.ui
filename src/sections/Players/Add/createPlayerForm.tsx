@@ -39,6 +39,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useUserMutations } from "@/hooks/Users/useUserMutation";
 import { State } from "@/types/State/State";
 import { City } from "@/types/City/City";
+import ImagePickerDialog from "@/components/Image-Picker/Dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 type FormValues = z.infer<typeof UserSchema>;
 
@@ -50,11 +52,13 @@ function CreatePlayerForm() {
   const [selectedState, setSelectedState] = useState<State | null>(null);
   const [selectedCity, setSelectedCity] = useState<City | null>(null);
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const { addUserMutation } = useUserMutations();
 
   async function onSubmit(data: z.infer<typeof UserSchema>) {
     const payload: any = {
       ...data,
+      photo: selectedImage,
     };
     try {
       const playerCreationPromise = addUserMutation.mutateAsync(payload);
@@ -94,6 +98,10 @@ function CreatePlayerForm() {
     }
   };
 
+  const handleImageSelect = (image: string) => {
+    setSelectedImage(image);
+  };
+
   return (
     <>
       <div key="1" className="w-full">
@@ -117,16 +125,18 @@ function CreatePlayerForm() {
               </CardHeader>
               <CardContent className="grid gap-6">
                 <div className="grid grid-cols-2 gap-6">
-                  {/* <div className="col-span-2 flex flex-col items-center gap-4">
-              <Avatar className="h-24 w-24">
-                <AvatarImage
-                  alt="Patient Avatar"
-                  src="/placeholder-avatar.jpg"
-                />
-                <AvatarFallback>JP</AvatarFallback>
-              </Avatar>
-              <Button variant="outline">Upload Photo</Button>
-            </div> */}
+                  <div className="col-span-2 flex flex-col items-center gap-4">
+                    <div className="relative">
+                      <Avatar className="h-24 w-24">
+                        <AvatarImage
+                          alt="Player Avatar"
+                          src={selectedImage || "/placeholder-avatar.jpg"}
+                        />
+                        <AvatarFallback>JP</AvatarFallback>
+                      </Avatar>
+                      <ImagePickerDialog onImageSelect={handleImageSelect} onlyIcon />
+                    </div>
+                  </div>
                   {/* <div className="space-y-2">
                 <Label htmlFor="firstName">Nombre</Label>
                 
