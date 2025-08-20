@@ -1,5 +1,5 @@
 import { Sets } from "@/types/Set/Sets";
-import { Shift } from "@/modules/shift/domain/Shift";
+import { Shift } from "@/types/Shift/Shift";
 
 export interface GroupFixtureDto {
     id: number;
