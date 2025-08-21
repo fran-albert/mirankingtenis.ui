@@ -55,7 +55,7 @@ function ClientMasterComponent() {
         selectedTournament={selectedTournament}
         selectedCategory={selectedCategory}
       />
-      <TournamentPlayers />
+      {/* <TournamentPlayers /> */}
       <div className="flex justify-center w-full px-4 lg:px-0 mt-10">
         <div className="w-full max-w-7xl space-y-6">
           <div>

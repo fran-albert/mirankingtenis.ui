@@ -132,13 +132,13 @@ export const CreateSingleMatch: React.FC<CreateSingleMatchProps> = React.memo(({
 
           {/* Selector de partido */}
           <div className="space-y-2">
-            <Label className="text-sm font-medium">Partido Pendiente *</Label>
+            <Label className="text-sm font-medium">Jugador 2</Label>
             <Select
               onValueChange={handleMatchChange}
               value={selectedMatchId ? String(selectedMatchId) : ""}
             >
               <SelectTrigger className="w-full h-12">
-                <SelectValue placeholder="Elegir partido pendiente" />
+                <SelectValue placeholder="Elegir jugador" />
               </SelectTrigger>
               <SelectContent className="max-h-60">
                 {pendingMatches.length > 0 ? (
