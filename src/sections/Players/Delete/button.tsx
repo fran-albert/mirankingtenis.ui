@@ -13,8 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import ActionIcon from "@/components/ui/actionIcon";
 import { FaTrashAlt } from "react-icons/fa";
-import { createApiUserRepository } from "@/modules/users/infra/ApiUserRepository";
-import { deleteUser } from "@/modules/users/application/delete/deleteUser";
+import { deleteUser } from "@/api/Users/delete-user";
 import { toast } from "sonner";
 
 interface DeletePlayerDialogProps {
@@ -31,9 +30,7 @@ export default function DeletePlayerDialog({
 
   const handleConfirmDelete = async () => {
     try {
-      const userRepository = createApiUserRepository();
-      const deleteUserFn = deleteUser(userRepository);
-      const playerDeletionPromise = deleteUserFn(idPlayer);
+      const playerDeletionPromise = deleteUser(idPlayer);
       toast.promise(playerDeletionPromise, {
         loading: "Eliminando jugador...",
         success: "Jugador eliminado con éxito!",

@@ -9,7 +9,6 @@ import {
   usePlayerInfo
 } from "@/hooks/Tournament/useTournament";
 import { usePlayerSetSummary } from "@/hooks/Sets/useSet";
-import { useUserStore } from "@/hooks/useUser";
 import { PlayerComponent } from "@/sections/Players/Component/player-component";
 import { useUser } from "@/hooks/Users/useUser";
 import { useTournamentRankingPlayerSummary } from "@/hooks/Tournament-Ranking/useTournamentRankingPlayerSummary";

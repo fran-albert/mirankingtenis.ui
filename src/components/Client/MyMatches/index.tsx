@@ -7,7 +7,6 @@ import {
   useLastTournamentByPlayer,
 } from "@/hooks/Tournament/useTournament";
 import { useTournamentRankingHistory } from "@/hooks/Tournament-Ranking/useTournamentRankingHistory";
-import { useUserStore } from "@/hooks/useUser";
 import { useMatchesByUser } from "@/hooks/Matches/useMatches";
 import MatchesIndex from "@/sections/Auth/Profile/Matches";
 import PlayerChart from "@/sections/Players/View/HistoryRanking/chart";
@@ -24,8 +23,6 @@ function ClientMyMatchesComponent() {
   const { session } = useCustomSession();
   const idUser = Number(session?.user?.id);
   const isValidIdUser = !isNaN(idUser) && idUser > 0;
-  const { getUser, user } = useUserStore();
-
   // Usar React Query hooks para torneos
   const { tournaments: allTournamentsByPlayer } = useAllTournamentsByPlayer({
     idPlayer: idUser,

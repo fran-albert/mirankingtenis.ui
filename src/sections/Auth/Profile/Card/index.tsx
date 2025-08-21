@@ -4,8 +4,6 @@ import { useState } from "react";
 import { useUserMutations } from "@/hooks/Users/useUserMutation";
 import { toast } from "sonner";
 import axios from "axios";
-import { changePassword } from "@/modules/users/application/change-password/changePassword";
-import { createApiUserRepository } from "@/modules/users/infra/ApiUserRepository";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -33,7 +31,6 @@ import {
 } from "lucide-react";
 import { User as UserType } from "@/types/User/User";
 import ImagePickerDialog from "@/components/Image-Picker/Dialog";
-import { updatePhoto } from "@/modules/users/application/update-photo/updatePhoto";
 import { useProfilePhoto } from "@/context/ProfilePhotoContext";
 
 interface Props {
@@ -41,11 +38,8 @@ interface Props {
 }
 
 export default function PerfilPage({ user: usuario }: Props) {
-  const userRepository = createApiUserRepository();
-  const { updateUserMutation } = useUserMutations();
+  const { updateUserMutation, uploadPhotoMutation, changePasswordMutation } = useUserMutations();
   const { updateProfilePhoto } = useProfilePhoto();
-  const updatePhotoFn = updatePhoto(userRepository);
-  const changePasswordFn = changePassword(userRepository);
 
   const [editData, setEditData] = useState({ ...usuario });
   const [passwordData, setPasswordData] = useState({
@@ -101,13 +95,14 @@ export default function PerfilPage({ user: usuario }: Props) {
     }
 
     try {
-      const changePasswordPromise = changePasswordFn(
-        usuario.id,
-        {
-          password: passwordData.currentPassword,
-          newPassword: passwordData.newPassword
+      const changePasswordPromise = changePasswordMutation.mutateAsync({
+        userId: usuario.id,
+        data: {
+          currentPassword: passwordData.currentPassword,
+          newPassword: passwordData.newPassword,
+          confirmNewPassword: passwordData.confirmPassword
         } as any
-      );
+      });
 
       toast.promise(changePasswordPromise, {
         loading: "Cambiando contraseña...",
@@ -146,7 +141,10 @@ export default function PerfilPage({ user: usuario }: Props) {
         })
       );
 
-      const uploadPromise = updatePhotoFn(formData, usuario.id);
+      const uploadPromise = uploadPhotoMutation.mutateAsync({
+        formData,
+        idUser: usuario.id
+      });
 
       toast.promise(uploadPromise, {
         loading: "Actualizando foto de perfil...",

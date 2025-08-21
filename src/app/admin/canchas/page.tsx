@@ -8,13 +8,8 @@ import { createApiCategoryRepository } from "@/modules/category/infra/ApiCategor
 import { getAll } from "@/modules/court/application/get-all/getAllCourt";
 import { Court } from "@/modules/court/domain/Court";
 import { createApiCourtRepository } from "@/modules/court/infra/ApiCourtRepository";
-import { getAdminUsers } from "@/modules/users/application/get-all-admin/getAdminUsers";
-import { User } from "@/types/User/User";
-import { createApiUserRepository } from "@/modules/users/infra/ApiUserRepository";
 import CategoriesTable from "@/sections/Admin/Categories/Table/table";
 import CourtTable from "@/sections/Admin/Courts/Table/table";
-import AdminPlayersTanstackTable from "@/sections/Admin/Players/Table/tanstack";
-import { PlayersTable } from "@/sections/Players/Table/table";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 function CourtPage() {

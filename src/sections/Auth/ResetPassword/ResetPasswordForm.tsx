@@ -7,11 +7,9 @@ import { Button } from "@/components/ui/button";
 import { RiLock2Fill } from "react-icons/ri";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { User } from "@/types/User/User";
-import { createApiUserRepository } from "@/modules/users/infra/ApiUserRepository";
-import { createUser } from "@/modules/users/application/create/createUser";
 import { toast } from "sonner";
 import { goBack } from "@/lib/utils";
-import { requestResetPassword } from "@/modules/users/application/request-reset-password/requestResetPassword";
+import { useUserMutations } from "@/hooks/Users/useUserMutation";
 
 interface Inputs extends User {}
 
@@ -23,12 +21,11 @@ function ResetPasswordForm() {
     formState: { errors },
     setValue,
   } = useForm<Inputs>();
-  const userRepository = createApiUserRepository();
-  const createRequestFn = requestResetPassword(userRepository);
+  const { requestResetPasswordMutation } = useUserMutations();
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
-      const playerCreationPromise = createRequestFn(data);
+      const playerCreationPromise = requestResetPasswordMutation.mutateAsync(data);
       toast.promise(playerCreationPromise, {
         loading: "Enviando correo electrónico...",
         success: "Correo enviado éxito!",

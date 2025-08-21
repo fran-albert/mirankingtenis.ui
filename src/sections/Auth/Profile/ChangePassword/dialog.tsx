@@ -17,8 +17,7 @@ import { FaTrashAlt } from "react-icons/fa";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/passwordInput";
-import { createApiUserRepository } from "@/modules/users/infra/ApiUserRepository";
-import { changePassword } from "@/modules/users/application/change-password/changePassword";
+import { useUserMutations } from "@/hooks/Users/useUserMutation";
 import { User } from "@/types/User/User";
 import { toast } from "sonner";
 import axios from "axios";
@@ -42,8 +41,7 @@ export default function ChangePasswordDialog({
     control,
   } = useForm<User>();
   const toggleDialog = () => setIsOpen(!isOpen);
-  const userRepository = createApiUserRepository();
-  const changePasswordFn = changePassword(userRepository);
+  const { changePasswordMutation } = useUserMutations();
 
   const handleChangePassword = async (data: User) => {
     const dataToSend: any = {
@@ -53,7 +51,10 @@ export default function ChangePasswordDialog({
     };
 
     try {
-      const response = await changePasswordFn(id, dataToSend);
+      const response = await changePasswordMutation.mutateAsync({
+        userId: id,
+        data: dataToSend
+      });
       if (response) {
         toast.success("Contraseña cambiada correctamente");
         toggleDialog();
