@@ -54,7 +54,7 @@ export const ShiftCalendar = ({
   players: User[];
   doublesMatches: DoublesExhibitionMatchResponse[];
 }) => {
-  const { session } = useRoles();
+  const { session, isAdmin } = useRoles();
   const [events, setEvents] = useState<MatchEvent[]>([]);
   const [view, setView] = useState<View | undefined>(Views.DAY);
   const availableViews = [Views.DAY];
@@ -80,7 +80,7 @@ export const ShiftCalendar = ({
   const [showSingleMatchDialog, setShowSingleMatchDialog] = useState(false);
   const [selectedMatchId, setSelectedMatchId] = useState<number | undefined>(undefined);
   const { addDoublesMatchesMutation } = useDoubleMatchMutations();
-  const { shiftForMatchMutation } = useShiftMutation();
+  const { shiftForMatchMutation, deleteShiftMutation } = useShiftMutation();
 
   const idUser = session?.user?.id ? Number(session.user.id) : 0;
 
@@ -175,6 +175,8 @@ export const ShiftCalendar = ({
       status: match.status,
       shift: match.shift,
       resourceId: match.shift?.court?.id,
+      player1Id: match.user1.id,
+      player2Id: match.user2?.id,
     }));
 
     // 📌 Mapear `doublesMatches` (partidos dobles)
@@ -194,6 +196,10 @@ export const ShiftCalendar = ({
       status: "Doubles",
       shift: match.shift,
       resourceId: match.shift?.court?.id,
+      player1Id: match.player1?.id,
+      player2Id: match.player2?.id,
+      player3Id: match.player3?.id,
+      player4Id: match.player4?.id,
     }));
 
     // 📌 Unir partidos individuales y dobles
@@ -317,6 +323,36 @@ export const ShiftCalendar = ({
     );
   };
 
+  // Función para eliminar turno
+  const handleDeleteShift = useCallback((shiftId: number) => {
+    deleteShiftMutation.mutate(shiftId, {
+      onSuccess: () => {
+        toast.success("Turno eliminado con éxito!");
+        // Invalidar queries para refrescar los datos
+      },
+      onError: (error: any) => {
+        const errorMessage =
+          error.response?.data?.message || "Error al eliminar el turno";
+        toast.error(`Error: ${errorMessage}`);
+        console.error("Error al eliminar turno:", error);
+      }
+    });
+  }, [deleteShiftMutation]);
+
+  // Wrapper del CustomEvent para pasar props adicionales
+  const EventWrapper = useCallback((props: any) => {
+    return (
+      <CustomEvent
+        {...props}
+        sessionUser={{
+          id: session?.user?.id || 0,
+          role: isAdmin ? 'admin' : 'user',
+        }}
+        onDeleteShift={handleDeleteShift}
+      />
+    );
+  }, [session, isAdmin, handleDeleteShift]);
+
   return (
     <div className="flex flex-col justify-center items-center w-full">
       <div className="w-full px-2 max-h-[90vh]">
@@ -352,7 +388,7 @@ export const ShiftCalendar = ({
               max={maxTime}
               onNavigate={onNavigate}
               components={{
-                event: CustomEvent,
+                event: EventWrapper,
               }}
             />
           ) : (
