@@ -4,7 +4,11 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Ranking } from "@/modules/ranking/domain/Ranking";
 import { TournamentRanking } from "@/types/Tournament-Ranking/TournamentRanking";
-import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/ui/tooltip";
 
 export const getColumns = (): ColumnDef<TournamentRanking>[] => {
   const columns: ColumnDef<TournamentRanking>[] = [
@@ -27,14 +31,7 @@ export const getColumns = (): ColumnDef<TournamentRanking>[] => {
           }
         >
           <Avatar>
-            <AvatarImage
-              src={
-                row.original.photo
-                  ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${row.original.photo}.jpeg`
-                  : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/mirankingtenis_default.png"
-              }
-              alt="@avatar"
-            />
+            <AvatarImage src={row.original.photo} alt="@avatar" />
             <AvatarFallback>
               {row.original.name.charAt(0)}
               {row.original.lastname.charAt(0)}
