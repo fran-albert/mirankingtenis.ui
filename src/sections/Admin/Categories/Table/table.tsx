@@ -36,8 +36,6 @@ import { User } from "@/types/User/User";
 import { formatDate } from "@/lib/utils";
 import { DataTable } from "@/components/Table/dataTable";
 import { getColumns } from "./columns";
-import { createApiUserRepository } from "@/modules/users/infra/ApiUserRepository";
-import { getAllUsers } from "@/modules/users/application/get-all/getAllUsers";
 import useRoles from "@/hooks/useRoles";
 import { useCustomSession } from "@/context/SessionAuthProviders";
 import { Category } from "@/modules/category/domain/Category";

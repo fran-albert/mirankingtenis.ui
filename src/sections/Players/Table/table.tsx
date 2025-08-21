@@ -3,8 +3,7 @@ import Loading from "@/components/Loading/loading";
 import { DataTable } from "@/components/Table/dataTable";
 import { getColumns } from "./columns";
 import { User } from "@/types/User/User";
-import { createApiUserRepository } from "@/modules/users/infra/ApiUserRepository";
-import { getAllUsers } from "@/modules/users/application/get-all/getAllUsers";
+import { getAllUsers } from "@/api/Users/get-all-users";
 import { useUsers } from "@/hooks/Users/useUsers";
 
 export const PlayersTable = () => {

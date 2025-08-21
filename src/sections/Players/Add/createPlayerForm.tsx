@@ -15,9 +15,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { goBack } from "@/lib/utils";
-import { createUser } from "@/modules/users/application/create/createUser";
+import { createUser } from "@/api/Users/create";
 import { User } from "@/types/User/User";
-import { createApiUserRepository } from "@/modules/users/infra/ApiUserRepository";
 import axios from "axios";
 import React, { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";

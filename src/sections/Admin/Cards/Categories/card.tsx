@@ -9,7 +9,6 @@ import {
   CardContent,
   Card,
 } from "@/components/ui/card";
-import { createApiUserRepository } from "@/modules/users/infra/ApiUserRepository";
 import { createApiCategoryRepository } from "@/modules/category/infra/ApiCategoryRepository";
 import { BiSolidCategory } from "react-icons/bi";
 export const CategoriesCount = () => {

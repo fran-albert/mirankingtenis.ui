@@ -9,18 +9,13 @@ import {
   CardContent,
   Card,
 } from "@/components/ui/card";
-import { createApiUserRepository } from "@/modules/users/infra/ApiUserRepository";
+// TODO: Implementar contador de shifts correctamente
 export const ShiftsCount = () => {
   const [totalShifts, setTotalShifts] = useState(0);
 
   useEffect(() => {
-    const fetchTotalPlayers = async () => {
-      const userRepository = createApiUserRepository();
-      const total = await userRepository.getTotalUsers();
-      setTotalShifts(total);
-    };
-
-    fetchTotalPlayers().catch(console.error);
+    // TODO: Implementar contador de shifts
+    setTotalShifts(0);
   }, []);
   return (
     <>

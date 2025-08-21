@@ -1,7 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { FaUser, FaUsers } from "react-icons/fa";
+import { FaUsers } from "react-icons/fa";
 import {
   CardTitle,
   CardDescription,
@@ -9,19 +8,10 @@ import {
   CardContent,
   Card,
 } from "@/components/ui/card";
-import { createApiUserRepository } from "@/modules/users/infra/ApiUserRepository";
+import { useTotalUsers } from "@/hooks/Users/useTotalUsers";
+
 export const UsersCount = () => {
-  const [totalUsers, setTotalUsers] = useState(0);
-
-  useEffect(() => {
-    const fetchTotalPlayers = async () => {
-      const userRepository = createApiUserRepository();
-      const total = await userRepository.getTotalUsers();
-      setTotalUsers(total);
-    };
-
-    fetchTotalPlayers().catch(console.error);
-  }, []);
+  const { totalUsers } = useTotalUsers({ enabled: true });
   return (
     <>
       <div className="rounded-lg w-96 sm:transition sm:duration-300 sm:ease-in-out sm:transform sm:hover:-translate-y-2 hover:shadow-2xl cursor-pointer">

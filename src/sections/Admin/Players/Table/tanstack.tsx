@@ -36,12 +36,12 @@ import { User } from "@/types/User/User";
 import { formatDate } from "@/lib/utils";
 import { DataTable } from "@/components/Table/dataTable";
 import { getColumns } from "./columns";
-import { createApiUserRepository } from "@/modules/users/infra/ApiUserRepository";
-import { getAllUsers } from "@/modules/users/application/get-all/getAllUsers";
 import useRoles from "@/hooks/useRoles";
 import { useCustomSession } from "@/context/SessionAuthProviders";
+import { useRouter } from "next/navigation";
 function AdminPlayersTanstackTable({ players }: { players: User[] }) {
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
   const { isAdmin } = useRoles();
   const { session } = useCustomSession();
@@ -52,7 +52,7 @@ function AdminPlayersTanstackTable({ players }: { players: User[] }) {
       currentPlayers.filter((player) => player.id !== idPlayer);
   };
 
-  const playersColumns = getColumns({ isAdmin });
+  const playersColumns = getColumns({ isAdmin }, router);
   const customFilterFunction = (player: User, query: string) =>
     player.name.toLowerCase().includes(query.toLowerCase()) ||
     player.lastname.toLowerCase().includes(query.toLowerCase());

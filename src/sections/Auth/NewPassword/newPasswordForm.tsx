@@ -3,10 +3,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Label } from "@/components/ui/label";
 import { FaUnlockAlt } from "react-icons/fa";
 import { Controller, useForm } from "react-hook-form";
-import { createApiUserRepository } from "@/modules/users/infra/ApiUserRepository";
 import { toast } from "sonner";
 import { PasswordInput } from "@/components/ui/passwordInput";
-import { resetPassword } from "@/modules/users/application/reset-password/resetPassword";
+import { useUserMutations } from "@/hooks/Users/useUserMutation";
 import axios from "axios";
 interface Inputs {
   password: string;
@@ -24,17 +23,16 @@ function NewPasswordForm() {
     control,
     setValue,
   } = useForm<Inputs>();
-  const userRepository = createApiUserRepository();
-  const createResetPasswordFn = resetPassword(userRepository);
+  const { resetPasswordWithTokenMutation } = useUserMutations();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   const onSubmit = async (data: any) => {
     try {
-      const userResetPromise = createResetPasswordFn(
-        token as string,
-        data.password,
-        data.confirmPassword
-      );
+      const userResetPromise = resetPasswordWithTokenMutation.mutateAsync({
+        token: token as string,
+        password: data.password,
+        confirmPassword: data.confirmPassword
+      });
       toast.promise(userResetPromise, {
         loading: "Actualizando contraseña...",
         success: "Contraseña actualizada con éxito!",

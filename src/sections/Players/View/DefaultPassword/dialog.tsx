@@ -17,12 +17,10 @@ import { FaTrashAlt } from "react-icons/fa";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/passwordInput";
-import { createApiUserRepository } from "@/modules/users/infra/ApiUserRepository";
-import { changePassword } from "@/modules/users/application/change-password/changePassword";
 import { User } from "@/types/User/User";
 import { toast } from "sonner";
 import axios from "axios";
-import { resetUserPassword } from "@/modules/users/application/default-password/defaultPassword";
+import { useUserMutations } from "@/hooks/Users/useUserMutation";
 
 interface DefaultPasswordDialogProps {
   id: number;
@@ -34,12 +32,10 @@ export default function DefaultPasswordDialog({
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const { handleSubmit } = useForm<User>();
   const toggleDialog = () => setIsOpen(!isOpen);
-  const userRepository = createApiUserRepository();
-  const defaultPasswordFn = resetUserPassword(userRepository);
-
+  const { resetPasswordMutation } = useUserMutations();
   const handleChangePassword = async (data: User) => {
     try {
-      const response = await defaultPasswordFn(id);
+      const response = await resetPasswordMutation.mutateAsync(id);
       if (response) {
         toast.success("Contraseña restablecida correctamente");
         toggleDialog();
