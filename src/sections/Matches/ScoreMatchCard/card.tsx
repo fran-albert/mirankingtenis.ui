@@ -62,14 +62,7 @@ export const ScoreMatchCard = ({
               <div className="flex justify-between">
                 <div className="flex items-center space-x-2">
                   <Avatar>
-                    <AvatarImage
-                      src={
-                        match.user1photo
-                          ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${match.user1photo}.jpeg`
-                          : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/mirankingtenis_default.png"
-                      }
-                      alt="@avatar"
-                    />
+                    <AvatarImage src={match.user1photo} alt="@avatar" />
                     <AvatarFallback>
                       {match?.user1?.toString().charAt(0) || ""}
                     </AvatarFallback>
@@ -110,14 +103,7 @@ export const ScoreMatchCard = ({
                 <div className="flex justify-between">
                   <div className="flex items-center space-x-2">
                     <Avatar>
-                      <AvatarImage
-                        src={
-                          match.user2photo
-                            ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${match.user2photo}.jpeg`
-                            : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/mirankingtenis_default.png"
-                        }
-                        alt="@avatar"
-                      />
+                      <AvatarImage src={match.user2photo} alt="@avatar" />
                       <AvatarFallback>
                         {match?.user2?.toString().charAt(0) || ""}
                       </AvatarFallback>
@@ -193,4 +179,3 @@ export const ScoreMatchCard = ({
     </Card>
   );
 };
-
