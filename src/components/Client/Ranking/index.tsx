@@ -11,7 +11,7 @@ function ClientRankingComponent() {
   // Usar React Query hooks
   const { tournament: lastTournament } = useLastFinishedLeagueTournament({ enabled: true });
   
-  const initialTournamentId = process.env.NODE_ENV === 'production' ? "6" : "45";
+  const initialTournamentId = process.env.NODE_ENV === 'production' ? "7" : "45";
   const [selectedCategory, setSelectedCategory] = useState("1");
   const [selectedTournament, setSelectedTournament] = useState(initialTournamentId);
   const [error, setError] = useState<string | null>(null);
