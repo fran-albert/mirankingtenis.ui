@@ -10,15 +10,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
-import { Tournament } from "@/modules/tournament/domain/Tournament";
-import { createApiTournamentRepository } from "@/modules/tournament/infra/ApiTournamentRepository";
-import { createTournament } from "@/modules/tournament/application/create/createTournament";
 import { Category } from "@/modules/category/domain/Category";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useCategoriesStore } from "@/hooks/useCategories";
 import { toast } from "sonner";
-import { TournamentCategory } from "@/modules/tournament-category/domain/TournamentCategory";
+import { TournamentCategory } from "@/types/Tournament-Category/TournamentCategory";
 
 interface AddCategoriesForTournamentDialogProps {
   createCategoryForTournament: (

@@ -1,75 +1,49 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Loading from "@/components/Loading/loading";
 import { GroupStage } from "@/sections/Master/Group/group-stage";
-import { useGroupStore } from "@/hooks/useGroup";
-import { useMatchStore } from "@/hooks/useMatch";
-import { AxiosError } from "axios";
 import PlayOffCards from "@/sections/Master/PlayOffs";
 import FiltersMaster from "@/sections/Master/Filters";
 import { FixtureGroupStage } from "@/sections/Master/Fixture";
+import { useGroupsByStage, useGroupRankings } from "@/hooks/Group/useGroup";
+import { useGroupsStageByTournamentCategory } from "@/hooks/Group-Stage/useGroupStage";
+import { useMatchesByGroupStage } from "@/hooks/Matches/useMatches";
+import { MasterCard } from "@/sections/Master/Cards/card";
+import TournamentPlayers from "@/sections/Master/Cards/card.v2";
 
 function ClientMasterComponent() {
   const [selectedCategory, setSelectedCategory] = useState("1");
   const [selectedTournament, setSelectedTournament] = useState("2");
-  const { groupFixture, findMatchesByGroupStage, clearMatches } =
-    useMatchStore();
-  const {
-    findAllByGroupStage,
-    getGroupRankings,
-    getGroupStagesByTournamentCategory,
-    groupRankings,
-    clearRankings,
-    loading: groupLoading,
-  } = useGroupStore();
 
-  const [groupStageId, setGroupStageId] = useState<number | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  // Hook para obtener el groupStageId
+  const { groups: groupStageData, isLoading: groupStageLoading } =
+    useGroupsStageByTournamentCategory(
+      Number(selectedTournament),
+      Number(selectedCategory)
+    );
 
-  const updateMatches = async (groupStageId: number) => {
-    try {
-      setIsLoading(true);
-      await Promise.all([
-        findAllByGroupStage(groupStageId),
-        getGroupRankings(groupStageId),
-        findMatchesByGroupStage(groupStageId),
-      ]);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
+  const groupStageId = groupStageData as unknown as number;
+
+  // Hooks para obtener grupos y rankings
+  const { groups, isLoading: groupsLoading } = useGroupsByStage(
+    groupStageId,
+    !!groupStageId
+  );
+
+  const { rankings: groupRankings, isLoading: rankingsLoading } =
+    useGroupRankings(groupStageId, !!groupStageId);
+
+  // Hook para obtener matches por groupStage
+  const { data: groupFixture = [], isLoading: matchesLoading, refetch: refetchMatches } = useMatchesByGroupStage(groupStageId, !!groupStageId);
+
+  const updateMatches = async () => {
+    await refetchMatches();
   };
 
-  useEffect(() => {
-    const fetchGroupStageId = async () => {
-      try {
-        setIsLoading(true);
-        const groupStageId = await getGroupStagesByTournamentCategory(
-          Number(selectedTournament),
-          Number(selectedCategory)
-        );
-        setGroupStageId(groupStageId);
-        await updateMatches(groupStageId);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const loading =
+    groupStageLoading || groupsLoading || rankingsLoading || matchesLoading;
 
-    fetchGroupStageId();
-  }, [selectedCategory, selectedTournament]);
-
-  useEffect(() => {
-    if (groupStageId !== null) {
-      clearMatches();
-      clearRankings();
-      updateMatches(groupStageId);
-    }
-  }, [groupStageId]);
-
-  if (isLoading || groupLoading) {
+  if (loading) {
     return <Loading isLoading={true} />;
   }
 
@@ -81,14 +55,14 @@ function ClientMasterComponent() {
         selectedTournament={selectedTournament}
         selectedCategory={selectedCategory}
       />
-
+      <TournamentPlayers />
       <div className="flex justify-center w-full px-4 lg:px-0 mt-10">
         <div className="w-full max-w-7xl space-y-6">
           <div>
             <GroupStage groupRankings={groupRankings} />
             <FixtureGroupStage
               groupFixture={groupFixture}
-              updateMatches={() => updateMatches(groupStageId!)}
+              updateMatches={updateMatches}
             />
           </div>
           <div>

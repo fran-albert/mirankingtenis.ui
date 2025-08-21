@@ -1,17 +1,18 @@
 import { GetPlayerInfoDto } from "@/common/types/get-player-info.dto";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Match } from "@/modules/match/domain/Match";
+import { Match } from "@/types/Match/Match";
 import { User } from "@/types/User/User";
 import CurrentTournament from "../Current-Tournament";
 import PersonalInformation from "../Personal-Information";
-import { Tournament } from "@/modules/tournament/domain/Tournament";
+import { Tournament } from "@/types/Tournament/Tournament";
 import CompletedTournament from "../Completed-Tournament";
 import { NextMatchDto } from "@/common/types/next-match.dto";
 import { getInitials } from "@/common/helpers/helpers";
 import MatchStatistics from "../Match-Statistics";
 import { MatchSummaryDto } from "@/common/types/match-summary.dto";
 import { SetSummaryDto } from "@/common/types/set-summary.dto";
+import Image from "next/image";
 
 export function PlayerComponent({
   player,
@@ -40,12 +41,8 @@ export function PlayerComponent({
     <div className="  text-gray-900 min-h-screen">
       <header className="py-8 px-4 md:px-8 flex items-center justify-center">
         <div className="flex flex-col md:flex-row items-center space-x-6">
-          <img
-            src={
-              player?.photo
-                ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${player.photo}.jpeg`
-                : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/mirankingtenis_default.png"
-            }
+          <Image
+            src={player?.photo}
             alt="Player Image"
             width={150}
             height={150}

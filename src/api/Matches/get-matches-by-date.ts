@@ -1,4 +1,4 @@
-import { Match } from "@/modules/match/domain/Match";
+import { Match } from "@/types/Match/Match";
 import axiosInstance from "@/services/axiosConfig";
 
 export const getMatchesByDate = async () => {

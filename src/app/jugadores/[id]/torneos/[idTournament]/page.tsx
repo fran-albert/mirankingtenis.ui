@@ -1,77 +1,87 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import MatchesByTournamentPlayer from "@/sections/Tournament/ByPlayer/matches";
 import ChartRankingByPlayer from "@/sections/Tournament/ByPlayer/ranking";
 import StatisticsByPlayer from "@/sections/Tournament/ByPlayer/statistics";
-import { useTournamentCategoryStore } from "@/hooks/useTournamentCategory";
+import { useTournamentCategoriesByUser } from "@/hooks/Tournament-Category/useTournamentCategory";
 import { useParams } from "next/navigation";
-import { useMatchStore } from "@/hooks/useMatch";
-import { useTournamentRankingStore } from "@/hooks/useTournamentRanking";
-import { useTournamentStore } from "@/hooks/useTournament";
+import { useTournamentRankingPlayerTournamentSummary } from "@/hooks/Tournament-Ranking/useTournamentRankingPlayerTournamentSummary";
+import { useTournamentRankingHistory } from "@/hooks/Tournament-Ranking/useTournamentRankingHistory";
+import { useTournament } from "@/hooks/Tournament/useTournament";
 import { formatDate } from "@/lib/utils";
 import { formatTournamentDates } from "@/common/helpers/helpers";
 import Loading from "@/components/Loading/loading";
+import { useMatchesByUser } from "@/hooks/Matches/useMatches";
 
 function TournamentPlayerPage() {
   const { id, idTournament } = useParams();
-  const {
-    getTournamentCategoriesByUser,
-    categoriesForTournaments,
-    loading: isLoadingTCategories,
-  } = useTournamentCategoryStore();
-  const {
-    getTotalPlayerTournamentMatchSummary,
-    playerMatchSummary,
-    loading: isLoadingPlayerMatchSummary,
-    getHistoryRanking,
-    historyRanking,
-  } = useTournamentRankingStore();
-  const {
-    getTournament,
-    tournament,
-    loading: isLoadingTournaments,
-  } = useTournamentStore();
-  const {
-    getMatchesByUser,
-    matches,
-    loading: isLoadingMatches,
-  } = useMatchStore();
   const idUser = Number(id);
+  // Usar React Query hook para tournament categories
+  const { categoriesForTournaments, isLoading: isLoadingTCategories } = useTournamentCategoriesByUser({ 
+    idUser: idUser, 
+    enabled: !!idUser 
+  });
+  // Obtener la categoría del torneo actual
+  const matchingTournament = categoriesForTournaments?.find(
+    (category) => category.tournament.id === Number(idTournament)
+  );
+  
+  // Usar React Query hooks para tournament ranking
+  const { playerMatchSummary, isLoading: isLoadingPlayerMatchSummary } = useTournamentRankingPlayerTournamentSummary({
+    idPlayer: idUser,
+    idTournament: Number(idTournament),
+    idCategory: matchingTournament?.category.id || 0,
+    enabled: !!idUser && !!idTournament && !!matchingTournament?.category.id
+  });
+  
+  const { historyRanking = [], isLoading: isLoadingHistoryRanking } = useTournamentRankingHistory({
+    idPlayer: idUser,
+    idTournament: Number(idTournament),
+    idCategory: matchingTournament?.category.id || 0,
+    enabled: !!idUser && !!idTournament && !!matchingTournament?.category.id
+  });
+  
+  // Usar React Query hook para obtener el torneo
+  const { tournament, isLoading: isLoadingTournaments } = useTournament({ 
+    idTournament: Number(idTournament), 
+    enabled: !!idTournament 
+  });
+  
+  // Usar React Query hook para obtener partidos del usuario
+  const { data: rawMatches = [], isLoading: isLoadingMatches } = useMatchesByUser(
+    idUser, 
+    Number(idTournament), 
+    matchingTournament?.category.id || 0, 
+    !!idUser && !!idTournament && !!matchingTournament?.category.id
+  );
 
-  const [categories, setCategories] = useState("");
-  useEffect(() => {
-    if (idUser) {
-      getTournamentCategoriesByUser(idUser);
-      getTournament(Number(idTournament));
-    }
-  }, [getTournamentCategoriesByUser, idUser]);
-
-  useEffect(() => {
-    if (categoriesForTournaments.length > 0) {
-      const matchingTournament = categoriesForTournaments.find(
-        (category) => category.tournament.id === Number(idTournament)
-      );
-
-      if (matchingTournament) {
-        getMatchesByUser(
-          idUser,
-          matchingTournament.tournament.id,
-          matchingTournament.category.id
-        );
-        getTotalPlayerTournamentMatchSummary(
-          idUser,
-          matchingTournament.tournament.id,
-          matchingTournament.category.id
-        );
-        getHistoryRanking(
-          idUser,
-          matchingTournament.tournament.id,
-          matchingTournament.category.id
-        );
-        setCategories(matchingTournament.category.name);
+  // Procesar matches para agregar rivalName calculado
+  const matches = React.useMemo(() => {
+    return rawMatches.map((match) => {
+      if (match.isBye) {
+        return { ...match, rivalName: "Fecha Libre" };
       }
-    }
-  }, [categoriesForTournaments, idTournament]);
+
+      // Determinar quién es el rival basándose en user1 y user2
+      let rivalName = "";
+      if (match.user1 && match.user1.id !== idUser) {
+        rivalName = `${match.user1.lastname}, ${match.user1.name}`;
+      } else if (match.user2 && match.user2.id !== idUser) {
+        rivalName = `${match.user2.lastname}, ${match.user2.name}`;
+      } else {
+        rivalName = "Rival desconocido";
+      }
+
+      return { 
+        ...match, 
+        rivalName,
+        tournamentCategoryId: matchingTournament?.category.id || 0
+      };
+    });
+  }, [rawMatches, idUser, matchingTournament?.category.id]);
+
+  // Obtener nombre de categoría directamente de los datos
+  const categoryName = matchingTournament?.category.name || "";
 
   const validPositions = historyRanking.filter(
     (ranking) => ranking.position !== null
@@ -84,7 +94,10 @@ function TournamentPlayerPage() {
     isLoadingTournaments ||
     isLoadingMatches ||
     isLoadingPlayerMatchSummary ||
-    isLoadingTCategories
+    isLoadingHistoryRanking ||
+    isLoadingTCategories ||
+    !tournament ||
+    !categoriesForTournaments
   ) {
     return <Loading isLoading={true} />;
   }
@@ -106,7 +119,7 @@ function TournamentPlayerPage() {
       </div>
       <StatisticsByPlayer
         matchSummary={playerMatchSummary}
-        category={categories}
+        category={categoryName}
         initialPosition={historyRanking[0]?.position || 0}
         bestPosition={bestPosition}
       />

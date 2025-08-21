@@ -28,14 +28,7 @@ export const getColumns = (): ColumnDef<User>[] => {
           }
         >
           <Avatar>
-            <AvatarImage
-              src={
-                row.original.photo
-                  ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${row.original.photo}.jpeg`
-                  : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/mirankingtenis_default.png"
-              }
-              alt="@avatar"
-            />
+            <AvatarImage src={row.original.photo} alt="@avatar" />
             <AvatarFallback>
               {row.original.name.charAt(0)}
               {row.original.lastname.charAt(0)}

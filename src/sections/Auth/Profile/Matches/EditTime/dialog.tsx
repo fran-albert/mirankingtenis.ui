@@ -26,15 +26,14 @@ import { Label } from "@/components/ui/label";
 import "react-datepicker/dist/react-datepicker.css";
 import { Input } from "@/components/ui/input";
 import { es } from "date-fns/locale/es";
-import { createApiShiftRepository } from "@/modules/shift/infra/ApiShiftRepository";
 registerLocale("es", es);
 import moment from "moment-timezone";
-import { updateShift } from "@/modules/shift/application/update/updateShift";
-import { Match } from "@/modules/match/domain/Match";
+import { MatchByUserWithRival } from "@/types/Match/MatchByUser.dto";
+import { useShiftMutation } from "@/hooks/Shift/useShiftMutation";
 
 interface UpdateShiftDialogProps {
   onUpdateMatches?: () => void;
-  match: Match;
+  match: MatchByUserWithRival;
 }
 
 export default function UpdateShiftDialog({
@@ -49,8 +48,7 @@ export default function UpdateShiftDialog({
     formState: { errors },
     setValue,
   } = useForm();
-  const shiftRepository = createApiShiftRepository();
-  const updateShiftFn = updateShift(shiftRepository);
+  const { updateShiftMutation } = useShiftMutation();
   const [selectedCourt, setSelectedCourt] = useState<string>("");
 
   useEffect(() => {
@@ -71,34 +69,27 @@ export default function UpdateShiftDialog({
       startHour: startHour,
     };
 
-    try {
-      const shiftCreationPromise = updateShiftFn(dataToSend, match.id);
-      toast.promise(shiftCreationPromise, {
-        loading: "Reservando turno para el partido partido...",
-        success: "Turno reservado con éxito!",
-        duration: 3000,
-      });
-      await shiftCreationPromise;
-      if (onUpdateMatches) {
-        onUpdateMatches();
+    updateShiftMutation.mutate(
+      { newShift: dataToSend, idShift: match.shift?.id || 0 },
+      {
+        onSuccess: () => {
+          toast.success("Turno actualizado con éxito!", { duration: 3000 });
+          if (onUpdateMatches) {
+            onUpdateMatches();
+          }
+          setIsOpen(false);
+        },
+        onError: (error: any) => {
+          const errorMessage =
+            error.response?.data?.message ||
+            "Error desconocido al actualizar el turno";
+          toast.error(`Error al actualizar el turno: ${errorMessage}`, {
+            duration: 3000,
+          });
+          console.error("Error al actualizar el turno", error);
+        }
       }
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        const errorMessage =
-          error.response?.data?.message ||
-          "Error desconocido al reservar el partido";
-        toast.error(`Error al reservar el partido: ${errorMessage}`, {
-          duration: 3000,
-        });
-        console.error("Error al reservar el partido", errorMessage);
-      } else {
-        toast.error("Error al reservar el partido: Error desconocido", {
-          duration: 3000,
-        });
-        console.error("Error al reservar el partido", error);
-      }
-    }
-    setIsOpen(false);
+    );
   };
 
   const handleCourtSelection = (value: string) => {

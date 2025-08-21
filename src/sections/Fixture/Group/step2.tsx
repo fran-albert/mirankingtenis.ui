@@ -1,8 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { createFixture } from "@/modules/fixture/application/create/createFixture";
 import { createApiFixtureRepository } from "@/modules/fixture/infra/ApiFixtureRepository";
-import { TournamentParticipant } from "@/modules/tournament-participant/domain/TournamentParticipant";
-import { TournamentRanking } from "@/modules/tournament-ranking/domain/TournamentRanking";
+import { TournamentParticipant } from "@/types/Tournament-Participant/TournamentParticipant";
+import { TournamentRanking } from "@/types/Tournament-Ranking/TournamentRanking";
 import { User } from "@/types/User/User";
 import axios from "axios";
 import { useRouter } from "next/navigation";

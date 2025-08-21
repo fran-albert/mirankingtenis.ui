@@ -1,5 +1,5 @@
 import { Category } from "@/modules/category/domain/Category";
-import { HistoryRanking } from "@/modules/historyRanking/domain/HistoryRanking";
+import { HistoryRanking } from "@/types/History-Ranking/HistoryRanking";
 import { Ranking } from "@/modules/ranking/domain/Ranking";
 import { State } from "../State/State";
 import { City } from "../City/City";

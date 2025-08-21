@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Tournament } from "@/modules/tournament/domain/Tournament";
+import { Tournament } from "@/types/Tournament/Tournament";
 import CategoriesCard from "../Fixture/card";
 import PlayersTournamentTable from "../Players/Table/table";
-import { TournamentCategory } from "@/modules/tournament-category/domain/TournamentCategory";
+import { TournamentCategory } from "@/types/Tournament-Category/TournamentCategory";
 import AddCategoriesForTournamentDialog from "../Categories/Add/dialog";
-import { useTournamentCategoryStore } from "@/hooks/useTournamentCategory";
+import { useTournamentCategoryMutations } from "@/hooks/Tournament-Category/useTournamentCategory";
 import MasterCategoriesCard from "../Fixture/master-card";
 import { useFixtureStore } from "@/hooks/useFixture";
 import Loading from "@/components/Loading/loading";
@@ -16,15 +16,15 @@ function MasterTournamentDetail({
   tournament: Tournament;
   categories: TournamentCategory[];
 }) {
-  const {
-    loading: isLoadingCategories,
-    error,
-    getCategoriesForTournament,
-    createCategoryForTournament,
-  } = useTournamentCategoryStore();
+  const { createCategoryForTournamentMutation } = useTournamentCategoryMutations();
   const [categories, setCategories] = useState<TournamentCategory[]>(
     initialCategories || []
   );
+
+  // Crear función wrapper para el mutation
+  const createCategoryForTournament = async (idTournament: number, idCategory: number[]): Promise<TournamentCategory[]> => {
+    return await createCategoryForTournamentMutation.mutateAsync({ idTournament, idCategory });
+  };
   const { isGroupStageFixturesCreated, loading: isLoadingFixture } =
     useFixtureStore();
   const [groupStageFixturesCreated, setGroupStageFixturesCreated] = useState<{
@@ -38,14 +38,7 @@ function MasterTournamentDetail({
     }));
   };
 
-  useEffect(() => {
-    const fetchAndSetCategories = async () => {
-      const fetchedCategories = await getCategoriesForTournament(tournament.id);
-      setCategories(fetchedCategories);
-    };
-
-    fetchAndSetCategories();
-  }, [tournament.id, getCategoriesForTournament]);
+  // Ya no es necesario useEffect para categorías - se pasan como prop
 
   useEffect(() => {
     const checkFixtures = async () => {
@@ -67,13 +60,12 @@ function MasterTournamentDetail({
   }, [categories, tournament.id, isGroupStageFixturesCreated]);
 
   const handleCategoryAdded = async (newCategories: TournamentCategory[]) => {
-    const fetchedCategories = await getCategoriesForTournament(tournament.id);
-    setCategories(fetchedCategories);
+    setCategories([...categories, ...newCategories]);
   };
 
   const existingCategoryIds = categories.map((category) => category.id);
 
-  if (isLoadingCategories || isLoadingFixture) {
+  if (isLoadingFixture) {
     return <Loading isLoading />;
   }
 

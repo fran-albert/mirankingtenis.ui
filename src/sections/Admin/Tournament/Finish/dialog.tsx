@@ -13,11 +13,8 @@ import {
 import ActionIcon from "@/components/ui/actionIcon";
 import { FaPowerOff } from "react-icons/fa6";
 import { toast } from "sonner";
-import { createApiTournamentRepository } from "@/modules/tournament/infra/ApiTournamentRepository";
-import { createApiTournamentParticipantRepository } from "@/modules/tournament-participant/infra/ApiTournamentRepository";
-import { desactivatePlayer } from "@/modules/tournament-participant/application/desactivate-player/desactivatePlayer";
-import { Tournament } from "@/modules/tournament/domain/Tournament";
-import { useTournamentStore } from "@/hooks/useTournament";
+import { Tournament } from "@/types/Tournament/Tournament";
+import { useTournamentMutations } from "@/hooks/Tournament/useTournament";
 import axios from "axios";
 import { isAxiosError } from "@/common/helpers/helpers";
 
@@ -32,11 +29,11 @@ export default function FinishTournamentDialog({
 }: FinishTournamentDialogDialogProps) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const toggleDialog = () => setIsOpen(!isOpen);
-  const { finishTournament } = useTournamentStore();
+  const { finishTournamentMutation } = useTournamentMutations();
 
   const handleConfirmFinished = async () => {
     try {
-      const finishPromise = finishTournament(tournament.id);
+      const finishPromise = finishTournamentMutation.mutateAsync(tournament.id);
       toast.promise(finishPromise, {
         loading: "Finalizando torneo...",
         success: "Torneo finalizado con éxito!",

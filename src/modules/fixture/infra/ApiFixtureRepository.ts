@@ -1,7 +1,7 @@
 import axiosInstance from "@/services/axiosConfig";
 import { FixtureRepository } from "../domain/FixtureRepository";
 import { Fixture } from "../domain/Fixture";
-import { Match } from "@/modules/match/domain/Match";
+import { Match } from "@/types/Match/Match";
 
 export function createApiFixtureRepository(): FixtureRepository {
   async function createFixture(newFixture: Fixture): Promise<Fixture> {

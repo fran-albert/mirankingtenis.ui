@@ -1,6 +1,6 @@
+import { Shift } from "@/types/Shift/Shift";
 import { TournamentStatus } from "../enum/tournamentStatus.enum";
-import { Shift } from "@/modules/shift/domain/Shift";
-import { Sets } from "@/modules/sets/domain/Sets";
+import { Sets } from "@/types/Set/Sets";
 
 export interface NextMatchDto {
     id: number;

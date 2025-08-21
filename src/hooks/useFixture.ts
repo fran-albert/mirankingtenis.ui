@@ -4,7 +4,7 @@ import { createFixture } from '@/modules/fixture/application/create/createFixtur
 import { getFixtureByCategory } from '@/modules/fixture/application/get-fixture-by-category/getFixtureByCategory';
 import { getFixtureByCategoryAndTournament } from '@/modules/fixture/application/get-fixture-by-category-and-tournament/getFixtureByCategoryAndTournament';
 import { Fixture } from '@/modules/fixture/domain/Fixture';
-import { Match } from '@/modules/match/domain/Match';
+import { Match } from "@/types/Match/Match";
 
 const fixtureRepository = createApiFixtureRepository();
 

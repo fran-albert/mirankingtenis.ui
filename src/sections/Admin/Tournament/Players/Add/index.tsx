@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { User } from "@/types/User/User";
 import { NonParticipantsDto } from "@/common/types/non-participants.dto";
+import Image from "next/image";
 
 export default function SelectPlayerTournamentComponent({
   users,
@@ -71,7 +72,7 @@ export default function SelectPlayerTournamentComponent({
               }`}
               onClick={() => handlePlayerSelection(player)}
             >
-              <img
+              <Image
                 src={
                   player.photo
                     ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${player.photo}.jpeg`
@@ -108,7 +109,7 @@ export default function SelectPlayerTournamentComponent({
               {selectedPlayers.map((player, index) => (
                 <div key={player.id} className="flex items-center gap-4">
                   <span className="text-xl font-semibold">{index + 1}.</span>
-                  <img
+                  <Image
                     src={
                       player.photo
                         ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${player.photo}.jpeg`

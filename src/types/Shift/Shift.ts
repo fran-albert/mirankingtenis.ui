@@ -10,3 +10,10 @@ export interface UpdateShiftResponse {
     endHour: Date;
     court: Court;
 }
+
+export interface Shift {
+    id: number;
+    startHour: string;
+    date: Date;
+    court: Court | string;
+}

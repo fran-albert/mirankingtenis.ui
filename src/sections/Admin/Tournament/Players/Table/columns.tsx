@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import DeletePlayerDialog from "@/sections/Players/Delete/button";
 import { formatDate } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { TournamentParticipant } from "@/modules/tournament-participant/domain/TournamentParticipant";
+import { TournamentParticipant } from "@/types/Tournament-Participant/TournamentParticipant";
 import DesactivatePlayerDialog from "../Desactivate/button";
 
 export const getColumns = (

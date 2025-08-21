@@ -1,19 +1,19 @@
 "use client";
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { Sets } from "@/modules/sets/domain/Sets";
+import { Sets } from "@/types/Set/Sets";
 import { IoTimeOutline } from "react-icons/io5";
 import DeleteMatchDialog from "./Delete/button";
 import AddResultMatchDialog from "./AddResult/dialog";
 import EditMatchDialog from "./Time/dialog";
 import { formatDate, formatDateComplete } from "@/lib/utils";
 import UpdateShiftDialog from "./EditTime/dialog";
-import { Match } from "@/modules/match/domain/Match";
+import { MatchByUserWithRival } from "@/types/Match/MatchByUser.dto";
 import { BadgeWin } from "@/components/Badge/Green/badge";
 import { BadgePending } from "@/components/Badge/Pending/badge";
 import DeleteShiftDialog from "./DeleteShift/dialog";
-export const getColumns = (onUpdateMatches: () => void): ColumnDef<Match>[] => {
-  const columns: ColumnDef<Match>[] = [
+export const getColumns = (onUpdateMatches: () => void): ColumnDef<MatchByUserWithRival>[] => {
+  const columns: ColumnDef<MatchByUserWithRival>[] = [
     {
       header: "Fecha",
       cell: ({ row }) => (
@@ -54,7 +54,7 @@ export const getColumns = (onUpdateMatches: () => void): ColumnDef<Match>[] => {
         }
         return (
           <div className="flex items-center w-48">
-            {formatDateComplete(row.original.shift?.startHour)} hs
+            {formatDateComplete(row.original.shift?.startHour!)} hs
           </div>
         );
       },
@@ -141,7 +141,7 @@ export const getColumns = (onUpdateMatches: () => void): ColumnDef<Match>[] => {
                     onUpdateMatches={onUpdateMatches}
                   />
                   <DeleteShiftDialog
-                    idShift={Number(row.original.shift.id)}
+                    idShift={Number(row.original.shift?.id)}
                     onUpdateMatches={onUpdateMatches}
                   />
                 </>

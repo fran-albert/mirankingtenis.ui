@@ -1,7 +1,7 @@
 import ActionIcon from "@/components/ui/actionIcon";
 import { Button } from "@/components/ui/button";
 import { Category } from "@/modules/category/domain/Category";
-import { TournamentCategory } from "@/modules/tournament-category/domain/TournamentCategory";
+import { TournamentCategory } from "@/types/Tournament-Category/TournamentCategory";
 import { useRouter } from "next/navigation";
 import { FaPencilAlt } from "react-icons/fa";
 

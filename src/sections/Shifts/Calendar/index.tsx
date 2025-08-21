@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, useMemo } from "react";
 import {
   Calendar,
   SlotInfo,
@@ -13,20 +13,22 @@ import "../Calendar/style.css";
 import { CustomEvent } from "./event";
 import { Button } from "@/components/ui/button";
 import { ShiftTable } from "../Table/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { CreateDoubleMatch } from "../Create";
+import { CreateSingleMatch } from "../Create/createSingleMatch";
 import { User } from "@/types/User/User";
 import useRoles from "@/hooks/useRoles";
 import { useDoubleMatchMutations } from "@/hooks/Doubles-Express/useDoubleMatchMutation";
 import { toast } from "sonner";
 import { DoublesExhibitionMatchResponse } from "@/types/Double-Match/DoublesExhibitionMatch";
+import { useMatchesByUser } from "@/hooks/Matches/useMatches";
+import {
+  useCurrentTournamentByPlayer,
+  useLastTournamentByPlayer,
+} from "@/hooks/Tournament/useTournament";
+import { useTournamentCategoriesByUser } from "@/hooks/Tournament-Category/useTournamentCategory";
+import { createSingleMatch, createShiftForMatch } from "@/api/Shift/create-single-match";
+import { useShiftMutation } from "@/hooks/Shift/useShiftMutation";
+import { MatchByUserResponseDto } from "@/types/Match/MatchByUser.dto";
 
 moment.locale("es");
 interface MatchEvent {
@@ -74,8 +76,79 @@ export const ShiftCalendar = ({
   const [jugadoresSeleccionados, setJugadoresSeleccionados] = useState<
     number[]
   >([]);
+  const [selectedRival, setSelectedRival] = useState<number | null>(null);
+  const [showSingleMatchDialog, setShowSingleMatchDialog] = useState(false);
+  const [selectedMatchId, setSelectedMatchId] = useState<number | undefined>(undefined);
   const { addDoublesMatchesMutation } = useDoubleMatchMutations();
-   const handleJugadorChange = (index: number, value: number) => {
+  const { shiftForMatchMutation } = useShiftMutation();
+
+  const idUser = session?.user?.id ? Number(session.user.id) : 0;
+
+  // Obtener el torneo actual o último del usuario
+  const { tournament: currentTournament } = useCurrentTournamentByPlayer({
+    idPlayer: idUser,
+    enabled: !!idUser,
+  });
+
+  const { tournament: lastTournament } = useLastTournamentByPlayer({
+    idPlayer: idUser,
+    enabled: !!idUser,
+  });
+
+  // Usar torneo actual o último como fallback
+  const activeTournament = currentTournament || lastTournament;
+
+  // Obtener las categorías del usuario en ese torneo
+  const { categoriesForTournaments } = useTournamentCategoriesByUser({
+    idUser: idUser,
+    enabled: !!idUser && !!activeTournament,
+  });
+
+  // Obtener la primera categoría disponible
+  const firstCategory = activeTournament
+    ? categoriesForTournaments.find(
+        (tc) => tc.tournament.id === activeTournament.id
+      )
+    : undefined;
+
+  // Obtener los partidos del usuario en el torneo y categoría actuales
+  const { data: userMatches = [] } = useMatchesByUser(
+    idUser,
+    activeTournament?.id || 0,
+    firstCategory?.category.id || 0,
+    !!idUser && !!activeTournament && !!firstCategory
+  );
+
+  // Extraer rivales únicos de los partidos del usuario
+  const availableRivals = useMemo(() => {
+    if (!userMatches.length || !session?.user?.id) return [];
+
+    const currentUserId = Number(session.user.id);
+    const rivals = new Map();
+
+    userMatches.forEach((match: MatchByUserResponseDto) => {
+      // Agregar user1 si no es el usuario actual
+      if (match.user1 && match.user1.id !== currentUserId) {
+        rivals.set(match.user1.id, {
+          id: match.user1.id,
+          name: match.user1.name,
+          lastname: match.user1.lastname,
+        });
+      }
+
+      // Agregar user2 si existe y no es el usuario actual
+      if (match.user2 && match.user2.id !== currentUserId) {
+        rivals.set(match.user2.id, {
+          id: match.user2.id,
+          name: match.user2.name,
+          lastname: match.user2.lastname,
+        });
+      }
+    });
+
+    return Array.from(rivals.values());
+  }, [userMatches, session?.user?.id]);
+  const handleJugadorChange = (index: number, value: number) => {
     setJugadoresSeleccionados((prev) => {
       const newJugadores = [...prev];
       newJugadores[index - 1] = value;
@@ -145,12 +218,15 @@ export const ShiftCalendar = ({
     event: "Partido",
   };
 
-  const resourceMap = [
-    { resourceId: 1, resourceTitle: "Cancha 1" },
-    { resourceId: 2, resourceTitle: "Cancha 2" },
-    { resourceId: 3, resourceTitle: "Cancha 3" },
-    { resourceId: 4, resourceTitle: "Cancha 4" },
-  ];
+  const resourceMap = useMemo(
+    () => [
+      { resourceId: 1, resourceTitle: "Cancha 1" },
+      { resourceId: 2, resourceTitle: "Cancha 2" },
+      { resourceId: 3, resourceTitle: "Cancha 3" },
+      { resourceId: 4, resourceTitle: "Cancha 4" },
+    ],
+    []
+  );
 
   const minTime = new Date();
   minTime.setHours(9, 0, 0);
@@ -161,34 +237,37 @@ export const ShiftCalendar = ({
   // Función que se ejecuta al hacer clic en un slot vacío del calendario
   const [selectedCourt, setSelectedCourt] = useState<string | null>(null);
 
-  const handleSelectSlot = (slotInfo: SlotInfo) => {
-    if (!session) {
-      return;
-    }
-    const selectedStart = moment(slotInfo.start).startOf("hour");
-    const selectedEnd = moment(selectedStart).add(2, "hours");
+  const handleSelectSlot = useCallback(
+    (slotInfo: SlotInfo) => {
+      if (!session) {
+        return;
+      }
 
-    setSelectedSlot({
-      start: selectedStart.toDate(),
-      end: selectedEnd.toDate(),
-    });
+      // Optimización: calcular todo de una vez
+      const selectedStart = moment(slotInfo.start).startOf("hour");
+      const selectedEnd = moment(selectedStart).add(2, "hours");
+      const selectedCourtTitle =
+        resourceMap.find((court) => court.resourceId === slotInfo.resourceId)
+          ?.resourceTitle || "Cancha desconocida";
 
-    // Guardar la cancha seleccionada usando el resourceId
-    const selectedCourt = resourceMap.find(
-      (court) => court.resourceId === slotInfo.resourceId
-    )?.resourceTitle;
-
-    setSelectedCourt(selectedCourt || "Cancha desconocida");
-
-    setShowDialog(true);
-  };
+      // Batch de state updates para evitar re-renders múltiples
+      setSelectedSlot({
+        start: selectedStart.toDate(),
+        end: selectedEnd.toDate(),
+      });
+      setSelectedCourt(selectedCourtTitle);
+      // Cambiar a modal de partido individual
+      setShowSingleMatchDialog(true);
+    },
+    [session, resourceMap]
+  );
 
   const handleReserve = () => {
     if (!session || !selectedSlot) return;
 
     const formattedData = {
-      createdBy: session.user.id,
-      player1Id: session.user.id,
+      createdBy: Number(session.user.id),
+      player1Id: Number(session.user.id),
       player2Id: jugadoresSeleccionados[0] || null,
       player3Id: jugadoresSeleccionados[1] || null,
       player4Id: jugadoresSeleccionados[2] || null,
@@ -207,6 +286,35 @@ export const ShiftCalendar = ({
       },
     });
     setShowDialog(false);
+  };
+
+  // Función para asignar turno a partido existente
+  const handleSingleMatchReserve = async (matchId: number) => {
+    if (!session || !selectedSlot || !matchId) return;
+
+    const courtId = resourceMap.find((court) => court.resourceTitle === selectedCourt)
+      ?.resourceId || 0;
+
+    const shiftData = {
+      idCourt: courtId,
+      startHour: moment(selectedSlot.start).toISOString(),
+    };
+    
+    shiftForMatchMutation.mutate(
+      { shift: shiftData, idMatch: matchId },
+      {
+        onSuccess: () => {
+          toast.success("Turno asignado con éxito!");
+          setShowSingleMatchDialog(false);
+        },
+        onError: (error: any) => {
+          const errorMessage =
+            error.response?.data?.message || "Ocurrió un error inesperado.";
+          toast.error(`Error al asignar turno: ${errorMessage}`);
+          console.error("Error al asignar turno:", error);
+        }
+      }
+    );
   };
 
   return (
@@ -252,6 +360,22 @@ export const ShiftCalendar = ({
           )}
         </div>
       </div>
+      <CreateSingleMatch
+        open={showSingleMatchDialog}
+        onClose={() => {
+          setShowSingleMatchDialog(false);
+          setSelectedMatchId(undefined); // Reset match ID when closing
+        }}
+        selectedSlot={selectedSlot}
+        onReserve={handleSingleMatchReserve}
+        pendingMatches={userMatches || []}
+        sessionUser={{
+          id: session?.user?.id || 0,
+          name: session?.user?.name || "Desconocido",
+          lastname: session?.user?.lastname || "",
+        }}
+        court={String(selectedCourt)}
+      />
       <CreateDoubleMatch
         open={showDialog}
         onClose={() => setShowDialog(false)}

@@ -1,7 +1,7 @@
 import { BadgeWin } from "@/components/Badge/Green/badge";
 import { BadgeLost } from "@/components/Badge/Lost/badge";
 import { BadgePending } from "@/components/Badge/Pending/badge";
-import { Match } from "@/modules/match/domain/Match";
+import { Match } from "@/types/Match/Match";
 import React from "react";
 import {
   CardTitle,

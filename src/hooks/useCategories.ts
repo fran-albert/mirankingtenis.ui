@@ -1,4 +1,4 @@
-import create from 'zustand';
+import { create } from 'zustand';
 import { Category } from '@/modules/category/domain/Category';
 import { createApiCategoryRepository } from '@/modules/category/infra/ApiCategoryRepository';
 

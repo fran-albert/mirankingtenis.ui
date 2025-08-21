@@ -31,7 +31,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { IoMenu } from "react-icons/io5";
-import { signOut } from "next-auth/react";
+import { useAuth } from "@/context/AuthProvider";
 import { User } from "@/types/User/User";
 import { formatDate } from "@/lib/utils";
 import { DataTable } from "@/components/Table/dataTable";

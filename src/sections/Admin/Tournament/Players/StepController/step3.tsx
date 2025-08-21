@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Tournament } from "@/modules/tournament/domain/Tournament";
+import { Tournament } from "@/types/Tournament/Tournament";
 
 interface Step3Props {
   onNext: () => void;

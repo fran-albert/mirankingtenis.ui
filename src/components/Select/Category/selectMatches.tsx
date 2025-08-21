@@ -5,7 +5,7 @@ import {
     SelectTrigger,
     SelectValue,
   } from "@/components/ui/select";
-  import { useTournamentCategoryStore } from "@/hooks/useTournamentCategory";
+  import { useCategoriesForTournament } from "@/hooks/Tournament-Category/useTournamentCategory";
   import { useEffect } from "react";
   
   interface CategorySelectProps {
@@ -19,14 +19,13 @@ import {
     onCategory,
     idTournament,
   }: CategorySelectProps) => {
-    const { categoriesForTournaments, getCategoriesForTournament, loading } =
-      useTournamentCategoryStore();
+    // Usar React Query hook
+    const { categories: categoriesForTournaments, isLoading: loading } = useCategoriesForTournament({
+      idTournament,
+      enabled: !!idTournament
+    });
   
-    useEffect(() => {
-      if (idTournament) {
-        getCategoriesForTournament(idTournament);
-      }
-    }, [idTournament, getCategoriesForTournament]);
+    // Ya no es necesario useEffect - React Query maneja la carga automáticamente
   
     return (
       <Select value={selected} onValueChange={onCategory}>
@@ -34,7 +33,7 @@ import {
           <SelectValue placeholder="Categoría" />
         </SelectTrigger>
         <SelectContent>
-          {categoriesForTournaments.map((category) => (
+          {categoriesForTournaments?.map((category) => (
             <SelectItem
               key={category.id}
               value={String(category.id)}

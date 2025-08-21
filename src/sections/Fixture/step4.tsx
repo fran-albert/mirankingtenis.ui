@@ -11,8 +11,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { TournamentParticipant } from "@/modules/tournament-participant/domain/TournamentParticipant";
-import { TournamentRanking } from "@/modules/tournament-ranking/domain/TournamentRanking";
+import { TournamentParticipant } from "@/types/Tournament-Participant/TournamentParticipant";
+import { TournamentRanking } from "@/types/Tournament-Ranking/TournamentRanking";
 
 interface Step4Props {
   onNext: () => void;

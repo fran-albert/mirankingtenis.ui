@@ -8,8 +8,8 @@ import {
 } from "@/components/ui/card";
 import { Create } from "@/components/Button/Create/button";
 import { Category } from "@/modules/category/domain/Category";
-import { TournamentCategory } from "@/modules/tournament-category/domain/TournamentCategory";
-import { useTournamentParticipantStore } from "@/hooks/useTournamentParticipant";
+import { TournamentCategory } from "@/types/Tournament-Category/TournamentCategory";
+import { useHasPlayersForCategory } from "@/hooks/Tournament-Participant/useTournamentParticipant";
 import Loading from "@/components/Loading/loading";
 function CategoriesCard({
   category,
@@ -20,23 +20,8 @@ function CategoriesCard({
   idTournament: number;
   nextMatchDay: any;
 }) {
-  const { hasPlayersForCategory } = useTournamentParticipantStore();
-
-  const [hasParticipants, setHasParticipants] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  useEffect(() => {
-    const fetchGroupAndPlayersStatus = async () => {
-      setIsLoading(true);
-
-      const playersStatus = await hasPlayersForCategory(
-        idTournament,
-        category.id
-      );
-      setHasParticipants(playersStatus);
-      setIsLoading(false);
-    };
-    fetchGroupAndPlayersStatus();
-  }, [category.id, hasPlayersForCategory, idTournament]);
+  // Usar React Query hook para verificar si hay jugadores para la categoría
+  const { data: hasParticipants = false, isLoading } = useHasPlayersForCategory(idTournament, category.id, !!idTournament && !!category.id);
 
   // if (isLoading) {
   //   return <Loading isLoading />;

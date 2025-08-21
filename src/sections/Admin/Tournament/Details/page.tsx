@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Tournament } from "@/modules/tournament/domain/Tournament";
-import { TournamentCategory } from "@/modules/tournament-category/domain/TournamentCategory";
+import { Tournament } from "@/types/Tournament/Tournament";
+import { TournamentCategory } from "@/types/Tournament-Category/TournamentCategory";
 import MasterTournamentDetail from "../Master";
 import LeagueTournamentDetail from "../League";
 function DetailsTournament({

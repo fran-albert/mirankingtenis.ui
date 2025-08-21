@@ -7,7 +7,7 @@ import { FaCalendarAlt } from "react-icons/fa";
 import { FaPencilAlt } from "react-icons/fa";
 import UpdateMatchDialog from "@/sections/Matches/Update/dialog";
 import { MdOutlineScoreboard } from "react-icons/md";
-import { useMatchStore } from "@/hooks/useMatch";
+import { useMatchStore } from "@/hooks/useMatchStore";
 import AddShiftDialog from "@/sections/Auth/Profile/Matches/NewShift/new-shift";
 
 export function FixtureGroupStage({

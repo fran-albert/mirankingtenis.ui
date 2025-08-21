@@ -13,11 +13,8 @@ import {
 import ActionIcon from "@/components/ui/actionIcon";
 import { FaPowerOff } from "react-icons/fa6";
 import { toast } from "sonner";
-import { createApiTournamentRepository } from "@/modules/tournament/infra/ApiTournamentRepository";
-import { createApiTournamentParticipantRepository } from "@/modules/tournament-participant/infra/ApiTournamentRepository";
-import { desactivatePlayer } from "@/modules/tournament-participant/application/desactivate-player/desactivatePlayer";
-import { Tournament } from "@/modules/tournament/domain/Tournament";
-import { useTournamentStore } from "@/hooks/useTournament";
+import { Tournament } from "@/types/Tournament/Tournament";
+import { useTournamentMutations } from "@/hooks/Tournament/useTournament";
 import axios from "axios";
 import { isAxiosError } from "@/common/helpers/helpers";
 
@@ -32,12 +29,12 @@ export default function StartTournamentDialog({
 }: StartTournamentDialogDialogProps) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const toggleDialog = () => setIsOpen(!isOpen);
-  const { startTournament } = useTournamentStore();
+  const { startTournamentMutation } = useTournamentMutations();
 
   const handleConfirmStarted = async () => {
     try {
-      const finishPromise = startTournament(tournament.id);
-      toast.promise(finishPromise, {
+      const startPromise = startTournamentMutation.mutateAsync(tournament.id);
+      toast.promise(startPromise, {
         loading: "Iniciando torneo...",
         success: "Torneo iniciado con éxito!",
         error: (err) => {
@@ -48,7 +45,7 @@ export default function StartTournamentDialog({
         },
         duration: 3000,
       });
-      const updatedTournament = await finishPromise;
+      const updatedTournament = await startPromise;
       if (onUpdateTournamentOnList) {
         onUpdateTournamentOnList(updatedTournament);
       }

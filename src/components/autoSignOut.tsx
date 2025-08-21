@@ -1,8 +1,10 @@
 import { useEffect } from "react";
-import { useSession, signOut } from "next-auth/react";
+import { useCustomSession } from "@/context/SessionAuthProviders";
+import { useAuth } from "@/context/AuthProvider";
 
 const AutoSignOut = () => {
-  const { status } = useSession();
+  const { status } = useCustomSession();
+  const { logout } = useAuth();
 
   useEffect(() => {
     if (status !== "authenticated") {
@@ -14,7 +16,7 @@ const AutoSignOut = () => {
     const resetTimer = () => {
       clearTimeout(timeoutId);
       timeoutId = setTimeout(() => {
-        signOut();
+        logout();
       }, 5 * 60 * 1000);
     };
 
@@ -30,7 +32,7 @@ const AutoSignOut = () => {
       window.removeEventListener("scroll", resetTimer);
       clearTimeout(timeoutId);
     };
-  }, [status]);
+  }, [status, logout]);
 
   return null;
 };

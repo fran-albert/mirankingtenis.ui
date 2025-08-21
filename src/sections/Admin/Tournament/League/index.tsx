@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Tournament } from "@/modules/tournament/domain/Tournament";
+import { Tournament } from "@/types/Tournament/Tournament";
 import CategoriesCard from "../Fixture/card";
 import PlayersTournamentTable from "../Players/Table/table";
-import { TournamentCategory } from "@/modules/tournament-category/domain/TournamentCategory";
+import { TournamentCategory } from "@/types/Tournament-Category/TournamentCategory";
 import AddCategoriesForTournamentDialog from "../Categories/Add/dialog";
-import { useTournamentCategoryStore } from "@/hooks/useTournamentCategory";
+import { useTournamentCategoryMutations } from "@/hooks/Tournament-Category/useTournamentCategory";
 import MasterCategoriesCard from "../Fixture/master-card";
 import { useFixtureStore } from "@/hooks/useFixture";
 import Loading from "@/components/Loading/loading";
@@ -18,35 +18,25 @@ function LeagueTournamentDetail({
   categories: TournamentCategory[];
   categoryDates: any;
 }) {
-  const {
-    loading: isLoadingCategories,
-    error,
-    getCategoriesForTournament,
-    createCategoryForTournament,
-  } = useTournamentCategoryStore();
+  const { createCategoryForTournamentMutation } = useTournamentCategoryMutations();
   const [categories, setCategories] = useState<TournamentCategory[]>(
     initialCategories || []
   );
 
-  useEffect(() => {
-    const fetchAndSetCategories = async () => {
-      const fetchedCategories = await getCategoriesForTournament(tournament.id);
-      setCategories(fetchedCategories);
-    };
-
-    fetchAndSetCategories();
-  }, [tournament.id, getCategoriesForTournament]);
+  // Ya no es necesario useEffect - React Query manejará la actualización automáticamente
 
   const handleCategoryAdded = async (newCategories: TournamentCategory[]) => {
-    const fetchedCategories = await getCategoriesForTournament(tournament.id);
-    setCategories(fetchedCategories);
+    setCategories([...categories, ...newCategories]);
+  };
+
+  // Crear función wrapper para el mutation
+  const createCategoryForTournament = async (idTournament: number, idCategory: number[]): Promise<TournamentCategory[]> => {
+    return await createCategoryForTournamentMutation.mutateAsync({ idTournament, idCategory });
   };
 
   const existingCategoryIds = categories.map((category) => category.id);
 
-  if (isLoadingCategories) {
-    return <Loading isLoading />;
-  }
+  // Ya no es necesario el loading state - las categorías se pasan como prop
 
   return (
     <div>

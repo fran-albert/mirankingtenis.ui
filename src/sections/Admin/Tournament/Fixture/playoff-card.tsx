@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { CardTitle, CardHeader, CardContent, Card } from "@/components/ui/card";
 import CreateFixtureForGroup from "./dialog";
-import { useGroupStore } from "@/hooks/useGroup";
-import { useTournamentParticipantStore } from "@/hooks/useTournamentParticipant";
-import { TournamentCategory } from "@/modules/tournament-category/domain/TournamentCategory";
+import { useHasGroupsForCategory } from "@/hooks/Group/useGroup";
+import { useHasPlayersForCategory } from "@/hooks/Tournament-Participant/useTournamentParticipant";
+import { TournamentCategory } from "@/types/Tournament-Category/TournamentCategory";
 import Loading from "@/components/Loading/loading";
 import CreatePlayOffForCategory from "./playoffdialog";
 
@@ -16,26 +16,11 @@ function PlayOffCategoriesCard({
   idTournament: number;
   onFixtureCreated: (idCategory: number) => void;
 }) {
-  const { hasGroupsForCategory } = useGroupStore();
-  const { hasPlayersForCategory } = useTournamentParticipantStore();
+  // Usar React Query hooks
+  const { hasGroups, isLoading: isLoadingGroups } = useHasGroupsForCategory(idTournament, category.id);
+  const { data: hasParticipants = false, isLoading: isLoadingParticipants } = useHasPlayersForCategory(idTournament, category.id, !!idTournament && !!category.id);
 
-  const [hasGroups, setHasGroups] = useState(false);
-  const [hasParticipants, setHasParticipants] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  useEffect(() => {
-    const fetchGroupAndPlayersStatus = async () => {
-      setIsLoading(true);
-      const groupStatus = await hasGroupsForCategory(idTournament, category.id);
-      const playersStatus = await hasPlayersForCategory(
-        idTournament,
-        category.id
-      );
-      setHasGroups(groupStatus);
-      setHasParticipants(playersStatus);
-      setIsLoading(false);
-    };
-    fetchGroupAndPlayersStatus();
-  }, [category.id, hasGroupsForCategory, hasPlayersForCategory, idTournament]);
+  const isLoading = isLoadingGroups || isLoadingParticipants;
 
   if (isLoading) {
     return <Loading isLoading />;

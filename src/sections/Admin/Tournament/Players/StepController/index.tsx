@@ -5,11 +5,11 @@ import { Step2 } from "./step2";
 import { Step3 } from "./step3";
 import { Step4 } from "./step4";
 import { Step5 } from "./step5";
-import { useTournamentParticipantStore } from "@/hooks/useTournamentParticipant";
+import { useCreateParticipantsForTournament } from "@/hooks/Tournament-Participant/useTournamentParticipant";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { NonParticipantsDto } from "@/common/types/non-participants.dto";
-import { Tournament } from "@/modules/tournament/domain/Tournament";
+import { Tournament } from "@/types/Tournament/Tournament";
 
 function StepControllerForTournament({
   users,
@@ -21,7 +21,7 @@ function StepControllerForTournament({
   idTournament: number;
 }) {
   const router = useRouter();
-  const { create } = useTournamentParticipantStore();
+  const createParticipantsMutation = useCreateParticipantsForTournament();
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedCategoryId, setSelectedCategoryId] = useState(0);
   const nextStep = () => setCurrentStep(currentStep + 1);
@@ -64,13 +64,13 @@ function StepControllerForTournament({
       ),
     };
     try {
-      const createPromise = create(
-        payload.tournamentId,
-        payload.categoryId,
-        payload.userIds,
-        payload.positionInitials,
-        payload.isDirectlyQualified
-      );
+      const createPromise = createParticipantsMutation.mutateAsync({
+        idTournament: payload.tournamentId,
+        idCategory: payload.categoryId,
+        userIds: payload.userIds,
+        positionInitials: payload.positionInitials,
+        directToPlayoffsFlags: payload.isDirectlyQualified
+      });
 
       toast.promise(createPromise, {
         loading: "Enviando datos...",

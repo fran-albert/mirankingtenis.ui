@@ -1,47 +1,30 @@
 "use client";
-import React, { createContext, useContext, useState, useEffect } from "react";
-import { SessionProvider, useSession } from "next-auth/react";
+import React, { createContext, useContext, PropsWithChildren } from "react";
+import { useAuth } from "./AuthProvider";
 
+// Mantener la misma interfaz que antes para compatibilidad total
 interface SessionContextType {
-  session: ReturnType<typeof useSession>["data"];
-  status: ReturnType<typeof useSession>["status"];
-}
-
-interface SessionAuthProviderProps {
-  children: React.ReactNode;
-}
-
-interface CustomSessionProviderProps {
-  children: React.ReactNode;
+  session: ReturnType<typeof useAuth>["session"];
+  status: ReturnType<typeof useAuth>["status"];
 }
 
 const SessionContext = createContext<SessionContextType>({
-  session: null, // Aquí asumimos que 'session' puede ser 'null' si no hay sesión activa
-  status: "unauthenticated", // Un estado predeterminado
+  session: null,
+  status: "unauthenticated",
 });
 
+// Hook que mantiene la misma interfaz que antes
 export const useCustomSession = () => useContext(SessionContext);
 
-const CustomSessionProvider: React.FC<CustomSessionProviderProps> = ({
-  children,
-}) => {
-  const { data: session, status } = useSession();
+// Provider que simplemente pasa los datos del AuthProvider
+function SessionAuthProvider({ children }: PropsWithChildren) {
+  const { session, status } = useAuth();
 
   return (
     <SessionContext.Provider value={{ session, status }}>
       {children}
     </SessionContext.Provider>
   );
-};
-
-const SessionAuthProvider: React.FC<SessionAuthProviderProps> = ({
-  children,
-}) => {
-  return (
-    <SessionProvider>
-      <CustomSessionProvider>{children}</CustomSessionProvider>
-    </SessionProvider>
-  );
-};
+}
 
 export default SessionAuthProvider;

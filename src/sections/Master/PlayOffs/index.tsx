@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { usePlayOffStore } from "@/hooks/usePlayoff";
-import { ResponsePlayOffDto } from "@/modules/playoff/domain/PlayOff";
+import { useQuarterFinals, useSemifinals, useFinals } from "@/hooks/PlayOff/usePlayOff";
+import { useQueryClient } from "@tanstack/react-query";
 import useRoles from "@/hooks/useRoles";
-import { useMatchStore } from "@/hooks/useMatch";
-import { Match } from "@/modules/match/domain/Match";
+import { useMatchStore } from "@/hooks/useMatchStore";
+import { Match } from "@/types/Match/Match";
 import UpdateMatchDialog from "@/sections/Matches/Update/dialog";
 import AddShiftDialog from "@/sections/Auth/Profile/Matches/NewShift/new-shift";
 import QuarterFinalsCard from "./Quarters/card";
@@ -18,28 +18,24 @@ function PlayOffCards({
   idTournament: number;
   idCategory: number;
 }) {
-  const {
-    fetchQuarterFinals,
-    finals,
-    fetchFinals,
-    loading,
-    quarterFinals,
-    fetchSemiFinals,
-    semiFinals,
-  } = usePlayOffStore();
+  // Usar React Query hooks
+  const { data: quarterFinals = [], isLoading: quarterFinalsLoading } = useQuarterFinals(idTournament, idCategory);
+  const { data: semiFinals = [], isLoading: semiFinalsLoading } = useSemifinals(idTournament, idCategory);
+  const { data: finals = [], isLoading: finalsLoading } = useFinals(idTournament, idCategory);
+  
+  const loading = quarterFinalsLoading || semiFinalsLoading || finalsLoading;
+  const queryClient = useQueryClient();
+  
+  // Función para refrescar todas las queries de playoffs
+  const updateAllMatches = () => {
+    queryClient.invalidateQueries({ queryKey: ["quarter-finals", idTournament, idCategory] });
+    queryClient.invalidateQueries({ queryKey: ["semifinals", idTournament, idCategory] });
+    queryClient.invalidateQueries({ queryKey: ["finals", idTournament, idCategory] });
+  };
+  
   const { selectMatch } = useMatchStore();
   const [isAddResultDialogOpen, setIsAddResultDialogOpen] = useState(false);
   const [isAddShiftDialogOpen, setIsAddShiftDialogOpen] = useState(false);
-
-  const updateAllMatches = () => {
-    fetchQuarterFinals(idTournament, idCategory);
-    fetchSemiFinals(idTournament, idCategory);
-    fetchFinals(idTournament, idCategory);
-  };
-
-  useEffect(() => {
-    updateAllMatches();
-  }, [idTournament, idCategory]);
 
   const handleAddResult = (match: GroupFixtureDto) => {
     selectMatch(match);

@@ -8,9 +8,9 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
-import { Match } from "@/modules/match/domain/Match";
-function MatchesByTournamentPlayer({ matches }: { matches: Match[] }) {
-  const getMatchStageText = (match: Match) => {
+import { MatchByUserWithRival } from "@/types/Match/MatchByUser.dto";
+function MatchesByTournamentPlayer({ matches }: { matches: MatchByUserWithRival[] }) {
+  const getMatchStageText = (match: MatchByUserWithRival) => {
     if (match.fixture?.jornada) {
       return match.fixture.jornada;
     }

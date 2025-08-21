@@ -2,21 +2,26 @@
 import { useUserStore } from "@/hooks/useUser";
 import { useParams } from "next/navigation";
 import StepControllerForTournament from "@/sections/Admin/Tournament/Players/StepController";
-import React, { useEffect } from "react";
-import { useTournamentParticipantStore } from "@/hooks/useTournamentParticipant";
-import { useTournamentStore } from "@/hooks/useTournament";
+import React from "react";
+import { useNonParticipants } from "@/hooks/Tournament-Participant/useTournamentParticipant";
+import { useTournament } from "@/hooks/Tournament/useTournament";
 
 function AddPlayerTournament() {
   const params = useParams();
   const idTournament = Number(params.id);
-  const { tournament, getTournament } = useTournamentStore();
-  const { nonParticipants, findNonParticipants } =
-    useTournamentParticipantStore();
+  
+  // Usar React Query hook para obtener el torneo
+  const { tournament, isLoading: isTournamentLoading } = useTournament({ 
+    idTournament, 
+    enabled: !!idTournament 
+  });
+  
+  // Usar React Query hook para obtener no participantes
+  const { data: nonParticipants = [], isLoading: isNonParticipantsLoading } = useNonParticipants(idTournament, !!idTournament);
 
-  useEffect(() => {
-    findNonParticipants(idTournament);
-    getTournament(idTournament);
-  }, [findNonParticipants, idTournament]);
+  if (isTournamentLoading || isNonParticipantsLoading || !tournament) {
+    return <div>Cargando...</div>;
+  }
 
   return (
     <div>

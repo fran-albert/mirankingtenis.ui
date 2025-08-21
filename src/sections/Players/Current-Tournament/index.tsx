@@ -3,7 +3,7 @@ import { GetPlayerInfoDto } from "@/common/types/get-player-info.dto";
 import { NextMatchDto } from "@/common/types/next-match.dto";
 import { Separator } from "@/components/ui/separator";
 import { formatDate, formatDateDays } from "@/lib/utils";
-import { Tournament } from "@/modules/tournament/domain/Tournament";
+import { Tournament } from "@/types/Tournament/Tournament";
 import React from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 

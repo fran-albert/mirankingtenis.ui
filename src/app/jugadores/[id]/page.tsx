@@ -1,95 +1,69 @@
 "use client";
 import { useParams } from "next/navigation";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React from "react";
 import Loading from "@/components/Loading/loading";
-import { useTournamentStore } from "@/hooks/useTournament";
-import { useMatchStore } from "@/hooks/useMatch";
-import { useTournamentRankingStore } from "@/hooks/useTournamentRanking";
-import { useSetsStore } from "@/hooks/useSet";
+import { 
+  useCurrentTournamentByPlayer, 
+  useAllTournamentsByPlayer, 
+  useCompletedTournamentsByPlayer,
+  usePlayerInfo
+} from "@/hooks/Tournament/useTournament";
+import { usePlayerSetSummary } from "@/hooks/Sets/useSet";
 import { useUserStore } from "@/hooks/useUser";
 import { PlayerComponent } from "@/sections/Players/Component/player-component";
 import { useUser } from "@/hooks/Users/useUser";
+import { useTournamentRankingPlayerSummary } from "@/hooks/Tournament-Ranking/useTournamentRankingPlayerSummary";
+import { useAllMatchesByUser, useNextMatch } from "@/hooks/Matches/useMatches";
 
 function PlayerDetailsPage() {
   const params = useParams();
   const idParam = params.id;
   const idUser = Number(idParam);
-  const {
-    fetchAllDataForPlayer,
-    currentTournaments,
-    allTournaments,
-    completedTournaments,
-    getCompletedTournamentsByPlayer,
-    playerInfo,
-    loading: isTournamentLoading,
-  } = useTournamentStore();
-  const { playerMatchSummary, getTotalPlayerMatchSummary } =
-    useTournamentRankingStore();
-  const {
-    getAllMatchesByUser,
-    matches,
-    nextMatch,
-    getNextMatch,
-    loading: isMatchLoading,
-  } = useMatchStore();
-  const {
-    getTotalPlayerSetSummary,
-    setSummary,
-    loading: isLoadingSets,
-  } = useSetsStore();
+  // Usar los nuevos hooks de React Query
+  const { tournament: currentTournaments, isLoading: isCurrentTournamentLoading } = useCurrentTournamentByPlayer({ 
+    idPlayer: idUser, 
+    enabled: !!idUser 
+  });
+  
+  const { tournaments: allTournaments, isLoading: isAllTournamentsLoading } = useAllTournamentsByPlayer({ 
+    idPlayer: idUser, 
+    enabled: !!idUser 
+  });
+  
+  const { tournaments: completedTournaments, isLoading: isCompletedTournamentsLoading } = useCompletedTournamentsByPlayer({ 
+    idPlayer: idUser, 
+    enabled: false // Temporalmente deshabilitado porque el endpoint devuelve 404
+  });
+  
+  const { playerInfo, isLoading: isPlayerInfoLoading } = usePlayerInfo({ 
+    idTournament: currentTournaments?.id || 0, 
+    idPlayer: idUser,
+    enabled: !!idUser && !!currentTournaments?.id
+  });
+
+  const isTournamentLoading = isCurrentTournamentLoading || isAllTournamentsLoading || isCompletedTournamentsLoading || isPlayerInfoLoading;
+
+  const { playerMatchSummary } = useTournamentRankingPlayerSummary({
+    idPlayer: idUser,
+    enabled: !!!idUser,
+  });
+  // Usar React Query hooks para obtener partidos y próximo partido
+  const { data: matches = [], isLoading: isMatchLoading } = useAllMatchesByUser(idUser, !!idUser);
+  const { data: nextMatch } = useNextMatch(
+    currentTournaments?.id || 0, 
+    idUser, 
+    !!currentTournaments?.id && !!idUser
+  );
+  // Usar React Query hook para el resumen de sets del jugador
+  const { data: setSummary, isLoading: isLoadingSets } = usePlayerSetSummary(idUser, !!idUser);
   // const { loading: isLoadingUser, getUser, user } = useUserStore();
   const { user, isLoading, error } = useUser({
     auth: true,
-    id: idUser
-  })
-  const [loading, setLoading] = useState(true);
+    id: idUser,
+  });
   const currentUser = user?.name + " " + user?.lastname;
-  useEffect(() => {
-    const fetchUserAndMatches = async () => {
-      try {
-        setLoading(true);
-        // await getUser(idUser);
-        await Promise.all([
-          getAllMatchesByUser(idUser),
-          fetchAllDataForPlayer(idUser),
-          getCompletedTournamentsByPlayer(idUser),
-          getTotalPlayerMatchSummary(idUser),
-          getTotalPlayerSetSummary(idUser),
-        ]);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        setLoading(false);
-      }
-    };
-    fetchUserAndMatches();
-  }, [
-    idUser,
-    // getUser,
-    getAllMatchesByUser,
-    fetchAllDataForPlayer,
-    getTotalPlayerMatchSummary,
-    getTotalPlayerSetSummary,
-  ]);
 
-  useEffect(() => {
-    const fetchNextMatch = async () => {
-      try {
-        if (currentTournaments && currentTournaments.id) {
-          const activeTournamentId = currentTournaments.id;
-          await getNextMatch(activeTournamentId, idUser);
-        }
-      } catch (error) {
-        console.error("Error fetching next match:", error);
-      }
-    };
-
-    if (!isTournamentLoading && currentTournaments) {
-      fetchNextMatch();
-    }
-  }, [idUser, currentTournaments, getNextMatch, isTournamentLoading]);
-
-  if (loading) {
+  if (isTournamentLoading || isLoading || isLoadingSets) {
     return <Loading isLoading />;
   }
 
@@ -106,7 +80,7 @@ function PlayerDetailsPage() {
           currentTournaments={currentTournaments}
           allTournaments={allTournaments}
           completedTournaments={completedTournaments}
-          playerInfo={playerInfo}
+          playerInfo={playerInfo!}
         />
       )}
     </div>

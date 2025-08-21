@@ -13,13 +13,11 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { createApiSetsRepository } from "@/modules/sets/infra/ApiSetsRepository";
-import { createSets } from "@/modules/sets/application/create/createSets";
+import { useCreateSets } from "@/hooks/Sets/useSet";
 import axios from "axios";
-import { Match } from "@/modules/match/domain/Match";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { useMatchStore } from "@/hooks/useMatch";
+import { useMatchStore } from "@/hooks/useMatchStore";
 import { GiConsoleController } from "react-icons/gi";
 import { CiKeyboard } from "react-icons/ci";
 
@@ -46,8 +44,7 @@ export default function UpdateMatchDialog({
     reset,
     setValue,
   } = useForm();
-  const setRepository = createApiSetsRepository();
-  const createSetFn = createSets(setRepository);
+  const createSetsMutation = useCreateSets();
 
   const onSubmit: SubmitHandler<any> = async (formData) => {
     setFormData(formData);
@@ -66,7 +63,7 @@ export default function UpdateMatchDialog({
     };
 
     try {
-      const setCreationPromise = createSetFn(dataToSend);
+      const setCreationPromise = createSetsMutation.mutateAsync(dataToSend);
       toast.promise(setCreationPromise, {
         loading: "Actualizando partido...",
         success: "Partido actualizado con éxito!",

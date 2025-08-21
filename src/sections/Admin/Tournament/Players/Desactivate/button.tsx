@@ -13,9 +13,7 @@ import {
 import ActionIcon from "@/components/ui/actionIcon";
 import { FaPowerOff } from "react-icons/fa6";
 import { toast } from "sonner";
-import { createApiTournamentRepository } from "@/modules/tournament/infra/ApiTournamentRepository";
-import { createApiTournamentParticipantRepository } from "@/modules/tournament-participant/infra/ApiTournamentRepository";
-import { desactivatePlayer } from "@/modules/tournament-participant/application/desactivate-player/desactivatePlayer";
+import { useDesactivatePlayer } from "@/hooks/Tournament-Participant/useTournamentParticipant";
 
 interface DesactivatePlayerDialogProps {
   handlePlayerDesactivated?: (idPlayer: number) => void;
@@ -28,21 +26,21 @@ export default function DesactivatePlayerDialog({
 }: DesactivatePlayerDialogProps) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const toggleDialog = () => setIsOpen(!isOpen);
-  const tournamentParticipantRepository =
-    createApiTournamentParticipantRepository();
+  const desactivatePlayerMutation = useDesactivatePlayer();
 
   const handleConfirmDesactivate = async () => {
     try {
-      const desactivatePlayerFn = desactivatePlayer(
-        tournamentParticipantRepository
-      );
-      const playerDesactivatePromise = desactivatePlayerFn(idPlayer, 1);
+      const playerDesactivatePromise = desactivatePlayerMutation.mutateAsync({ 
+        idPlayer, 
+        tournamentId: 1 
+      });
       toast.promise(playerDesactivatePromise, {
         loading: "Desactivando jugador...",
         success: "Jugador eliminado del Torneo 1 con éxito!",
         error: "Error al eliminar el Jugador del Torneo 1",
         duration: 3000,
       });
+      await playerDesactivatePromise;
       if (handlePlayerDesactivated) {
         handlePlayerDesactivated(idPlayer);
       }
