@@ -32,6 +32,9 @@ export const CustomEvent = ({ event, sessionUser, onDeleteShift }: CustomEventPr
   const canDeleteShift = () => {
     if (!sessionUser || !event.shift?.id) return false;
     
+    // No se puede eliminar si el partido ya está finalizado
+    if (event.status === 'played') return false;
+    
     // Admin puede eliminar cualquier turno
     if (sessionUser.role === 'admin') return true;
     
