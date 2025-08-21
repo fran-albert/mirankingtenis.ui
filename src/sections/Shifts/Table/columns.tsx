@@ -22,7 +22,7 @@ export const getColumns = (totalRows: number): ColumnDef<Match>[] => {
       header: () => <div className="w-36 text-center">Partido</div>,
       cell: ({ row }) => (
         <div className="w-36 text-center">
-          {row.original.user1.lastname} vs {row.original.user2.lastname}
+          {row.original.user1.name.charAt(0)}. {row.original.user1.lastname} vs {row.original.user2.name.charAt(0)}. {row.original.user2.lastname}
         </div>
       ),
     },

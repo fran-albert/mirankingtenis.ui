@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { User } from "@/types/User/User";
 import { NonParticipantsDto } from "@/common/types/non-participants.dto";
 import Image from "next/image";
@@ -13,10 +14,18 @@ export default function SelectPlayerTournamentComponent({
 }) {
   const [selectedPlayers, setSelectedPlayers] = useState<User[]>([]);
   const [currentPage, setCurrentPage] = useState(0);
+  const [searchTerm, setSearchTerm] = useState("");
   const itemsPerPage = 10;
+  
+  // Filtrar usuarios basado en el término de búsqueda
+  const filteredUsers = users.filter((user) => {
+    const fullName = `${user.name} ${user.lastname}`.toLowerCase();
+    return fullName.includes(searchTerm.toLowerCase());
+  });
+  
   const indexOfLastItem = (currentPage + 1) * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = users.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = filteredUsers.slice(indexOfFirstItem, indexOfLastItem);
 
   const handlePlayerSelection = (player: any) => {
     let newSelectedPlayers;
@@ -29,10 +38,15 @@ export default function SelectPlayerTournamentComponent({
     onSelectedPlayersChange(newSelectedPlayers);
   };
 
-  const pageCount = Math.ceil(users.length / itemsPerPage);
+  const pageCount = Math.ceil(filteredUsers.length / itemsPerPage);
 
   const handlePageChange = (pageIndex: number) => {
     setCurrentPage(pageIndex);
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(0); // Reset a la primera página cuando se busca
   };
 
   const renderPageNumbers = () => {
@@ -61,6 +75,15 @@ export default function SelectPlayerTournamentComponent({
     <div className="grid md:grid-cols-[1fr_300px] gap-6 p-4">
       <div>
         <h2 className="text-2xl font-bold mb-4">Jugadores</h2>
+        <div className="mb-4">
+          <Input
+            type="text"
+            placeholder="Buscar jugadores por nombre o apellido..."
+            value={searchTerm}
+            onChange={handleSearchChange}
+            className="max-w-md"
+          />
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {currentItems.map((player) => (
             <div
@@ -73,11 +96,7 @@ export default function SelectPlayerTournamentComponent({
               onClick={() => handlePlayerSelection(player)}
             >
               <Image
-                src={
-                  player.photo
-                    ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${player.photo}.jpeg`
-                    : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/mirankingtenis_default.png"
-                }
+                src={player.photo}
                 alt={player.name}
                 width={100}
                 height={100}
@@ -110,11 +129,7 @@ export default function SelectPlayerTournamentComponent({
                 <div key={player.id} className="flex items-center gap-4">
                   <span className="text-xl font-semibold">{index + 1}.</span>
                   <Image
-                    src={
-                      player.photo
-                        ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${player.photo}.jpeg`
-                        : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/mirankingtenis_default.png"
-                    }
+                    src={player.photo}
                     alt={player.name}
                     width={50}
                     height={50}

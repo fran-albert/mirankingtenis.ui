@@ -168,7 +168,7 @@ export const ShiftCalendar = ({
 
     // 📌 Mapear `matches` (partidos 1vs1)
     let myEventsList: MatchEvent[] = matches.map((match: any) => ({
-      title: `${match.user1.lastname} vs ${match.user2?.lastname || "???"}`,
+      title: `${match.user1.name.charAt(0)}. ${match.user1.lastname} vs ${match.user2?.name?.charAt(0) || "?"}. ${match.user2?.lastname || "???"}`,
       start: new Date(match.shift?.startHour),
       end: new Date(match.shift?.endHour),
       allDay: false,
@@ -181,7 +181,7 @@ export const ShiftCalendar = ({
 
     // 📌 Mapear `doublesMatches` (partidos dobles)
     const formatPlayerName = (player?: User | null) => {
-      return player ? `${player.lastname}` : "???";
+      return player ? `${player.name.charAt(0)}. ${player.lastname}` : "???";
     };
 
     const doublesEvents = doublesMatches.map((match) => ({

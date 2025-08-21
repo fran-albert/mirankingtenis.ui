@@ -57,7 +57,7 @@ export default function AddResultMatchDialog({
         pointsPlayer2: parseInt(set.pointsPlayer2, 10),
         setNumber: index + 1,
       })),
-      tournamentCategoryId: match.tournamentCategoryId || match.fixture?.tournamentCategories?.id || 0,
+      tournamentCategoryId: match.fixture?.tournamentCategories?.id,
     };
     try {
       const setCreationPromise = createSetsMutation.mutateAsync(dataToSend);
@@ -192,18 +192,19 @@ export default function AddResultMatchDialog({
           <DialogHeader>
             <DialogTitle>Resultados del Partido de Tenis</DialogTitle>
             <DialogDescription>
-              Ingresa los nombres de los jugadores y los puntajes de cada set.
+              Ingresa los puntajes de cada set para el partido vs{" "}
+              {match.user2?.name} {match.user2?.lastname}.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-5 items-center gap-4">
                 <Label htmlFor="player1" className="col-span-2 text-right">
-                  {match.user1Name}
+                  {match.user1.name} {match.user1.lastname}
                 </Label>
                 <div className="col-span-1" />
                 <Label htmlFor="player2" className="col-span-2 text-left">
-                  {match.user2Name}
+                  {match.user2?.name} {match.user2?.lastname}
                 </Label>
               </div>
               <div className="grid grid-cols-5 gap-4 items-center">
@@ -297,7 +298,8 @@ export default function AddResultMatchDialog({
                 <div className="mt-2">
                   <p className="text-md font-medium text-gray-800">
                     <span className="font-normal">
-                      {match.user1Name} vs {match.user2Name}
+                      {match.user1.name} {match.user1.lastname} vs{" "}
+                      {match.user2?.name} {match.user2?.lastname}
                     </span>
                   </p>
                   <ul className="mt-2 space-y-1">
