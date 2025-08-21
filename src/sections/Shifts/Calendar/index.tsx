@@ -297,7 +297,7 @@ export const ShiftCalendar = ({
 
     const shiftData = {
       idCourt: courtId,
-      startHour: moment(selectedSlot.start).toISOString(),
+      startHour: moment(selectedSlot.start).format('YYYY-MM-DDTHH:mm:ss'),
     };
     
     shiftForMatchMutation.mutate(
