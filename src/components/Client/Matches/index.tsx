@@ -10,7 +10,7 @@ function ClientMatchesComponent() {
   const [selectedJornada, setSelectedJornada] = useState("1");
   const [selectedCategory, setSelectedCategory] = useState("1");
   const initialTournamentId =
-    process.env.NODE_ENV === "production" ? "3" : "45";
+    process.env.NODE_ENV === "production" ? "7" : "45";
   const [selectedTournament, setSelectedTournament] =
     useState(initialTournamentId);
   // Usar React Query hooks

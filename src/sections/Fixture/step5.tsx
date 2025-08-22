@@ -1,9 +1,7 @@
 import { FixtureType } from "@/common/types/fixture-type.dto";
 import { Button } from "@/components/ui/button";
 import { useFixtureMutations } from "@/hooks/Fixture/useFixtureMutations";
-import { TournamentParticipant } from "@/types/Tournament-Participant/TournamentParticipant";
 import { TournamentRanking } from "@/types/Tournament-Ranking/TournamentRanking";
-import { User } from "@/types/User/User";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -55,7 +53,7 @@ export const Step5 = ({
         },
         duration: 1000,
       });
-      router.push("/partidos");
+      router.push(`/admin/torneos/${selectedTournamentId}`);
     } catch (error: any) {
       console.error("Error al crear fixture:", error);
     }
