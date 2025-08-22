@@ -77,6 +77,7 @@ export const Step4 = ({
   };
 
   const handleNext = () => {
+
     // Filtrar solo los partidos que tienen ambos jugadores asignados
     const validMatches = matches.filter(match => match.idUser1 !== null && match.idUser2 !== null);
     
@@ -93,6 +94,7 @@ export const Step4 = ({
       .map(player => player.idPlayer);
 
     onMatchesSelect(validMatches);
+
     onFreePlayersSelect(freePlayerIds);
     onNext();
   };
@@ -105,8 +107,6 @@ export const Step4 = ({
   }, []);
 
   const freePlayers = players.filter(player => !assignedPlayerIds.includes(player.idPlayer));
-  const maxPossibleMatches = Math.floor(players.length / 2);
-  const validMatches = matches.filter(match => match.idUser1 !== null && match.idUser2 !== null);
 
   return (
     <div className="sm:px-6 md:px-8 lg:px-10">
