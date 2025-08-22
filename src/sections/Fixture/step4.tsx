@@ -258,7 +258,7 @@ export const Step4 = ({
       {matches.length === 0 && (
         <div className="text-center py-8">
           <p className="text-gray-500 text-lg">
-            No hay partidos agregados. Haz clic en "Agregar Partido" para comenzar.
+            No hay partidos agregados. Haz clic en &quot;Agregar Partido&quot; para comenzar.
           </p>
         </div>
       )}
