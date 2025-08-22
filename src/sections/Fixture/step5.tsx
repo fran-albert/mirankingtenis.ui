@@ -1,11 +1,8 @@
-import { FixtureType } from "@/common/types/fixture-type.dto";
 import { Button } from "@/components/ui/button";
-import { createFixture } from "@/modules/fixture/application/create/createFixture";
-import { createApiFixtureRepository } from "@/modules/fixture/infra/ApiFixtureRepository";
+import { useFixtureMutations } from "@/hooks/Fixture/useFixtureMutations";
 import { TournamentParticipant } from "@/types/Tournament-Participant/TournamentParticipant";
 import { TournamentRanking } from "@/types/Tournament-Ranking/TournamentRanking";
 import { User } from "@/types/User/User";
-import axios from "axios";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -16,6 +13,7 @@ interface Step5Props {
   selectedTournamentId: number;
   selectedJornada: string;
   selectedMatches: { idUser1: number | null; idUser2: number | null }[];
+  freePlayerIds: number[];
   players: TournamentRanking[];
 }
 
@@ -26,42 +24,39 @@ export const Step5 = ({
   selectedJornada,
   tournamentCategoryId,
   selectedMatches,
+  freePlayerIds,
   players,
 }: Step5Props) => {
-  const fixtureRepository = createApiFixtureRepository();
-  const createFixtureFn = createFixture(fixtureRepository);
   const router = useRouter();
+  const { createFixtureMutation } = useFixtureMutations();
 
   const handleSubmit = async () => {
     const payload = {
       idTournamentCategory: tournamentCategoryId,
       jornada: Number(selectedJornada),
-      type: FixtureType.LeagueStage,
       matches: selectedMatches.map((match) => ({
         idUser1: Number(match.idUser1),
         idUser2: Number(match.idUser2),
       })),
+      freePlayerIds: freePlayerIds,
     };
 
     try {
-      const fixtureCreationPromise = createFixtureFn(payload);
-      toast.promise(fixtureCreationPromise, {
-        loading: "Creando fixture...",
-        success: "Fixture creado con éxito!",
-        duration: 1000,
-      });
-      await fixtureCreationPromise;
-      router.push("/partidos");
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        const errorMessage =
-          error.response?.data?.message ||
-          "Error desconocido al crear el fixture";
-        toast.error(`Error al crear el fixture: ${errorMessage}`, {
+      await toast.promise(
+        createFixtureMutation.mutateAsync(payload),
+        {
+          loading: "Creando fixture...",
+          success: "Fixture creado con éxito!",
+          error: (error: any) => {
+            const errorMessage = error.response?.data?.message || "Error desconocido al crear el fixture";
+            return `Error al crear el fixture: ${errorMessage}`;
+          },
           duration: 1000,
-        });
-        console.error("Error al enviar los datos:", errorMessage);
-      }
+        }
+      );
+      router.push("/partidos");
+    } catch (error: any) {
+      console.error("Error al crear fixture:", error);
     }
   };
 
@@ -117,6 +112,29 @@ export const Step5 = ({
           </table>
         </div>
       </div>
+
+      {/* Mostrar jugadores libres si los hay */}
+      {freePlayerIds.length > 0 && (
+        <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <h3 className="text-lg font-semibold text-yellow-800 mb-2">
+            Jugadores que quedan libres esta fecha ({freePlayerIds.length}):
+          </h3>
+          <div className="flex flex-wrap gap-2">
+            {freePlayerIds.map(playerId => {
+              const player = players.find(p => p.idPlayer === playerId);
+              return player ? (
+                <span key={playerId} className="px-3 py-1 bg-yellow-200 text-yellow-800 rounded-full text-sm">
+                  {player.lastname}, {player.name} ({player.position}°)
+                </span>
+              ) : null;
+            })}
+          </div>
+          <p className="text-sm text-yellow-700 mt-2">
+            Los jugadores libres no jugarán esta fecha y se registrará automáticamente en el sistema.
+          </p>
+        </div>
+      )}
+
       <div className="flex justify-center mt-4">
         <Button
           onClick={onBack}

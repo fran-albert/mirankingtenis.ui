@@ -1,15 +1,12 @@
 import { Button } from "@/components/ui/button";
-import { createFixture } from "@/modules/fixture/application/create/createFixture";
-import { createApiFixtureRepository } from "@/modules/fixture/infra/ApiFixtureRepository";
+import { useFixtureMutations } from "@/hooks/Fixture/useFixtureMutations";
 import { TournamentParticipant } from "@/types/Tournament-Participant/TournamentParticipant";
 import { TournamentRanking } from "@/types/Tournament-Ranking/TournamentRanking";
 import { User } from "@/types/User/User";
-import axios from "axios";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import React, { useState, useEffect } from "react";
 import { GroupRankingDto } from "@/common/types/group-ranking.dto";
-import { useFixtureStore } from "@/hooks/useFixture";
 
 interface Step2GroupProps {
   onBack: () => void;
@@ -30,7 +27,7 @@ export const Step2Group = ({
   selectedMatches,
   groupRankings,
 }: Step2GroupProps) => {
-  const { createFixtureGroup } = useFixtureStore();
+  const { createFixtureGroupMutation } = useFixtureMutations();
   const router = useRouter();
 
   const handleSubmit = async () => {
@@ -50,27 +47,24 @@ export const Step2Group = ({
     };
 
     try {
-      const fixtureCreationPromise = createFixtureGroup(
-        selectedTournamentId,
-        selectedCategoryId
-      );
-      toast.promise(fixtureCreationPromise, {
-        loading: "Creando fixture...",
-        success: "Fixture creado con éxito!",
-        duration: 1000,
-      });
-      await fixtureCreationPromise;
-      router.push("/partidos");
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        const errorMessage =
-          error.response?.data?.message ||
-          "Error desconocido al crear el fixture";
-        toast.error(`Error al crear el fixture: ${errorMessage}`, {
+      await toast.promise(
+        createFixtureGroupMutation.mutateAsync({ 
+          idTournament: selectedTournamentId, 
+          idCategory: selectedCategoryId 
+        }),
+        {
+          loading: "Creando fixture...",
+          success: "Fixture creado con éxito!",
+          error: (error: any) => {
+            const errorMessage = error.response?.data?.message || "Error desconocido al crear el fixture";
+            return `Error al crear el fixture: ${errorMessage}`;
+          },
           duration: 1000,
-        });
-        console.error("Error al enviar los datos:", errorMessage);
-      }
+        }
+      );
+      router.push("/partidos");
+    } catch (error: any) {
+      console.error("Error al crear fixture:", error);
     }
   };
 

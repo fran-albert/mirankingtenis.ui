@@ -17,7 +17,7 @@ import { toast } from "sonner";
 import { Category } from "@/modules/category/domain/Category";
 import { createApiCategoryRepository } from "@/modules/category/infra/ApiCategoryRepository";
 import { deleteCategory } from "@/modules/category/application/delete/deleteCategory";
-import { useFixtureStore } from "@/hooks/useFixture";
+import { useFixtureMutations } from "@/hooks/Fixture/useFixtureMutations";
 
 interface CreatePlayOffForCategoryProps {
   idTournament: number;
@@ -32,7 +32,7 @@ export default function CreatePlayOffForCategory({
 }: CreatePlayOffForCategoryProps) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const toggleDialog = () => setIsOpen(!isOpen);
-  const { createPlayOff } = useFixtureStore();
+  const { createPlayOffMutation } = useFixtureMutations();
 
   const isAxiosError = (
     error: any
@@ -47,24 +47,25 @@ export default function CreatePlayOffForCategory({
 
   const handleConfirmCreate = async () => {
     try {
-      const catPromise = createPlayOff(idTournament, idCategory);
-      toast.promise(catPromise, {
-        loading: "Creando...",
-        success: "Playoffs creado con éxito!",
-        error: (err) => {
-          if (isAxiosError(err)) {
-            return err.response.data.message || "Error al crear el PlayOff";
-          }
-          return "Error al crear el PlayOff";
-        },
-        duration: 3000,
-      });
-      await catPromise;
+      await toast.promise(
+        createPlayOffMutation.mutateAsync({ idTournament, idCategory }),
+        {
+          loading: "Creando...",
+          success: "Playoffs creado con éxito!",
+          error: (err: any) => {
+            if (isAxiosError(err)) {
+              return err.response.data.message || "Error al crear el PlayOff";
+            }
+            return "Error al crear el PlayOff";
+          },
+          duration: 3000,
+        }
+      );
       if (onFixtureCreated) {
         onFixtureCreated(idCategory);
       }
       setIsOpen(false);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error al crear el PlayOff", error);
     }
   };

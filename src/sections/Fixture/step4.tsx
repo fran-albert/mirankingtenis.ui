@@ -19,6 +19,7 @@ interface Step4Props {
   onMatchesSelect: (
     matches: { idUser1: number | null; idUser2: number | null }[]
   ) => void;
+  onFreePlayersSelect: (freePlayerIds: number[]) => void;
   players: TournamentRanking[];
 }
 
@@ -26,6 +27,7 @@ export const Step4 = ({
   onNext,
   idCategory,
   onMatchesSelect,
+  onFreePlayersSelect,
   players,
 }: Step4Props) => {
   const initialMatchesCount = Math.floor(players.length / 2);
@@ -75,15 +77,54 @@ export const Step4 = ({
   };
 
   const handleNext = () => {
+    // Obtener IDs de jugadores asignados a partidos
+    const assignedPlayerIds = matches.reduce((ids: number[], match) => {
+      if (match.idUser1) ids.push(match.idUser1);
+      if (match.idUser2) ids.push(match.idUser2);
+      return ids;
+    }, []);
+
+    // Encontrar jugadores libres (no asignados a ningún partido)
+    const freePlayerIds = players
+      .filter(player => !assignedPlayerIds.includes(player.idPlayer))
+      .map(player => player.idPlayer);
+
     onMatchesSelect(matches);
+    onFreePlayersSelect(freePlayerIds);
     onNext();
   };
+
+  // Calcular jugadores libres para mostrar en tiempo real
+  const assignedPlayerIds = matches.reduce((ids: number[], match) => {
+    if (match.idUser1) ids.push(match.idUser1);
+    if (match.idUser2) ids.push(match.idUser2);
+    return ids;
+  }, []);
+
+  const freePlayers = players.filter(player => !assignedPlayerIds.includes(player.idPlayer));
 
   return (
     <div className="sm:px-6 md:px-8 lg:px-10">
       <p className="text-xl sm:text-2xl md:text-3xl text-center p-2">
         ¡Asigna los jugadores a los partidos!
       </p>
+      
+      {/* Mostrar jugadores libres si los hay */}
+      {freePlayers.length > 0 && (
+        <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <h3 className="text-lg font-semibold text-yellow-800 mb-2">
+            Jugadores Libres esta fecha ({freePlayers.length}):
+          </h3>
+          <div className="flex flex-wrap gap-2">
+            {freePlayers.map(player => (
+              <span key={player.idPlayer} className="px-3 py-1 bg-yellow-200 text-yellow-800 rounded-full text-sm">
+                {player.lastname}, {player.name} ({player.position}°)
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="rounded-lg overflow-hidden shadow-xl border border-gray-200">
         <div className="overflow-x-auto">
           <table className="min-w-full bg-white">

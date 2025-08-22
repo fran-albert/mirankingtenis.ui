@@ -1,4 +1,4 @@
-import { Fixture } from "@/modules/fixture/domain/Fixture";
+import { Fixture } from "@/types/Fixture/Fixture";
 import { Sets } from "@/types/Set/Sets";
 import { User } from "@/types/User/User";
 import { Shift } from "../Shift/Shift";

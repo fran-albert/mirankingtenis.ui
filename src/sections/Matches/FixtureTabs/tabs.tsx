@@ -1,4 +1,3 @@
-import { createApiFixtureRepository } from "@/modules/fixture/infra/ApiFixtureRepository";
 import React, { useEffect, useState } from "react";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 
