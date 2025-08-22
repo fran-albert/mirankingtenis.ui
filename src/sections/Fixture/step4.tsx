@@ -30,7 +30,9 @@ export const Step4 = ({
   onFreePlayersSelect,
   players,
 }: Step4Props) => {
-  const [matches, setMatches] = useState<{ idUser1: number | null; idUser2: number | null }[]>([]);
+  const [matches, setMatches] = useState<
+    { idUser1: number | null; idUser2: number | null }[]
+  >([]);
 
   const addMatch = () => {
     setMatches([...matches, { idUser1: null, idUser2: null }]);
@@ -77,10 +79,11 @@ export const Step4 = ({
   };
 
   const handleNext = () => {
-
     // Filtrar solo los partidos que tienen ambos jugadores asignados
-    const validMatches = matches.filter(match => match.idUser1 !== null && match.idUser2 !== null);
-    
+    const validMatches = matches.filter(
+      (match) => match.idUser1 !== null && match.idUser2 !== null
+    );
+
     // Obtener IDs de jugadores asignados a partidos válidos
     const assignedPlayerIds = validMatches.reduce((ids: number[], match) => {
       if (match.idUser1) ids.push(match.idUser1);
@@ -90,8 +93,8 @@ export const Step4 = ({
 
     // Encontrar jugadores libres (no asignados a ningún partido)
     const freePlayerIds = players
-      .filter(player => !assignedPlayerIds.includes(player.idPlayer))
-      .map(player => player.idPlayer);
+      .filter((player) => !assignedPlayerIds.includes(player.idPlayer))
+      .map((player) => player.idPlayer);
 
     onMatchesSelect(validMatches);
 
@@ -106,7 +109,15 @@ export const Step4 = ({
     return ids;
   }, []);
 
-  const freePlayers = players.filter(player => !assignedPlayerIds.includes(player.idPlayer));
+  const freePlayers = players.filter(
+    (player) => !assignedPlayerIds.includes(player.idPlayer)
+  );
+
+  const validMatches = matches.filter(
+    (match) => match.idUser1 !== null && match.idUser2 !== null
+  );
+
+  const maxPossibleMatches = Math.floor(players.length / 2);
 
   return (
     <div className="sm:px-6 md:px-8 lg:px-10">
@@ -119,10 +130,12 @@ export const Step4 = ({
         <div className="flex justify-between items-center mb-4">
           <div>
             <p className="text-blue-800 font-semibold">
-              Partidos válidos: {validMatches.length} / {maxPossibleMatches} posibles
+              Partidos válidos: {validMatches.length} / {maxPossibleMatches}{" "}
+              posibles
             </p>
             <p className="text-blue-600 text-sm">
-              Total de jugadores: {players.length} | Jugadores libres: {freePlayers.length}
+              Total de jugadores: {players.length} | Jugadores libres:{" "}
+              {freePlayers.length}
             </p>
           </div>
           <div className="flex gap-2">
@@ -136,7 +149,7 @@ export const Step4 = ({
           </div>
         </div>
       </div>
-      
+
       {/* Mostrar jugadores libres si los hay */}
       {freePlayers.length > 0 && (
         <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
@@ -144,8 +157,11 @@ export const Step4 = ({
             Jugadores Libres esta fecha ({freePlayers.length}):
           </h3>
           <div className="flex flex-wrap gap-2">
-            {freePlayers.map(player => (
-              <span key={player.idPlayer} className="px-3 py-1 bg-yellow-200 text-yellow-800 rounded-full text-sm">
+            {freePlayers.map((player) => (
+              <span
+                key={player.idPlayer}
+                className="px-3 py-1 bg-yellow-200 text-yellow-800 rounded-full text-sm"
+              >
                 {player.lastname}, {player.name} ({player.position}°)
               </span>
             ))}
@@ -258,7 +274,8 @@ export const Step4 = ({
       {matches.length === 0 && (
         <div className="text-center py-8">
           <p className="text-gray-500 text-lg">
-            No hay partidos agregados. Haz clic en &quot;Agregar Partido&quot; para comenzar.
+            No hay partidos agregados. Haz clic en &quot;Agregar Partido&quot;
+            para comenzar.
           </p>
         </div>
       )}
