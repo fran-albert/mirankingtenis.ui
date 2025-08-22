@@ -1,3 +1,4 @@
+import { FixtureType } from "@/common/types/fixture-type.dto";
 import { Button } from "@/components/ui/button";
 import { useFixtureMutations } from "@/hooks/Fixture/useFixtureMutations";
 import { TournamentParticipant } from "@/types/Tournament-Participant/TournamentParticipant";
@@ -38,22 +39,22 @@ export const Step5 = ({
         idUser1: Number(match.idUser1),
         idUser2: Number(match.idUser2),
       })),
+      type: FixtureType.LeagueStage,
       freePlayerIds: freePlayerIds,
     };
 
     try {
-      await toast.promise(
-        createFixtureMutation.mutateAsync(payload),
-        {
-          loading: "Creando fixture...",
-          success: "Fixture creado con éxito!",
-          error: (error: any) => {
-            const errorMessage = error.response?.data?.message || "Error desconocido al crear el fixture";
-            return `Error al crear el fixture: ${errorMessage}`;
-          },
-          duration: 1000,
-        }
-      );
+      await toast.promise(createFixtureMutation.mutateAsync(payload), {
+        loading: "Creando fixture...",
+        success: "Fixture creado con éxito!",
+        error: (error: any) => {
+          const errorMessage =
+            error.response?.data?.message ||
+            "Error desconocido al crear el fixture";
+          return `Error al crear el fixture: ${errorMessage}`;
+        },
+        duration: 1000,
+      });
       router.push("/partidos");
     } catch (error: any) {
       console.error("Error al crear fixture:", error);
@@ -120,17 +121,21 @@ export const Step5 = ({
             Jugadores que quedan libres esta fecha ({freePlayerIds.length}):
           </h3>
           <div className="flex flex-wrap gap-2">
-            {freePlayerIds.map(playerId => {
-              const player = players.find(p => p.idPlayer === playerId);
+            {freePlayerIds.map((playerId) => {
+              const player = players.find((p) => p.idPlayer === playerId);
               return player ? (
-                <span key={playerId} className="px-3 py-1 bg-yellow-200 text-yellow-800 rounded-full text-sm">
+                <span
+                  key={playerId}
+                  className="px-3 py-1 bg-yellow-200 text-yellow-800 rounded-full text-sm"
+                >
                   {player.lastname}, {player.name} ({player.position}°)
                 </span>
               ) : null;
             })}
           </div>
           <p className="text-sm text-yellow-700 mt-2">
-            Los jugadores libres no jugarán esta fecha y se registrará automáticamente en el sistema.
+            Los jugadores libres no jugarán esta fecha y se registrará
+            automáticamente en el sistema.
           </p>
         </div>
       )}
