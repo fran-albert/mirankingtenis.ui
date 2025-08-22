@@ -30,15 +30,15 @@ export const Step4 = ({
   onFreePlayersSelect,
   players,
 }: Step4Props) => {
-  const initialMatchesCount = Math.floor(players.length / 2);
-  const [matches, setMatches] = useState(
-    Array(initialMatchesCount).fill({ idUser1: null, idUser2: null })
-  );
+  const [matches, setMatches] = useState<{ idUser1: number | null; idUser2: number | null }[]>([]);
 
-  useEffect(() => {
-    const matchesCount = Math.floor(players.length / 2);
-    setMatches(Array(matchesCount).fill({ idUser1: null, idUser2: null }));
-  }, [players.length]);
+  const addMatch = () => {
+    setMatches([...matches, { idUser1: null, idUser2: null }]);
+  };
+
+  const removeMatch = (matchIndex: number) => {
+    setMatches(matches.filter((_, index) => index !== matchIndex));
+  };
 
   const updateMatch = (
     matchIndex: any,
@@ -77,8 +77,11 @@ export const Step4 = ({
   };
 
   const handleNext = () => {
-    // Obtener IDs de jugadores asignados a partidos
-    const assignedPlayerIds = matches.reduce((ids: number[], match) => {
+    // Filtrar solo los partidos que tienen ambos jugadores asignados
+    const validMatches = matches.filter(match => match.idUser1 !== null && match.idUser2 !== null);
+    
+    // Obtener IDs de jugadores asignados a partidos válidos
+    const assignedPlayerIds = validMatches.reduce((ids: number[], match) => {
       if (match.idUser1) ids.push(match.idUser1);
       if (match.idUser2) ids.push(match.idUser2);
       return ids;
@@ -89,7 +92,7 @@ export const Step4 = ({
       .filter(player => !assignedPlayerIds.includes(player.idPlayer))
       .map(player => player.idPlayer);
 
-    onMatchesSelect(matches);
+    onMatchesSelect(validMatches);
     onFreePlayersSelect(freePlayerIds);
     onNext();
   };
@@ -102,12 +105,37 @@ export const Step4 = ({
   }, []);
 
   const freePlayers = players.filter(player => !assignedPlayerIds.includes(player.idPlayer));
+  const maxPossibleMatches = Math.floor(players.length / 2);
+  const validMatches = matches.filter(match => match.idUser1 !== null && match.idUser2 !== null);
 
   return (
     <div className="sm:px-6 md:px-8 lg:px-10">
       <p className="text-xl sm:text-2xl md:text-3xl text-center p-2">
         ¡Asigna los jugadores a los partidos!
       </p>
+
+      {/* Información y controles */}
+      <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+        <div className="flex justify-between items-center mb-4">
+          <div>
+            <p className="text-blue-800 font-semibold">
+              Partidos válidos: {validMatches.length} / {maxPossibleMatches} posibles
+            </p>
+            <p className="text-blue-600 text-sm">
+              Total de jugadores: {players.length} | Jugadores libres: {freePlayers.length}
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Button
+              onClick={addMatch}
+              disabled={matches.length >= maxPossibleMatches}
+              className="px-4 py-2 bg-green-600 text-white hover:bg-green-700 disabled:bg-gray-400"
+            >
+              + Agregar Partido
+            </Button>
+          </div>
+        </div>
+      </div>
       
       {/* Mostrar jugadores libres si los hay */}
       {freePlayers.length > 0 && (
@@ -133,6 +161,7 @@ export const Step4 = ({
                 <th className="py-4 px-6">Partido</th>
                 <th className="py-4 px-6">LOCAL</th>
                 <th className="py-4 px-6">VISITANTE</th>
+                <th className="py-4 px-6">Acciones</th>
               </tr>
             </thead>
             <tbody className="text-gray-700">
@@ -211,6 +240,14 @@ export const Step4 = ({
                       </SelectContent>
                     </Select>
                   </td>
+                  <td className="py-4 px-6">
+                    <Button
+                      onClick={() => removeMatch(index)}
+                      className="px-3 py-1 bg-red-600 text-white hover:bg-red-700 text-sm"
+                    >
+                      Eliminar
+                    </Button>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -218,12 +255,21 @@ export const Step4 = ({
         </div>
       </div>
 
+      {matches.length === 0 && (
+        <div className="text-center py-8">
+          <p className="text-gray-500 text-lg">
+            No hay partidos agregados. Haz clic en "Agregar Partido" para comenzar.
+          </p>
+        </div>
+      )}
+
       <div className="flex justify-center mt-4">
         <Button
           onClick={handleNext}
-          className="px-4 py-2 rounded-md bg-slate-700 text-white hover:bg-slate-900 transition-colors"
+          disabled={validMatches.length === 0}
+          className="px-4 py-2 rounded-md bg-slate-700 text-white hover:bg-slate-900 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
-          Siguiente
+          Siguiente ({validMatches.length} partidos válidos)
         </Button>
       </div>
     </div>

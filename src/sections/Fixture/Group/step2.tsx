@@ -62,7 +62,7 @@ export const Step2Group = ({
           duration: 1000,
         }
       );
-      router.push("/partidos");
+      router.push(`/admin/torneos/${selectedTournamentId}`);
     } catch (error: any) {
       console.error("Error al crear fixture:", error);
     }
