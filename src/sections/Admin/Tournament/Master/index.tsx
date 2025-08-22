@@ -6,7 +6,8 @@ import { TournamentCategory } from "@/types/Tournament-Category/TournamentCatego
 import AddCategoriesForTournamentDialog from "../Categories/Add/dialog";
 import { useTournamentCategoryMutations } from "@/hooks/Tournament-Category/useTournamentCategory";
 import MasterCategoriesCard from "../Fixture/master-card";
-import { useFixtureStore } from "@/hooks/useFixture";
+import { isGroupStageFixturesCreated } from "@/api/Fixture/is-group-stage-fixtures-created";
+import { useQuery } from "@tanstack/react-query";
 import Loading from "@/components/Loading/loading";
 import PlayOffCategoriesCard from "../Fixture/playoff-card";
 function MasterTournamentDetail({
@@ -25,39 +26,46 @@ function MasterTournamentDetail({
   const createCategoryForTournament = async (idTournament: number, idCategory: number[]): Promise<TournamentCategory[]> => {
     return await createCategoryForTournamentMutation.mutateAsync({ idTournament, idCategory });
   };
-  const { isGroupStageFixturesCreated, loading: isLoadingFixture } =
-    useFixtureStore();
-  const [groupStageFixturesCreated, setGroupStageFixturesCreated] = useState<{
+  const [manualFixturesCreated, setManualFixturesCreated] = useState<{
     [key: number]: boolean;
   }>({});
 
   const handleFixtureCreated = (idCategory: number) => {
-    setGroupStageFixturesCreated((prev) => ({
+    setManualFixturesCreated((prev) => ({
       ...prev,
       [idCategory]: true,
     }));
   };
 
-  // Ya no es necesario useEffect para categorías - se pasan como prop
-
-  useEffect(() => {
-    const checkFixtures = async () => {
-      if (categories.length > 0) {
-        const results = await Promise.all(
-          categories.map((category) =>
-            isGroupStageFixturesCreated(tournament.id, Number(category.id))
-          )
-        );
-        const newFixturesCreated = categories.reduce((acc, category, index) => {
-          acc[category.id] = results[index];
-          return acc;
-        }, {} as { [key: number]: boolean });
-        setGroupStageFixturesCreated(newFixturesCreated);
+  // Usar useQuery para obtener todos los estados de fixtures de una vez
+  const { data: groupStageFixturesCreated = {}, isLoading: isLoadingFixture } = useQuery({
+    queryKey: ['group-stage-fixtures-created', tournament.id, categories.map(c => c.id)],
+    queryFn: async () => {
+      if (!categories || categories.length === 0) {
+        return {};
       }
-    };
+      
+      const results: { [key: number]: boolean } = {};
+      await Promise.all(
+        categories.map(async (category) => {
+          const isCreated = await isGroupStageFixturesCreated(tournament.id, Number(category.id));
+          results[category.id] = isCreated;
+        })
+      );
+      return results;
+    },
+    enabled: !!tournament.id && !!categories && categories.length > 0,
+    staleTime: 1000 * 60 * 5,
+  });
 
-    checkFixtures();
-  }, [categories, tournament.id, isGroupStageFixturesCreated]);
+  // Combinar los estados: usar manual override si existe, sino usar el del query
+  const finalFixturesCreated = React.useMemo(() => {
+    const combined = { ...groupStageFixturesCreated };
+    Object.entries(manualFixturesCreated).forEach(([key, value]) => {
+      if (value) combined[Number(key)] = true;
+    });
+    return combined;
+  }, [groupStageFixturesCreated, manualFixturesCreated]);
 
   const handleCategoryAdded = async (newCategories: TournamentCategory[]) => {
     setCategories([...categories, ...newCategories]);
@@ -98,7 +106,7 @@ function MasterTournamentDetail({
       <h1 className="text-lg font-bold m-4 text-orange-700">Fase de Grupos</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {categories.map((category) =>
-          !groupStageFixturesCreated[category.id] ? (
+          !finalFixturesCreated[category.id] ? (
             <MasterCategoriesCard
               key={category.id}
               onFixtureCreated={handleFixtureCreated}

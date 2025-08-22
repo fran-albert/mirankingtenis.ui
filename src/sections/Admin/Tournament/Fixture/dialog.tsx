@@ -17,7 +17,7 @@ import { toast } from "sonner";
 import { Category } from "@/modules/category/domain/Category";
 import { createApiCategoryRepository } from "@/modules/category/infra/ApiCategoryRepository";
 import { deleteCategory } from "@/modules/category/application/delete/deleteCategory";
-import { useFixtureStore } from "@/hooks/useFixture";
+import { useFixtureMutations } from "@/hooks/Fixture/useFixtureMutations";
 
 interface CreateFixtureForGroupProps {
   idTournament: number;
@@ -32,7 +32,7 @@ export default function CreateFixtureForGroup({
 }: CreateFixtureForGroupProps) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const toggleDialog = () => setIsOpen(!isOpen);
-  const { createFixtureGroup } = useFixtureStore();
+  const { createFixtureGroupMutation } = useFixtureMutations();
 
   const isAxiosError = (
     error: any
@@ -47,24 +47,25 @@ export default function CreateFixtureForGroup({
 
   const handleConfirmCreate = async () => {
     try {
-      const catPromise = createFixtureGroup(idTournament, idCategory);
-      toast.promise(catPromise, {
-        loading: "Creando fixture...",
-        success: "Fixture creado con éxito!",
-        error: (err) => {
-          if (isAxiosError(err)) {
-            return err.response.data.message || "Error al crear el Fixture";
-          }
-          return "Error al crear el Fixture";
-        },
-        duration: 3000,
-      });
-      await catPromise;
+      await toast.promise(
+        createFixtureGroupMutation.mutateAsync({ idTournament, idCategory }),
+        {
+          loading: "Creando fixture...",
+          success: "Fixture creado con éxito!",
+          error: (err: any) => {
+            if (isAxiosError(err)) {
+              return err.response.data.message || "Error al crear el Fixture";
+            }
+            return "Error al crear el Fixture";
+          },
+          duration: 3000,
+        }
+      );
       if (onFixtureCreated) {
         onFixtureCreated(idCategory);
       }
       setIsOpen(false);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error al crear el Fixture", error);
     }
   };

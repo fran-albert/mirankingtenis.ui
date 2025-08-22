@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { createApiFixtureRepository } from "@/modules/fixture/infra/ApiFixtureRepository";
+import { useFixtureCountByTournamentCategory } from "@/hooks/Fixture/useFixtures";
 import { useTournamentCategoryId } from "@/hooks/Tournament-Category/useTournamentCategory";
 import FiltersMatches from "@/sections/Matches/Filters";
 import { useLastFinishedLeagueTournament } from "@/hooks/Tournament/useTournament";
@@ -13,9 +13,6 @@ function ClientMatchesComponent() {
     process.env.NODE_ENV === "production" ? "3" : "45";
   const [selectedTournament, setSelectedTournament] =
     useState(initialTournamentId);
-  const [jornadas, setJornadas] = useState<number[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const fixtureRepository = createApiFixtureRepository();
   // Usar React Query hooks
   const { tournament: lastTournament } = useLastFinishedLeagueTournament({ enabled: true });
   
@@ -25,7 +22,26 @@ function ClientMatchesComponent() {
     enabled: !!selectedTournament && !!selectedCategory
   });
 
-  // Ya no es necesario - React Query maneja la carga automáticamente
+  // Obtener el conteo de fixtures usando React Query
+  const { count: numeroDeJornadas, isLoading: isLoadingFixtures, isError: isErrorFixtures } = useFixtureCountByTournamentCategory({
+    idCategory: Number(selectedCategory),
+    idTournament: Number(selectedTournament),
+    enabled: !!selectedCategory && !!selectedTournament
+  });
+
+  // Calcular las jornadas disponibles basado en el conteo
+  const jornadas = React.useMemo(() => {
+    if (!numeroDeJornadas || numeroDeJornadas === 0) return [];
+    return Array.from({ length: numeroDeJornadas }, (_, i) => i + 1);
+  }, [numeroDeJornadas]);
+
+  const error = React.useMemo(() => {
+    if (isErrorFixtures) return "Error al obtener las jornadas.";
+    if (selectedCategory && selectedTournament && numeroDeJornadas === 0) {
+      return "Esta categoría no tiene fechas disponibles.";
+    }
+    return null;
+  }, [isErrorFixtures, selectedCategory, selectedTournament, numeroDeJornadas]);
 
   useEffect(() => {
     if (lastTournament && !selectedTournament) {
@@ -33,46 +49,15 @@ function ClientMatchesComponent() {
     }
   }, [lastTournament, selectedTournament]);
 
+  // Reset jornada when category or tournament changes
   useEffect(() => {
-    const fetchJornadas = async () => {
-      if (!selectedCategory || !selectedTournament) return;
-      try {
-        const numeroDeJornadas =
-          await fixtureRepository.getFixtureByCategoryAndTournament(
-            Number(selectedCategory),
-            Number(selectedTournament)
-          );
-  
-        if (numeroDeJornadas === 0) {
-          setError("Esta categoría no tiene fechas disponibles.");
-          setJornadas([]);
-          setSelectedJornada("");
-        } else {
-          const jornadasArray = Array.from(
-            { length: numeroDeJornadas },
-            (_, i) => i + 1
-          );
-          setJornadas(jornadasArray);
-          // Solo selecciona la jornada 1 si no hay una jornada seleccionada previamente
-          if (!selectedJornada) {
-            setSelectedJornada("1");
-          }
-          setError(null);
-        }
-      } catch (error) {
-        console.error("Error fetching número de jornadas", error);
-        setError("Error al obtener las jornadas.");
-        setJornadas([]);
-        setSelectedJornada("");
-      }
-    };
-  
-    fetchJornadas();
-  }, [selectedCategory, selectedTournament, fixtureRepository, selectedJornada]);
-  
-  
-
-  // Ya no es necesario - React Query hook maneja esto automáticamente
+    if (jornadas.length > 0 && !selectedJornada) {
+      setSelectedJornada("1");
+    }
+    if (jornadas.length === 0 && selectedJornada) {
+      setSelectedJornada("");
+    }
+  }, [jornadas, selectedJornada]);
 
   const isSelectionComplete =
     selectedCategory && selectedTournament && selectedJornada;

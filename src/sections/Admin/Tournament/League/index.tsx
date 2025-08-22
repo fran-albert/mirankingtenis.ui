@@ -6,7 +6,6 @@ import { TournamentCategory } from "@/types/Tournament-Category/TournamentCatego
 import AddCategoriesForTournamentDialog from "../Categories/Add/dialog";
 import { useTournamentCategoryMutations } from "@/hooks/Tournament-Category/useTournamentCategory";
 import MasterCategoriesCard from "../Fixture/master-card";
-import { useFixtureStore } from "@/hooks/useFixture";
 import Loading from "@/components/Loading/loading";
 import PlayOffCategoriesCard from "../Fixture/playoff-card";
 function LeagueTournamentDetail({

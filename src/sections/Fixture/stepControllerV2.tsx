@@ -31,6 +31,7 @@ export const StepsControllerV2 = ({
   const [selectedMatches, setSelectedMatches] = useState<
     { idUser1: number | null; idUser2: number | null }[]
   >([]);
+  const [freePlayerIds, setFreePlayerIds] = useState<number[]>([]);
   // Usar React Query hook para rankings
   const { rankings: players = [] } = useTournamentRanking({
     idTournament,
@@ -46,6 +47,7 @@ export const StepsControllerV2 = ({
           onNext={nextStep}
           idCategory={idCategory}
           onMatchesSelect={setSelectedMatches}
+          onFreePlayersSelect={setFreePlayerIds}
           players={players}
         />
       );
@@ -58,6 +60,7 @@ export const StepsControllerV2 = ({
           selectedJornada={String(nextMatchDay)}
           tournamentCategoryId={tournamentCategoryId}
           selectedMatches={selectedMatches}
+          freePlayerIds={freePlayerIds}
           players={players}
         />
       );
