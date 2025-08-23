@@ -13,15 +13,20 @@ import {
 } from "@/components/ui/dialog";
 import ActionIcon from "@/components/ui/actionIcon";
 import { FaTrashAlt } from "react-icons/fa";
+import { useDeleteMatch } from "@/hooks/Matches/useMatches";
+import { toast } from "sonner";
 
 interface DeleteMatchDialogProps {
+  matchId: number;
   onDeleteMatch?: () => void;
 }
 
 export default function DeleteMatchDialog({
+  matchId,
   onDeleteMatch,
 }: DeleteMatchDialogProps) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const deleteMatchMutation = useDeleteMatch();
 
   const toggleDialog = () => setIsOpen(!isOpen);
 
@@ -51,8 +56,12 @@ export default function DeleteMatchDialog({
           <Button variant="outline" onClick={toggleDialog}>
             Cancelar
           </Button>
-          <Button variant="destructive" onClick={onDeleteMatch}>
-            Confirmar
+          <Button 
+            variant="destructive" 
+            onClick={onDeleteMatch}
+            disabled={deleteMatchMutation.isPending}
+          >
+            {deleteMatchMutation.isPending ? "Eliminando..." : "Confirmar"}
           </Button>
         </DialogFooter>
       </DialogContent>
