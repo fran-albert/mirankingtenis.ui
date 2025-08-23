@@ -1,6 +1,6 @@
 import { createCategory } from "@/api/Category/create-category";
 import { deleteCategory } from "@/api/Category/delete-category";
-import { Category } from "@/modules/category/domain/Category";
+import { Category } from "@/types/Category/Category";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export const useCategoryMutations = () => {
