@@ -9,7 +9,6 @@ import { useAuth } from "@/context/AuthProvider";
 import { usePathname, useRouter } from "next/navigation";
 import useRoles from "@/hooks/useRoles";
 import Image from "next/image";
-import { useProfilePhoto } from "@/context/ProfilePhotoContext";
 // import AutoSignOut from "./autoSignOut";
 
 function classNames(...classes: string[]) {
@@ -21,7 +20,6 @@ export default function Navbar() {
   const { isAdmin } = useRoles();
   const { logout } = useAuth();
   const pathname = usePathname();
-  const { profilePhoto } = useProfilePhoto();
 
   const [navigation, setNavigation] = useState([
     { name: "Master", href: "/master", current: false },
@@ -125,15 +123,7 @@ export default function Navbar() {
 
                           <Image
                             className="h-8 w-8 rounded-full"
-                            src={
-                              profilePhoto ||
-                              "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/mirankingtenis_default.png"
-                            }
-                            // src={
-                            //   session?.user?.photo
-                            //     ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${session.user.photo}.jpeg`
-                            //     : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/mirankingtenis_default.png"
-                            // }
+                            src={session?.user?.photo!}
                             alt="User profile"
                             height={32}
                             width={32}
