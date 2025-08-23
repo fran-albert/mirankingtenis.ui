@@ -2,9 +2,7 @@
 import Loading from "@/components/Loading/loading";
 import { useCustomSession } from "@/context/SessionAuthProviders";
 import useRoles from "@/hooks/useRoles";
-import { getAllCategories } from "@/modules/category/application/get-all/getAllCategories";
-import { Category } from "@/modules/category/domain/Category";
-import { createApiCategoryRepository } from "@/modules/category/infra/ApiCategoryRepository";
+import { Category } from "@/types/Category/Category";
 import { getAll } from "@/modules/court/application/get-all/getAllCourt";
 import { Court } from "@/modules/court/domain/Court";
 import { createApiCourtRepository } from "@/modules/court/infra/ApiCourtRepository";
