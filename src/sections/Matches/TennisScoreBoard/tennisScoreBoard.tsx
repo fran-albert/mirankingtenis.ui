@@ -3,8 +3,6 @@ import { ScoreMatchCard } from "@/sections/Matches/ScoreMatchCard/card";
 import { toast } from "sonner";
 import { useMatchesByTournamentCategoryAndMatchday } from "@/hooks/Matches/useMatches";
 
-// React Query hook importado arriba
-
 export const TennisScoreboard = ({
   jornada,
   tournamentCategoryId,

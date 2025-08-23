@@ -13,10 +13,6 @@ import {
 import ActionIcon from "@/components/ui/actionIcon";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { toast } from "sonner";
-
-import { Category } from "@/modules/category/domain/Category";
-import { createApiCategoryRepository } from "@/modules/category/infra/ApiCategoryRepository";
-import { deleteCategory } from "@/modules/category/application/delete/deleteCategory";
 import { useFixtureMutations } from "@/hooks/Fixture/useFixtureMutations";
 
 interface CreatePlayOffForCategoryProps {

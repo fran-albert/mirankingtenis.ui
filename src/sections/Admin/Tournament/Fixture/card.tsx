@@ -7,7 +7,7 @@ import {
   Card,
 } from "@/components/ui/card";
 import { Create } from "@/components/Button/Create/button";
-import { Category } from "@/modules/category/domain/Category";
+import { Category } from "@/types/Category/Category";
 import { TournamentCategory } from "@/types/Tournament-Category/TournamentCategory";
 import { useHasPlayersForCategory } from "@/hooks/Tournament-Participant/useTournamentParticipant";
 import Loading from "@/components/Loading/loading";

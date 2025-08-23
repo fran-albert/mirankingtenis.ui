@@ -5,9 +5,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Category } from "@/modules/category/domain/Category";
-import { CategoryRepository } from "@/modules/category/domain/CategoryRepository";
-import { createApiCategoryRepository } from "@/modules/category/infra/ApiCategoryRepository";
+import { Category } from "@/types/Category/Category";
 import { Court } from "@/modules/court/domain/Court";
 import { createApiCourtRepository } from "@/modules/court/infra/ApiCourtRepository";
 import { useEffect, useState } from "react";
