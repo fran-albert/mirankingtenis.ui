@@ -5,7 +5,7 @@ import { DataTable } from "@/components/Table/dataTable";
 import { getColumns } from "./columns";
 import useRoles from "@/hooks/useRoles";
 import { useCustomSession } from "@/context/SessionAuthProviders";
-import { Category } from "@/modules/category/domain/Category";
+import { Category } from "@/types/Category/Category";
 import { Tournament } from "@/types/Tournament/Tournament";
 import AddTournamentDialog from "../Add/dialog";
 

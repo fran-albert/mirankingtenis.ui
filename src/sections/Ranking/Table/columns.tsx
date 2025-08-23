@@ -2,7 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Ranking } from "@/modules/ranking/domain/Ranking";
+import { Ranking } from "@/types/Ranking/Ranking";;
 import { TournamentRanking } from "@/types/Tournament-Ranking/TournamentRanking";
 import {
   Tooltip,

@@ -12,9 +12,8 @@ import { toast } from "sonner";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { Category } from "@/modules/category/domain/Category";
-import { createApiCategoryRepository } from "@/modules/category/infra/ApiCategoryRepository";
-import { createCategory } from "@/modules/category/application/create/createCategory";
+import { useCategoryMutations } from "@/hooks/Category";
+import { Category } from "@/types/Category/Category";
 
 interface AddCategoriesDialogProps {
   isOpen: boolean;
@@ -23,17 +22,19 @@ interface AddCategoriesDialogProps {
 }
 
 interface Inputs extends Category {}
-const categoryRepository = createApiCategoryRepository();
 
 export default function AddCategoriesDialog({
   isOpen,
   onCategoryAdded,
   setIsOpen,
 }: AddCategoriesDialogProps) {
+  const { createCategoryMutation } = useCategoryMutations();
+  
   const toggleDialog = () => {
     setIsOpen(!isOpen);
     reset();
   };
+  
   const {
     register,
     handleSubmit,
@@ -44,24 +45,18 @@ export default function AddCategoriesDialog({
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
-      const createCatFn = createCategory(categoryRepository);
-      const specialityCreationPromise = createCatFn(data);
-
-      toast.promise(specialityCreationPromise, {
-        loading: "Creando categoría...",
-        success: "Categoría creada con éxito!",
-        error: "Error al crear la Categoría",
-      });
-
-      specialityCreationPromise
-        .then(() => {
+      createCategoryMutation.mutate(data, {
+        onSuccess: (newCategory) => {
+          toast.success("Categoría creada con éxito!");
           setIsOpen(false);
           reset();
-          onCategoryAdded(data);
-        })
-        .catch((error) => {
+          onCategoryAdded(newCategory);
+        },
+        onError: (error) => {
+          toast.error("Error al crear la Categoría");
           console.error("Error al crear la Categoría", error);
-        });
+        },
+      });
     } catch (error) {
       console.error("Error al crear la Categoría", error);
     }

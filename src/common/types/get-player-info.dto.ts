@@ -1,7 +1,7 @@
 import { TournamentParticipant } from "@/types/Tournament-Participant/TournamentParticipant";
 import { TournamentStatus } from "../enum/tournamentStatus.enum";
 import { TournamentCategory } from "@/types/Tournament-Category/TournamentCategory";
-import { Ranking } from "@/modules/ranking/domain/Ranking";
+import { Ranking } from "@/types/Ranking/Ranking";
 
 export interface GetPlayerInfoDto {
     tournament: {

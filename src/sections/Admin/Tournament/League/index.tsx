@@ -5,6 +5,7 @@ import PlayersTournamentTable from "../Players/Table/table";
 import { TournamentCategory } from "@/types/Tournament-Category/TournamentCategory";
 import AddCategoriesForTournamentDialog from "../Categories/Add/dialog";
 import { useTournamentCategoryMutations } from "@/hooks/Tournament-Category/useTournamentCategory";
+import { useAllCategories } from "@/hooks/Category";
 import MasterCategoriesCard from "../Fixture/master-card";
 import Loading from "@/components/Loading/loading";
 import PlayOffCategoriesCard from "../Fixture/playoff-card";
@@ -35,7 +36,12 @@ function LeagueTournamentDetail({
 
   const existingCategoryIds = categories.map((category) => category.id);
 
-  // Ya no es necesario el loading state - las categorías se pasan como prop
+  // Calcular si hay categorías disponibles para agregar
+  const { categories: allCategories } = useAllCategories();
+  const availableCategories = allCategories.filter(
+    (category) => !existingCategoryIds.includes(category.id)
+  );
+  const hasAvailableCategories = availableCategories.length > 0;
 
   return (
     <div>
@@ -52,7 +58,7 @@ function LeagueTournamentDetail({
             Categoría {category.name}
           </li>
         ))}
-        {tournament?.status === "pending" && (
+        {tournament?.status === "pending" && hasAvailableCategories && (
           <div className="m-4">
             <AddCategoriesForTournamentDialog
               idTournament={tournament.id}

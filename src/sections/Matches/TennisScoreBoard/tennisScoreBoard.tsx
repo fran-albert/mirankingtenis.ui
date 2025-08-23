@@ -1,9 +1,7 @@
 import React from "react";
 import { ScoreMatchCard } from "@/sections/Matches/ScoreMatchCard/card";
 import { toast } from "sonner";
-import { useMatchesByTournamentCategoryAndMatchday } from "@/hooks/Matches/useMatches";
-
-// React Query hook importado arriba
+import { useMatchesByTournamentCategoryAndMatchday, useDeleteMatch } from "@/hooks/Matches/useMatches";
 
 export const TennisScoreboard = ({
   jornada,
@@ -19,11 +17,20 @@ export const TennisScoreboard = ({
     !!tournamentCategoryId && !!jornada
   );
 
+  // Hook para eliminar partido
+  const deleteMatchMutation = useDeleteMatch();
+
   const handleDeleteMatch = async (id: number) => {
-    // Esta funcionalidad debería usar el hook useDeleteMatch
-    // Por ahora solo mostramos el toast y refetch
-    toast.success("Partido eliminado correctamente");
-    refetch();
+    deleteMatchMutation.mutate(id, {
+      onSuccess: () => {
+        toast.success("Partido eliminado correctamente");
+        refetch();
+      },
+      onError: (error) => {
+        toast.error("Error al eliminar el partido");
+        console.error("Error deleting match:", error);
+      }
+    });
   };
 
   if (isLoading) {

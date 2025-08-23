@@ -166,7 +166,10 @@ export const ScoreMatchCard = ({
                 <button onClick={() => handleEdit(match)}>
                   <FaPencilAlt className="text-slate-500 hover:text-slate-800" />
                 </button>
-                <DeleteMatchDialog onDeleteMatch={onDeleteMatch} />
+                <DeleteMatchDialog 
+                  matchId={match.id}
+                  onDeleteMatch={() => onDeleteMatch()} 
+                />
               </>
             ) : null}
           </div>

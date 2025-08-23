@@ -12,7 +12,7 @@ import { toast } from "sonner";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { Category } from "@/modules/category/domain/Category";
+import { Category } from "@/types/Category/Category";
 import { createApiCourtRepository } from "@/modules/court/infra/ApiCourtRepository";
 import { createCourt } from "@/modules/court/application/create/createCourt";
 

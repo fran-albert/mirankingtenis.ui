@@ -4,7 +4,7 @@ import { DataTable } from "@/components/Table/dataTable";
 import { getColumns } from "./columns";
 import useRoles from "@/hooks/useRoles";
 import { useCustomSession } from "@/context/SessionAuthProviders";
-import { Category } from "@/modules/category/domain/Category";
+import { Category } from "@/types/Category/Category";
 import { Court } from "@/modules/court/domain/Court";
 import AddCourtDialog from "../Add/dialog";
 

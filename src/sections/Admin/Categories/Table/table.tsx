@@ -38,8 +38,8 @@ import { DataTable } from "@/components/Table/dataTable";
 import { getColumns } from "./columns";
 import useRoles from "@/hooks/useRoles";
 import { useCustomSession } from "@/context/SessionAuthProviders";
-import { Category } from "@/modules/category/domain/Category";
 import AddCategoriesDialog from "../Add/dialog";
+import { Category } from "@/types/Category/Category";
 function CategoriesTable({
   categories,
   addCategoryToList,

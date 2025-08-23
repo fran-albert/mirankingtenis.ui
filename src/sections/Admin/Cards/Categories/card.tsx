@@ -1,6 +1,5 @@
 "use client";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import { FaUser } from "react-icons/fa";
 import {
   CardTitle,
@@ -9,20 +8,11 @@ import {
   CardContent,
   Card,
 } from "@/components/ui/card";
-import { createApiCategoryRepository } from "@/modules/category/infra/ApiCategoryRepository";
 import { BiSolidCategory } from "react-icons/bi";
+import { useTotalCategories } from "@/hooks/Category";
+
 export const CategoriesCount = () => {
-  const [totalUsers, setTotalUsers] = useState(0);
-
-  useEffect(() => {
-    const fetchTotalCategories = async () => {
-      const userRepository = createApiCategoryRepository();
-      const total = await userRepository.getTotalCategories();
-      setTotalUsers(total);
-    };
-
-    fetchTotalCategories().catch(console.error);
-  }, []);
+  const { total: totalUsers } = useTotalCategories();
   return (
     <>
       <div className="rounded-lg w-96 sm:transition sm:duration-300 sm:ease-in-out sm:transform sm:hover:-translate-y-2 hover:shadow-2xl cursor-pointer">

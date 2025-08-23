@@ -13,6 +13,9 @@ export const useFixtureMutations = () => {
       queryClient.invalidateQueries({ queryKey: ['fixtures'] });
       queryClient.invalidateQueries({ queryKey: ['fixtures', 'category', variables.idCategory] });
       queryClient.invalidateQueries({ queryKey: ['fixtures', 'count'] });
+      queryClient.invalidateQueries({ queryKey: ['fixtures', 'count', 'category', variables.idCategory] });
+      queryClient.invalidateQueries({ queryKey: ['fixtures', 'count', 'tournament-category'] });
+      queryClient.invalidateQueries({ queryKey: ['fixture-counts'] });
       queryClient.invalidateQueries({ queryKey: ['matches'] });
       console.log("Fixture created", fixture, variables, context);
     },
@@ -27,7 +30,11 @@ export const useFixtureMutations = () => {
     onSuccess: (result, variables, context) => {
       queryClient.invalidateQueries({ queryKey: ['fixtures'] });
       queryClient.invalidateQueries({ queryKey: ['fixtures', 'category', variables.idCategory] });
+      queryClient.invalidateQueries({ queryKey: ['fixtures', 'count'] });
+      queryClient.invalidateQueries({ queryKey: ['fixtures', 'count', 'category', variables.idCategory] });
+      queryClient.invalidateQueries({ queryKey: ['fixtures', 'count', 'tournament-category', variables.idCategory, variables.idTournament] });
       queryClient.invalidateQueries({ queryKey: ['fixtures', 'group-stage-created', variables.idTournament, variables.idCategory] });
+      queryClient.invalidateQueries({ queryKey: ['fixture-counts'] });
       queryClient.invalidateQueries({ queryKey: ['matches'] });
       queryClient.invalidateQueries({ queryKey: ['group'] });
       console.log("Fixture group created", result, variables, context);
@@ -42,9 +49,14 @@ export const useFixtureMutations = () => {
       createPlayOff(idTournament, idCategory),
     onSuccess: (result, variables, context) => {
       queryClient.invalidateQueries({ queryKey: ['fixtures'] });
+      queryClient.invalidateQueries({ queryKey: ['fixtures', 'category', variables.idCategory] });
+      queryClient.invalidateQueries({ queryKey: ['fixtures', 'count'] });
+      queryClient.invalidateQueries({ queryKey: ['fixtures', 'count', 'category', variables.idCategory] });
+      queryClient.invalidateQueries({ queryKey: ['fixtures', 'count', 'tournament-category', variables.idCategory, variables.idTournament] });
       queryClient.invalidateQueries({ queryKey: ['fixtures', 'semi-finals', variables.idTournament, variables.idCategory] });
       queryClient.invalidateQueries({ queryKey: ['fixtures', 'quarter-finals', variables.idTournament, variables.idCategory] });
       queryClient.invalidateQueries({ queryKey: ['fixtures', 'finals', variables.idTournament, variables.idCategory] });
+      queryClient.invalidateQueries({ queryKey: ['fixture-counts'] });
       queryClient.invalidateQueries({ queryKey: ['matches'] });
       queryClient.invalidateQueries({ queryKey: ['playoff'] });
       console.log("Playoff created", result, variables, context);
