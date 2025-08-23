@@ -1,8 +1,8 @@
 import { Category } from "@/types/Category/Category";
 import { HistoryRanking } from "@/types/History-Ranking/HistoryRanking";
-import { Ranking } from "@/modules/ranking/domain/Ranking";
 import { State } from "../State/State";
 import { City } from "../City/City";
+import { Ranking } from "../Ranking/Ranking";
 
 export interface User {
     id: number;
