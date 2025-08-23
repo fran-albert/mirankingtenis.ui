@@ -5,7 +5,6 @@ import { cn } from "@/lib/utils";
 import { Toaster } from "sonner";
 import { AuthProvider } from "@/context/AuthProvider";
 import SessionAuthProvider from "@/context/SessionAuthProviders";
-import { ProfilePhotoProvider } from "@/context/ProfilePhotoContext";
 import MainContainer from "./mainContainer";
 import ClientWrapper from "@/components/Client/Wrapper";
 
@@ -41,17 +40,14 @@ export default function RootLayout({
         )}
       >
         <AuthProvider>
-          <ProfilePhotoProvider>
-            <SessionAuthProvider>
-              <Toaster richColors position="top-center" />
-              <MainContainer>
-
+          <SessionAuthProvider>
+            <Toaster richColors position="top-center" />
+            <MainContainer>
               <ClientWrapper>
                 {children}
               </ClientWrapper>
-              </MainContainer>
-            </SessionAuthProvider>
-          </ProfilePhotoProvider>
+            </MainContainer>
+          </SessionAuthProvider>
         </AuthProvider>
       </body>
     </html>

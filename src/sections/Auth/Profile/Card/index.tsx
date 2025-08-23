@@ -31,7 +31,7 @@ import {
 } from "lucide-react";
 import { User as UserType } from "@/types/User/User";
 import ImagePickerDialog from "@/components/Image-Picker/Dialog";
-import { useProfilePhoto } from "@/context/ProfilePhotoContext";
+import { useAuth } from "@/context/AuthProvider";
 
 interface Props {
   user: UserType;
@@ -39,7 +39,7 @@ interface Props {
 
 export default function PerfilPage({ user: usuario }: Props) {
   const { updateUserMutation, uploadPhotoMutation, changePasswordMutation } = useUserMutations();
-  const { updateProfilePhoto } = useProfilePhoto();
+  const { session } = useAuth();
 
   const [editData, setEditData] = useState({ ...usuario });
   const [passwordData, setPasswordData] = useState({
@@ -155,7 +155,8 @@ export default function PerfilPage({ user: usuario }: Props) {
       const result = await uploadPromise;
       if (result) {
         const newPhotoUrl = result;
-        updateProfilePhoto(newPhotoUrl);
+        // Actualizar localStorage directamente (se sincronizará en el siguiente login)
+        localStorage.setItem('user_photo', newPhotoUrl);
         // Actualizar el estado local también
         setEditData((prev) => ({ ...prev, photo: newPhotoUrl }));
       }
