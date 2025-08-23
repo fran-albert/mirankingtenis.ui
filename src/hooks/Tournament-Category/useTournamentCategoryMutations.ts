@@ -10,6 +10,7 @@ export const useTournamentCategoryMutations = () => {
     onSuccess: (result, { idTournament, idCategory }, context) => {
       // Invalidar queries relacionadas
       queryClient.invalidateQueries({ queryKey: ['categories', 'tournament', idTournament] });
+      queryClient.invalidateQueries({ queryKey: ['categories'] }); // Para actualizar la lista de categorías disponibles
       queryClient.invalidateQueries({ queryKey: ['tournamentCategories'] });
       console.log("Tournament category created", result, { idTournament, idCategory }, context);
     },
