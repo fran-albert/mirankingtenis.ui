@@ -8,8 +8,8 @@ import { Button } from "@/components/ui/button";
 import DeletePlayerDialog from "@/sections/Players/Delete/button";
 import { formatDate } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { Category } from "@/modules/category/domain/Category";
 import DeleteCategoryDialog from "../Delete/dialog";
+import { Category } from "@/types/Category/Category";
 
 export const getColumns = (
   removeCategoryFromList: (idCategory: number) => void,

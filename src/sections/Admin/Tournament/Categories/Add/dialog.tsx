@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,10 +10,10 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
-import { Category } from "@/modules/category/domain/Category";
+import { Category } from "@/types/Category/Category";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { useCategoriesStore } from "@/hooks/useCategories";
+import { useAllCategories } from "@/hooks/Category";
 import { toast } from "sonner";
 import { TournamentCategory } from "@/types/Tournament-Category/TournamentCategory";
 
@@ -37,7 +37,7 @@ export default function AddCategoriesForTournamentDialog({
   onClose,
   existingCategories, 
 }: AddCategoriesForTournamentDialogProps) {
-  const { categories, fetchCategories } = useCategoriesStore();
+  const { categories } = useAllCategories();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const toggleDialog = () => setIsOpen(!isOpen);
 
@@ -71,10 +71,6 @@ export default function AddCategoriesForTournamentDialog({
       console.error("Error al crear la categoría", error);
     }
   };
-
-  useEffect(() => {
-    fetchCategories();
-  }, [fetchCategories]);
 
   const availableCategories = categories.filter(
     (category) => !existingCategories.includes(category.id)

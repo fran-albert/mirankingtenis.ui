@@ -13,10 +13,8 @@ import {
 import ActionIcon from "@/components/ui/actionIcon";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { toast } from "sonner";
-
-import { Category } from "@/modules/category/domain/Category";
-import { createApiCategoryRepository } from "@/modules/category/infra/ApiCategoryRepository";
-import { deleteCategory } from "@/modules/category/application/delete/deleteCategory";
+import { useCategoryMutations } from "@/hooks/Category";
+import { Category } from "@/types/Category/Category";
 
 interface DeleteCategoryDialogProps {
   category: Category;
@@ -27,32 +25,27 @@ export default function DeleteCategoryDialog({
   category,
   removeCategoryFromList,
 }: DeleteCategoryDialogProps) {
+  const { deleteCategoryMutation } = useCategoryMutations();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const toggleDialog = () => setIsOpen(!isOpen);
 
   const handleConfirmDelete = async () => {
     try {
-      const categoryRepository = createApiCategoryRepository();
-      const deleteSpecialityFn = deleteCategory(categoryRepository);
-      const catPromise = deleteSpecialityFn(Number(category.id));
-      toast.promise(catPromise, {
-        loading: "Eliminando categoría...",
-        success: "Categoría eliminada con éxito!",
-        error: "Error al eliminar la Categoría",
-        duration: 3000,
-      });
-      catPromise
-        .then(() => {
+      deleteCategoryMutation.mutate(Number(category.id), {
+        onSuccess: () => {
+          toast.success("Categoría eliminada con éxito!");
           setIsOpen(false);
           if (removeCategoryFromList) {
             removeCategoryFromList(Number(category.id));
           }
-        })
-        .catch((error) => {
-          console.error("Error al crear la Especialidad", error);
-        });
+        },
+        onError: (error) => {
+          toast.error("Error al eliminar la Categoría");
+          console.error("Error al eliminar la Categoría", error);
+        },
+      });
     } catch (error) {
-      console.error("Error al crear la Especialidad", error);
+      console.error("Error al eliminar la Categoría", error);
     }
   };
 

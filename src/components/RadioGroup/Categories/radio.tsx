@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useCategoriesStore } from "@/hooks/useCategories";
-import { Category } from "@/modules/category/domain/Category";
+import { useAllCategories } from "@/hooks/Category";
+import { Category } from "@/types/Category/Category";
 
 interface CheckboxGroupCategoriesProps {
   onSelectCategories: (categoryIds: number[]) => void;
@@ -11,12 +11,8 @@ interface CheckboxGroupCategoriesProps {
 const CheckboxGroupCategories: React.FC<CheckboxGroupCategoriesProps> = ({
   onSelectCategories,
 }) => {
-  const { categories, loading, fetchCategories } = useCategoriesStore();
+  const { categories, isLoading: loading } = useAllCategories();
   const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
-
-  useEffect(() => {
-    fetchCategories();
-  }, [fetchCategories]);
 
   const handleCategoryChange = (categoryId: number) => {
     setSelectedCategories((prevSelected) => {
