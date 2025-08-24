@@ -1,13 +1,35 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: [
-      "www.atptour.com",
-      "mirankingtenis.com.ar",
-      "incor-ranking.s3.us-east-1.amazonaws.com",
-      "mirankingtenis.s3.us-east-1.amazonaws.com",
-      "res.cloudinary.com"
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'www.atptour.com'
+      },
+      {
+        protocol: 'https',
+        hostname: 'mirankingtenis.com.ar'
+      },
+      {
+        protocol: 'https',
+        hostname: 'incor-ranking.s3.us-east-1.amazonaws.com'
+      },
+      {
+        protocol: 'https',
+        hostname: 'mirankingtenis.s3.us-east-1.amazonaws.com'
+      },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com'
+      }
     ],
+    // Configuración específica para Cloudinary
+    loader: 'custom',
+    loaderFile: './src/lib/cloudinary-loader.js',
+    formats: ['image/webp', 'image/avif'],
+    minimumCacheTTL: 60,
+    dangerouslyAllowSVG: true,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
   
   // Optimizaciones básicas

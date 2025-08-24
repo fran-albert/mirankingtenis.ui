@@ -1,7 +1,7 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { OptimizedAvatar } from "@/components/ui/optimized-avatar";
 import { EditButton } from "@/components/Button/Edit/button";
 import { User } from "@/types/User/User";
 import { Button } from "@/components/ui/button";
@@ -27,13 +27,12 @@ export const getColumns = (): ColumnDef<User>[] => {
             (window.location.href = `/jugadores/${row.original.id}`)
           }
         >
-          <Avatar>
-            <AvatarImage src={row.original.photo} alt="@avatar" />
-            <AvatarFallback>
-              {row.original.name.charAt(0)}
-              {row.original.lastname.charAt(0)}
-            </AvatarFallback>
-          </Avatar>
+          <OptimizedAvatar
+            src={row.original.photo}
+            alt={`${row.original.name} ${row.original.lastname}`}
+            size="thumbnail"
+            fallbackText={`${row.original.name.charAt(0)}${row.original.lastname.charAt(0)}`}
+          />
           <div className="flex flex-col ml-2">
             <p className="text-sm font-medium">
               {row.original.lastname}, {row.original.name}

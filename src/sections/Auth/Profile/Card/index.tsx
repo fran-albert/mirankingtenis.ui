@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useUserMutations } from "@/hooks/Users/useUserMutation";
 import { toast } from "sonner";
 import axios from "axios";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { OptimizedAvatar } from "@/components/ui/optimized-avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -181,21 +181,14 @@ export default function PerfilPage({ user: usuario }: Props) {
           <CardHeader className="bg-slate-800 text-white">
             <div className="flex flex-col md:flex-row items-center gap-6">
               <div className="relative">
-                <Avatar className="w-24 h-24 border-4 border-white shadow-lg">
-                  <AvatarImage
-                    src={
-                      editData.photo ||
-                      (usuario.photo
-                        ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${usuario.photo}.jpeg`
-                        : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/mirankingtenis_default.png")
-                    }
-                    alt={`${usuario.name} ${usuario.lastname}`}
-                  />
-                  <AvatarFallback className="text-2xl bg-white text-green-600">
-                    {usuario.name[0]}
-                    {usuario.lastname[0]}
-                  </AvatarFallback>
-                </Avatar>
+                <OptimizedAvatar
+                  src={editData.photo || usuario.photo}
+                  alt={`${usuario.name} ${usuario.lastname}`}
+                  size="large"
+                  className="w-24 h-24 border-4 border-white shadow-lg"
+                  fallbackText={`${usuario.name[0]}${usuario.lastname[0]}`}
+                  priority
+                />
                 <ImagePickerDialog
                   onImageSelect={handleChangeAvatar}
                   onlyIcon
