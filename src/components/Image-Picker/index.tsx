@@ -15,6 +15,11 @@ interface ImagePickerProps {
   onImageSelect: (image: string) => void;
 }
 
+// Constantes de configuración fuera del componente
+const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
+const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+const COMPRESSION_QUALITY = 0.8;
+
 const ImagePicker: React.FC<ImagePickerProps> = ({ onImageSelect }) => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [crop, setCrop] = useState<CropWithAspect>({
@@ -41,11 +46,6 @@ const ImagePicker: React.FC<ImagePickerProps> = ({ onImageSelect }) => {
 
   // Imagen a recortar
   const imgRef = useRef<HTMLImageElement | null>(null);
-
-  // Constantes de configuración
-  const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
-  const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-  const COMPRESSION_QUALITY = 0.8;
 
   // Función para comprimir imagen
   const compressImage = useCallback(async (
@@ -76,7 +76,7 @@ const ImagePicker: React.FC<ImagePickerProps> = ({ onImageSelect }) => {
       
       tryCompress();
     });
-  }, [MAX_FILE_SIZE]);
+  }, []);
 
   // Función para validar archivo
   const validateFile = useCallback((file: File): boolean => {
@@ -93,7 +93,7 @@ const ImagePicker: React.FC<ImagePickerProps> = ({ onImageSelect }) => {
     }
 
     return true;
-  }, [ALLOWED_TYPES, MAX_FILE_SIZE]);
+  }, []);
 
   // Función para obtener dimensiones de imagen
   const getImageDimensions = useCallback((src: string): Promise<{ width: number; height: number }> => {
