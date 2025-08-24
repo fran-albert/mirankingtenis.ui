@@ -1,10 +1,11 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import ReactCrop, { Crop } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
-import { Camera, Upload, Check, X, Crop as CropIcon, Undo } from "lucide-react";
+import { Camera, Upload, Check, X, Crop as CropIcon, Undo, AlertCircle, Info } from "lucide-react";
 import { Button } from "../ui/button";
 import { Label } from "../ui/label";
 import Image from "next/image";
+import { toast } from "sonner";
 
 interface CropWithAspect extends Crop {
   aspect?: number;
@@ -13,6 +14,11 @@ interface CropWithAspect extends Crop {
 interface ImagePickerProps {
   onImageSelect: (image: string) => void;
 }
+
+// Constantes de configuración fuera del componente
+const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
+const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+const COMPRESSION_QUALITY = 0.8;
 
 const ImagePicker: React.FC<ImagePickerProps> = ({ onImageSelect }) => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -27,6 +33,12 @@ const ImagePicker: React.FC<ImagePickerProps> = ({ onImageSelect }) => {
   const [croppedImage, setCroppedImage] = useState<string | null>(null);
   const [usingWebcam, setUsingWebcam] = useState<boolean>(false);
   const [isPreviewMode, setIsPreviewMode] = useState<boolean>(false);
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [imageInfo, setImageInfo] = useState<{
+    originalSize: number;
+    compressedSize: number;
+    dimensions: { width: number; height: number };
+  } | null>(null);
 
   // Cámara nativa
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -34,6 +46,63 @@ const ImagePicker: React.FC<ImagePickerProps> = ({ onImageSelect }) => {
 
   // Imagen a recortar
   const imgRef = useRef<HTMLImageElement | null>(null);
+
+  // Función para comprimir imagen
+  const compressImage = useCallback(async (
+    canvas: HTMLCanvasElement, 
+    originalSize: number
+  ): Promise<string> => {
+    return new Promise((resolve) => {
+      let quality = COMPRESSION_QUALITY;
+      let compressedDataUrl = '';
+      
+      const tryCompress = () => {
+        compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+        const compressedSize = Math.round((compressedDataUrl.length - 22) * 3 / 4);
+        
+        // Si el archivo comprimido sigue siendo muy grande, reducir calidad
+        if (compressedSize > MAX_FILE_SIZE && quality > 0.3) {
+          quality -= 0.1;
+          tryCompress();
+        } else {
+          setImageInfo({
+            originalSize,
+            compressedSize,
+            dimensions: { width: canvas.width, height: canvas.height }
+          });
+          resolve(compressedDataUrl);
+        }
+      };
+      
+      tryCompress();
+    });
+  }, []);
+
+  // Función para validar archivo
+  const validateFile = useCallback((file: File): boolean => {
+    // Validar tipo
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      toast.error('Formato no soportado. Use JPG, PNG o WebP.');
+      return false;
+    }
+
+    // Validar tamaño
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error(`El archivo es muy grande. Máximo ${MAX_FILE_SIZE / 1024 / 1024}MB.`);
+      return false;
+    }
+
+    return true;
+  }, []);
+
+  // Función para obtener dimensiones de imagen
+  const getImageDimensions = useCallback((src: string): Promise<{ width: number; height: number }> => {
+    return new Promise((resolve) => {
+      const img = new window.Image();
+      img.onload = () => resolve({ width: img.width, height: img.height });
+      img.src = src;
+    });
+  }, []);
 
   const startCamera = useCallback(async () => {
     try {
@@ -66,16 +135,39 @@ const ImagePicker: React.FC<ImagePickerProps> = ({ onImageSelect }) => {
     return () => stopCamera();
   }, [usingWebcam, startCamera, stopCamera]);
 
-  const onSelectFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onSelectFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setSelectedImage(reader.result as string);
-        setIsPreviewMode(false);
-        setCroppedImage(null);
-        setUsingWebcam(false); // Asegurar que la cámara esté cerrada
-      };
-      reader.readAsDataURL(e.target.files[0]);
+      const file = e.target.files[0];
+      
+      // Validar archivo
+      if (!validateFile(file)) {
+        e.target.value = '';
+        return;
+      }
+      
+      setIsProcessing(true);
+      
+      try {
+        const reader = new FileReader();
+        reader.onload = async () => {
+          const imageSrc = reader.result as string;
+          const dimensions = await getImageDimensions(imageSrc);
+          
+          // Mostrar información del archivo
+          toast.success(`Imagen cargada: ${dimensions.width}x${dimensions.height}px, ${(file.size / 1024 / 1024).toFixed(2)}MB`);
+          
+          setSelectedImage(imageSrc);
+          setIsPreviewMode(false);
+          setCroppedImage(null);
+          setUsingWebcam(false);
+          setIsProcessing(false);
+        };
+        reader.readAsDataURL(file);
+      } catch (error) {
+        console.error('Error al cargar imagen:', error);
+        toast.error('Error al cargar la imagen');
+        setIsProcessing(false);
+      }
     }
     // Limpiar el input para permitir seleccionar el mismo archivo nuevamente
     e.target.value = '';
@@ -114,8 +206,10 @@ const ImagePicker: React.FC<ImagePickerProps> = ({ onImageSelect }) => {
     imgRef.current = event.currentTarget;
   };
 
-  const generateCroppedImage = () => {
+  const generateCroppedImage = async () => {
     if (!imgRef.current || !crop.width || !crop.height) return;
+    
+    setIsProcessing(true);
 
     // Medidas en pantalla
     const displayW = imgRef.current.width;
@@ -158,9 +252,27 @@ const ImagePicker: React.FC<ImagePickerProps> = ({ onImageSelect }) => {
       canvas.height
     );
 
-    const base64Image = canvas.toDataURL("image/jpeg");
-    setCroppedImage(base64Image);
-    setIsPreviewMode(true);
+    try {
+      // Calcular tamaño original estimado
+      const originalSize = Math.round((selectedImage?.length || 0) * 3 / 4);
+      
+      // Comprimir imagen
+      const compressedImage = await compressImage(canvas, originalSize);
+      
+      setCroppedImage(compressedImage);
+      setIsPreviewMode(true);
+      
+      // Mostrar información de compresión
+      if (imageInfo) {
+        const compressionRatio = ((imageInfo.originalSize - imageInfo.compressedSize) / imageInfo.originalSize * 100).toFixed(1);
+        toast.success(`Imagen optimizada: ${compressionRatio}% de reducción`);
+      }
+    } catch (error) {
+      console.error('Error al procesar imagen:', error);
+      toast.error('Error al procesar la imagen');
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   return (
@@ -186,16 +298,32 @@ const ImagePicker: React.FC<ImagePickerProps> = ({ onImageSelect }) => {
             <span>Usar cámara</span>
           </Button>
 
-          <Label className="flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-secondary hover:bg-secondary/80 text-secondary-foreground cursor-pointer transition-all duration-300 transform hover:scale-105 hover:shadow-lg">
+          <Label className={`flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-secondary hover:bg-secondary/80 text-secondary-foreground cursor-pointer transition-all duration-300 transform hover:scale-105 hover:shadow-lg ${isProcessing ? 'opacity-50 pointer-events-none' : ''}`}>
             <Upload className="w-5 h-5" />
-            <span>Subir imagen</span>
+            <span>{isProcessing ? 'Procesando...' : 'Subir imagen'}</span>
             <input
               type="file"
-              accept="image/*"
+              accept="image/jpeg,image/jpg,image/png,image/webp"
               onChange={onSelectFile}
               className="hidden"
+              disabled={isProcessing}
             />
           </Label>
+        </div>
+
+        {/* Información de limitaciones */}
+        <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
+          <div className="flex items-start gap-2">
+            <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+            <div className="text-sm text-blue-700">
+              <p className="font-medium mb-1">Requisitos:</p>
+              <ul className="text-xs space-y-0.5">
+                <li>• Formatos: JPG, PNG, WebP</li>
+                <li>• Tamaño máximo: 2MB</li>
+                <li>• Se optimizará automáticamente</li>
+              </ul>
+            </div>
+          </div>
         </div>
 
         {usingWebcam && !selectedImage && (
@@ -252,10 +380,15 @@ const ImagePicker: React.FC<ImagePickerProps> = ({ onImageSelect }) => {
               <Button
                 type="button"
                 onClick={generateCroppedImage}
-                className="flex items-center gap-2 px-4 py-2 rounded-md bg-primary hover:bg-primary/90 text-primary-foreground transition-colors"
+                disabled={isProcessing}
+                className={`flex items-center gap-2 px-4 py-2 rounded-md bg-primary hover:bg-primary/90 text-primary-foreground transition-colors ${isProcessing ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
-                <CropIcon className="w-5 h-5" />
-                <span>Confirmar recorte</span>
+                {isProcessing ? (
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <CropIcon className="w-5 h-5" />
+                )}
+                <span>{isProcessing ? 'Procesando...' : 'Confirmar recorte'}</span>
               </Button>
             </div>
           </div>

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { OptimizedAvatar } from "@/components/ui/optimized-avatar";
 import {
   Card,
   CardContent,
@@ -61,12 +61,12 @@ export const ScoreMatchCard = ({
             <div className="flex flex-col space-y-1.5">
               <div className="flex justify-between">
                 <div className="flex items-center space-x-2">
-                  <Avatar>
-                    <AvatarImage src={match.user1photo} alt="@avatar" />
-                    <AvatarFallback>
-                      {match?.user1?.toString().charAt(0) || ""}
-                    </AvatarFallback>
-                  </Avatar>
+                  <OptimizedAvatar
+                    src={match.user1photo}
+                    alt={match.user1?.toString() || "Usuario 1"}
+                    size="small"
+                    fallbackText={match?.user1?.toString().charAt(0) || "U"}
+                  />
                   <div className="text-xs font-bold text-gray-500">
                     {match.user1position ? match.user1position : "-"}
                   </div>
@@ -102,12 +102,12 @@ export const ScoreMatchCard = ({
               <div className="flex flex-col space-y-1.5">
                 <div className="flex justify-between">
                   <div className="flex items-center space-x-2">
-                    <Avatar>
-                      <AvatarImage src={match.user2photo} alt="@avatar" />
-                      <AvatarFallback>
-                        {match?.user2?.toString().charAt(0) || ""}
-                      </AvatarFallback>
-                    </Avatar>
+                    <OptimizedAvatar
+                      src={match.user2photo}
+                      alt={match.user2?.toString() || "Usuario 2"}
+                      size="small"
+                      fallbackText={match?.user2?.toString().charAt(0) || "U"}
+                    />
                     <div className="text-xs font-bold text-gray-500">
                       {match.user2position ? match.user2position : "-"}
                     </div>

@@ -1,5 +1,5 @@
 import React from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { OptimizedAvatar } from "@/components/ui/optimized-avatar";
 import { FaCalendarAlt } from "react-icons/fa";
 import { MdOutlineScoreboard } from "react-icons/md";
 import { formatDateDaysMonth } from "@/lib/utils";
@@ -46,19 +46,13 @@ const SemiFinalCard = ({
                         )}
                       </div>
                     )}
-                    <Avatar className="w-10 h-10">
-                      <AvatarImage
-                        src={
-                          match.user1.photo
-                            ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${match.user1.photo}.jpeg`
-                            : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/mirankingtenis_default.png"
-                        }
-                        alt={match.user1.name.charAt(0)}
-                      />
-                      <AvatarFallback>
-                        {match.user1.name.charAt(0)}
-                      </AvatarFallback>
-                    </Avatar>
+                    <OptimizedAvatar
+                      src={match.user1.photo}
+                      alt={`${match.user1.name} ${match.user1.lastname}`}
+                      size="thumbnail"
+                      className="w-10 h-10"
+                      fallbackText={match.user1.name.charAt(0)}
+                    />
                     <div>
                       <p className="font-medium flex">{match.user1.lastname}</p>
                     </div>
@@ -98,19 +92,13 @@ const SemiFinalCard = ({
                     <div className="text-right">
                       <p className="font-medium">{match.user2.lastname}</p>
                     </div>
-                    <Avatar className="w-10 h-10">
-                      <AvatarImage
-                        src={
-                          match.user2.photo
-                            ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${match.user2.photo}.jpeg`
-                            : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/mirankingtenis_default.png"
-                        }
-                        alt={match.user2.name.charAt(0)}
-                      />
-                      <AvatarFallback>
-                        {match.user2.name.charAt(0)}
-                      </AvatarFallback>
-                    </Avatar>
+                    <OptimizedAvatar
+                      src={match.user2.photo}
+                      alt={`${match.user2.name} ${match.user2.lastname}`}
+                      size="thumbnail"
+                      className="w-10 h-10"
+                      fallbackText={match.user2.name.charAt(0)}
+                    />
                   </div>
                 </div>
               </div>
