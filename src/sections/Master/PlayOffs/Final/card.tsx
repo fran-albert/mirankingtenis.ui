@@ -1,5 +1,5 @@
 import React from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { OptimizedAvatar } from "@/components/ui/optimized-avatar";
 import { FaCalendarAlt } from "react-icons/fa";
 import { MdOutlineScoreboard } from "react-icons/md";
 import { formatDateDaysMonth } from "@/lib/utils";
@@ -43,17 +43,13 @@ const FinalCard = ({
                     )}
                   </div>
                 )}
-                <Avatar className="w-12 h-12">
-                  <AvatarImage
-                    src={
-                      match.user1.photo
-                        ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${match.user1.photo}.jpeg`
-                        : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/mirankingtenis_default.png"
-                    }
-                    alt={match.user1.name.charAt(0)}
-                  />
-                  <AvatarFallback>{match.user1.name.charAt(0)}</AvatarFallback>
-                </Avatar>
+                <OptimizedAvatar
+                  src={match.user1.photo}
+                  alt={`${match.user1.name} ${match.user1.lastname}`}
+                  size="small"
+                  className="w-12 h-12"
+                  fallbackText={match.user1.name.charAt(0)}
+                />
                 <div>
                   <p className="font-semibold text-gray-800">
                     {match.user1.lastname}
@@ -97,17 +93,13 @@ const FinalCard = ({
                     {match.user2.lastname}
                   </p>
                 </div>
-                <Avatar className="w-12 h-12">
-                  <AvatarImage
-                    src={
-                      match.user2.photo
-                        ? `https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/${match.user2.photo}.jpeg`
-                        : "https://mirankingtenis.s3.us-east-1.amazonaws.com/storage/avatar/mirankingtenis_default.png"
-                    }
-                    alt={match.user2.name.charAt(0)}
-                  />
-                  <AvatarFallback>{match.user2.name.charAt(0)}</AvatarFallback>
-                </Avatar>
+                <OptimizedAvatar
+                  src={match.user2.photo}
+                  alt={`${match.user2.name} ${match.user2.lastname}`}
+                  size="small"
+                  className="w-12 h-12"
+                  fallbackText={match.user2.name.charAt(0)}
+                />
               </div>
             </div>
           </div>

@@ -8,8 +8,6 @@ import { FixtureGroupStage } from "@/sections/Master/Fixture";
 import { useGroupsByStage, useGroupRankings } from "@/hooks/Group/useGroup";
 import { useGroupsStageByTournamentCategory } from "@/hooks/Group-Stage/useGroupStage";
 import { useMatchesByGroupStage } from "@/hooks/Matches/useMatches";
-import { MasterCard } from "@/sections/Master/Cards/card";
-import TournamentPlayers from "@/sections/Master/Cards/card.v2";
 
 function ClientMasterComponent() {
   const [selectedCategory, setSelectedCategory] = useState("1");

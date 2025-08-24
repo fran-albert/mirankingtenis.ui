@@ -23,6 +23,7 @@ export default function Navbar() {
 
   const [navigation, setNavigation] = useState([
     { name: "Master", href: "/master", current: false },
+    { name: "Carrera al Master", href: "/carrera-al-master", current: false },
     { name: "Jugadores", href: "/jugadores", current: false },
     { name: "Ranking", href: "/ranking", current: false },
     { name: "Partidos", href: "/partidos", current: false },
@@ -33,6 +34,7 @@ export default function Navbar() {
   useEffect(() => {
     const baseNavigation = [
       { name: "Master", href: "/master", current: false },
+      { name: "Carrera al Master", href: "/carrera-al-master", current: false },
       { name: "Jugadores", href: "/jugadores", current: false },
       { name: "Ranking", href: "/ranking", current: false },
       { name: "Partidos", href: "/partidos", current: false },
