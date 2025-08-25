@@ -16,3 +16,51 @@
 .my-pending-event {
   color: red;
 }
+
+/* Estilos para asegurar que los slots de 30 minutos se muestren correctamente */
+.rbc-time-slot {
+  border-bottom: 1px solid #ddd !important;
+}
+
+.rbc-timeslot-group {
+  border-bottom: 2px solid #ccc !important;
+}
+
+/* Mostrar líneas de tiempo cada 30 minutos */
+.rbc-time-content > * + * {
+  border-left: 1px solid #ddd;
+}
+
+/* Asegurar que el time gutter (primera columna) sea visible */
+.rbc-time-gutter {
+  display: block !important;
+  border-right: 1px solid #ddd;
+}
+
+.rbc-time-gutter .rbc-timeslot-group {
+  display: block !important;
+}
+
+.rbc-time-gutter .rbc-time-slot {
+  display: block !important;
+  border-bottom: 1px solid #ddd;
+  min-height: 30px;
+}
+
+/* Mostrar labels de tiempo en el time gutter */
+.rbc-time-gutter .rbc-time-slot .rbc-label {
+  display: block !important;
+  font-size: 12px;
+  line-height: 1;
+  padding: 2px 5px;
+  text-align: right;
+}
+
+/* Líneas horizontales cada 30 minutos en las columnas de canchas */
+.rbc-time-content .rbc-timeslot-group {
+  border-bottom: 1px solid #ddd !important;
+}
+
+.rbc-time-content .rbc-time-slot {
+  border-bottom: 1px solid #eee !important;
+}

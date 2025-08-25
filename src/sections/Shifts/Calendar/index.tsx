@@ -224,6 +224,19 @@ export const ShiftCalendar = ({
     event: "Partido",
   };
 
+  const formats = {
+    timeGutterFormat: (date: Date, culture?: string, localizer?: any) => {
+      return moment(date).format('HH:mm');
+    },
+    eventTimeRangeFormat: ({ start, end }: { start: Date; end: Date }) => {
+      return moment(start).format('HH:mm') + ' - ' + moment(end).format('HH:mm');
+    },
+    agendaTimeFormat: 'HH:mm',
+    agendaTimeRangeFormat: ({ start, end }: { start: Date; end: Date }) => {
+      return moment(start).format('HH:mm') + ' - ' + moment(end).format('HH:mm');
+    },
+  };
+
   const resourceMap = useMemo(
     () => [
       { resourceId: 1, resourceTitle: "Cancha 1" },
@@ -249,8 +262,8 @@ export const ShiftCalendar = ({
         return;
       }
 
-      // Optimización: calcular todo de una vez
-      const selectedStart = moment(slotInfo.start).startOf("hour");
+      // Optimización: calcular todo de una vez - mantener minutos exactos para slots de 30 minutos
+      const selectedStart = moment(slotInfo.start);
       const selectedEnd = moment(selectedStart).add(2, "hours");
       const selectedCourtTitle =
         resourceMap.find((court) => court.resourceId === slotInfo.resourceId)
@@ -370,12 +383,14 @@ export const ShiftCalendar = ({
         <div className="responsive-calendar-container">
           {showCalendar ? (
             <Calendar
+              key={`calendar-${view}-30min`}
               localizer={localizer}
               events={events}
               startAccessor="start"
               endAccessor="end"
               date={date}
               messages={messages}
+              formats={formats}
               onView={onView}
               views={availableViews}
               selectable={!!session}
@@ -387,6 +402,8 @@ export const ShiftCalendar = ({
               min={minTime}
               max={maxTime}
               onNavigate={onNavigate}
+              step={30}
+              timeslots={1}
               components={{
                 event: EventWrapper,
               }}

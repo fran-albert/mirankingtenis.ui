@@ -9,6 +9,7 @@ import { useAuth } from "@/context/AuthProvider";
 import { usePathname, useRouter } from "next/navigation";
 import useRoles from "@/hooks/useRoles";
 import Image from "next/image";
+import { OptimizedAvatar } from "@/components/ui/optimized-avatar";
 // import AutoSignOut from "./autoSignOut";
 
 function classNames(...classes: string[]) {
@@ -123,12 +124,13 @@ export default function Navbar() {
                           <span className="absolute -inset-1.5" />
                           <span className="sr-only">Open user menu</span>
 
-                          <Image
-                            className="h-8 w-8 rounded-full"
-                            src={session?.user?.photo!}
-                            alt="User profile"
-                            height={32}
-                            width={32}
+                          <OptimizedAvatar
+                            src={session?.user?.photo}
+                            alt={`${session?.user?.name} ${session?.user?.lastname}`}
+                            size="thumbnail"
+                            className="h-8 w-8"
+                            fallbackText={`${session?.user?.name?.[0] || ''}${session?.user?.lastname?.[0] || ''}`}
+                            showFallback={true}
                           />
                         </Menu.Button>
                       </div>
