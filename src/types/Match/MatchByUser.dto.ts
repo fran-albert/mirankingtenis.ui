@@ -32,7 +32,9 @@ export interface PlayoffInfoDto {
 export enum MatchStatus {
   PENDING = "pending",
   PLAYED = "played",
-  CANCELLED = "cancelled"
+  CANCELLED = "cancelled",
+  VICTORY = 'Victoria',
+  DEFEAT = 'Derrota',
 }
 
 export interface MatchByUserResponseDto {
