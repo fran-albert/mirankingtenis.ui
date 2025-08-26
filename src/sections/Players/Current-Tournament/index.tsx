@@ -6,15 +6,20 @@ import { formatDate, formatDateDays } from "@/lib/utils";
 import { Tournament } from "@/types/Tournament/Tournament";
 import React from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { OptimizedAvatar } from "@/components/ui/optimized-avatar";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 function CurrentTournament({
   playerInfo,
   currentTournaments,
   nextMatch,
+  playerId,
 }: {
   playerInfo: GetPlayerInfoDto;
   nextMatch: NextMatchDto | undefined;
   currentTournaments: Tournament;
+  playerId: number;
 }) {
   const winRate =
     playerInfo && playerInfo.ranking && playerInfo.ranking.playedMatches > 0
@@ -25,7 +30,16 @@ function CurrentTournament({
     <div>
       <Card className="w-full max-w-full">
         <CardHeader>
-          <CardTitle>Torneo Actual</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle>Torneo Actual</CardTitle>
+            {currentTournaments && (
+              <Link href={`/jugadores/${playerId}/torneos/${currentTournaments.id}`}>
+                <Button variant="outline" size="sm">
+                  Ver
+                </Button>
+              </Link>
+            )}
+          </div>
         </CardHeader>
         <CardContent className="grid gap-4">
           {currentTournaments ? (
@@ -76,12 +90,11 @@ function CurrentTournament({
                     <h4 className="text-gray-500  mb-2">Próximo Partido</h4>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <div className="rounded-full w-8 h-8 bg-gray-200  flex items-center justify-center text-sm font-bold">
-                          {getInitials(
-                            String(nextMatch?.user1.name),
-                            String(nextMatch?.user1.lastname)
-                          )}
-                        </div>
+                        <OptimizedAvatar
+                          src={nextMatch?.user1.photo}
+                          alt={`${nextMatch?.user1.name} ${nextMatch?.user1.lastname}`}
+                          size="thumbnail"
+                        />
                         <div>
                           <p className="font-medium">
                             {nextMatch?.user1.name} {nextMatch?.user1.lastname}
@@ -92,29 +105,43 @@ function CurrentTournament({
                         </div>
                       </div>
                       <div>
-                        <p className="font-medium">vs</p>
-                        <p className="text-gray-500  text-sm">
-                          {nextMatch?.shift === null
-                            ? "Sin horario"
-                            : formatDate(String(nextMatch?.shift.startHour))}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="rounded-full w-8 h-8 bg-gray-200  flex items-center justify-center text-sm font-bold">
-                          {getInitials(
-                            String(nextMatch?.user2.name),
-                            String(nextMatch?.user2.lastname)
-                          )}
-                        </div>
-                        <div>
-                          <p className="font-medium">
-                            {nextMatch?.user2.name} {nextMatch?.user2.lastname}
-                          </p>
+                        <p className="font-medium">{nextMatch?.user2 ? "vs" : "Libre"}</p>
+                        {nextMatch?.user2 && (
                           <p className="text-gray-500  text-sm">
-                            {nextMatch?.user2.position}°
+                            {nextMatch?.shift === null
+                              ? "Sin horario"
+                              : formatDate(String(nextMatch?.shift.startHour))}
                           </p>
-                        </div>
+                        )}
                       </div>
+                      {nextMatch?.user2 ? (
+                        <div className="flex items-center gap-2">
+                          <OptimizedAvatar
+                            src={nextMatch.user2.photo}
+                            alt={`${nextMatch.user2.name} ${nextMatch.user2.lastname}`}
+                            size="thumbnail"
+                          />
+                          <div>
+                            <p className="font-medium">
+                              {nextMatch.user2.name} {nextMatch.user2.lastname}
+                            </p>
+                            <p className="text-gray-500  text-sm">
+                              {nextMatch.user2.position}°
+                            </p>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <div className="rounded-full w-8 h-8 bg-green-100  flex items-center justify-center text-sm font-bold text-green-600">
+                            ✓
+                          </div>
+                          <div>
+                            <p className="font-medium text-green-600">
+                              Fecha libre
+                            </p>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ) : (

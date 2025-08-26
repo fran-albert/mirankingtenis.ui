@@ -27,6 +27,21 @@ function MatchesByTournamentPlayer({ matches }: { matches: MatchByUserWithRival[
     }
   };
 
+  const getMatchStatusText = (finalResult: any) => {
+    switch (finalResult) {
+      case "pending":
+        return "Pendiente";
+      case "Victoria":
+        return "Victoria";
+      case "Derrota":
+        return "Derrota";
+      case "played":
+        return "Jugado";
+      default:
+        return finalResult;
+    }
+  };
+
   return (
     <>
       <Card>
@@ -52,7 +67,15 @@ function MatchesByTournamentPlayer({ matches }: { matches: MatchByUserWithRival[
                       : getMatchStageText(match)}
                   </TableCell>
                   <TableCell>{match.rivalName}</TableCell>
-                  <TableCell>{match.finalResult}</TableCell>
+                  <TableCell>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      match.finalResult === 'Victoria' ? 'bg-green-100 text-green-800' :
+                      match.finalResult === 'Derrota' ? 'bg-red-100 text-red-800' :
+                      'bg-gray-100 text-gray-800'
+                    }`}>
+                      {getMatchStatusText(match.finalResult)}
+                    </span>
+                  </TableCell>
                   <TableCell>
                     <div className="flex">
                       {match.sets.map((set, index) => (

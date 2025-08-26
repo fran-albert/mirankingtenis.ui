@@ -2,11 +2,11 @@
 import { useParams } from "next/navigation";
 import React from "react";
 import Loading from "@/components/Loading/loading";
-import { 
-  useCurrentTournamentByPlayer, 
-  useAllTournamentsByPlayer, 
+import {
+  useCurrentTournamentByPlayer,
+  useAllTournamentsByPlayer,
   useCompletedTournamentsByPlayer,
-  usePlayerInfo
+  usePlayerInfo,
 } from "@/hooks/Tournament/useTournament";
 import { usePlayerSetSummary } from "@/hooks/Sets/useSet";
 import { PlayerComponent } from "@/sections/Players/Component/player-component";
@@ -19,42 +19,59 @@ function PlayerDetailsPage() {
   const idParam = params.id;
   const idUser = Number(idParam);
   // Usar los nuevos hooks de React Query
-  const { tournament: currentTournaments, isLoading: isCurrentTournamentLoading } = useCurrentTournamentByPlayer({ 
-    idPlayer: idUser, 
-    enabled: !!idUser 
-  });
-  
-  const { tournaments: allTournaments, isLoading: isAllTournamentsLoading } = useAllTournamentsByPlayer({ 
-    idPlayer: idUser, 
-    enabled: !!idUser 
-  });
-  
-  const { tournaments: completedTournaments, isLoading: isCompletedTournamentsLoading } = useCompletedTournamentsByPlayer({ 
-    idPlayer: idUser, 
-    enabled: false // Temporalmente deshabilitado porque el endpoint devuelve 404
-  });
-  
-  const { playerInfo, isLoading: isPlayerInfoLoading } = usePlayerInfo({ 
-    idTournament: currentTournaments?.id || 0, 
+  const {
+    tournament: currentTournaments,
+    isLoading: isCurrentTournamentLoading,
+  } = useCurrentTournamentByPlayer({
     idPlayer: idUser,
-    enabled: !!idUser && !!currentTournaments?.id
+    enabled: !!idUser,
   });
 
-  const isTournamentLoading = isCurrentTournamentLoading || isAllTournamentsLoading || isCompletedTournamentsLoading || isPlayerInfoLoading;
+  const { tournaments: allTournaments, isLoading: isAllTournamentsLoading } =
+    useAllTournamentsByPlayer({
+      idPlayer: idUser,
+      enabled: !!idUser,
+    });
+
+  const {
+    tournaments: completedTournaments,
+    isLoading: isCompletedTournamentsLoading,
+  } = useCompletedTournamentsByPlayer({
+    idPlayer: idUser,
+  });
+
+  const { playerInfo, isLoading: isPlayerInfoLoading } = usePlayerInfo({
+    idTournament: currentTournaments?.id || 0,
+    idPlayer: idUser,
+    enabled: !!idUser && !!currentTournaments?.id,
+  });
+
+  const isTournamentLoading =
+    isCurrentTournamentLoading ||
+    isAllTournamentsLoading ||
+    isCompletedTournamentsLoading ||
+    isPlayerInfoLoading;
 
   const { playerMatchSummary } = useTournamentRankingPlayerSummary({
     idPlayer: idUser,
     enabled: !!!idUser,
   });
   // Usar React Query hooks para obtener partidos y próximo partido
-  const { data: matches = [], isLoading: isMatchLoading } = useAllMatchesByUser(idUser, !!idUser);
+  const { data: matches = [], isLoading: isMatchLoading } = useAllMatchesByUser(
+    idUser,
+    !!idUser
+  );
+
   const { data: nextMatch } = useNextMatch(
-    currentTournaments?.id || 0, 
-    idUser, 
+    Number(currentTournaments?.id),
+    idUser,
     !!currentTournaments?.id && !!idUser
   );
   // Usar React Query hook para el resumen de sets del jugador
-  const { data: setSummary, isLoading: isLoadingSets } = usePlayerSetSummary(idUser, !!idUser);
+  const { data: setSummary, isLoading: isLoadingSets } = usePlayerSetSummary(
+    idUser,
+    !!idUser
+  );
   // const { loading: isLoadingUser, getUser, user } = useUserStore();
   const { user, isLoading, error } = useUser({
     auth: true,

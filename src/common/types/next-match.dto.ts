@@ -11,11 +11,13 @@ export interface NextMatchDto {
         name: string;
         lastname: string;
         position: number;
+        photo: string;
     };
     user2: {
         name: string;
         lastname: string;
         position: number;
+        photo: string;
     };
     fixture: {
         id: number;
