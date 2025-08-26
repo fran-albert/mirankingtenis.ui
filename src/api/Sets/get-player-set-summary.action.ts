@@ -8,7 +8,7 @@ export async function getTotalPlayerSetSummary(playerId: number): Promise<SetSum
         return data;
     } catch (error: any) {
         if (error?.response?.status === 404) {
-            console.error("Player set summary not found.");
+            // Player has no matches yet, return default values
             return {
                 totalSetsPlayed: 0,
                 totalSetsWon: 0,
