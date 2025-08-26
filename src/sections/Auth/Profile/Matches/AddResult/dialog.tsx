@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -34,6 +34,7 @@ export default function AddResultMatchDialog({
   const [isAddResultOpen, setIsAddResultOpen] = useState<boolean>(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState<boolean>(false);
   const [formData, setFormData] = useState<any>(null);
+  const isSubmittingRef = useRef(false);
   const toggleAddResultDialog = () => setIsAddResultOpen(!isAddResultOpen);
   const toggleConfirmDialog = () => setIsConfirmOpen(!isConfirmOpen);
   const {
@@ -46,30 +47,49 @@ export default function AddResultMatchDialog({
   const createSetsMutation = useCreateSets();
 
   const onSubmit: SubmitHandler<any> = async (formData) => {
+    // No need to block here, this just prepares the confirmation
     setFormData(formData);
     toggleConfirmDialog();
   };
   const onConfirm = async () => {
-    const dataToSend: any = {
-      idMatch: match.id,
-      sets: Object.values(formData.sets).map((set: any, index) => ({
-        pointsPlayer1: parseInt(set.pointsPlayer1, 10),
-        pointsPlayer2: parseInt(set.pointsPlayer2, 10),
-        setNumber: index + 1,
-      })),
-      tournamentCategoryId: match.fixture?.tournamentCategories?.id,
-    };
+    if (isSubmittingRef.current) return;
+    isSubmittingRef.current = true;
+    
     try {
+      const dataToSend: any = {
+        idMatch: match.id,
+        sets: Object.values(formData.sets).map((set: any, index) => ({
+          pointsPlayer1: parseInt(set.pointsPlayer1, 10),
+          pointsPlayer2: parseInt(set.pointsPlayer2, 10),
+          setNumber: index + 1,
+        })),
+        tournamentCategoryId: match.fixture?.tournamentCategories?.id,
+      };
+      
       const setCreationPromise = createSetsMutation.mutateAsync(dataToSend);
       toast.promise(setCreationPromise, {
         loading: "Actualizando partido...",
-        success: "Partido actualizado con éxito!",
+        success: (response) => {
+          // Check if response is from cache
+          const isIdempotent = response?.headers?.['x-idempotent'] === 'true';
+          if (isIdempotent) {
+            return "Partido actualizado (resultado recuperado)";
+          }
+          return "Partido actualizado con éxito!";
+        },
         duration: 3000,
       });
-      await setCreationPromise;
+      const result = await setCreationPromise;
+      
+      // Small delay to ensure invalidation completes
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
       if (onUpdateMatches) {
         onUpdateMatches();
       }
+      setIsConfirmOpen(false);
+      setIsAddResultOpen(false);
+      reset();
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const errorMessage =
@@ -85,10 +105,9 @@ export default function AddResultMatchDialog({
         });
         console.error("Error al crear el set", error);
       }
+    } finally {
+      isSubmittingRef.current = false; // ALWAYS reset
     }
-    setIsConfirmOpen(false);
-    setIsAddResultOpen(false);
-    reset();
   };
 
   const closeAndResetDialog = () => {
@@ -275,7 +294,10 @@ export default function AddResultMatchDialog({
               >
                 Cancelar
               </Button>
-              <Button className="button bg-slate-700" type="submit">
+              <Button 
+                className="button bg-slate-700" 
+                type="submit"
+              >
                 Siguiente
               </Button>
             </DialogFooter>
@@ -284,7 +306,12 @@ export default function AddResultMatchDialog({
       </Dialog>
 
       {formData && formData.sets && (
-        <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
+        <Dialog open={isConfirmOpen} onOpenChange={(open) => {
+          if (!open) {
+            isSubmittingRef.current = false;
+          }
+          setIsConfirmOpen(open);
+        }}>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Confirmar Cambios</DialogTitle>
@@ -320,12 +347,19 @@ export default function AddResultMatchDialog({
                 type="button"
                 variant="outline"
                 className="w-full md:w-auto"
-                onClick={() => setIsConfirmOpen(false)}
+                onClick={() => {
+                  isSubmittingRef.current = false;
+                  setIsConfirmOpen(false);
+                }}
               >
                 Cancelar
               </Button>
-              <Button className="bg-slate-700" onClick={onConfirm}>
-                Confirmar
+              <Button 
+                className="bg-slate-700" 
+                onClick={onConfirm}
+                disabled={createSetsMutation.isPending || isSubmittingRef.current}
+              >
+                {createSetsMutation.isPending ? "Procesando..." : "Confirmar"}
               </Button>
             </DialogFooter>
           </DialogContent>
