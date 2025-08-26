@@ -12,6 +12,10 @@ import { formatDate } from "@/lib/utils";
 import { formatTournamentDates } from "@/common/helpers/helpers";
 import Loading from "@/components/Loading/loading";
 import { useMatchesByUser } from "@/hooks/Matches/useMatches";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
+import { useUser } from "@/hooks/Users/useUser";
 
 function TournamentPlayerPage() {
   const { id, idTournament } = useParams();
@@ -45,6 +49,12 @@ function TournamentPlayerPage() {
   const { tournament, isLoading: isLoadingTournaments } = useTournament({ 
     idTournament: Number(idTournament), 
     enabled: !!idTournament 
+  });
+
+  // Obtener información del usuario
+  const { user, isLoading: isLoadingUser } = useUser({
+    auth: true,
+    id: idUser,
   });
   
   // Usar React Query hook para obtener partidos del usuario
@@ -96,22 +106,31 @@ function TournamentPlayerPage() {
     isLoadingPlayerMatchSummary ||
     isLoadingHistoryRanking ||
     isLoadingTCategories ||
+    isLoadingUser ||
     !tournament ||
-    !categoriesForTournaments
+    !categoriesForTournaments ||
+    !user
   ) {
     return <Loading isLoading={true} />;
   }
 
   return (
     <div className="grid gap-6 container mt-10">
-      <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold">{tournament?.name}</h1>
-        <p className="text-muted-foreground">
-          {formatTournamentDates(
-            String(tournament?.startedAt),
-            String(tournament?.finishedAt)
-          )}
-        </p>
+      {/* Header con navegación */}
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-4xl font-bold text-gray-900">{tournament?.name}</h1>
+          <p className="text-lg text-muted-foreground mt-2">
+            {user.name} {user.lastname} - {categoryName}
+          </p>
+        </div>
+        
+        <Link href={`/jugadores/${idUser}`}>
+          <Button variant="outline" size="default">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Volver al perfil
+          </Button>
+        </Link>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <MatchesByTournamentPlayer matches={matches} />
