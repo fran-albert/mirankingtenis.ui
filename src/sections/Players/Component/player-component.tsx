@@ -65,6 +65,7 @@ export function PlayerComponent({
             nextMatch={nextMatch}
             playerInfo={playerInfo}
             currentTournaments={currentTournaments}
+            playerId={player.id}
           />
         </section>
         <section className="mt-8">
