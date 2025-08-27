@@ -1,4 +1,5 @@
 import axios from "axios";
+import { v4 as uuidv4 } from 'uuid';
 
 const axiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
@@ -14,6 +15,15 @@ axiosInstance.interceptors.request.use(
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    // Inject idempotency key for specific routes
+    const idempotentRoutes = ['/sets/matches-with-sets', '/sets/matches/admin'];
+    
+    if (config.url && idempotentRoutes.some(route => config.url!.includes(route))) {
+      // Ensure headers object exists
+      config.headers = config.headers || {};
+      config.headers['X-Idempotency-Key'] = uuidv4();
     }
 
     return config;

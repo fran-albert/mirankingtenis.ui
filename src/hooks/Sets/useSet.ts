@@ -23,11 +23,43 @@ export function useCreateSets() {
   
   return useMutation({
     mutationFn: (sets: Match) => createSets(sets),
-    onSuccess: (data, variables) => {
-      // Invalidar queries relacionadas después de crear sets
-      queryClient.invalidateQueries({ queryKey: ["matches"] });
+    retry: (failureCount, error: any) => {
+      // Retry en 409 hasta 3 veces
+      if (error?.response?.status === 409 && failureCount < 3) {
+        return true;
+      }
+      return false;
+    },
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 5000),
+    onSuccess: (response, variables) => {
+      // Check if idempotent response
+      const isIdempotent = response.headers?.['x-idempotent'] === 'true';
+      if (isIdempotent) {
+        console.log('Resultado obtenido del cache');
+      }
+      
+      // Log the created sets for debugging
+      if (response.data) {
+        console.log('Sets creados:', response.data);
+      }
+      
+      // Invalidate queries - use predicate to match all matches-related queries
+      queryClient.invalidateQueries({ 
+        predicate: (query) => {
+          const key = query.queryKey;
+          return Array.isArray(key) && key[0] === "matches";
+        }
+      });
       queryClient.invalidateQueries({ queryKey: ["player-set-summary"] });
       queryClient.invalidateQueries({ queryKey: ["tournament-ranking"] });
+      
+      // Invalidate tournament ranking history for the chart
+      queryClient.invalidateQueries({ 
+        predicate: (query) => {
+          const key = query.queryKey;
+          return Array.isArray(key) && key[0] === "tournament-ranking-history";
+        }
+      });
       
       // Si podemos extraer los IDs de los jugadores del match, invalidamos sus resúmenes específicos
       if (variables.idUser1) {
