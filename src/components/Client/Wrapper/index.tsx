@@ -21,9 +21,9 @@ const ClientWrapper = ({
   return (
     <QueryClientProvider client={queryClient}>
       <div style={{ flex: 1 }}>{children}</div>
-      {process.env.NODE_ENV === 'development' && (
+      {/* {process.env.NODE_ENV === 'development' && (
         <ReactQueryDevtools initialIsOpen={false} />
-      )}
+      )} */}
     </QueryClientProvider>
   );
 };
