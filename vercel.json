@@ -12,9 +12,6 @@
   "functions": {
     "app/**/*.tsx": {
       "maxDuration": 30
-    },
-    "src/**/*.ts": {
-      "maxDuration": 30
     }
   }
 }
