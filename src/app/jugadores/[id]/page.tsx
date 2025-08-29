@@ -54,7 +54,7 @@ function PlayerDetailsPage() {
 
   const { playerMatchSummary } = useTournamentRankingPlayerSummary({
     idPlayer: idUser,
-    enabled: !!!idUser,
+    enabled: !!idUser,
   });
   // Usar React Query hooks para obtener partidos y próximo partido
   const { data: matches = [], isLoading: isMatchLoading } = useAllMatchesByUser(

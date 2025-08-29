@@ -32,6 +32,9 @@ import {
 import { User as UserType } from "@/types/User/User";
 import ImagePickerDialog from "@/components/Image-Picker/Dialog";
 import { useAuth } from "@/context/AuthProvider";
+import { TrophyList, TrophyHistoryModal } from "@/components/Trophy";
+import { useUserTrophies, useUserTrophyCount } from "@/hooks/Trophy";
+import { useTournamentsByUser } from "@/hooks/Tournament/useTournamentsByUser";
 
 interface Props {
   user: UserType;
@@ -40,6 +43,9 @@ interface Props {
 export default function PerfilPage({ user: usuario }: Props) {
   const { updateUserMutation, uploadPhotoMutation, changePasswordMutation } = useUserMutations();
   const { session } = useAuth();
+  const { data: userTrophies = [], isLoading: trophiesLoading } = useUserTrophies(usuario.id);
+  const { data: trophyCount = 0 } = useUserTrophyCount(usuario.id);
+  const { data: tournamentCount = 0 } = useTournamentsByUser(usuario.id);
 
   const [editData, setEditData] = useState({ ...usuario });
   const [passwordData, setPasswordData] = useState({
@@ -49,6 +55,7 @@ export default function PerfilPage({ user: usuario }: Props) {
   });
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [isTrophyModalOpen, setIsTrophyModalOpen] = useState(false);
 
   const handleSaveData = async () => {
     try {
@@ -432,17 +439,45 @@ export default function PerfilPage({ user: usuario }: Props) {
 
                 {/* Estadísticas rápidas */}
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="text-center p-4 bg-green-50 rounded-lg">
-                    <p className="text-2xl font-bold text-green-600">1</p>
-                    <p className="text-sm text-gray-600">Torneos</p>
+                  <div 
+                    className="text-center p-4 bg-yellow-50 rounded-lg cursor-pointer transition-all hover:bg-yellow-100 hover:shadow-md"
+                    onClick={() => setIsTrophyModalOpen(true)}
+                  >
+                    <p className="text-2xl font-bold text-yellow-600">{trophyCount}</p>
+                    <p className="text-sm text-gray-600">Trofeos</p>
+                    <p className="text-xs text-yellow-600 mt-1 opacity-75">
+                      Click para ver historial
+                    </p>
                   </div>
                   <div className="text-center p-4 bg-blue-50 rounded-lg">
-                    <p className="text-2xl font-bold text-blue-600">2</p>
-                    <p className="text-sm text-gray-600">Victorias</p>
+                    <p className="text-2xl font-bold text-blue-600">{tournamentCount}</p>
+                    <p className="text-sm text-gray-600">Torneos Jugados</p>
                   </div>
                 </div>
               </div>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Sección de Trofeos */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Trophy className="w-5 h-5 text-yellow-600" />
+              Mis Trofeos
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {trophiesLoading ? (
+              <div className="flex justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-yellow-600"></div>
+              </div>
+            ) : (
+              <TrophyList 
+                trophies={userTrophies} 
+                showStats={true}
+              />
+            )}
           </CardContent>
         </Card>
 
@@ -477,6 +512,14 @@ export default function PerfilPage({ user: usuario }: Props) {
             </div>
           </CardContent>
         </Card> */}
+      
+      {/* Modal de historial de trofeos */}
+      <TrophyHistoryModal
+        open={isTrophyModalOpen}
+        onOpenChange={setIsTrophyModalOpen}
+        userId={usuario.id}
+        userName={`${usuario.name} ${usuario.lastname}`}
+      />
       </div>
     </div>
   );

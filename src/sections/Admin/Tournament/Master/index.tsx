@@ -10,6 +10,9 @@ import { isGroupStageFixturesCreated } from "@/api/Fixture/is-group-stage-fixtur
 import { useQuery } from "@tanstack/react-query";
 import Loading from "@/components/Loading/loading";
 import PlayOffCategoriesCard from "../Fixture/playoff-card";
+import { RelatedTournamentsCard, LinkTournamentDialog } from "@/components/Tournament";
+import { useTournaments } from "@/hooks/Tournament/useTournaments";
+import { TournamentType } from "@/common/enums/tournament.enum";
 function MasterTournamentDetail({
   tournament,
   categories: initialCategories,
@@ -21,6 +24,14 @@ function MasterTournamentDetail({
   const [categories, setCategories] = useState<TournamentCategory[]>(
     initialCategories || []
   );
+  const [isLinkDialogOpen, setIsLinkDialogOpen] = useState(false);
+  
+  // Get Liga tournaments for linking
+  const { tournaments: allTournaments } = useTournaments();
+  const ligaTournaments = allTournaments?.filter(t => 
+    t.tournamentType === TournamentType.League && 
+    t.id !== tournament.id
+  ) || [];
 
   // Crear función wrapper para el mutation
   const createCategoryForTournament = async (idTournament: number, idCategory: number[]): Promise<TournamentCategory[]> => {
@@ -82,6 +93,14 @@ function MasterTournamentDetail({
       <h1 className="text-2xl font-bold mb-4 text-lime-800">
         {tournament.name} - Configuración
       </h1>
+      
+      {/* Sección de vinculación */}
+      <div className="mb-6">
+        <RelatedTournamentsCard
+          tournament={tournament}
+          onLinkClick={() => setIsLinkDialogOpen(true)}
+        />
+      </div>
       <h1 className="text-lg font-bold m-4 text-orange-700">
         Categorías Inscriptas
       </h1>
@@ -131,6 +150,14 @@ function MasterTournamentDetail({
       <div className="gap-4">
         <PlayersTournamentTable idTournament={tournament.id} />
       </div>
+      
+      {/* Dialog de vinculación */}
+      <LinkTournamentDialog
+        open={isLinkDialogOpen}
+        onOpenChange={setIsLinkDialogOpen}
+        masterTournament={tournament}
+        ligaTournaments={ligaTournaments}
+      />
     </div>
   );
 }

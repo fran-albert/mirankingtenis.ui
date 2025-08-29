@@ -141,6 +141,8 @@ function TournamentPlayerPage() {
         category={categoryName}
         initialPosition={historyRanking[0]?.position || 0}
         bestPosition={bestPosition}
+        userId={idUser}
+        userName={`${user.name} ${user.lastname}`}
       />
     </div>
   );

@@ -78,6 +78,8 @@ export function PlayerComponent({
           <MatchStatistics
             matchSummary={matchSummary}
             setSummary={setSummary}
+            userId={player.id}
+            userName={`${player.name} ${player.lastname}`}
           />
         </section>
         {/* <section className="mt-8">

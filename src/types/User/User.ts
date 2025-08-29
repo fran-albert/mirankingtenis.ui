@@ -3,6 +3,7 @@ import { HistoryRanking } from "@/types/History-Ranking/HistoryRanking";
 import { State } from "../State/State";
 import { City } from "../City/City";
 import { Ranking } from "../Ranking/Ranking";
+import { Trophy } from "../Trophy/Trophy";
 
 export interface User {
     id: number;
@@ -34,4 +35,5 @@ export interface User {
     idPlayer: number;
     user2name: string;
     user1name: string;
+    trophies?: Trophy[];
 }
