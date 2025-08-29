@@ -1,0 +1,242 @@
+/* Tennis Assistant Custom Styles */
+
+/* Smooth slide-in animations for messages */
+@keyframes slideInFromBottom {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Floating animation for the chat button */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Tennis ball bounce animation */
+@keyframes ballBounce {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-5px) rotate(90deg);
+  }
+  50% {
+    transform: translateY(0) rotate(180deg);
+  }
+  75% {
+    transform: translateY(5px) rotate(270deg);
+  }
+}
+
+/* Pulse animation for connection indicator */
+@keyframes connectionPulse {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Typing indicator animation */
+@keyframes typing {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.6;
+  }
+  30% {
+    transform: translateY(-10px);
+    opacity: 1;
+  }
+}
+
+/* Gradient animation for tennis theme */
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Message slide-in classes */
+.messageSlideIn {
+  animation: slideInFromBottom 0.3s ease-out forwards;
+}
+
+/* Floating button */
+.floatingButton {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Tennis ball pattern */
+.tennisBallPattern {
+  background-image: 
+    radial-gradient(circle at 30% 30%, white 2px, transparent 2px),
+    radial-gradient(circle at 70% 30%, white 2px, transparent 2px),
+    radial-gradient(circle at 50% 70%, white 2px, transparent 2px);
+}
+
+/* Connection indicator animations */
+.connectionIndicator.connected {
+  animation: connectionPulse 2s ease-in-out infinite;
+}
+
+/* Typing indicator dots */
+.typingDot {
+  animation: typing 1.4s ease-in-out infinite;
+}
+
+.typingDot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typingDot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+/* Gradient background animation */
+.gradientBackground {
+  background: linear-gradient(-45deg, #059669, #0ea5e9, #10b981, #3b82f6);
+  background-size: 400% 400%;
+  animation: gradientShift 8s ease infinite;
+}
+
+/* Message hover effects */
+.messageHover {
+  transition: all 0.2s ease;
+}
+
+.messageHover:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Tennis court lines pattern */
+.tennisCourtPattern {
+  position: relative;
+  overflow: hidden;
+}
+
+.tennisCourtPattern::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 20px,
+      rgba(255, 255, 255, 0.1) 20px,
+      rgba(255, 255, 255, 0.1) 22px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 40px,
+      rgba(255, 255, 255, 0.1) 40px,
+      rgba(255, 255, 255, 0.1) 42px
+    );
+  pointer-events: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .chatContainer {
+    width: calc(100vw - 1rem);
+    height: calc(100vh - 4rem);
+    max-width: none;
+    margin: 0.5rem;
+  }
+  
+  .floatingButton {
+    bottom: 0.5rem;
+    right: 0.5rem;
+    animation: float 3s ease-in-out infinite;
+  }
+  
+  /* Reduce animation intensity on mobile */
+  .floatingButton {
+    animation-duration: 4s;
+  }
+  
+  .messageHover:hover {
+    transform: translateY(-0.5px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Smaller typing animation on mobile */
+  .typingDot {
+    animation: typing 1.2s ease-in-out infinite;
+  }
+  
+  /* Optimize floating animation for mobile */
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-6px);
+    }
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .messageUser {
+    background: #000;
+    color: #fff;
+    border: 2px solid #fff;
+  }
+  
+  .messageAssistant {
+    background: #fff;
+    color: #000;
+    border: 2px solid #000;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .messageSlideIn,
+  .floatingButton,
+  .connectionIndicator.connected,
+  .gradientBackground {
+    animation: none;
+  }
+  
+  .messageHover:hover {
+    transform: none;
+  }
+}
+
+/* Focus styles for accessibility */
+.assistantButton:focus,
+.messageInput:focus,
+.controlButton:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
