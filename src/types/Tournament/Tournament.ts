@@ -1,5 +1,6 @@
 import { TournamentStatus } from "@/common/enum/tournamentStatus.enum";
 import { TournamentSeason } from "@/common/enum/tournamentSeason.enum";
+import { TournamentType } from "@/common/enum/tournament.enum";
 
 export interface TournamentConfiguration {
     id: number;
@@ -22,6 +23,7 @@ export interface Tournament {
     parentTournament?: Tournament;
     childTournaments?: Tournament[];
     configuration?: TournamentConfiguration;
+    tournamentType: TournamentType
 }
 
 export interface LinkTournamentRequest {
@@ -30,5 +32,5 @@ export interface LinkTournamentRequest {
 
 export interface RelatedTournamentsResponse {
     parent?: Tournament;
-    children: Tournament[];
+    relatedTournament: Tournament;
 }

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Link, ExternalLink } from 'lucide-react';
 import { useRelatedTournaments } from '@/hooks/Tournament/useLinkTournament';
 import { Tournament } from '@/types/Tournament/Tournament';
-import { TournamentType } from '@/common/enums/tournament.enum';
+import { TournamentType } from '@/common/enum/tournament.enum';
 
 interface RelatedTournamentsCardProps {
   tournament: Tournament;

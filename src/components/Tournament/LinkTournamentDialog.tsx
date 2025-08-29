@@ -65,9 +65,6 @@ export const LinkTournamentDialog: React.FC<LinkTournamentDialogProps> = ({
             </Label>
             <div className="mt-1 p-2 bg-gray-50 rounded-md">
               <span className="font-medium">{masterTournament.name}</span>
-              <span className="text-sm text-gray-600 ml-2">
-                ({masterTournament.tournamentCategory?.name})
-              </span>
             </div>
           </div>
 
@@ -84,9 +81,6 @@ export const LinkTournamentDialog: React.FC<LinkTournamentDialogProps> = ({
                   <SelectItem key={liga.id} value={liga.id.toString()}>
                     <div className="flex flex-col">
                       <span className="font-medium">{liga.name}</span>
-                      <span className="text-xs text-gray-500">
-                        {liga.tournamentCategory?.name}
-                      </span>
                     </div>
                   </SelectItem>
                 ))}

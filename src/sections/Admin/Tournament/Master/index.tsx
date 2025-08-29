@@ -11,8 +11,8 @@ import { useQuery } from "@tanstack/react-query";
 import Loading from "@/components/Loading/loading";
 import PlayOffCategoriesCard from "../Fixture/playoff-card";
 import { RelatedTournamentsCard, LinkTournamentDialog } from "@/components/Tournament";
-import { useTournaments } from "@/hooks/Tournament/useTournaments";
-import { TournamentType } from "@/common/enums/tournament.enum";
+import { useAllTournaments } from "@/hooks/Tournament/useTournaments";
+import { TournamentType } from "@/common/enum/tournament.enum";
 function MasterTournamentDetail({
   tournament,
   categories: initialCategories,
@@ -27,7 +27,7 @@ function MasterTournamentDetail({
   const [isLinkDialogOpen, setIsLinkDialogOpen] = useState(false);
   
   // Get Liga tournaments for linking
-  const { tournaments: allTournaments } = useTournaments();
+  const { tournaments: allTournaments } = useAllTournaments();
   const ligaTournaments = allTournaments?.filter(t => 
     t.tournamentType === TournamentType.League && 
     t.id !== tournament.id
