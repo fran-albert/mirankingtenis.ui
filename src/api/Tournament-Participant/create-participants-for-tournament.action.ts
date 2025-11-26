@@ -4,7 +4,7 @@ export async function createParticipantsForTournament(
     idTournament: number,
     idCategory: number,
     userIds: number[],
-    positionInitials: number[] | null,
+    positionInitials: (number | null)[] | null,
     directToPlayoffsFlags: boolean[]
 ): Promise<string> {
     try {

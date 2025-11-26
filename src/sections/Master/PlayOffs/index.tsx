@@ -1,12 +1,10 @@
 import React, { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { useQuarterFinals, useSemifinals, useFinals } from "@/hooks/PlayOff/usePlayOff";
+import { useRoundOf16, useQuarterFinals, useSemifinals, useFinals, usePlayoffStageStatus } from "@/hooks/PlayOff/usePlayOff";
 import { useQueryClient } from "@tanstack/react-query";
-import useRoles from "@/hooks/useRoles";
 import { useMatchStore } from "@/hooks/useMatchStore";
-import { Match } from "@/types/Match/Match";
 import UpdateMatchDialog from "@/sections/Matches/Update/dialog";
 import AddShiftDialog from "@/sections/Auth/Profile/Matches/NewShift/new-shift";
+import RoundOf16Card from "./RoundOf16/card";
 import QuarterFinalsCard from "./Quarters/card";
 import { GroupFixtureDto } from "@/common/types/group-fixture.dto";
 import SemiFinalCard from "./SemiFinal/card";
@@ -18,16 +16,41 @@ function PlayOffCards({
   idTournament: number;
   idCategory: number;
 }) {
-  // Usar React Query hooks
-  const { data: quarterFinals = [], isLoading: quarterFinalsLoading } = useQuarterFinals(idTournament, idCategory);
-  const { data: semiFinals = [], isLoading: semiFinalsLoading } = useSemifinals(idTournament, idCategory);
-  const { data: finals = [], isLoading: finalsLoading } = useFinals(idTournament, idCategory);
-  
-  const loading = quarterFinalsLoading || semiFinalsLoading || finalsLoading;
+  // Obtener estado del playoff para saber la ronda inicial
+  const { data: playoffStatus } = usePlayoffStageStatus(
+    idTournament,
+    idCategory,
+    !!idTournament && !!idCategory
+  );
+
+  // Usar React Query hooks con condiciones basadas en la ronda inicial
+  const { data: roundOf16 = [], isLoading: roundOf16Loading } = useRoundOf16(
+    idTournament,
+    idCategory,
+    playoffStatus?.startingRound === "RoundOf16"
+  );
+  const { data: quarterFinals = [], isLoading: quarterFinalsLoading } = useQuarterFinals(
+    idTournament,
+    idCategory,
+    playoffStatus?.exists || false
+  );
+  const { data: semiFinals = [], isLoading: semiFinalsLoading } = useSemifinals(
+    idTournament,
+    idCategory,
+    playoffStatus?.exists || false
+  );
+  const { data: finals = [], isLoading: finalsLoading } = useFinals(
+    idTournament,
+    idCategory,
+    playoffStatus?.exists || false
+  );
+
+  const loading = roundOf16Loading || quarterFinalsLoading || semiFinalsLoading || finalsLoading;
   const queryClient = useQueryClient();
-  
+
   // Función para refrescar todas las queries de playoffs
   const updateAllMatches = () => {
+    queryClient.invalidateQueries({ queryKey: ["round-of-16", idTournament, idCategory] });
     queryClient.invalidateQueries({ queryKey: ["quarter-finals", idTournament, idCategory] });
     queryClient.invalidateQueries({ queryKey: ["semifinals", idTournament, idCategory] });
     queryClient.invalidateQueries({ queryKey: ["finals", idTournament, idCategory] });
@@ -55,6 +78,13 @@ function PlayOffCards({
             Fase Final
           </h1>
         </div>
+        {playoffStatus?.startingRound === "RoundOf16" && roundOf16 && roundOf16.length > 0 && (
+          <RoundOf16Card
+            matches={roundOf16}
+            handleAddResult={handleAddResult}
+            handleAddShift={handleAddShift}
+          />
+        )}
         {quarterFinals && quarterFinals.length > 0 && (
           <QuarterFinalsCard
             matches={quarterFinals}

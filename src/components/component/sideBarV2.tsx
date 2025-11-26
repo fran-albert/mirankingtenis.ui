@@ -18,7 +18,7 @@ import {
   FaHeadset,
 } from "react-icons/fa";
 import { BiSolidCategory } from "react-icons/bi";
-import { FaCalendarAlt } from "react-icons/fa";
+import { FaCalendarAlt, FaCog } from "react-icons/fa";
 import { IoMdTennisball } from "react-icons/io";
 import { GiTrophyCup } from "react-icons/gi";
 
@@ -96,6 +96,15 @@ function SideBarV3() {
                       >
                         <GiTrophyCup size={25} color="#334155" />
                         <span className="ml-3">Torneos</span>
+                      </Link>
+                    </li>
+                    <li className="pl-5">
+                      <Link
+                        href="/admin/configuracion"
+                        className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-200 group cursor-pointer"
+                      >
+                        <FaCog size={25} color="#334155" />
+                        <span className="ml-3">Configuracion</span>
                       </Link>
                     </li>
                     {/* <li className="pl-5">

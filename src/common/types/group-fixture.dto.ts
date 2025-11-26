@@ -25,7 +25,7 @@ export interface GroupFixtureDto {
     tournamentCategoryId?: number;
     sets: Sets[];
     status: string;
-    match?: number
+    match?: number;
     isBye: boolean;
-
+    finalResult?: string;
 }

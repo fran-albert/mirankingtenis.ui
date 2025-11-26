@@ -20,31 +20,44 @@ export const getColumns = (totalRows: number): ColumnDef<Match>[] => {
     {
       accessorKey: "match",
       header: () => <div className="w-36 text-center">Partido</div>,
-      cell: ({ row }) => (
-        <div className="w-36 text-center">
-          {row.original.user1.name.charAt(0)}. {row.original.user1.lastname} vs {row.original.user2.name.charAt(0)}. {row.original.user2.lastname}
-        </div>
-      ),
+      cell: ({ row }) => {
+        const user1 = row.original.user1;
+        const user2 = row.original.user2;
+        const player1Name = user1 ? `${user1.name?.charAt(0) || "?"}. ${user1.lastname || "???"}` : "???";
+        const player2Name = user2 ? `${user2.name?.charAt(0) || "?"}. ${user2.lastname || "???"}` : "???";
+        return (
+          <div className="w-36 text-center">
+            {player1Name} vs {player2Name}
+          </div>
+        );
+      },
     },
     {
       accessorKey: "date",
       header: () => <div className="w-32 text-center">Fecha</div>,
       cell: ({ row }) => (
         <div className="w-32 h-20 text-center">
-          {formatDateComplete(row.original.shift.startHour)}
+          {row.original.shift?.startHour
+            ? formatDateComplete(row.original.shift.startHour)
+            : "Sin fecha"}
         </div>
       ),
     },
     {
       accessorKey: "court",
       header: () => <div className="w-10 text-center">Cancha</div>,
-      cell: ({ row }) => (
-        <div className="w-10 text-center">
-          {typeof row.original.shift.court === "string"
-            ? row.original.shift.court
-            : row.original.shift.court.name}
-        </div>
-      ),
+      cell: ({ row }) => {
+        const court = row.original.shift?.court;
+        let courtName = "Sin cancha";
+        if (court) {
+          courtName = typeof court === "string" ? court : (court.name || "Sin cancha");
+        }
+        return (
+          <div className="w-10 text-center">
+            {courtName}
+          </div>
+        );
+      },
     },
     {
       accessorKey: "status",
