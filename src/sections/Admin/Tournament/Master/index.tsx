@@ -13,6 +13,8 @@ import PlayOffCategoriesCard from "../Fixture/playoff-card";
 import { RelatedTournamentsCard, LinkTournamentDialog } from "@/components/Tournament";
 import { useAllTournaments } from "@/hooks/Tournament/useTournaments";
 import { TournamentType } from "@/common/enum/tournament.enum";
+import DirectPlayoffCard from "../Fixture/direct-playoff-card";
+import DirectPlayoffRegistration from "../Players/DirectPlayoffRegistration";
 function MasterTournamentDetail({
   tournament,
   categories: initialCategories,
@@ -34,8 +36,18 @@ function MasterTournamentDetail({
   ) || [];
 
   // Crear función wrapper para el mutation
-  const createCategoryForTournament = async (idTournament: number, idCategory: number[]): Promise<TournamentCategory[]> => {
-    return await createCategoryForTournamentMutation.mutateAsync({ idTournament, idCategory });
+  const createCategoryForTournament = async (
+    idTournament: number,
+    idCategory: number[],
+    skipGroupStage?: boolean,
+    startingPlayoffRound?: any
+  ): Promise<TournamentCategory[]> => {
+    return await createCategoryForTournamentMutation.mutateAsync({
+      idTournament,
+      idCategory,
+      skipGroupStage,
+      startingPlayoffRound
+    });
   };
   const [manualFixturesCreated, setManualFixturesCreated] = useState<{
     [key: number]: boolean;
@@ -117,24 +129,53 @@ function MasterTournamentDetail({
               existingCategories={existingCategoryIds}
               createCategoryForTournament={createCategoryForTournament}
               onClose={handleCategoryAdded}
+              isMasterTournament={true}
             />
           </div>
         )}
       </div>
 
-      <h1 className="text-lg font-bold m-4 text-orange-700">Fase de Grupos</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {categories.map((category) =>
-          !finalFixturesCreated[category.id] ? (
-            <MasterCategoriesCard
-              key={category.id}
-              onFixtureCreated={handleFixtureCreated}
-              idTournament={tournament.id}
-              category={category}
-            />
-          ) : null
-        )}
-      </div>
+      {/* Sección de categorías con playoff directo */}
+      {categories.some(cat => cat.skipGroupStage) && (
+        <>
+          <h1 className="text-lg font-bold m-4 text-orange-700">
+            Categorías - Directo a Playoffs
+          </h1>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 m-4">
+            {categories
+              .filter(category => category.skipGroupStage)
+              .map((category) => (
+                <DirectPlayoffCard
+                  key={category.id}
+                  category={category}
+                  idTournament={tournament.id}
+                  onBracketCreated={handleFixtureCreated}
+                />
+              ))}
+          </div>
+        </>
+      )}
+
+      {/* Sección de categorías con fase de grupos */}
+      {categories.some(cat => !cat.skipGroupStage && !finalFixturesCreated[cat.id]) && (
+        <>
+          <h1 className="text-lg font-bold m-4 text-orange-700">Fase de Grupos</h1>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 m-4">
+            {categories
+              .filter(category => !category.skipGroupStage)
+              .map((category) =>
+                !finalFixturesCreated[category.id] ? (
+                  <MasterCategoriesCard
+                    key={category.id}
+                    onFixtureCreated={handleFixtureCreated}
+                    idTournament={tournament.id}
+                    category={category}
+                  />
+                ) : null
+              )}
+          </div>
+        </>
+      )}
       {/* <h1 className="text-lg font-bold m-4 text-orange-700">PlayOffs</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {categories.map((category) => (
@@ -146,9 +187,34 @@ function MasterTournamentDetail({
           />
         ))}
       </div> */}
-      <h1 className="text-lg font-bold m-4 text-orange-700">Jugadores</h1>
-      <div className="gap-4">
-        <PlayersTournamentTable idTournament={tournament.id} />
+
+      {/* Inscripción rápida para playoffs directos */}
+      {categories.some(cat => cat.skipGroupStage) && (
+        <>
+          <h1 className="text-lg font-bold m-4 text-orange-700">
+            Inscripción Rápida - Playoffs Directos
+          </h1>
+          <div className="m-4 mb-8">
+            <div className="bg-gradient-to-r from-purple-50 to-blue-50 border-2 border-purple-200 rounded-lg p-4 mb-4">
+              <h3 className="font-semibold text-purple-900 mb-2">📋 Instrucciones para Inscripción</h3>
+              <ol className="text-sm text-purple-800 space-y-1 list-decimal list-inside">
+                <li>Selecciona la categoría (solo aparecen las que van directo a playoffs)</li>
+                <li>Marca exactamente el número requerido de jugadores según la ronda inicial</li>
+                <li>Opcionalmente asigna posiciones para el seeding del bracket</li>
+                <li>Una vez inscritos, ve a la sección &quot;Categorías - Directo a Playoffs&quot; arriba para crear el bracket</li>
+              </ol>
+            </div>
+            <DirectPlayoffRegistration
+              tournamentId={tournament.id}
+              categories={categories}
+            />
+          </div>
+        </>
+      )}
+
+      <h1 className="text-lg font-bold m-4 text-orange-700">Jugadores Inscritos</h1>
+      <div className="gap-4 m-4">
+        <PlayersTournamentTable idTournament={tournament.id} categories={categories} />
       </div>
       
       {/* Dialog de vinculación */}

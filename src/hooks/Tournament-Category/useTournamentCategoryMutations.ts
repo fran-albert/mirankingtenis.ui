@@ -1,12 +1,23 @@
 import { createCategoryForTournament } from "@/api/Tournament-Category/create-category-for-tournament";
+import { PlayoffRound } from "@/types/Tournament-Category/TournamentCategory";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export const useTournamentCategoryMutations = () => {
   const queryClient = useQueryClient();
 
   const createCategoryForTournamentMutation = useMutation({
-    mutationFn: ({ idTournament, idCategory }: { idTournament: number; idCategory: number[] }) => 
-      createCategoryForTournament(idTournament, idCategory),
+    mutationFn: ({
+      idTournament,
+      idCategory,
+      skipGroupStage,
+      startingPlayoffRound
+    }: {
+      idTournament: number;
+      idCategory: number[];
+      skipGroupStage?: boolean;
+      startingPlayoffRound?: PlayoffRound;
+    }) =>
+      createCategoryForTournament(idTournament, idCategory, skipGroupStage, startingPlayoffRound),
     onSuccess: (result, { idTournament, idCategory }, context) => {
       // Invalidar queries relacionadas
       queryClient.invalidateQueries({ queryKey: ['categories', 'tournament', idTournament] });
@@ -19,7 +30,7 @@ export const useTournamentCategoryMutations = () => {
     },
   });
 
-  return { 
+  return {
     createCategoryForTournamentMutation
   };
 };

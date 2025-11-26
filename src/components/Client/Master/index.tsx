@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import Loading from "@/components/Loading/loading";
 import { GroupStage } from "@/sections/Master/Group/group-stage";
 import PlayOffCards from "@/sections/Master/PlayOffs";
@@ -8,12 +8,25 @@ import { FixtureGroupStage } from "@/sections/Master/Fixture";
 import { useGroupsByStage, useGroupRankings } from "@/hooks/Group/useGroup";
 import { useGroupsStageByTournamentCategory } from "@/hooks/Group-Stage/useGroupStage";
 import { useMatchesByGroupStage } from "@/hooks/Matches/useMatches";
+import { useCategoriesForTournament } from "@/hooks/Tournament-Category/useTournamentCategories";
 
 function ClientMasterComponent() {
   const [selectedCategory, setSelectedCategory] = useState("1");
   const [selectedTournament, setSelectedTournament] = useState("2");
 
-  // Hook para obtener el groupStageId
+  // Obtener categorías del torneo para verificar skipGroupStage
+  const { categories = [], isLoading: categoriesLoading } = useCategoriesForTournament({
+    idTournament: Number(selectedTournament),
+  });
+
+  // Verificar si la categoría seleccionada tiene skipGroupStage
+  const selectedCategoryInfo = useMemo(() => {
+    return categories.find(c => c.id === Number(selectedCategory));
+  }, [categories, selectedCategory]);
+
+  const isDirectPlayoff = selectedCategoryInfo?.skipGroupStage === true;
+
+  // Hook para obtener el groupStageId (solo si no es playoff directo)
   const { groups: groupStageData, isLoading: groupStageLoading } =
     useGroupsStageByTournamentCategory(
       Number(selectedTournament),
@@ -22,24 +35,28 @@ function ClientMasterComponent() {
 
   const groupStageId = groupStageData as unknown as number;
 
-  // Hooks para obtener grupos y rankings
+  // Hooks para obtener grupos y rankings (solo si no es playoff directo)
   const { groups, isLoading: groupsLoading } = useGroupsByStage(
     groupStageId,
-    !!groupStageId
+    !!groupStageId && !isDirectPlayoff
   );
 
   const { rankings: groupRankings, isLoading: rankingsLoading } =
-    useGroupRankings(groupStageId, !!groupStageId);
+    useGroupRankings(groupStageId, !!groupStageId && !isDirectPlayoff);
 
-  // Hook para obtener matches por groupStage
-  const { data: groupFixture = [], isLoading: matchesLoading, refetch: refetchMatches } = useMatchesByGroupStage(groupStageId, !!groupStageId);
+  // Hook para obtener matches por groupStage (solo si no es playoff directo)
+  const { data: groupFixture = [], isLoading: matchesLoading, refetch: refetchMatches } = useMatchesByGroupStage(
+    groupStageId,
+    !!groupStageId && !isDirectPlayoff
+  );
 
   const updateMatches = async () => {
     await refetchMatches();
   };
 
-  const loading =
-    groupStageLoading || groupsLoading || rankingsLoading || matchesLoading;
+  const loading = categoriesLoading || (
+    !isDirectPlayoff && (groupStageLoading || groupsLoading || rankingsLoading || matchesLoading)
+  );
 
   if (loading) {
     return <Loading isLoading={true} />;
@@ -56,19 +73,32 @@ function ClientMasterComponent() {
       {/* <TournamentPlayers /> */}
       <div className="flex justify-center w-full px-4 lg:px-0 mt-10">
         <div className="w-full max-w-7xl space-y-6">
-          <div>
-            <GroupStage groupRankings={groupRankings} />
-            <FixtureGroupStage
-              groupFixture={groupFixture}
-              updateMatches={updateMatches}
-            />
-          </div>
-          <div>
-            <PlayOffCards
-              idTournament={2}
-              idCategory={Number(selectedCategory)}
-            />
-          </div>
+          {isDirectPlayoff ? (
+            // Mostrar solo bracket de playoffs para torneos directos
+            <div>
+              <PlayOffCards
+                idTournament={Number(selectedTournament)}
+                idCategory={Number(selectedCategory)}
+              />
+            </div>
+          ) : (
+            // Mostrar fase de grupos + playoffs para torneos normales
+            <>
+              <div>
+                <GroupStage groupRankings={groupRankings} />
+                <FixtureGroupStage
+                  groupFixture={groupFixture}
+                  updateMatches={updateMatches}
+                />
+              </div>
+              <div>
+                <PlayOffCards
+                  idTournament={Number(selectedTournament)}
+                  idCategory={Number(selectedCategory)}
+                />
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>

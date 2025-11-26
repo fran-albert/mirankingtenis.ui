@@ -30,7 +30,7 @@ export const RelatedTournamentsCard: React.FC<RelatedTournamentsCardProps> = ({
     );
   }
 
-  const isMaster = tournament.tournamentType === TournamentType.Master;
+  const isMaster = tournament.type === 'master';
   const relatedTournament = relatedData?.relatedTournament;
   const hasRelated = !!relatedTournament;
 
@@ -84,16 +84,35 @@ export const RelatedTournamentsCard: React.FC<RelatedTournamentsCardProps> = ({
               </div>
             </div>
           ) : (
-            <div className="p-3 bg-gray-50 border border-gray-200 rounded-md">
-              <div className="text-sm text-gray-600 text-center">
-                Sin {isMaster ? 'Liga' : 'Master'} vinculado
+            <div className="space-y-2">
+              <div className="p-3 bg-gray-50 border border-gray-200 rounded-md">
+                <div className="text-sm text-gray-600 text-center">
+                  Sin {isMaster ? 'Liga' : 'Master'} vinculado
+                </div>
               </div>
+              {isMaster && (
+                <div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
+                  <div className="text-sm text-blue-900">
+                    <strong>¿Para qué vincular a una Liga?</strong>
+                    <p className="mt-1 text-xs">
+                      Al vincular este Master a una Liga, los jugadores inscritos heredarán
+                      automáticamente su posición final del torneo Liga vinculado. Esto es útil
+                      para Masters que son &quot;Finales de Temporada&quot; o que usan el ranking de una
+                      Liga anterior para determinar el seeding de playoffs.
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
           {hasRelated && (
-            <div className="text-xs text-gray-500">
-              Los trofeos del Master se asociarán con la Liga vinculada
+            <div className="p-2 bg-green-50 border border-green-200 rounded-md">
+              <div className="text-xs text-green-900">
+                <strong>Vinculación activa:</strong> Los jugadores inscritos heredarán su posición
+                del torneo {isMaster ? 'Liga' : 'Master'} vinculado. Los trofeos del Master se
+                asociarán con la Liga vinculada.
+              </div>
             </div>
           )}
         </div>

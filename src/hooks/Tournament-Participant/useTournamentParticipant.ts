@@ -92,7 +92,7 @@ export function useCreateParticipantsForTournament() {
       idTournament: number;
       idCategory: number;
       userIds: number[];
-      positionInitials: number[] | null;
+      positionInitials: (number | null)[] | null;
       directToPlayoffsFlags: boolean[];
     }) => createParticipantsForTournament(
       params.idTournament,
