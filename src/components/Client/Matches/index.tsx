@@ -3,18 +3,23 @@ import React, { useEffect, useState } from "react";
 import { useFixtureCountByTournamentCategory } from "@/hooks/Fixture/useFixtures";
 import { useTournamentCategoryId } from "@/hooks/Tournament-Category/useTournamentCategory";
 import FiltersMatches from "@/sections/Matches/Filters";
-import { useLastFinishedLeagueTournament } from "@/hooks/Tournament/useTournament";
 import { TennisScoreboard } from "@/sections/Matches/TennisScoreBoard/tennisScoreBoard";
+import { useDefaultTournaments } from "@/hooks/AppConfig/useDefaultTournaments";
 
 function ClientMatchesComponent() {
   const [selectedJornada, setSelectedJornada] = useState("1");
   const [selectedCategory, setSelectedCategory] = useState("1");
-  const initialTournamentId =
-    process.env.NODE_ENV === "production" ? "7" : "45";
-  const [selectedTournament, setSelectedTournament] =
-    useState(initialTournamentId);
-  // Usar React Query hooks
-  const { tournament: lastTournament } = useLastFinishedLeagueTournament({ enabled: true });
+  const [selectedTournament, setSelectedTournament] = useState("");
+
+  // Obtener torneo por defecto desde la configuración
+  const { defaults, isLoading: isLoadingDefaults } = useDefaultTournaments();
+
+  // Setear el torneo por defecto cuando se carga la configuración
+  useEffect(() => {
+    if (defaults?.defaultLeagueTournament && !selectedTournament) {
+      setSelectedTournament(String(defaults.defaultLeagueTournament));
+    }
+  }, [defaults, selectedTournament]);
   
   const { tournamentCategoryId } = useTournamentCategoryId({
     idTournament: Number(selectedTournament),
@@ -42,12 +47,6 @@ function ClientMatchesComponent() {
     }
     return null;
   }, [isErrorFixtures, selectedCategory, selectedTournament, numeroDeJornadas]);
-
-  useEffect(() => {
-    if (lastTournament && !selectedTournament) {
-      setSelectedTournament(String(lastTournament.id));
-    }
-  }, [lastTournament, selectedTournament]);
 
   // Reset jornada when category or tournament changes
   useEffect(() => {

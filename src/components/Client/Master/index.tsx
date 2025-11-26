@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import Loading from "@/components/Loading/loading";
 import { GroupStage } from "@/sections/Master/Group/group-stage";
 import PlayOffCards from "@/sections/Master/PlayOffs";
@@ -9,10 +9,21 @@ import { useGroupsByStage, useGroupRankings } from "@/hooks/Group/useGroup";
 import { useGroupsStageByTournamentCategory } from "@/hooks/Group-Stage/useGroupStage";
 import { useMatchesByGroupStage } from "@/hooks/Matches/useMatches";
 import { useCategoriesForTournament } from "@/hooks/Tournament-Category/useTournamentCategories";
+import { useDefaultTournaments } from "@/hooks/AppConfig/useDefaultTournaments";
 
 function ClientMasterComponent() {
   const [selectedCategory, setSelectedCategory] = useState("1");
-  const [selectedTournament, setSelectedTournament] = useState("2");
+  const [selectedTournament, setSelectedTournament] = useState("");
+
+  // Obtener torneo por defecto desde la configuración
+  const { defaults, isLoading: isLoadingDefaults } = useDefaultTournaments();
+
+  // Setear el torneo por defecto cuando se carga la configuración
+  useEffect(() => {
+    if (defaults?.defaultMasterTournament && !selectedTournament) {
+      setSelectedTournament(String(defaults.defaultMasterTournament));
+    }
+  }, [defaults, selectedTournament]);
 
   // Obtener categorías del torneo para verificar skipGroupStage
   const { categories = [], isLoading: categoriesLoading } = useCategoriesForTournament({
@@ -54,7 +65,7 @@ function ClientMasterComponent() {
     await refetchMatches();
   };
 
-  const loading = categoriesLoading || (
+  const loading = isLoadingDefaults || !selectedTournament || categoriesLoading || (
     !isDirectPlayoff && (groupStageLoading || groupsLoading || rankingsLoading || matchesLoading)
   );
 
