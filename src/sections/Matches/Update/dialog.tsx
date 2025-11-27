@@ -111,14 +111,18 @@ export default function UpdateMatchDialog({
                   htmlFor="player1"
                   className="col-span-2 text-right text-black"
                 >
-                  {match.user1?.toString()}
+                  {typeof match.user1 === 'object' && match.user1 !== null
+                    ? `${match.user1.name} ${match.user1.lastname}`
+                    : match.user1}
                 </Label>
                 <div className="col-span-1" />
                 <Label
                   htmlFor="player2"
                   className="col-span-2 text-left text-black"
                 >
-                   {match.user2?.toString()}
+                  {typeof match.user2 === 'object' && match.user2 !== null
+                    ? `${match.user2.name} ${match.user2.lastname}`
+                    : match.user2}
                 </Label>
               </div>
               <div className="grid grid-cols-5 gap-4 items-center">
@@ -214,7 +218,13 @@ export default function UpdateMatchDialog({
                 <div className="mt-2">
                   <p className="text-md font-medium text-gray-800">
                     <span className="font-normal">
-                      {match.user1.toString()} vs {match.user2.toString()}
+                      {typeof match.user1 === 'object' && match.user1 !== null
+                        ? `${match.user1.name} ${match.user1.lastname}`
+                        : match.user1}{' '}
+                      vs{' '}
+                      {typeof match.user2 === 'object' && match.user2 !== null
+                        ? `${match.user2.name} ${match.user2.lastname}`
+                        : match.user2}
                     </span>
                   </p>
                   <ul className="mt-2 space-y-1">
