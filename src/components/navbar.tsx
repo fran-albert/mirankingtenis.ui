@@ -30,6 +30,7 @@ export default function Navbar() {
     { name: "Partidos", href: "/partidos", current: false },
     // { name: "Dobles Express", href: "/dobles-express", current: false },
     { name: "Turnos", href: "/turnos", current: false },
+    { name: "Torneo Dobles", href: "/torneo-dobles", current: false },
   ]);
 
   useEffect(() => {
@@ -41,6 +42,7 @@ export default function Navbar() {
       { name: "Partidos", href: "/partidos", current: false },
       // { name: "Dobles Express", href: "/dobles-express", current: false },
       { name: "Turnos", href: "/turnos", current: false },
+      { name: "Torneo Dobles", href: "/torneo-dobles", current: false },
     ];
 
     if (session) {
