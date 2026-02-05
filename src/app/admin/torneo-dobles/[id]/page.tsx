@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useMemo } from "react";
 import { useParams } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { useDoublesEvent } from "@/hooks/Doubles-Event/useDoublesEvents";
 import { useDoublesCategories } from "@/hooks/Doubles-Event/useDoublesCategories";
 import { useDoublesTeams } from "@/hooks/Doubles-Event/useDoublesTeams";
@@ -18,6 +19,7 @@ import {
   UpdateDoublesMatchResultRequest,
 } from "@/types/Doubles-Event/DoublesEvent";
 import { DoublesMatchPhase, DoublesMatchStatus, DoublesEventStatus } from "@/common/enum/doubles-event.enum";
+import { DOUBLES_SHIFTS, DOUBLES_VENUES, DOUBLES_ZONES, DOUBLES_PLAYOFF_ROUNDS, getPlayoffRoundLabel, buildDateTime } from "@/common/constants/doubles-event.constants";
 import Loading from "@/components/Loading/loading";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -73,9 +75,13 @@ export default function DoublesEventManagePage() {
         <div>
           <h1 className="text-2xl font-bold">{event.name}</h1>
           <p className="text-gray-500 text-sm">
-            {new Date(event.startDate).toLocaleDateString("es-AR")}
+            {new Date(event.startDate).toLocaleDateString("es-AR", {
+              timeZone: "America/Buenos_Aires",
+            })}
             {event.endDate &&
-              ` - ${new Date(event.endDate).toLocaleDateString("es-AR")}`}
+              ` - ${new Date(event.endDate).toLocaleDateString("es-AR", {
+                timeZone: "America/Buenos_Aires",
+              })}`}
           </p>
         </div>
         <StatusToggle eventId={eventId} status={event.status} mutations={mutations} />
@@ -122,6 +128,7 @@ export default function DoublesEventManagePage() {
             matches={matches}
             teams={teams}
             mutations={mutations}
+            eventDate={event.startDate}
           />
         </TabsContent>
 
@@ -249,6 +256,7 @@ function CategoriesTab({
   mutations: ReturnType<typeof useDoublesEventMutations>;
 }) {
   const [open, setOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<DoublesEventCategory | null>(null);
   const [form, setForm] = useState<CreateDoublesCategoryRequest>({
     name: "",
     gender: "male",
@@ -258,17 +266,50 @@ function CategoriesTab({
     pointsForNotPlayed: 0,
   });
 
-  const handleCreate = async () => {
+  const isEditing = !!editingCategory;
+
+  const resetForm = () => {
+    setForm({ name: "", gender: "male", level: "A", pointsForWin: 3, pointsForLoss: 1, pointsForNotPlayed: 0 });
+    setEditingCategory(null);
+  };
+
+  const handleOpenCreate = () => {
+    resetForm();
+    setOpen(true);
+  };
+
+  const handleOpenEdit = (category: DoublesEventCategory) => {
+    setEditingCategory(category);
+    setForm({
+      name: category.name,
+      gender: category.gender,
+      level: category.level,
+      pointsForWin: category.pointsForWin,
+      pointsForLoss: category.pointsForLoss,
+      pointsForNotPlayed: category.pointsForNotPlayed,
+    });
+    setOpen(true);
+  };
+
+  const handleSave = async () => {
     try {
-      await mutations.createCategoryMutation.mutateAsync({
-        eventId,
-        data: form,
-      });
-      toast.success("Categoría creada");
+      if (isEditing) {
+        await mutations.updateCategoryMutation.mutateAsync({
+          id: editingCategory.id,
+          data: form,
+        });
+        toast.success("Categoría actualizada");
+      } else {
+        await mutations.createCategoryMutation.mutateAsync({
+          eventId,
+          data: form,
+        });
+        toast.success("Categoría creada");
+      }
       setOpen(false);
-      setForm({ name: "", gender: "male", level: "A", pointsForWin: 3, pointsForLoss: 1, pointsForNotPlayed: 0 });
+      resetForm();
     } catch {
-      toast.error("Error al crear categoría");
+      toast.error(isEditing ? "Error al actualizar categoría" : "Error al crear categoría");
     }
   };
 
@@ -282,17 +323,24 @@ function CategoriesTab({
     }
   };
 
+  const handleOpenChange = (isOpen: boolean) => {
+    setOpen(isOpen);
+    if (!isOpen) {
+      resetForm();
+    }
+  };
+
   return (
     <div>
       <div className="flex justify-between mb-4">
         <h2 className="text-lg font-semibold">Categorías</h2>
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={open} onOpenChange={handleOpenChange}>
           <DialogTrigger asChild>
-            <Button size="sm">Crear Categoría</Button>
+            <Button size="sm" onClick={handleOpenCreate}>Crear Categoría</Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Nueva Categoría</DialogTitle>
+              <DialogTitle>{isEditing ? "Editar Categoría" : "Nueva Categoría"}</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
               <div>
@@ -371,8 +419,8 @@ function CategoriesTab({
                   />
                 </div>
               </div>
-              <Button onClick={handleCreate} disabled={!form.name} className="w-full">
-                Crear
+              <Button onClick={handleSave} disabled={!form.name} className="w-full">
+                {isEditing ? "Guardar Cambios" : "Crear"}
               </Button>
             </div>
           </DialogContent>
@@ -401,13 +449,22 @@ function CategoriesTab({
                 {cat.pointsForWin}/{cat.pointsForLoss}/{cat.pointsForNotPlayed}
               </TableCell>
               <TableCell>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => handleDelete(cat.id)}
-                >
-                  Eliminar
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleOpenEdit(cat)}
+                  >
+                    Editar
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => handleDelete(cat.id)}
+                  >
+                    Eliminar
+                  </Button>
+                </div>
               </TableCell>
             </TableRow>
           ))}
@@ -427,23 +484,54 @@ function TeamsTab({
   mutations: ReturnType<typeof useDoublesEventMutations>;
 }) {
   const [open, setOpen] = useState(false);
+  const [editingTeam, setEditingTeam] = useState<DoublesTeam | null>(null);
   const [form, setForm] = useState<CreateDoublesTeamRequest>({
     player1Name: "",
     player2Name: "",
     zoneName: "",
   });
 
-  const handleCreate = async () => {
+  const isEditing = !!editingTeam;
+
+  const resetForm = () => {
+    setForm({ player1Name: "", player2Name: "", zoneName: "" });
+    setEditingTeam(null);
+  };
+
+  const handleOpenCreate = () => {
+    resetForm();
+    setOpen(true);
+  };
+
+  const handleOpenEdit = (team: DoublesTeam) => {
+    setEditingTeam(team);
+    setForm({
+      player1Name: team.player1Name,
+      player2Name: team.player2Name,
+      zoneName: team.zoneName || "",
+    });
+    setOpen(true);
+  };
+
+  const handleSave = async () => {
     try {
-      await mutations.createTeamMutation.mutateAsync({
-        categoryId,
-        data: form,
-      });
-      toast.success("Equipo creado");
+      if (isEditing) {
+        await mutations.updateTeamMutation.mutateAsync({
+          id: editingTeam.id,
+          data: form,
+        });
+        toast.success("Equipo actualizado");
+      } else {
+        await mutations.createTeamMutation.mutateAsync({
+          categoryId,
+          data: form,
+        });
+        toast.success("Equipo creado");
+      }
       setOpen(false);
-      setForm({ player1Name: "", player2Name: "", zoneName: "" });
+      resetForm();
     } catch {
-      toast.error("Error al crear equipo");
+      toast.error(isEditing ? "Error al actualizar equipo" : "Error al crear equipo");
     }
   };
 
@@ -454,6 +542,13 @@ function TeamsTab({
       toast.success("Equipo eliminado");
     } catch {
       toast.error("Error al eliminar");
+    }
+  };
+
+  const handleOpenChange = (isOpen: boolean) => {
+    setOpen(isOpen);
+    if (!isOpen) {
+      resetForm();
     }
   };
 
@@ -472,15 +567,15 @@ function TeamsTab({
     <div>
       <div className="flex justify-between mb-4">
         <h2 className="text-lg font-semibold">Equipos</h2>
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={open} onOpenChange={handleOpenChange}>
           <DialogTrigger asChild>
-            <Button size="sm" disabled={!categoryId}>
+            <Button size="sm" disabled={!categoryId} onClick={handleOpenCreate}>
               Crear Equipo
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Nuevo Equipo</DialogTitle>
+              <DialogTitle>{isEditing ? "Editar Equipo" : "Nuevo Equipo"}</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
               <div>
@@ -505,20 +600,28 @@ function TeamsTab({
               </div>
               <div>
                 <Label>Zona</Label>
-                <Input
+                <Select
                   value={form.zoneName || ""}
-                  onChange={(e) =>
-                    setForm({ ...form, zoneName: e.target.value })
-                  }
-                  placeholder="Zona 1"
-                />
+                  onValueChange={(v) => setForm({ ...form, zoneName: v })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Seleccionar zona" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {DOUBLES_ZONES.map((zone) => (
+                      <SelectItem key={zone.id} value={zone.name}>
+                        {zone.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <Button
-                onClick={handleCreate}
+                onClick={handleSave}
                 disabled={!form.player1Name || !form.player2Name}
                 className="w-full"
               >
-                Crear
+                {isEditing ? "Guardar Cambios" : "Crear"}
               </Button>
             </div>
           </DialogContent>
@@ -544,13 +647,22 @@ function TeamsTab({
                   <TableCell>{team.player1Name}</TableCell>
                   <TableCell>{team.player2Name}</TableCell>
                   <TableCell>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => handleDelete(team.id)}
-                    >
-                      Eliminar
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleOpenEdit(team)}
+                      >
+                        Editar
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleDelete(team.id)}
+                      >
+                        Eliminar
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
@@ -567,20 +679,24 @@ function MatchesTab({
   matches,
   teams,
   mutations,
+  eventDate,
 }: {
   categoryId: number;
   matches: DoublesMatch[];
   teams: DoublesTeam[];
   mutations: ReturnType<typeof useDoublesEventMutations>;
+  eventDate: string;
 }) {
   const [open, setOpen] = useState(false);
+  const [editingMatch, setEditingMatch] = useState<DoublesMatch | null>(null);
   const [phase, setPhase] = useState<DoublesMatchPhase>(DoublesMatchPhase.zone);
+  const [selectedVenueId, setSelectedVenueId] = useState<string>("");
   const [form, setForm] = useState<CreateDoublesMatchRequest>({
     team1Id: 0,
     phase: DoublesMatchPhase.zone,
     venue: "",
     courtName: "",
-    turnNumber: 1,
+    turnNumber: undefined,
     startTime: "",
     endTime: "",
     zoneName: "",
@@ -588,29 +704,111 @@ function MatchesTab({
     positionInBracket: undefined,
   });
 
+  const isEditing = !!editingMatch;
   const filteredMatches = matches.filter((m) => m.phase === phase);
 
-  const handleCreate = async () => {
-    try {
-      await mutations.createMatchMutation.mutateAsync({
-        categoryId,
-        data: { ...form, phase },
-      });
-      toast.success("Partido creado");
-      setOpen(false);
+  // Get courts for selected venue
+  const selectedVenue = DOUBLES_VENUES.find((v) => v.id === selectedVenueId);
+  const availableCourts = selectedVenue?.courts || [];
+
+  const resetForm = () => {
+    setForm({
+      team1Id: 0,
+      phase: DoublesMatchPhase.zone,
+      venue: "",
+      courtName: "",
+      turnNumber: undefined,
+      startTime: "",
+      endTime: "",
+      zoneName: "",
+      round: "",
+      positionInBracket: undefined,
+    });
+    setSelectedVenueId("");
+    setEditingMatch(null);
+  };
+
+  const handleOpenCreate = () => {
+    resetForm();
+    setOpen(true);
+  };
+
+  const handleOpenEdit = (match: DoublesMatch) => {
+    setEditingMatch(match);
+    // Find venue ID by name
+    const venue = DOUBLES_VENUES.find((v) => v.name === match.venue);
+    setSelectedVenueId(venue?.id || "");
+    setForm({
+      team1Id: match.team1?.id || 0,
+      team2Id: match.team2?.id,
+      phase: match.phase,
+      venue: match.venue || "",
+      courtName: match.courtName || "",
+      turnNumber: match.turnNumber || undefined,
+      startTime: match.startTime || "",
+      endTime: match.endTime || "",
+      zoneName: match.zoneName || "",
+      round: match.round || "",
+      positionInBracket: match.positionInBracket || undefined,
+    });
+    setOpen(true);
+  };
+
+  const handleTurnChange = (turnNumber: number) => {
+    const shift = DOUBLES_SHIFTS.find((s) => s.turnNumber === turnNumber);
+    if (shift) {
       setForm({
-        team1Id: 0,
-        phase: DoublesMatchPhase.zone,
-        venue: "",
-        courtName: "",
-        turnNumber: 1,
-        startTime: "",
-        endTime: "",
-        zoneName: "",
-        round: "",
+        ...form,
+        turnNumber,
+        startTime: buildDateTime(eventDate, shift.startTime),
+        endTime: buildDateTime(eventDate, shift.endTime),
       });
+    }
+  };
+
+  const handleVenueChange = (venueId: string) => {
+    const venue = DOUBLES_VENUES.find((v) => v.id === venueId);
+    setSelectedVenueId(venueId);
+    setForm({
+      ...form,
+      venue: venue?.name || "",
+      courtName: "", // Reset court when venue changes
+    });
+  };
+
+  const handleZoneChange = (zoneName: string) => {
+    setForm({
+      ...form,
+      zoneName,
+      team1Id: isEditing ? form.team1Id : 0, // Keep teams when editing
+      team2Id: isEditing ? form.team2Id : undefined,
+    });
+  };
+
+  // Filter teams by selected zone (only for zone phase)
+  const filteredTeams = phase === DoublesMatchPhase.zone && form.zoneName
+    ? teams.filter((t) => t.zoneName === form.zoneName)
+    : teams;
+
+  const handleSave = async () => {
+    try {
+      if (isEditing) {
+        await mutations.updateMatchMutation.mutateAsync({
+          id: editingMatch.id,
+          data: { ...form, phase },
+        });
+        toast.success("Partido actualizado");
+      } else {
+        await mutations.createMatchMutation.mutateAsync({
+          categoryId,
+          data: { ...form, phase },
+        });
+        toast.success("Partido creado");
+      }
+      setOpen(false);
+      resetForm();
     } catch {
-      toast.error("Error al crear partido");
+      toast.error(isEditing ? "Error al actualizar partido" : "Error al crear partido");
     }
   };
 
@@ -624,12 +822,25 @@ function MatchesTab({
     }
   };
 
+  const handleOpenChange = (isOpen: boolean) => {
+    setOpen(isOpen);
+    if (!isOpen) {
+      resetForm();
+    }
+  };
+
   const formatScore = (match: DoublesMatch) => {
     if (!match.sets || match.sets.length === 0) return "-";
     return match.sets
       .sort((a, b) => a.setNumber - b.setNumber)
       .map((s) => `${s.team1Score}-${s.team2Score}`)
       .join(" ");
+  };
+
+  const getShiftLabel = (turnNumber: number | null) => {
+    if (!turnNumber) return "";
+    const shift = DOUBLES_SHIFTS.find((s) => s.turnNumber === turnNumber);
+    return shift ? `${shift.startTime} - ${shift.endTime}` : "";
   };
 
   return (
@@ -651,19 +862,39 @@ function MatchesTab({
             Llaves
           </Button>
         </div>
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={open} onOpenChange={handleOpenChange}>
           <DialogTrigger asChild>
-            <Button size="sm" disabled={!categoryId}>
+            <Button size="sm" disabled={!categoryId} onClick={handleOpenCreate}>
               Crear Partido
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-lg">
             <DialogHeader>
               <DialogTitle>
-                Nuevo Partido - {phase === DoublesMatchPhase.zone ? "Zona" : "Llave"}
+                {isEditing ? "Editar Partido" : "Nuevo Partido"} - {phase === DoublesMatchPhase.zone ? "Zona" : "Llave"}
               </DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
+              {phase === DoublesMatchPhase.zone && (
+                <div>
+                  <Label>Zona</Label>
+                  <Select
+                    value={form.zoneName || ""}
+                    onValueChange={handleZoneChange}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccionar zona" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {DOUBLES_ZONES.map((zone) => (
+                        <SelectItem key={zone.id} value={zone.name}>
+                          {zone.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label>Equipo 1</Label>
@@ -672,16 +903,19 @@ function MatchesTab({
                     onValueChange={(v) =>
                       setForm({ ...form, team1Id: Number(v) })
                     }
+                    disabled={phase === DoublesMatchPhase.zone && !form.zoneName}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Seleccionar" />
+                      <SelectValue placeholder={phase === DoublesMatchPhase.zone && !form.zoneName ? "Seleccione zona primero" : "Seleccionar"} />
                     </SelectTrigger>
                     <SelectContent>
-                      {teams.map((t) => (
-                        <SelectItem key={t.id} value={String(t.id)}>
-                          {t.teamName}
-                        </SelectItem>
-                      ))}
+                      {filteredTeams
+                        .filter((t) => !form.team2Id || t.id !== form.team2Id)
+                        .map((t) => (
+                          <SelectItem key={t.id} value={String(t.id)}>
+                            {t.teamName}
+                          </SelectItem>
+                        ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -692,43 +926,42 @@ function MatchesTab({
                     onValueChange={(v) =>
                       setForm({ ...form, team2Id: Number(v) })
                     }
+                    disabled={phase === DoublesMatchPhase.zone && !form.zoneName}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Seleccionar" />
+                      <SelectValue placeholder={phase === DoublesMatchPhase.zone && !form.zoneName ? "Seleccione zona primero" : "Seleccionar"} />
                     </SelectTrigger>
                     <SelectContent>
-                      {teams.map((t) => (
-                        <SelectItem key={t.id} value={String(t.id)}>
-                          {t.teamName}
-                        </SelectItem>
-                      ))}
+                      {filteredTeams
+                        .filter((t) => !form.team1Id || t.id !== form.team1Id)
+                        .map((t) => (
+                          <SelectItem key={t.id} value={String(t.id)}>
+                            {t.teamName}
+                          </SelectItem>
+                        ))}
                     </SelectContent>
                   </Select>
                 </div>
               </div>
-              {phase === DoublesMatchPhase.zone && (
-                <div>
-                  <Label>Zona</Label>
-                  <Input
-                    value={form.zoneName || ""}
-                    onChange={(e) =>
-                      setForm({ ...form, zoneName: e.target.value })
-                    }
-                    placeholder="Zona 1"
-                  />
-                </div>
-              )}
               {phase === DoublesMatchPhase.playoff && (
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label>Ronda</Label>
-                    <Input
+                    <Select
                       value={form.round || ""}
-                      onChange={(e) =>
-                        setForm({ ...form, round: e.target.value })
-                      }
-                      placeholder="Semifinal"
-                    />
+                      onValueChange={(v) => setForm({ ...form, round: v })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Seleccionar ronda" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {DOUBLES_PLAYOFF_ROUNDS.map((round) => (
+                          <SelectItem key={round.id} value={round.value}>
+                            {round.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div>
                     <Label>Posición Bracket</Label>
@@ -745,66 +978,69 @@ function MatchesTab({
                   </div>
                 </div>
               )}
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <Label>Turno #</Label>
-                  <Input
-                    type="number"
-                    value={form.turnNumber || ""}
-                    onChange={(e) =>
-                      setForm({ ...form, turnNumber: Number(e.target.value) })
-                    }
-                  />
-                </div>
-                <div>
-                  <Label>Sede</Label>
-                  <Input
-                    value={form.venue || ""}
-                    onChange={(e) =>
-                      setForm({ ...form, venue: e.target.value })
-                    }
-                    placeholder="LA VILLA"
-                  />
-                </div>
-                <div>
-                  <Label>Cancha</Label>
-                  <Input
-                    value={form.courtName || ""}
-                    onChange={(e) =>
-                      setForm({ ...form, courtName: e.target.value })
-                    }
-                    placeholder="C1"
-                  />
-                </div>
+              <div>
+                <Label>Turno</Label>
+                <Select
+                  value={String(form.turnNumber || "")}
+                  onValueChange={(v) => handleTurnChange(Number(v))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Seleccionar turno" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {DOUBLES_SHIFTS.map((shift) => (
+                      <SelectItem key={shift.turnNumber} value={String(shift.turnNumber)}>
+                        {shift.label} ({shift.startTime} - {shift.endTime})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label>Hora Inicio</Label>
-                  <Input
-                    type="datetime-local"
-                    value={form.startTime || ""}
-                    onChange={(e) =>
-                      setForm({ ...form, startTime: e.target.value })
-                    }
-                  />
+                  <Label>Sede</Label>
+                  <Select
+                    value={selectedVenueId}
+                    onValueChange={handleVenueChange}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccionar sede" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {DOUBLES_VENUES.map((venue) => (
+                        <SelectItem key={venue.id} value={venue.id}>
+                          {venue.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
-                  <Label>Hora Fin</Label>
-                  <Input
-                    type="datetime-local"
-                    value={form.endTime || ""}
-                    onChange={(e) =>
-                      setForm({ ...form, endTime: e.target.value })
-                    }
-                  />
+                  <Label>Cancha</Label>
+                  <Select
+                    value={form.courtName || ""}
+                    onValueChange={(v) => setForm({ ...form, courtName: v })}
+                    disabled={!selectedVenueId}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccionar cancha" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableCourts.map((court) => (
+                        <SelectItem key={court} value={court}>
+                          {court}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
               <Button
-                onClick={handleCreate}
+                onClick={handleSave}
                 disabled={!form.team1Id}
                 className="w-full"
               >
-                Crear Partido
+                {isEditing ? "Guardar Cambios" : "Crear Partido"}
               </Button>
             </div>
           </DialogContent>
@@ -830,9 +1066,14 @@ function MatchesTab({
               <TableCell>{match.team1?.teamName}</TableCell>
               <TableCell>{match.team2?.teamName || "BYE"}</TableCell>
               <TableCell>
-                {phase === DoublesMatchPhase.zone ? match.zoneName : match.round}
+                {phase === DoublesMatchPhase.zone ? match.zoneName : getPlayoffRoundLabel(match.round)}
               </TableCell>
-              <TableCell>{match.turnNumber}</TableCell>
+              <TableCell>
+                {match.turnNumber}
+                <span className="text-xs text-gray-500 ml-1">
+                  ({getShiftLabel(match.turnNumber)})
+                </span>
+              </TableCell>
               <TableCell>
                 {match.venue} {match.courtName}
               </TableCell>
@@ -853,13 +1094,22 @@ function MatchesTab({
                 </Badge>
               </TableCell>
               <TableCell>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => handleDelete(match.id)}
-                >
-                  Eliminar
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleOpenEdit(match)}
+                  >
+                    Editar
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => handleDelete(match.id)}
+                  >
+                    Eliminar
+                  </Button>
+                </div>
               </TableCell>
             </TableRow>
           ))}
@@ -878,7 +1128,9 @@ function ResultsTab({
   teams: DoublesTeam[];
   mutations: ReturnType<typeof useDoublesEventMutations>;
 }) {
+  const queryClient = useQueryClient();
   const [selectedMatch, setSelectedMatch] = useState<DoublesMatch | null>(null);
+  const [isEditingResult, setIsEditingResult] = useState(false);
   const [sets, setSets] = useState([
     { setNumber: 1, team1Score: 0, team2Score: 0 },
     { setNumber: 2, team1Score: 0, team2Score: 0 },
@@ -893,32 +1145,55 @@ function ResultsTab({
     (m) => m.status === DoublesMatchStatus.played
   );
 
-  const openResult = (match: DoublesMatch) => {
+  const openResult = (match: DoublesMatch, isEdit: boolean = false) => {
     setSelectedMatch(match);
-    setSets([
-      { setNumber: 1, team1Score: 0, team2Score: 0 },
-      { setNumber: 2, team1Score: 0, team2Score: 0 },
-    ]);
-    setWinnerId(undefined);
-    setShowThirdSet(false);
+    setIsEditingResult(isEdit);
+
+    if (isEdit && match.sets && match.sets.length > 0) {
+      // Pre-load existing sets when editing
+      const sortedSets = [...match.sets]
+        .sort((a, b) => a.setNumber - b.setNumber)
+        .map((s) => ({
+          setNumber: s.setNumber,
+          team1Score: s.team1Score,
+          team2Score: s.team2Score,
+        }));
+      setSets(sortedSets);
+      setShowThirdSet(sortedSets.length > 2);
+      setWinnerId(match.winnerId || undefined);
+    } else {
+      // Reset for new result
+      setSets([
+        { setNumber: 1, team1Score: 0, team2Score: 0 },
+        { setNumber: 2, team1Score: 0, team2Score: 0 },
+      ]);
+      setWinnerId(undefined);
+      setShowThirdSet(false);
+    }
   };
 
   const handleSave = async () => {
     if (!selectedMatch || !winnerId) return;
-    const setsToSend = showThirdSet ? [...sets, { setNumber: 3, team1Score: 0, team2Score: 0 }] : sets;
-    const finalSets = showThirdSet
-      ? setsToSend
-      : sets;
     try {
       await mutations.updateMatchResultMutation.mutateAsync({
         id: selectedMatch.id,
-        data: { sets: finalSets, winnerId },
+        data: { sets, winnerId },
       });
-      toast.success("Resultado cargado");
+      // Wait for data to refresh before closing dialog
+      await queryClient.invalidateQueries({ queryKey: ["doubles-matches"] });
+      await queryClient.invalidateQueries({ queryKey: ["doubles-standings"] });
+      await queryClient.invalidateQueries({ queryKey: ["doubles-schedule"] });
+      toast.success(isEditingResult ? "Resultado actualizado" : "Resultado cargado");
       setSelectedMatch(null);
+      setIsEditingResult(false);
     } catch {
-      toast.error("Error al cargar resultado");
+      toast.error(isEditingResult ? "Error al actualizar resultado" : "Error al cargar resultado");
     }
+  };
+
+  const handleDialogClose = () => {
+    setSelectedMatch(null);
+    setIsEditingResult(false);
   };
 
   const updateSet = (index: number, field: "team1Score" | "team2Score", value: number) => {
@@ -955,10 +1230,10 @@ function ResultsTab({
               <TableCell>
                 {match.phase === DoublesMatchPhase.zone
                   ? match.zoneName
-                  : match.round}
+                  : getPlayoffRoundLabel(match.round)}
               </TableCell>
               <TableCell>
-                <Button size="sm" onClick={() => openResult(match)}>
+                <Button size="sm" onClick={() => openResult(match, false)}>
                   Cargar Resultado
                 </Button>
               </TableCell>
@@ -984,6 +1259,7 @@ function ResultsTab({
                 <TableHead>Equipo 2</TableHead>
                 <TableHead>Resultado</TableHead>
                 <TableHead>Ganador</TableHead>
+                <TableHead>Acciones</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -995,6 +1271,15 @@ function ResultsTab({
                   <TableCell className="font-medium">
                     {match.winner?.teamName}
                   </TableCell>
+                  <TableCell>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => openResult(match, true)}
+                    >
+                      Editar
+                    </Button>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -1004,11 +1289,13 @@ function ResultsTab({
 
       <Dialog
         open={!!selectedMatch}
-        onOpenChange={(v) => !v && setSelectedMatch(null)}
+        onOpenChange={(v) => !v && handleDialogClose()}
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Cargar Resultado</DialogTitle>
+            <DialogTitle>
+              {isEditingResult ? "Editar Resultado" : "Cargar Resultado"}
+            </DialogTitle>
           </DialogHeader>
           {selectedMatch && (
             <div className="space-y-4">
@@ -1019,7 +1306,9 @@ function ResultsTab({
 
               {sets.map((set, idx) => (
                 <div key={idx} className="flex items-center gap-4">
-                  <span className="text-sm font-medium w-12">Set {set.setNumber}</span>
+                  <span className="text-sm font-medium w-24">
+                    {set.setNumber === 3 ? "Super Tiebreak" : `Set ${set.setNumber}`}
+                  </span>
                   <Input
                     type="number"
                     min={0}
@@ -1051,7 +1340,20 @@ function ResultsTab({
                     setSets([...sets, { setNumber: 3, team1Score: 0, team2Score: 0 }]);
                   }}
                 >
-                  + Agregar Set 3
+                  + Agregar Super Tiebreak
+                </Button>
+              )}
+
+              {showThirdSet && sets.length > 2 && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setShowThirdSet(false);
+                    setSets(sets.filter((s) => s.setNumber !== 3));
+                  }}
+                >
+                  - Quitar Super Tiebreak
                 </Button>
               )}
 
@@ -1082,7 +1384,7 @@ function ResultsTab({
                 disabled={!winnerId}
                 className="w-full"
               >
-                Guardar Resultado
+                {isEditingResult ? "Guardar Cambios" : "Guardar Resultado"}
               </Button>
             </div>
           )}

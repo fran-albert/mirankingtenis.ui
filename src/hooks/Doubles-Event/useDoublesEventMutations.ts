@@ -175,11 +175,8 @@ export const useDoublesEventMutations = () => {
       id: number;
       data: UpdateDoublesMatchResultRequest;
     }) => updateDoublesMatchResult(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["doubles-matches"] });
-      queryClient.invalidateQueries({ queryKey: ["doubles-standings"] });
-      queryClient.invalidateQueries({ queryKey: ["doubles-schedule"] });
-    },
+    // Note: invalidation is handled in the component after mutateAsync
+    // to ensure data is refreshed before dialog closes
   });
 
   const deleteMatchMutation = useMutation({

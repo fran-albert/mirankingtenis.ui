@@ -20,7 +20,11 @@ export function ScheduleGrid({ schedule }: ScheduleGridProps) {
   const formatTime = (iso: string | null) => {
     if (!iso) return "";
     const d = new Date(iso);
-    return d.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" });
+    return d.toLocaleTimeString("es-AR", {
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone: "America/Buenos_Aires",
+    });
   };
 
   const categoryColors: Record<string, string> = {};
