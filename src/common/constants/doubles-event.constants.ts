@@ -6,14 +6,15 @@ export interface DoublesShift {
 }
 
 export const DOUBLES_SHIFTS: DoublesShift[] = [
-  { turnNumber: 1, label: "Turno 1", startTime: "09:00", endTime: "10:30" },
-  { turnNumber: 2, label: "Turno 2", startTime: "10:30", endTime: "12:00" },
-  { turnNumber: 3, label: "Turno 3", startTime: "14:00", endTime: "15:30" },
-  { turnNumber: 4, label: "Turno 4", startTime: "15:30", endTime: "17:00" },
-  { turnNumber: 5, label: "Turno 5", startTime: "17:00", endTime: "18:30" },
-  { turnNumber: 6, label: "Turno 6", startTime: "18:30", endTime: "20:00" },
-  { turnNumber: 7, label: "Turno 7", startTime: "20:00", endTime: "21:30" },
-  { turnNumber: 8, label: "Turno 8", startTime: "21:30", endTime: "23:00" },
+  { turnNumber: 1, label: "Turno 1", startTime: "08:30", endTime: "10:00" },
+  { turnNumber: 2, label: "Turno 2", startTime: "10:00", endTime: "11:30" },
+  { turnNumber: 3, label: "Turno 3", startTime: "11:30", endTime: "13:00" },
+  { turnNumber: 4, label: "Turno 4", startTime: "13:00", endTime: "14:30" },
+  { turnNumber: 5, label: "Turno 5", startTime: "15:00", endTime: "16:30" },
+  { turnNumber: 6, label: "Turno 6", startTime: "16:30", endTime: "18:00" },
+  { turnNumber: 7, label: "Turno 7", startTime: "18:00", endTime: "19:30" },
+  { turnNumber: 8, label: "Turno 8", startTime: "19:30", endTime: "21:00" },
+  { turnNumber: 9, label: "Turno 9", startTime: "21:00", endTime: "22:30" },
 ];
 
 export interface DoublesVenue {
