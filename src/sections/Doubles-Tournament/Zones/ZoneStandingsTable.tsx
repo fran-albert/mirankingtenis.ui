@@ -21,8 +21,8 @@ export function ZoneStandingsTable({ standings }: ZoneStandingsTableProps) {
   };
 
   return (
-    <div className="overflow-x-auto">
-      <Table>
+    <div className="overflow-x-auto -mx-2 px-2">
+      <Table className="min-w-[600px]">
         <TableHeader>
           <TableRow>
             <TableHead className="w-8 px-2">Pos</TableHead>
@@ -30,30 +30,30 @@ export function ZoneStandingsTable({ standings }: ZoneStandingsTableProps) {
             <TableHead className="text-center px-1">PJ</TableHead>
             <TableHead className="text-center px-1">PG</TableHead>
             <TableHead className="text-center px-1">PP</TableHead>
-            <TableHead className="text-center px-1 hidden sm:table-cell">Sets</TableHead>
-            <TableHead className="text-center px-1 hidden sm:table-cell">Dif. Sets</TableHead>
-            <TableHead className="text-center px-1 hidden md:table-cell">Games</TableHead>
-            <TableHead className="text-center px-1 hidden md:table-cell">Dif. Games</TableHead>
+            <TableHead className="text-center px-1">Sets</TableHead>
+            <TableHead className="text-center px-1">Dif. Sets</TableHead>
+            <TableHead className="text-center px-1">Games</TableHead>
+            <TableHead className="text-center px-1">Dif. Games</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {standings.map((s) => (
             <TableRow key={s.team.id}>
               <TableCell className="font-bold px-2">{s.position}</TableCell>
-              <TableCell className="font-medium px-2 text-sm">{s.team.teamName}</TableCell>
+              <TableCell className="font-medium px-2 text-sm whitespace-nowrap">{s.team.teamName}</TableCell>
               <TableCell className="text-center px-1">{s.played}</TableCell>
               <TableCell className="text-center px-1 font-bold">{s.won}</TableCell>
               <TableCell className="text-center px-1">{s.lost}</TableCell>
-              <TableCell className="text-center px-1 hidden sm:table-cell">
+              <TableCell className="text-center px-1">
                 {s.setsWon}-{s.setsLost}
               </TableCell>
-              <TableCell className="text-center px-1 font-medium hidden sm:table-cell">
+              <TableCell className="text-center px-1 font-medium">
                 {formatDiff(s.setsWon, s.setsLost)}
               </TableCell>
-              <TableCell className="text-center px-1 hidden md:table-cell">
+              <TableCell className="text-center px-1">
                 {s.gamesWon}-{s.gamesLost}
               </TableCell>
-              <TableCell className="text-center px-1 font-medium hidden md:table-cell">
+              <TableCell className="text-center px-1 font-medium">
                 {formatDiff(s.gamesWon, s.gamesLost)}
               </TableCell>
             </TableRow>
