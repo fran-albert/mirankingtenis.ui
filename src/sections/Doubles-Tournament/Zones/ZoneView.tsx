@@ -22,15 +22,15 @@ export function ZoneView({ standings, matches }: ZoneViewProps) {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {standings.map((zone) => {
         const zMatches = zoneMatches.filter((m) => m.zoneName === zone.zoneName);
         return (
           <div key={zone.zoneName}>
-            <h3 className="text-lg font-bold mb-3">{zone.zoneName}</h3>
+            <h3 className="text-base sm:text-lg font-bold mb-2 sm:mb-3">{zone.zoneName}</h3>
             <ZoneStandingsTable standings={zone.standings} />
-            <div className="mt-4">
-              <h4 className="text-sm font-semibold text-gray-600 mb-2">
+            <div className="mt-3 sm:mt-4">
+              <h4 className="text-xs sm:text-sm font-semibold text-gray-600 mb-2">
                 Partidos
               </h4>
               <ZoneMatchList matches={zMatches} />

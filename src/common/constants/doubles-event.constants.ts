@@ -64,6 +64,33 @@ export function getPlayoffRoundLabel(round: string | null): string {
   return found?.label || round;
 }
 
+export interface EventDay {
+  date: string; // "YYYY-MM-DD"
+  label: string; // "viernes 6/2"
+}
+
+export function getEventDays(startDate: string, endDate: string | null): EventDay[] {
+  const dayNames = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
+
+  const start = new Date(startDate.split("T")[0] + "T12:00:00");
+  const end = endDate ? new Date(endDate.split("T")[0] + "T12:00:00") : start;
+
+  const days: EventDay[] = [];
+  const current = new Date(start);
+
+  while (current <= end) {
+    const yyyy = current.getFullYear();
+    const mm = String(current.getMonth() + 1).padStart(2, "0");
+    const dd = String(current.getDate()).padStart(2, "0");
+    const dateStr = `${yyyy}-${mm}-${dd}`;
+    const label = `${dayNames[current.getDay()]} ${current.getDate()}/${current.getMonth() + 1}`;
+    days.push({ date: dateStr, label });
+    current.setDate(current.getDate() + 1);
+  }
+
+  return days;
+}
+
 export function buildDateTime(eventDate: string, time: string): string {
   // Extract just the date part (YYYY-MM-DD) from eventDate
   const dateOnly = eventDate.split("T")[0];

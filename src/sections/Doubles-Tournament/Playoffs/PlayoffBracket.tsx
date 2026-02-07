@@ -34,13 +34,13 @@ export function PlayoffBracket({ matches }: PlayoffBracketProps) {
   }
 
   return (
-    <div className="flex gap-8 overflow-x-auto py-4">
+    <div className="flex gap-4 sm:gap-8 overflow-x-auto py-4 -mx-2 px-2">
       {roundGroups.map(([round, roundMatches]) => (
-        <div key={round} className="flex flex-col gap-4 min-w-[240px]">
-          <h4 className="text-sm font-bold text-center text-gray-600 uppercase">
+        <div key={round} className="flex flex-col gap-3 sm:gap-4 min-w-[180px] sm:min-w-[240px]">
+          <h4 className="text-xs sm:text-sm font-bold text-center text-gray-600 uppercase">
             {round}
           </h4>
-          <div className="flex flex-col gap-4 justify-around flex-1">
+          <div className="flex flex-col gap-3 sm:gap-4 justify-around flex-1">
             {roundMatches.map((match) => (
               <PlayoffMatchCard key={match.id} match={match} />
             ))}

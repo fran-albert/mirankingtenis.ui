@@ -53,16 +53,16 @@ export default function ClientDoublesTournamentComponent() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto py-8 px-4">
-      <h1 className="text-2xl md:text-3xl font-bold text-center mb-2">
+    <div className="max-w-6xl mx-auto py-4 sm:py-8 px-2 sm:px-4">
+      <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-center mb-2">
         {activeEvent.name}
       </h1>
       {activeEvent.description && (
-        <p className="text-gray-500 text-center mb-4">
+        <p className="text-gray-500 text-center text-sm sm:text-base mb-4">
           {activeEvent.description}
         </p>
       )}
-      <p className="text-sm text-gray-400 text-center mb-6">
+      <p className="text-xs sm:text-sm text-gray-400 text-center mb-4 sm:mb-6">
         {new Date(activeEvent.startDate).toLocaleDateString("es-AR", {
           day: "numeric",
           month: "long",
@@ -77,7 +77,7 @@ export default function ClientDoublesTournamentComponent() {
       </p>
 
       {categories.length > 0 && (
-        <div className="mb-6">
+        <div className="mb-4 sm:mb-6">
           <CategorySelector
             categories={categories}
             selectedId={activeCategoryId}
@@ -88,9 +88,9 @@ export default function ClientDoublesTournamentComponent() {
 
       <Tabs defaultValue="schedule">
         <TabsList className="mb-4 w-full justify-center">
-          <TabsTrigger value="schedule">Grilla</TabsTrigger>
-          <TabsTrigger value="zones">Zonas y Posiciones</TabsTrigger>
-          <TabsTrigger value="playoffs">Llaves</TabsTrigger>
+          <TabsTrigger value="schedule" className="text-xs sm:text-sm">Grilla</TabsTrigger>
+          <TabsTrigger value="zones" className="text-xs sm:text-sm">Zonas y Posiciones</TabsTrigger>
+          <TabsTrigger value="playoffs" className="text-xs sm:text-sm">Llaves</TabsTrigger>
         </TabsList>
 
         <TabsContent value="schedule">

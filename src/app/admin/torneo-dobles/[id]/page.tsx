@@ -19,7 +19,7 @@ import {
   UpdateDoublesMatchResultRequest,
 } from "@/types/Doubles-Event/DoublesEvent";
 import { DoublesMatchPhase, DoublesMatchStatus, DoublesEventStatus } from "@/common/enum/doubles-event.enum";
-import { DOUBLES_SHIFTS, DOUBLES_VENUES, DOUBLES_ZONES, DOUBLES_PLAYOFF_ROUNDS, getPlayoffRoundLabel, buildDateTime } from "@/common/constants/doubles-event.constants";
+import { DOUBLES_SHIFTS, DOUBLES_VENUES, DOUBLES_ZONES, DOUBLES_PLAYOFF_ROUNDS, getPlayoffRoundLabel, buildDateTime, getEventDays } from "@/common/constants/doubles-event.constants";
 import Loading from "@/components/Loading/loading";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -128,7 +128,8 @@ export default function DoublesEventManagePage() {
             matches={matches}
             teams={teams}
             mutations={mutations}
-            eventDate={event.startDate}
+            eventStartDate={event.startDate}
+            eventEndDate={event.endDate}
           />
         </TabsContent>
 
@@ -679,18 +680,24 @@ function MatchesTab({
   matches,
   teams,
   mutations,
-  eventDate,
+  eventStartDate,
+  eventEndDate,
 }: {
   categoryId: number;
   matches: DoublesMatch[];
   teams: DoublesTeam[];
   mutations: ReturnType<typeof useDoublesEventMutations>;
-  eventDate: string;
+  eventStartDate: string;
+  eventEndDate: string | null;
 }) {
+  const eventDays = useMemo(() => getEventDays(eventStartDate, eventEndDate), [eventStartDate, eventEndDate]);
+  const isMultiDay = eventDays.length > 1;
+
   const [open, setOpen] = useState(false);
   const [editingMatch, setEditingMatch] = useState<DoublesMatch | null>(null);
   const [phase, setPhase] = useState<DoublesMatchPhase>(DoublesMatchPhase.zone);
   const [selectedVenueId, setSelectedVenueId] = useState<string>("");
+  const [selectedDay, setSelectedDay] = useState<string>(eventDays[0]?.date || "");
   const [form, setForm] = useState<CreateDoublesMatchRequest>({
     team1Id: 0,
     phase: DoublesMatchPhase.zone,
@@ -725,6 +732,7 @@ function MatchesTab({
       positionInBracket: undefined,
     });
     setSelectedVenueId("");
+    setSelectedDay(eventDays[0]?.date || "");
     setEditingMatch(null);
   };
 
@@ -738,6 +746,19 @@ function MatchesTab({
     // Find venue ID by name
     const venue = DOUBLES_VENUES.find((v) => v.name === match.venue);
     setSelectedVenueId(venue?.id || "");
+
+    // Extract day from match.startTime
+    let matchDay = eventDays[0]?.date || "";
+    if (match.startTime) {
+      const d = new Date(match.startTime);
+      const argDate = new Date(d.toLocaleString("en-US", { timeZone: "America/Buenos_Aires" }));
+      const yyyy = argDate.getFullYear();
+      const mm = String(argDate.getMonth() + 1).padStart(2, "0");
+      const dd = String(argDate.getDate()).padStart(2, "0");
+      matchDay = `${yyyy}-${mm}-${dd}`;
+    }
+    setSelectedDay(matchDay);
+
     setForm({
       team1Id: match.team1?.id || 0,
       team2Id: match.team2?.id,
@@ -754,14 +775,29 @@ function MatchesTab({
     setOpen(true);
   };
 
+  const handleDayChange = (day: string) => {
+    setSelectedDay(day);
+    // If turn is already selected, recalculate startTime/endTime with new day
+    if (form.turnNumber) {
+      const shift = DOUBLES_SHIFTS.find((s) => s.turnNumber === form.turnNumber);
+      if (shift) {
+        setForm({
+          ...form,
+          startTime: buildDateTime(day, shift.startTime),
+          endTime: buildDateTime(day, shift.endTime),
+        });
+      }
+    }
+  };
+
   const handleTurnChange = (turnNumber: number) => {
     const shift = DOUBLES_SHIFTS.find((s) => s.turnNumber === turnNumber);
     if (shift) {
       setForm({
         ...form,
         turnNumber,
-        startTime: buildDateTime(eventDate, shift.startTime),
-        endTime: buildDateTime(eventDate, shift.endTime),
+        startTime: buildDateTime(selectedDay, shift.startTime),
+        endTime: buildDateTime(selectedDay, shift.endTime),
       });
     }
   };
@@ -841,6 +877,17 @@ function MatchesTab({
     if (!turnNumber) return "";
     const shift = DOUBLES_SHIFTS.find((s) => s.turnNumber === turnNumber);
     return shift ? `${shift.startTime} - ${shift.endTime}` : "";
+  };
+
+  const getMatchDayLabel = (startTime: string | null) => {
+    if (!startTime) return "";
+    const d = new Date(startTime);
+    const argDate = new Date(d.toLocaleString("en-US", { timeZone: "America/Buenos_Aires" }));
+    const found = eventDays.find((day) => {
+      const [y, m, dd] = day.date.split("-").map(Number);
+      return argDate.getFullYear() === y && argDate.getMonth() + 1 === m && argDate.getDate() === dd;
+    });
+    return found?.label || "";
   };
 
   return (
@@ -978,6 +1025,26 @@ function MatchesTab({
                   </div>
                 </div>
               )}
+              {isMultiDay && (
+                <div>
+                  <Label>Día</Label>
+                  <Select
+                    value={selectedDay}
+                    onValueChange={handleDayChange}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccionar día" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {eventDays.map((day) => (
+                        <SelectItem key={day.date} value={day.date}>
+                          {day.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
               <div>
                 <Label>Turno</Label>
                 <Select
@@ -1053,6 +1120,7 @@ function MatchesTab({
             <TableHead>Equipo 1</TableHead>
             <TableHead>Equipo 2</TableHead>
             <TableHead>{phase === DoublesMatchPhase.zone ? "Zona" : "Ronda"}</TableHead>
+            {isMultiDay && <TableHead>Día</TableHead>}
             <TableHead>Turno</TableHead>
             <TableHead>Sede/Cancha</TableHead>
             <TableHead>Resultado</TableHead>
@@ -1068,6 +1136,11 @@ function MatchesTab({
               <TableCell>
                 {phase === DoublesMatchPhase.zone ? match.zoneName : getPlayoffRoundLabel(match.round)}
               </TableCell>
+              {isMultiDay && (
+                <TableCell className="text-xs">
+                  {getMatchDayLabel(match.startTime)}
+                </TableCell>
+              )}
               <TableCell>
                 {match.turnNumber}
                 <span className="text-xs text-gray-500 ml-1">
@@ -1137,6 +1210,7 @@ function ResultsTab({
   ]);
   const [winnerId, setWinnerId] = useState<number | undefined>();
   const [showThirdSet, setShowThirdSet] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const pendingMatches = matches.filter(
     (m) => m.status === DoublesMatchStatus.pending
@@ -1173,7 +1247,8 @@ function ResultsTab({
   };
 
   const handleSave = async () => {
-    if (!selectedMatch || !winnerId) return;
+    if (!selectedMatch || !winnerId || isSaving) return;
+    setIsSaving(true);
     try {
       await mutations.updateMatchResultMutation.mutateAsync({
         id: selectedMatch.id,
@@ -1188,6 +1263,8 @@ function ResultsTab({
       setIsEditingResult(false);
     } catch {
       toast.error(isEditingResult ? "Error al actualizar resultado" : "Error al cargar resultado");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -1381,10 +1458,10 @@ function ResultsTab({
 
               <Button
                 onClick={handleSave}
-                disabled={!winnerId}
+                disabled={!winnerId || isSaving}
                 className="w-full"
               >
-                {isEditingResult ? "Guardar Cambios" : "Guardar Resultado"}
+                {isSaving ? "Guardando..." : isEditingResult ? "Guardar Cambios" : "Guardar Resultado"}
               </Button>
             </div>
           )}

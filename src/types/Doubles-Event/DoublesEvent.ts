@@ -97,6 +97,7 @@ export interface ScheduleMatch {
   phase: string;
   status: string;
   score: string;
+  winnerTeamNumber: 1 | 2 | null;
 }
 
 export interface ScheduleSlot {
@@ -113,10 +114,17 @@ export interface ScheduleTurn {
   slots: ScheduleSlot[];
 }
 
+export interface ScheduleDay {
+  date: string;
+  label: string;
+  turns: ScheduleTurn[];
+}
+
 export interface DoublesSchedule {
   venues: string[];
   courts: { venue: string; name: string }[];
   turns: ScheduleTurn[];
+  days: ScheduleDay[];
 }
 
 export interface CreateDoublesEventRequest {
