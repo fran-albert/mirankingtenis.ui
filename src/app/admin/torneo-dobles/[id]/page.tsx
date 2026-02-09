@@ -675,6 +675,45 @@ function TeamsTab({
   );
 }
 
+function MatchScoreboard({ match, compact = false }: { match: DoublesMatch; compact?: boolean }) {
+  const sets = [...(match.sets || [])].sort((a, b) => a.setNumber - b.setNumber);
+  const isTeam1Winner = match.winnerId === match.team1?.id;
+  const isTeam2Winner = match.winnerId === match.team2?.id;
+
+  return (
+    <div
+      className={`inline-grid gap-0 border rounded ${compact ? "text-xs" : "text-xs sm:text-sm"}`}
+      style={{ gridTemplateColumns: `1fr repeat(${sets.length || 1}, 2rem)` }}
+    >
+      <div className={`px-2 py-1 truncate ${isTeam1Winner ? "font-bold" : ""}`}>
+        {match.team1?.teamName || "TBD"}
+      </div>
+      {sets.length > 0 ? (
+        sets.map((s) => (
+          <div key={`t1-${s.setNumber}`} className={`px-1 py-1 text-center border-l ${isTeam1Winner ? "font-bold" : ""}`}>
+            {s.team1Score}
+          </div>
+        ))
+      ) : (
+        <div className="px-1 py-1 text-center border-l text-gray-400">-</div>
+      )}
+
+      <div className={`px-2 py-1 truncate border-t ${isTeam2Winner ? "font-bold" : ""}`}>
+        {match.team2?.teamName || "TBD"}
+      </div>
+      {sets.length > 0 ? (
+        sets.map((s) => (
+          <div key={`t2-${s.setNumber}`} className={`px-1 py-1 text-center border-l border-t ${isTeam2Winner ? "font-bold" : ""}`}>
+            {s.team2Score}
+          </div>
+        ))
+      ) : (
+        <div className="px-1 py-1 text-center border-l border-t text-gray-400">-</div>
+      )}
+    </div>
+  );
+}
+
 function MatchesTab({
   categoryId,
   matches,
@@ -880,14 +919,9 @@ function MatchesTab({
 
   const formatScore = (match: DoublesMatch) => {
     if (!match.sets || match.sets.length === 0) return "-";
-    const winnerIsTeam2 = match.winnerId === match.team2?.id;
     return match.sets
       .sort((a, b) => a.setNumber - b.setNumber)
-      .map((s) =>
-        winnerIsTeam2
-          ? `${s.team2Score}-${s.team1Score}`
-          : `${s.team1Score}-${s.team2Score}`,
-      )
+      .map((s) => `${s.team1Score}-${s.team2Score}`)
       .join(" ");
   };
 
@@ -1156,13 +1190,11 @@ function MatchesTab({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="text-xs sm:text-sm">Equipo 1</TableHead>
-              <TableHead className="text-xs sm:text-sm">Equipo 2</TableHead>
+              <TableHead className="text-xs sm:text-sm">Partido</TableHead>
               <TableHead className="text-xs sm:text-sm">{phase === DoublesMatchPhase.zone ? "Zona" : "Ronda"}</TableHead>
               {isMultiDay && <TableHead className="text-xs sm:text-sm">Día</TableHead>}
               <TableHead className="text-xs sm:text-sm hidden sm:table-cell">Turno</TableHead>
               <TableHead className="text-xs sm:text-sm hidden sm:table-cell">Sede/Cancha</TableHead>
-              <TableHead className="text-xs sm:text-sm">Resultado</TableHead>
               <TableHead className="text-xs sm:text-sm">Estado</TableHead>
               <TableHead className="text-xs sm:text-sm">Acciones</TableHead>
             </TableRow>
@@ -1170,8 +1202,7 @@ function MatchesTab({
           <TableBody>
             {filteredMatches.map((match) => (
               <TableRow key={match.id}>
-                <TableCell className="text-xs sm:text-sm">{match.team1?.teamName}</TableCell>
-                <TableCell className="text-xs sm:text-sm">{match.team2?.teamName || "BYE"}</TableCell>
+                <TableCell><MatchScoreboard match={match} compact /></TableCell>
                 <TableCell className="text-xs sm:text-sm">
                   {phase === DoublesMatchPhase.zone ? match.zoneName : getPlayoffRoundLabel(match.round)}
                 </TableCell>
@@ -1189,7 +1220,6 @@ function MatchesTab({
                 <TableCell className="hidden sm:table-cell text-xs sm:text-sm">
                   {match.venue} {match.courtName}
                 </TableCell>
-                <TableCell className="text-xs sm:text-sm">{formatScore(match)}</TableCell>
                 <TableCell>
                   <Badge
                     variant={
@@ -1329,19 +1359,6 @@ function ResultsTab({
     setSets(newSets);
   };
 
-  const formatScore = (match: DoublesMatch) => {
-    if (!match.sets || match.sets.length === 0) return "-";
-    const winnerIsTeam2 = match.winnerId === match.team2?.id;
-    return match.sets
-      .sort((a, b) => a.setNumber - b.setNumber)
-      .map((s) =>
-        winnerIsTeam2
-          ? `${s.team2Score}-${s.team1Score}`
-          : `${s.team1Score}-${s.team2Score}`,
-      )
-      .join(" ");
-  };
-
   return (
     <div>
       <div className="mb-4">
@@ -1358,8 +1375,7 @@ function ResultsTab({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="text-xs sm:text-sm">Equipo 1</TableHead>
-              <TableHead className="text-xs sm:text-sm">Equipo 2</TableHead>
+              <TableHead className="text-xs sm:text-sm">Partido</TableHead>
               <TableHead className="text-xs sm:text-sm">Fase</TableHead>
               <TableHead className="text-xs sm:text-sm">Acciones</TableHead>
             </TableRow>
@@ -1367,8 +1383,7 @@ function ResultsTab({
           <TableBody>
             {pendingMatches.map((match) => (
               <TableRow key={match.id}>
-                <TableCell className="text-xs sm:text-sm">{match.team1?.teamName}</TableCell>
-                <TableCell className="text-xs sm:text-sm">{match.team2?.teamName || "BYE"}</TableCell>
+                <TableCell><MatchScoreboard match={match} compact /></TableCell>
                 <TableCell className="text-xs sm:text-sm">
                   {match.phase === DoublesMatchPhase.zone
                     ? match.zoneName
@@ -1383,7 +1398,7 @@ function ResultsTab({
             ))}
             {pendingMatches.length === 0 && (
               <TableRow>
-                <TableCell colSpan={4} className="text-center text-gray-500 py-4">
+                <TableCell colSpan={3} className="text-center text-gray-500 py-4">
                   No hay partidos pendientes
                 </TableCell>
               </TableRow>
@@ -1399,22 +1414,14 @@ function ResultsTab({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="text-xs sm:text-sm">Equipo 1</TableHead>
-                  <TableHead className="text-xs sm:text-sm">Equipo 2</TableHead>
-                  <TableHead className="text-xs sm:text-sm">Ganador</TableHead>
-                  <TableHead className="text-xs sm:text-sm">Resultado (ganador 1ro)</TableHead>
+                  <TableHead className="text-xs sm:text-sm">Partido</TableHead>
                   <TableHead className="text-xs sm:text-sm">Acciones</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {playedMatches.map((match) => (
                   <TableRow key={match.id}>
-                    <TableCell className="text-xs sm:text-sm">{match.team1?.teamName}</TableCell>
-                    <TableCell className="text-xs sm:text-sm">{match.team2?.teamName}</TableCell>
-                    <TableCell className="text-xs sm:text-sm font-medium">
-                      {match.winner?.teamName}
-                    </TableCell>
-                    <TableCell className="text-xs sm:text-sm">{formatScore(match)}</TableCell>
+                    <TableCell><MatchScoreboard match={match} /></TableCell>
                     <TableCell>
                       <Button
                         variant="outline"

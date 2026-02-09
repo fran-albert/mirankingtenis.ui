@@ -42,7 +42,7 @@ export function AdminComponent({ children }: { children: React.ReactNode }) {
       <SideBarV3 />
       <div className="flex flex-col">
         <header className="flex h-14 lg:h-[60px] items-center gap-4 border-b bg-gray-100/40 px-6">
-          <div className="flex items-center md:hidden ">
+          <div className="flex items-center lg:hidden">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -51,23 +51,28 @@ export function AdminComponent({ children }: { children: React.ReactNode }) {
                   variant="ghost"
                 >
                   <IoMenu size={25} />
-                  <span className="sr-only">Toggle user menu</span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuContent align="start" className="w-56">
+                <DropdownMenuLabel>Navegación</DropdownMenuLabel>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem asChild><Link href="/admin/inicio">Inicio</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link href="/admin/canchas">Canchas</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link href="/admin/categorias">Categorías</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link href="/admin/jugadores">Jugadores</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link href="/admin/torneos">Torneos</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link href="/admin/torneo-dobles">Torneo Dobles</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link href="/admin/configuracion">Configuración</Link></DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild><Link href="/master">Volver</Link></DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => {
                     logout();
                     window.location.href = "/";
                   }}
                 >
-                  Logout
+                  Cerrar Sesión
                 </DropdownMenuItem>
-                <DropdownMenuItem>Support</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Logout</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>

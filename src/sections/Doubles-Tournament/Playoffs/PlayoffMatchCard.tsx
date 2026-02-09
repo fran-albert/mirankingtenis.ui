@@ -8,50 +8,55 @@ interface PlayoffMatchCardProps {
 }
 
 export function PlayoffMatchCard({ match }: PlayoffMatchCardProps) {
-  const formatScore = () => {
-    if (!match.sets || match.sets.length === 0) return "";
-    const winnerIsTeam2 = match.winnerId === match.team2?.id;
-    return match.sets
-      .sort((a, b) => a.setNumber - b.setNumber)
-      .map((s) =>
-        winnerIsTeam2
-          ? `${s.team2Score}-${s.team1Score}`
-          : `${s.team1Score}-${s.team2Score}`,
-      )
-      .join("  ");
-  };
-
+  const sets = [...(match.sets || [])].sort((a, b) => a.setNumber - b.setNumber);
   const isPlayed = match.status === DoublesMatchStatus.played;
+  const isTeam1Winner = isPlayed && match.winnerId === match.team1?.id;
+  const isTeam2Winner = isPlayed && match.winnerId === match.team2?.id;
 
   return (
     <div className="border rounded-lg bg-white shadow-sm overflow-hidden min-w-[160px] sm:min-w-[220px]">
       <div
-        className={`flex items-center justify-between p-1.5 sm:p-2 border-b ${
-          isPlayed && match.winnerId === match.team1?.id
-            ? "bg-green-50 font-bold"
-            : ""
-        }`}
+        className="grid gap-0"
+        style={{ gridTemplateColumns: `1fr repeat(${sets.length || 0}, 2rem)` }}
       >
-        <span className="text-xs sm:text-sm truncate flex-1">
+        {/* Team 1 row */}
+        <div
+          className={`px-2 py-1.5 text-xs sm:text-sm truncate border-b ${
+            isTeam1Winner ? "bg-green-50 font-bold" : ""
+          }`}
+        >
           {match.team1?.teamName || "TBD"}
-        </span>
-      </div>
-      <div
-        className={`flex items-center justify-between p-1.5 sm:p-2 ${
-          isPlayed && match.winnerId === match.team2?.id
-            ? "bg-green-50 font-bold"
-            : ""
-        }`}
-      >
-        <span className="text-xs sm:text-sm truncate flex-1">
-          {match.team2?.teamName || "TBD"}
-        </span>
-      </div>
-      {isPlayed && (
-        <div className="bg-gray-50 px-2 py-1 text-center">
-          <span className="text-[10px] sm:text-xs font-mono font-bold">{formatScore()}</span>
         </div>
-      )}
+        {sets.map((s) => (
+          <div
+            key={`t1-${s.setNumber}`}
+            className={`px-1 py-1.5 text-center text-xs sm:text-sm border-l border-b ${
+              isTeam1Winner ? "bg-green-50 font-bold" : ""
+            }`}
+          >
+            {s.team1Score}
+          </div>
+        ))}
+
+        {/* Team 2 row */}
+        <div
+          className={`px-2 py-1.5 text-xs sm:text-sm truncate ${
+            isTeam2Winner ? "bg-green-50 font-bold" : ""
+          }`}
+        >
+          {match.team2?.teamName || "TBD"}
+        </div>
+        {sets.map((s) => (
+          <div
+            key={`t2-${s.setNumber}`}
+            className={`px-1 py-1.5 text-center text-xs sm:text-sm border-l ${
+              isTeam2Winner ? "bg-green-50 font-bold" : ""
+            }`}
+          >
+            {s.team2Score}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
