@@ -11,9 +11,14 @@ interface ZoneMatchListProps {
 export function ZoneMatchList({ matches }: ZoneMatchListProps) {
   const formatScore = (match: DoublesMatch) => {
     if (!match.sets || match.sets.length === 0) return "";
+    const winnerIsTeam2 = match.winnerId === match.team2?.id;
     return match.sets
       .sort((a, b) => a.setNumber - b.setNumber)
-      .map((s) => `${s.team1Score}-${s.team2Score}`)
+      .map((s) =>
+        winnerIsTeam2
+          ? `${s.team2Score}-${s.team1Score}`
+          : `${s.team1Score}-${s.team2Score}`,
+      )
       .join("  ");
   };
 

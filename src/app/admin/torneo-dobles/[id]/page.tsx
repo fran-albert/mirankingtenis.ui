@@ -70,10 +70,10 @@ export default function DoublesEventManagePage() {
   if (!event) return <div className="p-6">Evento no encontrado</div>;
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
+    <div className="px-2 sm:px-4 md:px-6 py-4 sm:py-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0 mb-6">
         <div>
-          <h1 className="text-2xl font-bold">{event.name}</h1>
+          <h1 className="text-lg sm:text-2xl font-bold">{event.name}</h1>
           <p className="text-gray-500 text-sm">
             {new Date(event.startDate).toLocaleDateString("es-AR", {
               timeZone: "America/Buenos_Aires",
@@ -88,12 +88,12 @@ export default function DoublesEventManagePage() {
       </div>
 
       <Tabs defaultValue="categories">
-        <TabsList className="mb-4">
-          <TabsTrigger value="categories">Categorías</TabsTrigger>
-          <TabsTrigger value="teams">Equipos</TabsTrigger>
-          <TabsTrigger value="matches">Partidos</TabsTrigger>
-          <TabsTrigger value="results">Resultados</TabsTrigger>
-          <TabsTrigger value="preview">Vista Previa</TabsTrigger>
+        <TabsList className="mb-4 overflow-x-auto flex-wrap">
+          <TabsTrigger value="categories" className="text-xs sm:text-sm px-2 sm:px-3">Categorías</TabsTrigger>
+          <TabsTrigger value="teams" className="text-xs sm:text-sm px-2 sm:px-3">Equipos</TabsTrigger>
+          <TabsTrigger value="matches" className="text-xs sm:text-sm px-2 sm:px-3">Partidos</TabsTrigger>
+          <TabsTrigger value="results" className="text-xs sm:text-sm px-2 sm:px-3">Resultados</TabsTrigger>
+          <TabsTrigger value="preview" className="text-xs sm:text-sm px-2 sm:px-3">Vista Previa</TabsTrigger>
         </TabsList>
 
         <TabsContent value="categories">
@@ -232,7 +232,7 @@ function CategorySelector({
         value={String(selected)}
         onValueChange={(v) => onChange(Number(v))}
       >
-        <SelectTrigger className="w-[300px]">
+        <SelectTrigger className="w-full sm:w-[300px]">
           <SelectValue placeholder="Seleccionar categoría" />
         </SelectTrigger>
         <SelectContent>
@@ -698,6 +698,8 @@ function MatchesTab({
   const [phase, setPhase] = useState<DoublesMatchPhase>(DoublesMatchPhase.zone);
   const [selectedVenueId, setSelectedVenueId] = useState<string>("");
   const [selectedDay, setSelectedDay] = useState<string>(eventDays[0]?.date || "");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
   const [form, setForm] = useState<CreateDoublesMatchRequest>({
     team1Id: 0,
     phase: DoublesMatchPhase.zone,
@@ -712,7 +714,18 @@ function MatchesTab({
   });
 
   const isEditing = !!editingMatch;
-  const filteredMatches = matches.filter((m) => m.phase === phase);
+  const filteredMatches = matches.filter((m) => {
+    if (m.phase !== phase) return false;
+    if (statusFilter !== "all" && m.status !== statusFilter) return false;
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      const matchesSearch =
+        m.team1?.teamName?.toLowerCase().includes(q) ||
+        m.team2?.teamName?.toLowerCase().includes(q);
+      if (!matchesSearch) return false;
+    }
+    return true;
+  });
 
   // Get courts for selected venue
   const selectedVenue = DOUBLES_VENUES.find((v) => v.id === selectedVenueId);
@@ -867,9 +880,14 @@ function MatchesTab({
 
   const formatScore = (match: DoublesMatch) => {
     if (!match.sets || match.sets.length === 0) return "-";
+    const winnerIsTeam2 = match.winnerId === match.team2?.id;
     return match.sets
       .sort((a, b) => a.setNumber - b.setNumber)
-      .map((s) => `${s.team1Score}-${s.team2Score}`)
+      .map((s) =>
+        winnerIsTeam2
+          ? `${s.team2Score}-${s.team1Score}`
+          : `${s.team1Score}-${s.team2Score}`,
+      )
       .join(" ");
   };
 
@@ -915,7 +933,7 @@ function MatchesTab({
               Crear Partido
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-lg">
+          <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
                 {isEditing ? "Editar Partido" : "Nuevo Partido"} - {phase === DoublesMatchPhase.zone ? "Zona" : "Llave"}
@@ -942,7 +960,7 @@ function MatchesTab({
                   </Select>
                 </div>
               )}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <Label>Equipo 1</Label>
                   <Select
@@ -991,7 +1009,7 @@ function MatchesTab({
                 </div>
               </div>
               {phase === DoublesMatchPhase.playoff && (
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <Label>Ronda</Label>
                     <Select
@@ -1063,7 +1081,7 @@ function MatchesTab({
                   </SelectContent>
                 </Select>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <Label>Sede</Label>
                   <Select
@@ -1114,80 +1132,103 @@ function MatchesTab({
         </Dialog>
       </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Equipo 1</TableHead>
-            <TableHead>Equipo 2</TableHead>
-            <TableHead>{phase === DoublesMatchPhase.zone ? "Zona" : "Ronda"}</TableHead>
-            {isMultiDay && <TableHead>Día</TableHead>}
-            <TableHead>Turno</TableHead>
-            <TableHead>Sede/Cancha</TableHead>
-            <TableHead>Resultado</TableHead>
-            <TableHead>Estado</TableHead>
-            <TableHead>Acciones</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {filteredMatches.map((match) => (
-            <TableRow key={match.id}>
-              <TableCell>{match.team1?.teamName}</TableCell>
-              <TableCell>{match.team2?.teamName || "BYE"}</TableCell>
-              <TableCell>
-                {phase === DoublesMatchPhase.zone ? match.zoneName : getPlayoffRoundLabel(match.round)}
-              </TableCell>
-              {isMultiDay && (
-                <TableCell className="text-xs">
-                  {getMatchDayLabel(match.startTime)}
-                </TableCell>
-              )}
-              <TableCell>
-                {match.turnNumber}
-                <span className="text-xs text-gray-500 ml-1">
-                  ({getShiftLabel(match.turnNumber)})
-                </span>
-              </TableCell>
-              <TableCell>
-                {match.venue} {match.courtName}
-              </TableCell>
-              <TableCell>{formatScore(match)}</TableCell>
-              <TableCell>
-                <Badge
-                  variant={
-                    match.status === DoublesMatchStatus.played
-                      ? "default"
-                      : "secondary"
-                  }
-                >
-                  {match.status === DoublesMatchStatus.played
-                    ? "Jugado"
-                    : match.status === DoublesMatchStatus.cancelled
-                      ? "Cancelado"
-                      : "Pendiente"}
-                </Badge>
-              </TableCell>
-              <TableCell>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleOpenEdit(match)}
-                  >
-                    Editar
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => handleDelete(match.id)}
-                  >
-                    Eliminar
-                  </Button>
-                </div>
-              </TableCell>
+      <div className="flex flex-col sm:flex-row gap-2 mb-4">
+        <Input
+          placeholder="Buscar equipo..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full sm:w-64"
+        />
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="w-full sm:w-44">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos</SelectItem>
+            <SelectItem value={DoublesMatchStatus.pending}>Pendiente</SelectItem>
+            <SelectItem value={DoublesMatchStatus.played}>Jugado</SelectItem>
+            <SelectItem value={DoublesMatchStatus.cancelled}>Cancelado</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="overflow-x-auto -mx-2 px-2">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="text-xs sm:text-sm">Equipo 1</TableHead>
+              <TableHead className="text-xs sm:text-sm">Equipo 2</TableHead>
+              <TableHead className="text-xs sm:text-sm">{phase === DoublesMatchPhase.zone ? "Zona" : "Ronda"}</TableHead>
+              {isMultiDay && <TableHead className="text-xs sm:text-sm">Día</TableHead>}
+              <TableHead className="text-xs sm:text-sm hidden sm:table-cell">Turno</TableHead>
+              <TableHead className="text-xs sm:text-sm hidden sm:table-cell">Sede/Cancha</TableHead>
+              <TableHead className="text-xs sm:text-sm">Resultado</TableHead>
+              <TableHead className="text-xs sm:text-sm">Estado</TableHead>
+              <TableHead className="text-xs sm:text-sm">Acciones</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {filteredMatches.map((match) => (
+              <TableRow key={match.id}>
+                <TableCell className="text-xs sm:text-sm">{match.team1?.teamName}</TableCell>
+                <TableCell className="text-xs sm:text-sm">{match.team2?.teamName || "BYE"}</TableCell>
+                <TableCell className="text-xs sm:text-sm">
+                  {phase === DoublesMatchPhase.zone ? match.zoneName : getPlayoffRoundLabel(match.round)}
+                </TableCell>
+                {isMultiDay && (
+                  <TableCell className="text-xs">
+                    {getMatchDayLabel(match.startTime)}
+                  </TableCell>
+                )}
+                <TableCell className="hidden sm:table-cell">
+                  {match.turnNumber}
+                  <span className="text-xs text-gray-500 ml-1">
+                    ({getShiftLabel(match.turnNumber)})
+                  </span>
+                </TableCell>
+                <TableCell className="hidden sm:table-cell text-xs sm:text-sm">
+                  {match.venue} {match.courtName}
+                </TableCell>
+                <TableCell className="text-xs sm:text-sm">{formatScore(match)}</TableCell>
+                <TableCell>
+                  <Badge
+                    variant={
+                      match.status === DoublesMatchStatus.played
+                        ? "default"
+                        : "secondary"
+                    }
+                    className="text-[10px] sm:text-xs"
+                  >
+                    {match.status === DoublesMatchStatus.played
+                      ? "Jugado"
+                      : match.status === DoublesMatchStatus.cancelled
+                        ? "Cancelado"
+                        : "Pendiente"}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  <div className="flex flex-col sm:flex-row gap-1 sm:gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleOpenEdit(match)}
+                    >
+                      Editar
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleDelete(match.id)}
+                    >
+                      Eliminar
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 }
@@ -1202,6 +1243,7 @@ function ResultsTab({
   mutations: ReturnType<typeof useDoublesEventMutations>;
 }) {
   const queryClient = useQueryClient();
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedMatch, setSelectedMatch] = useState<DoublesMatch | null>(null);
   const [isEditingResult, setIsEditingResult] = useState(false);
   const [sets, setSets] = useState([
@@ -1212,11 +1254,19 @@ function ResultsTab({
   const [showThirdSet, setShowThirdSet] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
+  const matchesSearchQuery = (m: DoublesMatch) => {
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      m.team1?.teamName?.toLowerCase().includes(q) ||
+      m.team2?.teamName?.toLowerCase().includes(q)
+    );
+  };
   const pendingMatches = matches.filter(
-    (m) => m.status === DoublesMatchStatus.pending
+    (m) => m.status === DoublesMatchStatus.pending && matchesSearchQuery(m)
   );
   const playedMatches = matches.filter(
-    (m) => m.status === DoublesMatchStatus.played
+    (m) => m.status === DoublesMatchStatus.played && matchesSearchQuery(m)
   );
 
   const openResult = (match: DoublesMatch, isEdit: boolean = false) => {
@@ -1281,86 +1331,104 @@ function ResultsTab({
 
   const formatScore = (match: DoublesMatch) => {
     if (!match.sets || match.sets.length === 0) return "-";
+    const winnerIsTeam2 = match.winnerId === match.team2?.id;
     return match.sets
       .sort((a, b) => a.setNumber - b.setNumber)
-      .map((s) => `${s.team1Score}-${s.team2Score}`)
+      .map((s) =>
+        winnerIsTeam2
+          ? `${s.team2Score}-${s.team1Score}`
+          : `${s.team1Score}-${s.team2Score}`,
+      )
       .join(" ");
   };
 
   return (
     <div>
+      <div className="mb-4">
+        <Input
+          placeholder="Buscar equipo..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full sm:w-64"
+        />
+      </div>
+
       <h2 className="text-lg font-semibold mb-4">Partidos Pendientes</h2>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Equipo 1</TableHead>
-            <TableHead>Equipo 2</TableHead>
-            <TableHead>Fase</TableHead>
-            <TableHead>Acciones</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {pendingMatches.map((match) => (
-            <TableRow key={match.id}>
-              <TableCell>{match.team1?.teamName}</TableCell>
-              <TableCell>{match.team2?.teamName || "BYE"}</TableCell>
-              <TableCell>
-                {match.phase === DoublesMatchPhase.zone
-                  ? match.zoneName
-                  : getPlayoffRoundLabel(match.round)}
-              </TableCell>
-              <TableCell>
-                <Button size="sm" onClick={() => openResult(match, false)}>
-                  Cargar Resultado
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-          {pendingMatches.length === 0 && (
+      <div className="overflow-x-auto">
+        <Table>
+          <TableHeader>
             <TableRow>
-              <TableCell colSpan={4} className="text-center text-gray-500 py-4">
-                No hay partidos pendientes
-              </TableCell>
+              <TableHead className="text-xs sm:text-sm">Equipo 1</TableHead>
+              <TableHead className="text-xs sm:text-sm">Equipo 2</TableHead>
+              <TableHead className="text-xs sm:text-sm">Fase</TableHead>
+              <TableHead className="text-xs sm:text-sm">Acciones</TableHead>
             </TableRow>
-          )}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {pendingMatches.map((match) => (
+              <TableRow key={match.id}>
+                <TableCell className="text-xs sm:text-sm">{match.team1?.teamName}</TableCell>
+                <TableCell className="text-xs sm:text-sm">{match.team2?.teamName || "BYE"}</TableCell>
+                <TableCell className="text-xs sm:text-sm">
+                  {match.phase === DoublesMatchPhase.zone
+                    ? match.zoneName
+                    : getPlayoffRoundLabel(match.round)}
+                </TableCell>
+                <TableCell>
+                  <Button size="sm" onClick={() => openResult(match, false)}>
+                    Cargar Resultado
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+            {pendingMatches.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={4} className="text-center text-gray-500 py-4">
+                  No hay partidos pendientes
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
 
       {playedMatches.length > 0 && (
         <>
           <h2 className="text-lg font-semibold mt-8 mb-4">Resultados Cargados</h2>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Equipo 1</TableHead>
-                <TableHead>Equipo 2</TableHead>
-                <TableHead>Resultado</TableHead>
-                <TableHead>Ganador</TableHead>
-                <TableHead>Acciones</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {playedMatches.map((match) => (
-                <TableRow key={match.id}>
-                  <TableCell>{match.team1?.teamName}</TableCell>
-                  <TableCell>{match.team2?.teamName}</TableCell>
-                  <TableCell>{formatScore(match)}</TableCell>
-                  <TableCell className="font-medium">
-                    {match.winner?.teamName}
-                  </TableCell>
-                  <TableCell>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => openResult(match, true)}
-                    >
-                      Editar
-                    </Button>
-                  </TableCell>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="text-xs sm:text-sm">Equipo 1</TableHead>
+                  <TableHead className="text-xs sm:text-sm">Equipo 2</TableHead>
+                  <TableHead className="text-xs sm:text-sm">Ganador</TableHead>
+                  <TableHead className="text-xs sm:text-sm">Resultado (ganador 1ro)</TableHead>
+                  <TableHead className="text-xs sm:text-sm">Acciones</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {playedMatches.map((match) => (
+                  <TableRow key={match.id}>
+                    <TableCell className="text-xs sm:text-sm">{match.team1?.teamName}</TableCell>
+                    <TableCell className="text-xs sm:text-sm">{match.team2?.teamName}</TableCell>
+                    <TableCell className="text-xs sm:text-sm font-medium">
+                      {match.winner?.teamName}
+                    </TableCell>
+                    <TableCell className="text-xs sm:text-sm">{formatScore(match)}</TableCell>
+                    <TableCell>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => openResult(match, true)}
+                      >
+                        Editar
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </>
       )}
 
@@ -1368,7 +1436,7 @@ function ResultsTab({
         open={!!selectedMatch}
         onOpenChange={(v) => !v && handleDialogClose()}
       >
-        <DialogContent>
+        <DialogContent className="max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               {isEditingResult ? "Editar Resultado" : "Cargar Resultado"}
@@ -1381,10 +1449,21 @@ function ResultsTab({
                 {selectedMatch.team2?.teamName}
               </p>
 
+              <div className="flex items-center gap-2 sm:gap-4">
+                <span className="text-sm font-medium w-20 sm:w-24"></span>
+                <span className="w-16 sm:w-20 text-xs text-center text-gray-500 truncate">
+                  {selectedMatch.team1?.teamName}
+                </span>
+                <span></span>
+                <span className="w-16 sm:w-20 text-xs text-center text-gray-500 truncate">
+                  {selectedMatch.team2?.teamName}
+                </span>
+              </div>
+
               {sets.map((set, idx) => (
-                <div key={idx} className="flex items-center gap-4">
-                  <span className="text-sm font-medium w-24">
-                    {set.setNumber === 3 ? "Super Tiebreak" : `Set ${set.setNumber}`}
+                <div key={idx} className="flex items-center gap-2 sm:gap-4">
+                  <span className="text-sm font-medium w-20 sm:w-24">
+                    {set.setNumber === 3 ? "Super TB" : `Set ${set.setNumber}`}
                   </span>
                   <Input
                     type="number"
@@ -1393,7 +1472,7 @@ function ResultsTab({
                     onChange={(e) =>
                       updateSet(idx, "team1Score", Number(e.target.value))
                     }
-                    className="w-20"
+                    className="w-16 sm:w-20"
                   />
                   <span>-</span>
                   <Input
@@ -1403,7 +1482,7 @@ function ResultsTab({
                     onChange={(e) =>
                       updateSet(idx, "team2Score", Number(e.target.value))
                     }
-                    className="w-20"
+                    className="w-16 sm:w-20"
                   />
                 </div>
               ))}
