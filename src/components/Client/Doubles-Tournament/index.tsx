@@ -87,9 +87,9 @@ export default function ClientDoublesTournamentComponent() {
       )}
 
       <Tabs defaultValue="schedule">
-        <TabsList className="mb-4 w-full justify-center">
+        <TabsList className="mb-4 w-full justify-center overflow-x-auto">
           <TabsTrigger value="schedule" className="text-xs sm:text-sm">Grilla</TabsTrigger>
-          <TabsTrigger value="zones" className="text-xs sm:text-sm">Zonas y Posiciones</TabsTrigger>
+          <TabsTrigger value="zones" className="text-xs sm:text-sm"><span className="sm:hidden">Zonas</span><span className="hidden sm:inline">Zonas y Posiciones</span></TabsTrigger>
           <TabsTrigger value="playoffs" className="text-xs sm:text-sm">Llaves</TabsTrigger>
         </TabsList>
 

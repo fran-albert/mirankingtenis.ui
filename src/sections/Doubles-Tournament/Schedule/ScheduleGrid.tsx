@@ -1,12 +1,15 @@
 "use client";
 import React, { useState } from "react";
-import { DoublesSchedule, ScheduleTurn } from "@/types/Doubles-Event/DoublesEvent";
+import { DoublesSchedule, ScheduleMatch, ScheduleTurn } from "@/types/Doubles-Event/DoublesEvent";
+import { getPlayoffRoundLabel } from "@/common/constants/doubles-event.constants";
 
 interface ScheduleGridProps {
   schedule: DoublesSchedule;
 }
 
 export function ScheduleGrid({ schedule }: ScheduleGridProps) {
+  const [searchQuery, setSearchQuery] = useState("");
+
   if (!schedule || (schedule.days.length === 0 && schedule.turns.length === 0)) {
     return (
       <p className="text-gray-500 text-center py-8">
@@ -25,19 +28,34 @@ export function ScheduleGrid({ schedule }: ScheduleGridProps) {
 
   const isMultiDay = effectiveDays.length > 1;
 
-  if (isMultiDay) {
-    return <MultiDayGrid courts={courts} days={effectiveDays} />;
-  }
-
-  return <DayTable courts={courts} turns={effectiveDays[0].turns} />;
+  return (
+    <div>
+      <div className="mb-3">
+        <input
+          type="text"
+          placeholder="Buscar equipo..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full max-w-xs px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-400"
+        />
+      </div>
+      {isMultiDay ? (
+        <MultiDayGrid courts={courts} days={effectiveDays} searchQuery={searchQuery} />
+      ) : (
+        <DayTable courts={courts} turns={effectiveDays[0].turns} searchQuery={searchQuery} />
+      )}
+    </div>
+  );
 }
 
 function MultiDayGrid({
   courts,
   days,
+  searchQuery,
 }: {
   courts: { venue: string; name: string }[];
   days: { date: string; label: string; turns: ScheduleTurn[] }[];
+  searchQuery: string;
 }) {
   const [selectedDayIdx, setSelectedDayIdx] = useState(0);
   const currentDay = days[selectedDayIdx];
@@ -59,17 +77,28 @@ function MultiDayGrid({
           </button>
         ))}
       </div>
-      <DayTable courts={courts} turns={currentDay.turns} />
+      <DayTable courts={courts} turns={currentDay.turns} searchQuery={searchQuery} />
     </div>
+  );
+}
+
+function matchesSearch(match: ScheduleMatch, query: string): boolean {
+  if (!query) return false;
+  const q = query.toLowerCase();
+  return (
+    match.team1Name.toLowerCase().includes(q) ||
+    match.team2Name.toLowerCase().includes(q)
   );
 }
 
 function DayTable({
   courts,
   turns,
+  searchQuery,
 }: {
   courts: { venue: string; name: string }[];
   turns: ScheduleTurn[];
+  searchQuery: string;
 }) {
   const formatTime = (iso: string | null) => {
     if (!iso) return "";
@@ -98,6 +127,18 @@ function DayTable({
       colorIdx++;
     }
     return categoryColors[catName];
+  };
+
+  const TeamName = ({ name }: { name: string }) => {
+    const parts = name.split(" / ");
+    if (parts.length <= 1) return <>{name}</>;
+    return (
+      <>
+        {parts.map((p, i) => (
+          <span key={i} className="block">{p}</span>
+        ))}
+      </>
+    );
   };
 
   if (turns.length === 0) {
@@ -137,40 +178,66 @@ function DayTable({
                   {turn.endTime && ` - ${formatTime(turn.endTime)}`}
                 </div>
               </td>
-              {turn.slots.map((slot, i) => (
-                <td
-                  key={i}
-                  className={`border border-gray-300 p-0.5 sm:p-1 text-center ${
-                    slot.match
-                      ? getCategoryColor(slot.match.categoryName)
-                      : "bg-white"
-                  }`}
-                >
-                  {slot.match ? (
-                    <div className="space-y-0.5">
-                      <div className={`text-[10px] sm:text-[11px] leading-tight ${
-                        slot.match.winnerTeamNumber === 1 ? "font-bold" : "font-medium"
-                      }`}>
-                        {slot.match.team1Name}
-                      </div>
-                      <div className="text-gray-400 text-[9px] sm:text-[10px]">vs</div>
-                      <div className={`text-[10px] sm:text-[11px] leading-tight ${
-                        slot.match.winnerTeamNumber === 2 ? "font-bold" : "font-medium"
-                      }`}>
-                        {slot.match.team2Name}
-                      </div>
-                      {slot.match.score && (
-                        <div className="text-[9px] sm:text-[10px] font-bold text-gray-700 mt-0.5">
-                          {slot.match.score}
+              {turn.slots.map((slot, i) => {
+                const isHighlighted =
+                  !!searchQuery && !!slot.match && matchesSearch(slot.match, searchQuery);
+                const hasWinner = !!slot.match?.winnerTeamNumber;
+
+                return (
+                  <td
+                    key={i}
+                    className={`border border-gray-300 p-0.5 sm:p-1 text-center ${
+                      slot.match
+                        ? getCategoryColor(slot.match.categoryName)
+                        : "bg-white"
+                    } ${isHighlighted ? "ring-2 ring-yellow-400 ring-inset" : ""}`}
+                  >
+                    {slot.match ? (
+                      <div className="space-y-0.5">
+                        {hasWinner ? (
+                          <>
+                            <div className={`text-[10px] sm:text-[11px] leading-tight ${
+                              slot.match.winnerTeamNumber === 1
+                                ? "text-green-700 font-bold"
+                                : "text-gray-400"
+                            }`}>
+                              <TeamName name={slot.match.team1Name} />
+                              {slot.match.winnerTeamNumber === 1 && slot.match.score && (
+                                <span className="ml-1 text-[9px] sm:text-[10px]">{slot.match.score}</span>
+                              )}
+                            </div>
+                            <div className={`text-[10px] sm:text-[11px] leading-tight ${
+                              slot.match.winnerTeamNumber === 2
+                                ? "text-green-700 font-bold"
+                                : "text-gray-400"
+                            }`}>
+                              <TeamName name={slot.match.team2Name} />
+                              {slot.match.winnerTeamNumber === 2 && slot.match.score && (
+                                <span className="ml-1 text-[9px] sm:text-[10px]">{slot.match.score}</span>
+                              )}
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="text-[10px] sm:text-[11px] leading-tight font-medium">
+                              <TeamName name={slot.match.team1Name} />
+                            </div>
+                            <div className="text-gray-400 text-[9px] sm:text-[10px]">vs</div>
+                            <div className="text-[10px] sm:text-[11px] leading-tight font-medium">
+                              <TeamName name={slot.match.team2Name} />
+                            </div>
+                          </>
+                        )}
+                        <div className="text-[8px] sm:text-[9px] text-gray-400">
+                          {slot.match.phase === "playoff" && slot.match.round
+                            ? `${getPlayoffRoundLabel(slot.match.round)} · ${slot.match.categoryName}`
+                            : slot.match.categoryName}
                         </div>
-                      )}
-                      <div className="text-[8px] sm:text-[9px] text-gray-400">
-                        {slot.match.categoryName}
                       </div>
-                    </div>
-                  ) : null}
-                </td>
-              ))}
+                    ) : null}
+                  </td>
+                );
+              })}
             </tr>
           ))}
         </tbody>

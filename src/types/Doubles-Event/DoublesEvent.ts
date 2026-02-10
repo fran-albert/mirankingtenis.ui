@@ -98,6 +98,7 @@ export interface ScheduleMatch {
   status: string;
   score: string;
   winnerTeamNumber: 1 | 2 | null;
+  round: string | null;
 }
 
 export interface ScheduleSlot {

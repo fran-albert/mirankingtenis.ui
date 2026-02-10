@@ -685,12 +685,13 @@ function MatchScoreboard({ match, compact = false }: { match: DoublesMatch; comp
       className={`inline-grid gap-0 border rounded ${compact ? "text-xs" : "text-xs sm:text-sm"}`}
       style={{ gridTemplateColumns: `1fr repeat(${sets.length || 1}, 2rem)` }}
     >
-      <div className={`px-2 py-1 truncate ${isTeam1Winner ? "font-bold" : ""}`}>
+      <div className={`px-2 py-1 truncate flex items-center gap-1 ${isTeam1Winner ? "font-bold" : ""}`}>
         {match.team1?.teamName || "TBD"}
+        {isTeam1Winner && <Badge className="text-[9px] px-1 py-0 leading-tight shrink-0">G</Badge>}
       </div>
       {sets.length > 0 ? (
         sets.map((s) => (
-          <div key={`t1-${s.setNumber}`} className={`px-1 py-1 text-center border-l ${isTeam1Winner ? "font-bold" : ""}`}>
+          <div key={`t1-${s.setNumber}`} className={`px-1 py-1 text-center border-l ${s.team1Score > s.team2Score ? "text-green-600 font-bold" : ""}`}>
             {s.team1Score}
           </div>
         ))
@@ -698,12 +699,19 @@ function MatchScoreboard({ match, compact = false }: { match: DoublesMatch; comp
         <div className="px-1 py-1 text-center border-l text-gray-400">-</div>
       )}
 
-      <div className={`px-2 py-1 truncate border-t ${isTeam2Winner ? "font-bold" : ""}`}>
-        {match.team2?.teamName || "TBD"}
+      <div className={`px-2 py-1 truncate border-t flex items-center gap-1 ${isTeam2Winner ? "font-bold" : ""}`}>
+        {match.team2 ? (
+          <>
+            {match.team2.teamName}
+            {isTeam2Winner && <Badge className="text-[9px] px-1 py-0 leading-tight shrink-0">G</Badge>}
+          </>
+        ) : (
+          <span className="text-gray-400 italic">BYE</span>
+        )}
       </div>
       {sets.length > 0 ? (
         sets.map((s) => (
-          <div key={`t2-${s.setNumber}`} className={`px-1 py-1 text-center border-l border-t ${isTeam2Winner ? "font-bold" : ""}`}>
+          <div key={`t2-${s.setNumber}`} className={`px-1 py-1 text-center border-l border-t ${s.team2Score > s.team1Score ? "text-green-600 font-bold" : ""}`}>
             {s.team2Score}
           </div>
         ))
@@ -1238,6 +1246,22 @@ function MatchesTab({
                 </TableCell>
                 <TableCell>
                   <div className="flex flex-col sm:flex-row gap-1 sm:gap-2">
+                    {match.phase === DoublesMatchPhase.playoff &&
+                      !match.team2 &&
+                      match.status === DoublesMatchStatus.pending && (
+                        <Button
+                          variant="default"
+                          size="sm"
+                          onClick={async () => {
+                            await mutations.updateMatchResultMutation.mutateAsync({
+                              id: match.id,
+                              data: { sets: [], winnerId: match.team1!.id },
+                            });
+                          }}
+                        >
+                          Avanzar (BYE)
+                        </Button>
+                      )}
                     <Button
                       variant="outline"
                       size="sm"

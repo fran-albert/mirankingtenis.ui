@@ -1,6 +1,7 @@
 "use client";
 import React, { useMemo } from "react";
 import { DoublesMatch } from "@/types/Doubles-Event/DoublesEvent";
+import { DOUBLES_PLAYOFF_ROUNDS } from "@/common/constants/doubles-event.constants";
 import { PlayoffMatchCard } from "./PlayoffMatchCard";
 
 interface PlayoffBracketProps {
@@ -8,7 +9,7 @@ interface PlayoffBracketProps {
 }
 
 export function PlayoffBracket({ matches }: PlayoffBracketProps) {
-  // Group matches by round
+  // Group matches by round, sorted by canonical round order
   const roundGroups = useMemo(() => {
     const map = new Map<string, DoublesMatch[]>();
     matches.forEach((m) => {
@@ -22,7 +23,13 @@ export function PlayoffBracket({ matches }: PlayoffBracketProps) {
         (a, b) => (a.positionInBracket || 0) - (b.positionInBracket || 0)
       );
     });
-    return Array.from(map.entries());
+    // Sort rounds by canonical order from constants
+    const roundOrder = DOUBLES_PLAYOFF_ROUNDS.map((r) => r.value);
+    return Array.from(map.entries()).sort((a, b) => {
+      const idxA = roundOrder.indexOf(a[0]);
+      const idxB = roundOrder.indexOf(b[0]);
+      return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB);
+    });
   }, [matches]);
 
   if (matches.length === 0) {
