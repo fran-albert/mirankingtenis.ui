@@ -114,7 +114,7 @@ export default function AddTournamentDialog({
           <DialogDescription>
             <div className="space-y-4 mt-4">
               {/* Tournament Basic Info */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="name" className="text-black">
                     Nombre del Torneo
@@ -155,7 +155,7 @@ export default function AddTournamentDialog({
                   <h3 className="text-lg font-semibold text-black mb-3">
                     Configuración de Puntos
                   </h3>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="winnerPoints" className="text-black">
                         Puntos para Ganador

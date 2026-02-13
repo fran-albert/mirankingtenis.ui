@@ -114,7 +114,7 @@ export function DataTable<TData, TValue>({
   return (
     <>
       {showSearch && (
-        <div className="flex items-center mb-4 ">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-0 mb-4">
           <Search
             placeholder={searchPlaceholder}
             className="w-full px-4 py-2 border rounded-md"
@@ -123,7 +123,7 @@ export function DataTable<TData, TValue>({
           />
           {canAddUser && (
             <Button
-              className="ml-4 bg-slate-700"
+              className="w-full sm:w-auto sm:ml-4 bg-slate-700"
               onClick={onAddClick ? onAddClick : () => {}}
             >
               <Link href={addLinkPath}>{addLinkText}</Link>
@@ -137,27 +137,32 @@ export function DataTable<TData, TValue>({
             <thead className="bg-slate-700">
               {table.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <th
-                      key={header.id}
-                      onClick={header.column.getToggleSortingHandler()}
-                      className="py-2 px-6 text-left text-sm font-semibold text-white uppercase tracking-wider cursor-pointer"
-                    >
-                      <div className="flex items-center">
-                        {flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                        {header.column.getIsSorted() === "asc" ? (
-                          <FaAngleUp className="ml-2" />
-                        ) : header.column.getIsSorted() === "desc" ? (
-                          <FaAngleDown className="ml-2" />
-                        ) : (
-                          ""
-                        )}
-                      </div>
-                    </th>
-                  ))}
+                  {headerGroup.headers.map((header) => {
+                    const hideOnMobile = (header.column.columnDef.meta as any)?.hideOnMobile;
+                    return (
+                      <th
+                        key={header.id}
+                        onClick={header.column.getToggleSortingHandler()}
+                        className={`py-2 px-3 sm:px-6 text-left text-sm font-semibold text-white uppercase tracking-wider cursor-pointer ${
+                          hideOnMobile ? "hidden sm:table-cell" : ""
+                        }`}
+                      >
+                        <div className="flex items-center">
+                          {flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                          {header.column.getIsSorted() === "asc" ? (
+                            <FaAngleUp className="ml-2" />
+                          ) : header.column.getIsSorted() === "desc" ? (
+                            <FaAngleDown className="ml-2" />
+                          ) : (
+                            ""
+                          )}
+                        </div>
+                      </th>
+                    );
+                  })}
                 </tr>
               ))}
             </thead>
@@ -171,17 +176,22 @@ export function DataTable<TData, TValue>({
                       row.getIsSelected() ? "bg-teal-100" : "hover:bg-gray-50"
                     } transition duration-150 ease-in-out`}
                   >
-                    {row.getVisibleCells().map((cell) => (
-                      <td
-                        key={cell.id}
-                        className="py-2 px-6 border-b border-gray-200"
-                      >
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </td>
-                    ))}
+                    {row.getVisibleCells().map((cell) => {
+                      const hideOnMobile = (cell.column.columnDef.meta as any)?.hideOnMobile;
+                      return (
+                        <td
+                          key={cell.id}
+                          className={`py-2 px-3 sm:px-6 border-b border-gray-200 ${
+                            hideOnMobile ? "hidden sm:table-cell" : ""
+                          }`}
+                        >
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </td>
+                      );
+                    })}
                   </tr>
                 ))
               ) : (
@@ -190,7 +200,7 @@ export function DataTable<TData, TValue>({
                     colSpan={columns.length}
                     className="py-10 text-center text-gray-500"
                   >
-                    No se encuentran resultados con ese criterio de búsqueda.
+                    No se encuentran resultados con ese criterio de busqueda.
                   </td>
                 </tr>
               )}
@@ -200,9 +210,9 @@ export function DataTable<TData, TValue>({
       </div>
 
       <div className="flex justify-between items-center mt-4">
-        <Pagination className="mt-6 justify-end px-4 py-2">
+        <Pagination className="mt-6 justify-end px-2 sm:px-4 py-2">
           <PaginationContent>
-            {/* Botón para la página anterior */}
+            {/* Boton para la pagina anterior */}
             <PaginationPrevious
               onClick={() => {
                 if (pagination.pageIndex > 0) {
@@ -210,14 +220,14 @@ export function DataTable<TData, TValue>({
                 }
               }}
               aria-disabled={pagination.pageIndex === 0}
-              className={`cursor-pointer text-slate-800 hover:text-slate-900 ${
+              className={`cursor-pointer text-xs sm:text-sm text-slate-800 hover:text-slate-900 ${
                 pagination.pageIndex === 0
                   ? "cursor-not-allowed opacity-50"
                   : ""
               }`}
             />
 
-            {/* Números de páginas */}
+            {/* Numeros de paginas */}
             {renderPageNumbers().map((pageNumber, index) => (
               <PaginationItem key={index}>
                 <PaginationLink
@@ -232,7 +242,7 @@ export function DataTable<TData, TValue>({
               </PaginationItem>
             ))}
 
-            {/* Botón para la página siguiente */}
+            {/* Boton para la pagina siguiente */}
             <PaginationNext
               onClick={() => {
                 if (pagination.pageIndex < pageCount - 1) {
@@ -240,7 +250,7 @@ export function DataTable<TData, TValue>({
                 }
               }}
               aria-disabled={pagination.pageIndex === pageCount - 1}
-              className={`cursor-pointer text-slate-800 hover:text-slate-900 ${
+              className={`cursor-pointer text-xs sm:text-sm text-slate-800 hover:text-slate-900 ${
                 pagination.pageIndex === pageCount - 1
                   ? "cursor-not-allowed opacity-50"
                   : ""

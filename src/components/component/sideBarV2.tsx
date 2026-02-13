@@ -25,6 +25,15 @@ import { GiTrophyCup } from "react-icons/gi";
 function SideBarV3() {
   const { isAdmin } = useRoles();
   const { session, status } = useCustomSession();
+  const pathname = usePathname();
+
+  const linkClass = (href: string) =>
+    `flex items-center p-2 rounded-lg group cursor-pointer ${
+      pathname.startsWith(href)
+        ? "bg-gray-200 font-medium text-gray-900"
+        : "text-gray-900 hover:bg-gray-200"
+    }`;
+
   return (
     <>
       <div className="hidden border-r bg-gray-100/40 lg:block ">
@@ -41,7 +50,7 @@ function SideBarV3() {
                 <li>
                   <Link
                     href="/admin/inicio"
-                    className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-200 group cursor-pointer"
+                    className={linkClass("/admin/inicio")}
                   >
                     <FaHome size={25} color="#334155" />
                     <span className="ml-3">Inicio</span>
@@ -56,7 +65,7 @@ function SideBarV3() {
                     <li className="pl-5">
                       <Link
                         href="/admin/canchas"
-                        className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-200 group cursor-pointer"
+                        className={linkClass("/admin/canchas")}
                       >
                         <GiTennisCourt size={25} color="#334155" />
                         <span className="ml-3">Canchas</span>
@@ -65,34 +74,25 @@ function SideBarV3() {
                     <li className="pl-5">
                       <Link
                         href="/admin/categorias"
-                        className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-200 group cursor-pointer"
+                        className={linkClass("/admin/categorias")}
                       >
                         <BiSolidCategory size={25} color="#334155" />
-                        <span className="ml-3">Categorías</span>
+                        <span className="ml-3">Categorias</span>
                       </Link>
                     </li>
                     <li className="pl-5">
                       <Link
                         href="/admin/jugadores"
-                        className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-200 group cursor-pointer"
+                        className={linkClass("/admin/jugadores")}
                       >
                         <FaUsers size={25} color="#334155" />
                         <span className="ml-3">Jugadores</span>
                       </Link>
                     </li>
-                    {/* <li className="pl-5">
-                      <Link
-                        href="/admin/partidos"
-                        className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-200 group cursor-pointer"
-                      >
-                        <IoMdTennisball size={25} color="#334155" />
-                        <span className="ml-3">Partidos</span>
-                      </Link>
-                    </li> */}
                     <li className="pl-5">
                       <Link
                         href="/admin/torneos"
-                        className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-200 group cursor-pointer"
+                        className={linkClass("/admin/torneos")}
                       >
                         <GiTrophyCup size={25} color="#334155" />
                         <span className="ml-3">Torneos</span>
@@ -101,7 +101,7 @@ function SideBarV3() {
                     <li className="pl-5">
                       <Link
                         href="/admin/torneo-dobles"
-                        className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-200 group cursor-pointer"
+                        className={linkClass("/admin/torneo-dobles")}
                       >
                         <IoMdTennisball size={25} color="#334155" />
                         <span className="ml-3">Torneo Dobles</span>
@@ -110,21 +110,12 @@ function SideBarV3() {
                     <li className="pl-5">
                       <Link
                         href="/admin/configuracion"
-                        className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-200 group cursor-pointer"
+                        className={linkClass("/admin/configuracion")}
                       >
                         <FaCog size={25} color="#334155" />
                         <span className="ml-3">Configuracion</span>
                       </Link>
                     </li>
-                    {/* <li className="pl-5">
-                      <Link
-                        href="/admin/turnos"
-                        className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-200 group cursor-pointer"
-                      >
-                        <FaCalendarAlt size={25} color="#334155" />
-                        <span className="ml-3">Turnos</span>
-                      </Link>
-                    </li> */}
                   </>
                 )}
                 <hr />
