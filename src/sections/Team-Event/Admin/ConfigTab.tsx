@@ -301,7 +301,7 @@ export function ConfigTab({ event }: ConfigTabProps) {
               </CardHeader>
               <CardContent className="pt-0">
                 <p className="text-xs text-muted-foreground">
-                  {cat.teams?.length ?? 0} equipos
+                  {event.categories?.find((c) => c.id === cat.id)?.teams?.length ?? 0} equipos
                 </p>
               </CardContent>
             </Card>
