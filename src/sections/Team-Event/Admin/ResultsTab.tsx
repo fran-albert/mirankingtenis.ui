@@ -3,7 +3,6 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
@@ -36,6 +35,7 @@ import { SeriesCard } from "../SeriesCard";
 
 interface ResultsTabProps {
   eventId: number;
+  categoryId: number;
   singlesPerSeries: number;
   doublesPerSeries: number;
   gamesPerMatch: number;
@@ -92,13 +92,14 @@ function buildMatchTypes(
 
 export function ResultsTab({
   eventId,
+  categoryId,
   singlesPerSeries,
   doublesPerSeries,
   gamesPerMatch,
 }: ResultsTabProps) {
-  const { series, isLoading: seriesLoading } = useTeamEventSeries(eventId);
-  const { teams } = useTeamEventTeams(eventId);
-  const { loadResultMutation, updateResultMutation } = useSeriesMutations(eventId);
+  const { series, isLoading: seriesLoading } = useTeamEventSeries(eventId, categoryId);
+  const { teams } = useTeamEventTeams(eventId, categoryId);
+  const { loadResultMutation, updateResultMutation } = useSeriesMutations(eventId, categoryId);
 
   const [selectedSeries, setSelectedSeries] = useState<TeamEventSeries | null>(null);
   const matchTypes = buildMatchTypes(singlesPerSeries, doublesPerSeries);

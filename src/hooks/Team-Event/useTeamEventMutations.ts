@@ -6,6 +6,11 @@ import {
   deleteTeamEvent,
 } from "@/api/Team-Event/events";
 import {
+  createCategory,
+  updateCategory,
+  deleteCategory,
+} from "@/api/Team-Event/categories";
+import {
   createTeam,
   updateTeam,
   deleteTeam,
@@ -22,6 +27,8 @@ import { finalizeEvent } from "@/api/Team-Event/standings";
 import { teamEventKeys } from "./teamEventKeys";
 import {
   CreateTeamEventRequest,
+  CreateTeamEventCategoryRequest,
+  UpdateTeamEventCategoryRequest,
   CreateTeamRequest,
   AddPlayerRequest,
   ReplacePlayerRequest,
@@ -63,19 +70,63 @@ export const useEventMutations = () => {
   return { createEventMutation, updateEventMutation, deleteEventMutation };
 };
 
-export const useTeamMutations = (eventId: number) => {
+export const useCategoryMutations = (eventId: number) => {
   const queryClient = useQueryClient();
   const invalidate = () => {
     queryClient.invalidateQueries({
-      queryKey: teamEventKeys.teams(eventId),
+      queryKey: teamEventKeys.categories(eventId),
     });
     queryClient.invalidateQueries({
       queryKey: teamEventKeys.detail(eventId),
     });
   };
 
+  const createCategoryMutation = useMutation({
+    mutationFn: (data: CreateTeamEventCategoryRequest) =>
+      createCategory(eventId, data),
+    onSuccess: invalidate,
+  });
+
+  const updateCategoryMutation = useMutation({
+    mutationFn: ({
+      categoryId,
+      data,
+    }: {
+      categoryId: number;
+      data: UpdateTeamEventCategoryRequest;
+    }) => updateCategory(eventId, categoryId, data),
+    onSuccess: invalidate,
+  });
+
+  const deleteCategoryMutation = useMutation({
+    mutationFn: (categoryId: number) => deleteCategory(eventId, categoryId),
+    onSuccess: invalidate,
+  });
+
+  return {
+    createCategoryMutation,
+    updateCategoryMutation,
+    deleteCategoryMutation,
+  };
+};
+
+export const useTeamMutations = (eventId: number, categoryId: number) => {
+  const queryClient = useQueryClient();
+  const invalidate = () => {
+    queryClient.invalidateQueries({
+      queryKey: teamEventKeys.teams(eventId, categoryId),
+    });
+    queryClient.invalidateQueries({
+      queryKey: teamEventKeys.detail(eventId),
+    });
+    queryClient.invalidateQueries({
+      queryKey: teamEventKeys.categories(eventId),
+    });
+  };
+
   const createTeamMutation = useMutation({
-    mutationFn: (data: CreateTeamRequest) => createTeam(eventId, data),
+    mutationFn: (data: CreateTeamRequest) =>
+      createTeam(eventId, categoryId, data),
     onSuccess: invalidate,
   });
 
@@ -86,12 +137,12 @@ export const useTeamMutations = (eventId: number) => {
     }: {
       teamId: number;
       data: Partial<CreateTeamRequest>;
-    }) => updateTeam(eventId, teamId, data),
+    }) => updateTeam(eventId, categoryId, teamId, data),
     onSuccess: invalidate,
   });
 
   const deleteTeamMutation = useMutation({
-    mutationFn: (teamId: number) => deleteTeam(eventId, teamId),
+    mutationFn: (teamId: number) => deleteTeam(eventId, categoryId, teamId),
     onSuccess: invalidate,
   });
 
@@ -102,7 +153,7 @@ export const useTeamMutations = (eventId: number) => {
     }: {
       teamId: number;
       data: AddPlayerRequest;
-    }) => addPlayer(eventId, teamId, data),
+    }) => addPlayer(eventId, categoryId, teamId, data),
     onSuccess: invalidate,
   });
 
@@ -113,7 +164,7 @@ export const useTeamMutations = (eventId: number) => {
     }: {
       teamId: number;
       playerId: number;
-    }) => removePlayer(eventId, teamId, playerId),
+    }) => removePlayer(eventId, categoryId, teamId, playerId),
     onSuccess: invalidate,
   });
 
@@ -126,7 +177,7 @@ export const useTeamMutations = (eventId: number) => {
       teamId: number;
       playerId: number;
       data: ReplacePlayerRequest;
-    }) => replacePlayer(eventId, teamId, playerId, data),
+    }) => replacePlayer(eventId, categoryId, teamId, playerId, data),
     onSuccess: invalidate,
   });
 
@@ -140,17 +191,17 @@ export const useTeamMutations = (eventId: number) => {
   };
 };
 
-export const useSeriesMutations = (eventId: number) => {
+export const useSeriesMutations = (eventId: number, categoryId: number) => {
   const queryClient = useQueryClient();
   const invalidate = () => {
     queryClient.invalidateQueries({
-      queryKey: teamEventKeys.series(eventId),
+      queryKey: teamEventKeys.series(eventId, categoryId),
     });
     queryClient.invalidateQueries({
-      queryKey: teamEventKeys.standings(eventId),
+      queryKey: teamEventKeys.standings(eventId, categoryId),
     });
     queryClient.invalidateQueries({
-      queryKey: teamEventKeys.playerStats(eventId),
+      queryKey: teamEventKeys.playerStats(eventId, categoryId),
     });
     queryClient.invalidateQueries({
       queryKey: teamEventKeys.detail(eventId),
@@ -158,10 +209,10 @@ export const useSeriesMutations = (eventId: number) => {
   };
 
   const generateFixtureMutation = useMutation({
-    mutationFn: () => generateFixture(eventId),
+    mutationFn: () => generateFixture(eventId, categoryId),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: teamEventKeys.series(eventId),
+        queryKey: teamEventKeys.series(eventId, categoryId),
       });
       queryClient.invalidateQueries({
         queryKey: teamEventKeys.detail(eventId),
@@ -176,7 +227,7 @@ export const useSeriesMutations = (eventId: number) => {
     }: {
       seriesId: number;
       data: LoadSeriesResultRequest;
-    }) => loadSeriesResult(eventId, seriesId, data),
+    }) => loadSeriesResult(eventId, categoryId, seriesId, data),
     onSuccess: invalidate,
   });
 
@@ -187,24 +238,28 @@ export const useSeriesMutations = (eventId: number) => {
     }: {
       seriesId: number;
       data: LoadSeriesResultRequest;
-    }) => updateSeriesResult(eventId, seriesId, data),
+    }) => updateSeriesResult(eventId, categoryId, seriesId, data),
     onSuccess: invalidate,
   });
 
   return { generateFixtureMutation, loadResultMutation, updateResultMutation };
 };
 
-export const useStandingsMutations = (eventId: number) => {
+export const useStandingsMutations = (
+  eventId: number,
+  categoryId: number
+) => {
   const queryClient = useQueryClient();
 
   const finalizeMutation = useMutation({
-    mutationFn: (data: FinalizeEventRequest) => finalizeEvent(eventId, data),
+    mutationFn: (data: FinalizeEventRequest) =>
+      finalizeEvent(eventId, categoryId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: teamEventKeys.series(eventId),
+        queryKey: teamEventKeys.series(eventId, categoryId),
       });
       queryClient.invalidateQueries({
-        queryKey: teamEventKeys.standings(eventId),
+        queryKey: teamEventKeys.standings(eventId, categoryId),
       });
       queryClient.invalidateQueries({
         queryKey: teamEventKeys.detail(eventId),

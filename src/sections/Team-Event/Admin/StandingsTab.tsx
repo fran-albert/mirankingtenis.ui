@@ -24,14 +24,15 @@ import { Trophy } from "lucide-react";
 
 interface StandingsTabProps {
   event: TeamEvent;
+  categoryId: number;
 }
 
-export function StandingsTab({ event }: StandingsTabProps) {
-  const { standings, isLoading: standingsLoading } = useTeamEventStandings(event.id);
-  const { playerStats, isLoading: statsLoading } = useTeamEventPlayerStats(event.id);
-  const { teams } = useTeamEventTeams(event.id);
-  const { series } = useTeamEventSeries(event.id);
-  const { finalizeMutation } = useStandingsMutations(event.id);
+export function StandingsTab({ event, categoryId }: StandingsTabProps) {
+  const { standings, isLoading: standingsLoading } = useTeamEventStandings(event.id, categoryId);
+  const { playerStats, isLoading: statsLoading } = useTeamEventPlayerStats(event.id, categoryId);
+  const { teams } = useTeamEventTeams(event.id, categoryId);
+  const { series } = useTeamEventSeries(event.id, categoryId);
+  const { finalizeMutation } = useStandingsMutations(event.id, categoryId);
 
   const [team1Id, setTeam1Id] = useState("");
   const [team2Id, setTeam2Id] = useState("");

@@ -28,7 +28,7 @@ export interface TeamEventPlayer {
 
 export interface TeamEventTeam {
   id: number;
-  eventId: number;
+  categoryId: number;
   name: string;
   captainId: number | null;
   captain: User | null;
@@ -60,7 +60,7 @@ export interface TeamEventMatch {
 
 export interface TeamEventSeries {
   id: number;
-  eventId: number;
+  categoryId: number;
   roundNumber: number;
   matchday: number;
   homeTeam: TeamEventTeam;
@@ -78,6 +78,16 @@ export interface TeamEventSeries {
   matches: TeamEventMatch[];
 }
 
+export interface TeamEventCategory {
+  id: number;
+  eventId: number;
+  name: string;
+  maxPlayersPerTeam: number;
+  teams: TeamEventTeam[];
+  series: TeamEventSeries[];
+  createdAt: string;
+}
+
 export interface TeamEvent {
   id: number;
   name: string;
@@ -86,14 +96,12 @@ export interface TeamEvent {
   endDate: string | null;
   status: TeamEventStatus;
   rounds: number;
-  maxPlayersPerTeam: number;
   singlesPerSeries: number;
   doublesPerSeries: number;
   gamesPerMatch: number;
   noAdvantage: boolean;
   maxSinglesPerPlayerRegular: number;
-  teams: TeamEventTeam[];
-  series: TeamEventSeries[];
+  categories: TeamEventCategory[];
   createdAt: string;
   updatedAt: string;
 }
@@ -140,12 +148,21 @@ export interface CreateTeamEventRequest {
   endDate?: string;
   status?: TeamEventStatus;
   rounds?: number;
-  maxPlayersPerTeam?: number;
   singlesPerSeries?: number;
   doublesPerSeries?: number;
   gamesPerMatch?: number;
   noAdvantage?: boolean;
   maxSinglesPerPlayerRegular?: number;
+}
+
+export interface CreateTeamEventCategoryRequest {
+  name: string;
+  maxPlayersPerTeam?: number;
+}
+
+export interface UpdateTeamEventCategoryRequest {
+  name?: string;
+  maxPlayersPerTeam?: number;
 }
 
 export interface CreateTeamRequest {
