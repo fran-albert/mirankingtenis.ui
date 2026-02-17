@@ -22,7 +22,7 @@ export function CategorySelector({
       <button
         key={cat.id}
         onClick={() => onSelect(cat.id)}
-        className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+        className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-colors ${
           isSelected
             ? "bg-slate-700 text-white"
             : "bg-gray-200 text-gray-700 hover:bg-gray-300"

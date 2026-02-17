@@ -44,12 +44,14 @@ export const getColumns = (
     },
     {
       header: "Tipo",
+      meta: { hideOnMobile: true },
       cell: ({ row }) => (
         <div>{row.original.type === "master" ? "Master" : "Liga"}</div>
       ),
     },
     {
       header: "Creado",
+      meta: { hideOnMobile: true },
       cell: ({ row }) => (
         <div>
           {row.original.createdAt
@@ -60,6 +62,7 @@ export const getColumns = (
     },
     {
       header: "Empezado",
+      meta: { hideOnMobile: true },
       cell: ({ row }) => (
         <div>
           {row.original.startedAt ? formatDate(row.original.startedAt) : ""}
@@ -68,6 +71,7 @@ export const getColumns = (
     },
     {
       header: "Finalizado",
+      meta: { hideOnMobile: true },
       cell: ({ row }) => (
         <div>
           {row.original.finishedAt ? formatDate(row.original.finishedAt) : ""}

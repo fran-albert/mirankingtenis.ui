@@ -123,8 +123,8 @@ function CreatePlayerForm() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="grid gap-6">
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="col-span-2 flex flex-col items-center gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:gap-6">
+                  <div className="flex flex-col items-center gap-4">
                     <div className="relative">
                       <Avatar className="h-24 w-24">
                         <AvatarImage
@@ -140,7 +140,7 @@ function CreatePlayerForm() {
                 <Label htmlFor="firstName">Nombre</Label>
                 
               </div> */}
-                  <div className="grid grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                     <div className="space-y-2">
                       <FormField
                         control={form.control}
@@ -180,7 +180,7 @@ function CreatePlayerForm() {
                       />
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                     <div className="space-y-2">
                       <FormField
                         control={form.control}
@@ -222,13 +222,13 @@ function CreatePlayerForm() {
                       />
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                     <div className="space-y-2">
                       <Label htmlFor="phone">Sexo</Label>
                       <GenderSelect control={control} />
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                     <div className="space-y-2">
                       <Label htmlFor="state">Provincia</Label>
                       <StateSelect

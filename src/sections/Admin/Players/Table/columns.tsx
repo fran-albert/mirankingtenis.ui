@@ -57,18 +57,21 @@ export const getColumns = (
       accessorKey: "email",
       header: "Correo Electronico",
       enableSorting: false,
+      meta: { hideOnMobile: true },
       cell: ({ row }) => <div>{row.original.email}</div>,
     },
     {
       accessorKey: "registerDate",
       header: "Registro",
       enableSorting: true,
+      meta: { hideOnMobile: true },
       cell: ({ row }) => <div>{formatDate(row.original.registerDate)}</div>,
     },
     {
       accessorKey: "lastLoginDate",
-      header: "Último Login",
+      header: "Ultimo Login",
       enableSorting: true,
+      meta: { hideOnMobile: true },
       cell: ({ row }) => (
         <div className="font-bold">
           {row.original.lastLoginDate
