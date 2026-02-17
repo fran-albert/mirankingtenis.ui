@@ -1,11 +1,20 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { useTeamEvent } from "@/hooks/Team-Event/useTeamEvents";
+import { useTeamEventCategories } from "@/hooks/Team-Event/useTeamEventCategories";
 import { useUsers } from "@/hooks/Users/useUsers";
 import Loading from "@/components/Loading/loading";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
 import { TeamEventStatus } from "@/common/enum/team-event.enum";
 import { ConfigTab } from "@/sections/Team-Event/Admin/ConfigTab";
 import { TeamsTab } from "@/sections/Team-Event/Admin/TeamsTab";
@@ -24,14 +33,33 @@ export default function TeamEventManagePage() {
   const params = useParams();
   const eventId = Number(params.id);
   const { event, isLoading: eventLoading } = useTeamEvent(eventId);
+  const { categories, isLoading: categoriesLoading } = useTeamEventCategories(eventId, !!event);
   const [activeTab, setActiveTab] = useState("config");
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
   const { users } = useUsers({
     auth: true,
     fetchUsers: !!event && activeTab === "teams",
   });
 
+  // Auto-select first category, reconcile if deleted
+  useEffect(() => {
+    if (categories.length === 0) {
+      setSelectedCategoryId(null);
+      return;
+    }
+    const currentExists = categories.some((c) => c.id === selectedCategoryId);
+    if (!currentExists) {
+      setSelectedCategoryId(categories[0].id);
+    }
+  }, [categories, selectedCategoryId]);
+
   if (eventLoading) return <Loading isLoading={true} />;
   if (!event) return <div className="p-6">Torneo no encontrado</div>;
+
+  const selectedCategory = categories.find((c) => c.id === selectedCategoryId);
+  const showCategorySelector = categories.length > 1;
+  const hasCategorySelected = selectedCategoryId !== null && selectedCategory !== undefined;
+  const needsCategoryTabs = ["teams", "fixture", "results", "standings"];
 
   return (
     <div className="px-2 sm:px-4 md:px-6 py-4 sm:py-6">
@@ -50,6 +78,27 @@ export default function TeamEventManagePage() {
         </div>
         <Badge variant="outline">{statusLabels[event.status]}</Badge>
       </div>
+
+      {showCategorySelector && (
+        <div className="mb-4 max-w-xs">
+          <Label className="text-sm mb-1 block">Categoría</Label>
+          <Select
+            value={selectedCategoryId ? String(selectedCategoryId) : undefined}
+            onValueChange={(v) => setSelectedCategoryId(Number(v))}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Seleccionar categoría" />
+            </SelectTrigger>
+            <SelectContent>
+              {categories.map((cat) => (
+                <SelectItem key={cat.id} value={String(cat.id)}>
+                  {cat.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="mb-4 overflow-x-auto flex-wrap">
@@ -74,35 +123,58 @@ export default function TeamEventManagePage() {
           <ConfigTab event={event} />
         </TabsContent>
 
-        <TabsContent value="teams">
-          <TeamsTab
-            eventId={event.id}
-            maxPlayersPerTeam={event.maxPlayersPerTeam}
-            allUsers={users}
-          />
-        </TabsContent>
+        {categoriesLoading && needsCategoryTabs.includes(activeTab) ? (
+          <div className="py-8 text-center text-muted-foreground">
+            Cargando categorías...
+          </div>
+        ) : !hasCategorySelected && needsCategoryTabs.includes(activeTab) ? (
+          <div className="py-8 text-center text-muted-foreground">
+            Creá una categoría en la pestaña de Configuración para gestionar equipos, fixture y resultados.
+          </div>
+        ) : (
+          <>
+            <TabsContent value="teams">
+              {hasCategorySelected && (
+                <TeamsTab
+                  eventId={event.id}
+                  categoryId={selectedCategoryId!}
+                  maxPlayersPerTeam={selectedCategory!.maxPlayersPerTeam}
+                  allUsers={users}
+                />
+              )}
+            </TabsContent>
 
-        <TabsContent value="fixture">
-          <FixtureTab
-            event={event}
-            onSeriesClick={(seriesId) => {
-              setActiveTab("results");
-            }}
-          />
-        </TabsContent>
+            <TabsContent value="fixture">
+              {hasCategorySelected && (
+                <FixtureTab
+                  event={event}
+                  categoryId={selectedCategoryId!}
+                  onSeriesClick={() => {
+                    setActiveTab("results");
+                  }}
+                />
+              )}
+            </TabsContent>
 
-        <TabsContent value="results">
-          <ResultsTab
-            eventId={event.id}
-            singlesPerSeries={event.singlesPerSeries}
-            doublesPerSeries={event.doublesPerSeries}
-            gamesPerMatch={event.gamesPerMatch}
-          />
-        </TabsContent>
+            <TabsContent value="results">
+              {hasCategorySelected && (
+                <ResultsTab
+                  eventId={event.id}
+                  categoryId={selectedCategoryId!}
+                  singlesPerSeries={event.singlesPerSeries}
+                  doublesPerSeries={event.doublesPerSeries}
+                  gamesPerMatch={event.gamesPerMatch}
+                />
+              )}
+            </TabsContent>
 
-        <TabsContent value="standings">
-          <StandingsTab event={event} />
-        </TabsContent>
+            <TabsContent value="standings">
+              {hasCategorySelected && (
+                <StandingsTab event={event} categoryId={selectedCategoryId!} />
+              )}
+            </TabsContent>
+          </>
+        )}
       </Tabs>
     </div>
   );

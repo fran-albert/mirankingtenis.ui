@@ -10,10 +10,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { TeamEvent, CreateTeamEventRequest } from "@/types/Team-Event/TeamEvent";
+import {
+  TeamEvent,
+  TeamEventCategory,
+  CreateTeamEventRequest,
+} from "@/types/Team-Event/TeamEvent";
 import { TeamEventStatus } from "@/common/enum/team-event.enum";
-import { useEventMutations } from "@/hooks/Team-Event/useTeamEventMutations";
+import { useEventMutations, useCategoryMutations } from "@/hooks/Team-Event/useTeamEventMutations";
+import { useTeamEventCategories } from "@/hooks/Team-Event/useTeamEventCategories";
+import { Trash2, Plus } from "lucide-react";
 
 interface ConfigTabProps {
   event: TeamEvent;
@@ -28,6 +35,13 @@ const statusLabels: Record<TeamEventStatus, string> = {
 
 export function ConfigTab({ event }: ConfigTabProps) {
   const { updateEventMutation } = useEventMutations();
+  const { categories, isLoading: categoriesLoading } = useTeamEventCategories(event.id);
+  const {
+    createCategoryMutation,
+    updateCategoryMutation,
+    deleteCategoryMutation,
+  } = useCategoryMutations(event.id);
+
   const [form, setForm] = useState<Partial<CreateTeamEventRequest>>({
     name: event.name,
     description: event.description ?? "",
@@ -35,13 +49,15 @@ export function ConfigTab({ event }: ConfigTabProps) {
     endDate: event.endDate?.split("T")[0] ?? "",
     status: event.status,
     rounds: event.rounds,
-    maxPlayersPerTeam: event.maxPlayersPerTeam,
     singlesPerSeries: event.singlesPerSeries,
     doublesPerSeries: event.doublesPerSeries,
     gamesPerMatch: event.gamesPerMatch,
     noAdvantage: event.noAdvantage,
     maxSinglesPerPlayerRegular: event.maxSinglesPerPlayerRegular,
   });
+
+  const [newCategoryName, setNewCategoryName] = useState("");
+  const [newCategoryMaxPlayers, setNewCategoryMaxPlayers] = useState("5");
 
   const handleChange = (key: keyof CreateTeamEventRequest, value: string | number | boolean) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -74,6 +90,44 @@ export function ConfigTab({ event }: ConfigTabProps) {
         onError: () => toast.error("Error al guardar la configuración"),
       }
     );
+  };
+
+  const handleCreateCategory = () => {
+    const name = newCategoryName.trim();
+    if (!name) return;
+    const maxPlayers = parseInt(newCategoryMaxPlayers, 10);
+    createCategoryMutation.mutate(
+      { name, maxPlayersPerTeam: isNaN(maxPlayers) ? 5 : Math.max(2, maxPlayers) },
+      {
+        onSuccess: () => {
+          setNewCategoryName("");
+          setNewCategoryMaxPlayers("5");
+          toast.success("Categoría creada");
+        },
+        onError: () => toast.error("Error al crear la categoría"),
+      }
+    );
+  };
+
+  const handleUpdateCategoryMaxPlayers = (category: TeamEventCategory, raw: string) => {
+    const parsed = parseInt(raw, 10);
+    if (isNaN(parsed) || parsed < 2) return;
+    updateCategoryMutation.mutate(
+      { categoryId: category.id, data: { maxPlayersPerTeam: parsed } },
+      {
+        onSuccess: () => toast.success("Categoría actualizada"),
+        onError: () => toast.error("Error al actualizar"),
+      }
+    );
+  };
+
+  const handleDeleteCategory = (category: TeamEventCategory) => {
+    if (!confirm(`¿Eliminar la categoría "${category.name}"? Se eliminarán sus equipos y series.`))
+      return;
+    deleteCategoryMutation.mutate(category.id, {
+      onSuccess: () => toast.success("Categoría eliminada"),
+      onError: () => toast.error("No se pudo eliminar. Puede tener series con resultados cargados."),
+    });
   };
 
   return (
@@ -150,16 +204,6 @@ export function ConfigTab({ event }: ConfigTabProps) {
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="maxPlayersPerTeam">Jugadores por equipo</Label>
-          <Input
-            id="maxPlayersPerTeam"
-            type="number"
-            min={2}
-            value={form.maxPlayersPerTeam ?? 5}
-            onChange={(e) => handleNumberChange("maxPlayersPerTeam", e.target.value, 2)}
-          />
-        </div>
-        <div className="space-y-2">
           <Label htmlFor="gamesPerMatch">Games por partido</Label>
           <Input
             id="gamesPerMatch"
@@ -222,6 +266,76 @@ export function ConfigTab({ event }: ConfigTabProps) {
       >
         {updateEventMutation.isPending ? "Guardando..." : "Guardar cambios"}
       </Button>
+
+      <h3 className="text-lg font-semibold pt-6">Categorías</h3>
+      {categoriesLoading ? (
+        <p className="text-muted-foreground">Cargando categorías...</p>
+      ) : (
+        <div className="space-y-3">
+          {categories.map((cat) => (
+            <Card key={cat.id}>
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-base">{cat.name}</CardTitle>
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1">
+                      <Label className="text-xs whitespace-nowrap">Máx. jugadores:</Label>
+                      <Input
+                        type="number"
+                        min={2}
+                        className="w-16 h-8 text-sm"
+                        defaultValue={cat.maxPlayersPerTeam}
+                        onBlur={(e) => handleUpdateCategoryMaxPlayers(cat, e.target.value)}
+                      />
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={() => handleDeleteCategory(cat)}
+                    >
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <p className="text-xs text-muted-foreground">
+                  {cat.teams?.length ?? 0} equipos
+                </p>
+              </CardContent>
+            </Card>
+          ))}
+
+          <div className="flex gap-2 items-end pt-2">
+            <div className="flex-1 space-y-1">
+              <Label className="text-sm">Nueva categoría</Label>
+              <Input
+                placeholder="Nombre de la categoría"
+                value={newCategoryName}
+                onChange={(e) => setNewCategoryName(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleCreateCategory()}
+              />
+            </div>
+            <div className="w-20 space-y-1">
+              <Label className="text-sm">Jugadores</Label>
+              <Input
+                type="number"
+                min={2}
+                value={newCategoryMaxPlayers}
+                onChange={(e) => setNewCategoryMaxPlayers(e.target.value)}
+              />
+            </div>
+            <Button
+              onClick={handleCreateCategory}
+              disabled={createCategoryMutation.isPending || !newCategoryName.trim()}
+            >
+              <Plus className="h-4 w-4 mr-1" />
+              Crear
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
