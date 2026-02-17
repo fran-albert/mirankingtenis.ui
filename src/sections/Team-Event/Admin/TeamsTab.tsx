@@ -20,19 +20,20 @@ import { Trash2, UserPlus, UserMinus, RefreshCw, Plus } from "lucide-react";
 
 interface TeamsTabProps {
   eventId: number;
+  categoryId: number;
   maxPlayersPerTeam: number;
   allUsers: User[];
 }
 
-export function TeamsTab({ eventId, maxPlayersPerTeam, allUsers }: TeamsTabProps) {
-  const { teams, isLoading } = useTeamEventTeams(eventId);
+export function TeamsTab({ eventId, categoryId, maxPlayersPerTeam, allUsers }: TeamsTabProps) {
+  const { teams, isLoading } = useTeamEventTeams(eventId, categoryId);
   const {
     createTeamMutation,
     deleteTeamMutation,
     addPlayerMutation,
     removePlayerMutation,
     replacePlayerMutation,
-  } = useTeamMutations(eventId);
+  } = useTeamMutations(eventId, categoryId);
 
   const [newTeamName, setNewTeamName] = useState("");
   const [addPlayerDialog, setAddPlayerDialog] = useState<{

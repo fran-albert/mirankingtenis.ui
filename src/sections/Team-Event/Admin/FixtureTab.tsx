@@ -10,12 +10,13 @@ import { CalendarPlus } from "lucide-react";
 
 interface FixtureTabProps {
   event: TeamEvent;
+  categoryId: number;
   onSeriesClick?: (seriesId: number) => void;
 }
 
-export function FixtureTab({ event, onSeriesClick }: FixtureTabProps) {
-  const { series, isLoading } = useTeamEventSeries(event.id);
-  const { generateFixtureMutation } = useSeriesMutations(event.id);
+export function FixtureTab({ event, categoryId, onSeriesClick }: FixtureTabProps) {
+  const { series, isLoading } = useTeamEventSeries(event.id, categoryId);
+  const { generateFixtureMutation } = useSeriesMutations(event.id, categoryId);
 
   const canGenerate =
     event.status !== TeamEventStatus.finished && series.length === 0;

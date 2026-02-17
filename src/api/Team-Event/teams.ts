@@ -7,31 +7,35 @@ import {
   ReplacePlayerRequest,
 } from "@/types/Team-Event/TeamEvent";
 
-export const getTeamsByEvent = async (
-  eventId: number
+const basePath = (eventId: number, categoryId: number) =>
+  `team-events/${eventId}/categories/${categoryId}/teams`;
+
+export const getTeamsByCategory = async (
+  eventId: number,
+  categoryId: number
 ): Promise<TeamEventTeam[]> => {
-  const response = await axiosInstance.get(
-    `team-events/${eventId}/teams`
-  );
+  const response = await axiosInstance.get(basePath(eventId, categoryId));
   return response.data as TeamEventTeam[];
 };
 
 export const getTeam = async (
   eventId: number,
+  categoryId: number,
   teamId: number
 ): Promise<TeamEventTeam> => {
   const response = await axiosInstance.get(
-    `team-events/${eventId}/teams/${teamId}`
+    `${basePath(eventId, categoryId)}/${teamId}`
   );
   return response.data as TeamEventTeam;
 };
 
 export const createTeam = async (
   eventId: number,
+  categoryId: number,
   data: CreateTeamRequest
 ): Promise<TeamEventTeam> => {
   const response = await axiosInstance.post(
-    `team-events/${eventId}/teams`,
+    basePath(eventId, categoryId),
     data
   );
   return response.data as TeamEventTeam;
@@ -39,11 +43,12 @@ export const createTeam = async (
 
 export const updateTeam = async (
   eventId: number,
+  categoryId: number,
   teamId: number,
   data: Partial<CreateTeamRequest>
 ): Promise<TeamEventTeam> => {
   const response = await axiosInstance.patch(
-    `team-events/${eventId}/teams/${teamId}`,
+    `${basePath(eventId, categoryId)}/${teamId}`,
     data
   );
   return response.data as TeamEventTeam;
@@ -51,18 +56,22 @@ export const updateTeam = async (
 
 export const deleteTeam = async (
   eventId: number,
+  categoryId: number,
   teamId: number
 ): Promise<void> => {
-  await axiosInstance.delete(`team-events/${eventId}/teams/${teamId}`);
+  await axiosInstance.delete(
+    `${basePath(eventId, categoryId)}/${teamId}`
+  );
 };
 
 export const addPlayer = async (
   eventId: number,
+  categoryId: number,
   teamId: number,
   data: AddPlayerRequest
 ): Promise<TeamEventPlayer> => {
   const response = await axiosInstance.post(
-    `team-events/${eventId}/teams/${teamId}/players`,
+    `${basePath(eventId, categoryId)}/${teamId}/players`,
     data
   );
   return response.data as TeamEventPlayer;
@@ -70,22 +79,24 @@ export const addPlayer = async (
 
 export const removePlayer = async (
   eventId: number,
+  categoryId: number,
   teamId: number,
   playerId: number
 ): Promise<void> => {
   await axiosInstance.delete(
-    `team-events/${eventId}/teams/${teamId}/players/${playerId}`
+    `${basePath(eventId, categoryId)}/${teamId}/players/${playerId}`
   );
 };
 
 export const replacePlayer = async (
   eventId: number,
+  categoryId: number,
   teamId: number,
   playerId: number,
   data: ReplacePlayerRequest
 ): Promise<TeamEventPlayer> => {
   const response = await axiosInstance.post(
-    `team-events/${eventId}/teams/${teamId}/players/${playerId}/replace`,
+    `${basePath(eventId, categoryId)}/${teamId}/players/${playerId}/replace`,
     data
   );
   return response.data as TeamEventPlayer;

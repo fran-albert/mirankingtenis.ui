@@ -4,41 +4,46 @@ import {
   LoadSeriesResultRequest,
 } from "@/types/Team-Event/TeamEvent";
 
-export const getSeriesByEvent = async (
-  eventId: number
+const basePath = (eventId: number, categoryId: number) =>
+  `team-events/${eventId}/categories/${categoryId}/series`;
+
+export const getSeriesByCategory = async (
+  eventId: number,
+  categoryId: number
 ): Promise<TeamEventSeries[]> => {
-  const response = await axiosInstance.get(
-    `team-events/${eventId}/series`
-  );
+  const response = await axiosInstance.get(basePath(eventId, categoryId));
   return response.data as TeamEventSeries[];
 };
 
 export const getSeries = async (
   eventId: number,
+  categoryId: number,
   seriesId: number
 ): Promise<TeamEventSeries> => {
   const response = await axiosInstance.get(
-    `team-events/${eventId}/series/${seriesId}`
+    `${basePath(eventId, categoryId)}/${seriesId}`
   );
   return response.data as TeamEventSeries;
 };
 
 export const generateFixture = async (
-  eventId: number
+  eventId: number,
+  categoryId: number
 ): Promise<TeamEventSeries[]> => {
   const response = await axiosInstance.post(
-    `team-events/${eventId}/series/generate`
+    `${basePath(eventId, categoryId)}/generate`
   );
   return response.data as TeamEventSeries[];
 };
 
 export const loadSeriesResult = async (
   eventId: number,
+  categoryId: number,
   seriesId: number,
   data: LoadSeriesResultRequest
 ): Promise<TeamEventSeries> => {
   const response = await axiosInstance.post(
-    `team-events/${eventId}/series/${seriesId}/result`,
+    `${basePath(eventId, categoryId)}/${seriesId}/result`,
     data
   );
   return response.data as TeamEventSeries;
@@ -46,11 +51,12 @@ export const loadSeriesResult = async (
 
 export const updateSeriesResult = async (
   eventId: number,
+  categoryId: number,
   seriesId: number,
   data: LoadSeriesResultRequest
 ): Promise<TeamEventSeries> => {
   const response = await axiosInstance.patch(
-    `team-events/${eventId}/series/${seriesId}/result`,
+    `${basePath(eventId, categoryId)}/${seriesId}/result`,
     data
   );
   return response.data as TeamEventSeries;
