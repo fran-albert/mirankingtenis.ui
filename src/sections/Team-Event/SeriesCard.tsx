@@ -75,6 +75,11 @@ function renderMatchLine(match: TeamEventMatch) {
           <span className={homeWon ? "text-green-600" : "text-muted-foreground"}>{match.homeGames}</span>
           <span className="text-muted-foreground">-</span>
           <span className={awayWon ? "text-green-600" : "text-muted-foreground"}>{match.awayGames}</span>
+          {match.hasTiebreak && (
+            <span className="text-muted-foreground text-[10px]">
+              ({match.homeTiebreakScore}-{match.awayTiebreakScore})
+            </span>
+          )}
           <CheckCircle2 className="h-3 w-3 text-green-600" />
         </span>
       ) : (
