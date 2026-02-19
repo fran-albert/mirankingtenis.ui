@@ -22,6 +22,8 @@ import {
   generateFixture,
   loadSeriesResult,
   updateSeriesResult,
+  setLineup,
+  loadMatchScore,
 } from "@/api/Team-Event/series";
 import { finalizeEvent } from "@/api/Team-Event/standings";
 import { teamEventKeys } from "./teamEventKeys";
@@ -34,6 +36,8 @@ import {
   ReplacePlayerRequest,
   LoadSeriesResultRequest,
   FinalizeEventRequest,
+  SetLineupRequest,
+  LoadMatchScoreRequest,
 } from "@/types/Team-Event/TeamEvent";
 
 export const useEventMutations = () => {
@@ -242,7 +246,37 @@ export const useSeriesMutations = (eventId: number, categoryId: number) => {
     onSuccess: invalidate,
   });
 
-  return { generateFixtureMutation, loadResultMutation, updateResultMutation };
+  const setLineupMutation = useMutation({
+    mutationFn: ({
+      seriesId,
+      data,
+    }: {
+      seriesId: number;
+      data: SetLineupRequest;
+    }) => setLineup(eventId, categoryId, seriesId, data),
+    onSuccess: invalidate,
+  });
+
+  const loadMatchScoreMutation = useMutation({
+    mutationFn: ({
+      seriesId,
+      matchId,
+      data,
+    }: {
+      seriesId: number;
+      matchId: number;
+      data: LoadMatchScoreRequest;
+    }) => loadMatchScore(eventId, categoryId, seriesId, matchId, data),
+    onSuccess: invalidate,
+  });
+
+  return {
+    generateFixtureMutation,
+    loadResultMutation,
+    updateResultMutation,
+    setLineupMutation,
+    loadMatchScoreMutation,
+  };
 };
 
 export const useStandingsMutations = (

@@ -2,6 +2,9 @@ import axiosInstance from "@/services/axiosConfig";
 import {
   TeamEventSeries,
   LoadSeriesResultRequest,
+  SetLineupRequest,
+  LoadMatchScoreRequest,
+  TeamEventMatch,
 } from "@/types/Team-Event/TeamEvent";
 
 const basePath = (eventId: number, categoryId: number) =>
@@ -60,4 +63,31 @@ export const updateSeriesResult = async (
     data
   );
   return response.data as TeamEventSeries;
+};
+
+export const setLineup = async (
+  eventId: number,
+  categoryId: number,
+  seriesId: number,
+  data: SetLineupRequest
+): Promise<TeamEventSeries> => {
+  const response = await axiosInstance.post(
+    `${basePath(eventId, categoryId)}/${seriesId}/lineup`,
+    data
+  );
+  return response.data as TeamEventSeries;
+};
+
+export const loadMatchScore = async (
+  eventId: number,
+  categoryId: number,
+  seriesId: number,
+  matchId: number,
+  data: LoadMatchScoreRequest
+): Promise<TeamEventMatch> => {
+  const response = await axiosInstance.patch(
+    `${basePath(eventId, categoryId)}/${seriesId}/matches/${matchId}/score`,
+    data
+  );
+  return response.data as TeamEventMatch;
 };

@@ -199,3 +199,23 @@ export interface FinalizeEventRequest {
   team1Id: number;
   team2Id: number;
 }
+
+export interface SetLineupMatchRequest {
+  matchType: TeamEventMatchType;
+  homePlayer1Id: number;
+  homePlayer2Id?: number;
+  awayPlayer1Id: number;
+  awayPlayer2Id?: number;
+}
+
+export interface SetLineupRequest {
+  matches: SetLineupMatchRequest[];
+}
+
+export interface LoadMatchScoreRequest {
+  homeGames: number;
+  awayGames: number;
+  hasTiebreak?: boolean;
+  homeTiebreakScore?: number;
+  awayTiebreakScore?: number;
+}
