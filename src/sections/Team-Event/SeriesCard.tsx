@@ -1,10 +1,13 @@
 "use client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { TeamEventSeries } from "@/types/Team-Event/TeamEvent";
+import { CheckCircle2 } from "lucide-react";
+import { TeamEventSeries, TeamEventMatch, TeamEventPlayer } from "@/types/Team-Event/TeamEvent";
 import {
   TeamEventSeriesStatus,
   TeamEventSeriesPhase,
+  TeamEventMatchStatus,
+  TeamEventMatchType,
 } from "@/common/enum/team-event.enum";
 
 interface SeriesCardProps {
@@ -26,10 +29,54 @@ const statusColors: Record<TeamEventSeriesStatus, string> = {
   [TeamEventSeriesStatus.walkover]: "bg-gray-100 text-gray-800",
 };
 
+const matchTypeShort: Record<TeamEventMatchType, string> = {
+  [TeamEventMatchType.singles1]: "S1",
+  [TeamEventMatchType.singles2]: "S2",
+  [TeamEventMatchType.doubles]: "D",
+};
+
+function getShortName(player: TeamEventPlayer): string {
+  return `${player.player.lastname}`;
+}
+
+function renderMatchLine(match: TeamEventMatch) {
+  const isDoubles = match.matchType === TeamEventMatchType.doubles;
+  const isPlayed = match.status === TeamEventMatchStatus.played;
+
+  const home1 = getShortName(match.homePlayer1);
+  const away1 = getShortName(match.awayPlayer1);
+  const home2 = isDoubles && match.homePlayer2 ? getShortName(match.homePlayer2) : null;
+  const away2 = isDoubles && match.awayPlayer2 ? getShortName(match.awayPlayer2) : null;
+
+  const homeName = home2 ? `${home1}/${home2}` : home1;
+  const awayName = away2 ? `${away1}/${away2}` : away1;
+
+  return (
+    <div key={match.id} className="flex items-center justify-between text-xs gap-2">
+      <span className="font-medium text-muted-foreground w-6">
+        {matchTypeShort[match.matchType]}
+      </span>
+      <span className="flex-1 truncate">
+        {homeName} vs {awayName}
+      </span>
+      {isPlayed ? (
+        <span className="flex items-center gap-1 text-green-600 font-medium whitespace-nowrap">
+          {match.homeGames}-{match.awayGames}
+          <CheckCircle2 className="h-3 w-3" />
+        </span>
+      ) : (
+        <span className="text-muted-foreground whitespace-nowrap">pendiente</span>
+      )}
+    </div>
+  );
+}
+
 export function SeriesCard({ series, onClick }: SeriesCardProps) {
   const isCompleted =
     series.status === TeamEventSeriesStatus.completed ||
     series.status === TeamEventSeriesStatus.walkover;
+
+  const hasMatches = series.matches && series.matches.length > 0;
 
   return (
     <Card
@@ -70,7 +117,7 @@ export function SeriesCard({ series, onClick }: SeriesCardProps) {
           </div>
 
           <div className="flex items-center gap-2 min-w-[80px] justify-center">
-            {isCompleted ? (
+            {isCompleted || (hasMatches && series.status === TeamEventSeriesStatus.inProgress) ? (
               <span className="text-xl font-bold">
                 {series.homeMatchesWon} - {series.awayMatchesWon}
               </span>
@@ -91,6 +138,12 @@ export function SeriesCard({ series, onClick }: SeriesCardProps) {
             </p>
           </div>
         </div>
+
+        {hasMatches && (
+          <div className="mt-3 pt-3 border-t space-y-1">
+            {series.matches.map((match) => renderMatchLine(match))}
+          </div>
+        )}
       </CardContent>
     </Card>
   );
