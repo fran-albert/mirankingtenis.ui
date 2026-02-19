@@ -339,9 +339,28 @@ export function ResultsTab({
           setEditingMatchId(null);
           try {
             const updated = await getSeries(eventId, categoryId, selectedSeries.id);
+            // Si la serie se auto-completó, preparar matchForms para el modo view
+            if (
+              updated.status === TeamEventSeriesStatus.completed ||
+              updated.status === TeamEventSeriesStatus.walkover
+            ) {
+              setMatchForms(
+                updated.matches.map((m) => ({
+                  matchType: m.matchType,
+                  homePlayer1Id: String(m.homePlayer1Id),
+                  homePlayer2Id: m.homePlayer2Id ? String(m.homePlayer2Id) : "",
+                  awayPlayer1Id: String(m.awayPlayer1Id),
+                  awayPlayer2Id: m.awayPlayer2Id ? String(m.awayPlayer2Id) : "",
+                  homeGames: String(m.homeGames),
+                  awayGames: String(m.awayGames),
+                  hasTiebreak: m.hasTiebreak,
+                  homeTiebreakScore: m.homeTiebreakScore ? String(m.homeTiebreakScore) : "",
+                  awayTiebreakScore: m.awayTiebreakScore ? String(m.awayTiebreakScore) : "",
+                }))
+              );
+            }
             setSelectedSeries(updated);
           } catch {
-            // Si falla el refetch, cerramos el dialog
             setSelectedSeries(null);
           }
         },
@@ -532,7 +551,9 @@ export function ResultsTab({
               <CardContent className="space-y-3">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-xs">Local</Label>
+                    <Label className="text-xs font-semibold">
+                      {selectedSeries.homeTeam?.name ?? "Local"}
+                    </Label>
                     {renderPlayerSelect(
                       homePlayers,
                       form.homePlayer1Id,
@@ -548,7 +569,9 @@ export function ResultsTab({
                       )}
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs">Visitante</Label>
+                    <Label className="text-xs font-semibold">
+                      {selectedSeries.awayTeam?.name ?? "Visitante"}
+                    </Label>
                     {renderPlayerSelect(
                       awayPlayers,
                       form.awayPlayer1Id,
@@ -703,7 +726,9 @@ export function ResultsTab({
               <CardContent className="space-y-3">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-xs">Local</Label>
+                    <Label className="text-xs font-semibold">
+                      {selectedSeries.homeTeam?.name ?? "Local"}
+                    </Label>
                     {renderPlayerSelect(
                       homePlayers,
                       form.homePlayer1Id,
@@ -719,7 +744,9 @@ export function ResultsTab({
                       )}
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs">Visitante</Label>
+                    <Label className="text-xs font-semibold">
+                      {selectedSeries.awayTeam?.name ?? "Visitante"}
+                    </Label>
                     {renderPlayerSelect(
                       awayPlayers,
                       form.awayPlayer1Id,

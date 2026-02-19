@@ -8,6 +8,7 @@ import {
   TeamEventSeriesPhase,
   TeamEventMatchStatus,
   TeamEventMatchType,
+  TeamEventMatchSide,
 } from "@/common/enum/team-event.enum";
 
 interface SeriesCardProps {
@@ -42,6 +43,8 @@ function getShortName(player: TeamEventPlayer): string {
 function renderMatchLine(match: TeamEventMatch) {
   const isDoubles = match.matchType === TeamEventMatchType.doubles;
   const isPlayed = match.status === TeamEventMatchStatus.played;
+  const homeWon = match.winningSide === TeamEventMatchSide.home;
+  const awayWon = match.winningSide === TeamEventMatchSide.away;
 
   const home1 = getShortName(match.homePlayer1);
   const away1 = getShortName(match.awayPlayer1);
@@ -56,13 +59,23 @@ function renderMatchLine(match: TeamEventMatch) {
       <span className="font-medium text-muted-foreground w-6">
         {matchTypeShort[match.matchType]}
       </span>
-      <span className="flex-1 truncate">
-        {homeName} vs {awayName}
-      </span>
       {isPlayed ? (
-        <span className="flex items-center gap-1 text-green-600 font-medium whitespace-nowrap">
-          {match.homeGames}-{match.awayGames}
-          <CheckCircle2 className="h-3 w-3" />
+        <span className="flex-1 truncate">
+          <span className={homeWon ? "font-semibold text-green-600" : ""}>{homeName}</span>
+          {" vs "}
+          <span className={awayWon ? "font-semibold text-green-600" : ""}>{awayName}</span>
+        </span>
+      ) : (
+        <span className="flex-1 truncate">
+          {homeName} vs {awayName}
+        </span>
+      )}
+      {isPlayed ? (
+        <span className="flex items-center gap-1 font-medium whitespace-nowrap">
+          <span className={homeWon ? "text-green-600" : "text-muted-foreground"}>{match.homeGames}</span>
+          <span className="text-muted-foreground">-</span>
+          <span className={awayWon ? "text-green-600" : "text-muted-foreground"}>{match.awayGames}</span>
+          <CheckCircle2 className="h-3 w-3 text-green-600" />
         </span>
       ) : (
         <span className="text-muted-foreground whitespace-nowrap">pendiente</span>
