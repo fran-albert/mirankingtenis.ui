@@ -9,6 +9,11 @@ interface MainContainerProps {
 
 const MainContainer = ({ children }: MainContainerProps) => {
   const pathname = usePathname();
+  const isPublicRoute = pathname.startsWith("/p/");
+
+  if (isPublicRoute) {
+    return <div className="dark min-h-screen bg-[#040B1D] text-white overflow-x-hidden">{children}</div>;
+  }
 
   return (
     <>

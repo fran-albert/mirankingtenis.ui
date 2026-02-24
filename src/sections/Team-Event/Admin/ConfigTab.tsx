@@ -20,7 +20,8 @@ import {
 import { TeamEventStatus } from "@/common/enum/team-event.enum";
 import { useEventMutations, useCategoryMutations } from "@/hooks/Team-Event/useTeamEventMutations";
 import { useTeamEventCategories } from "@/hooks/Team-Event/useTeamEventCategories";
-import { Trash2, Plus } from "lucide-react";
+import { Trash2, Plus, QrCode, Download } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
 
 interface ConfigTabProps {
   event: TeamEvent;
@@ -130,8 +131,32 @@ export function ConfigTab({ event }: ConfigTabProps) {
     });
   };
 
+  const downloadQR = () => {
+    const svg = document.getElementById("tournament-qr");
+    if (!svg) return;
+    const svgData = new XMLSerializer().serializeToString(svg);
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    const img = new Image();
+    img.onload = () => {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx?.drawImage(img, 0, 0);
+      const pngFile = canvas.toDataURL("image/png");
+      const downloadLink = document.createElement("a");
+      downloadLink.download = `QR-${event.name}.png`;
+      downloadLink.href = pngFile;
+      downloadLink.click();
+    };
+    img.src = "data:image/svg+xml;base64," + btoa(svgData);
+  };
+
+  const publicUrl = typeof window !== "undefined" 
+    ? `${window.location.origin}/p/copa/${event.id}` 
+    : "";
+
   return (
-    <div className="space-y-6 max-w-2xl">
+    <div className="space-y-6 max-w-2xl pb-20">
       <div className="grid gap-4 md:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="name">Nombre del torneo</Label>
@@ -266,6 +291,50 @@ export function ConfigTab({ event }: ConfigTabProps) {
       >
         {updateEventMutation.isPending ? "Guardando..." : "Guardar cambios"}
       </Button>
+
+      {/* QR Code Section */}
+      <Card className="mt-8 border-tennis-accent/20 bg-tennis-accent/5">
+        <CardHeader>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <QrCode className="h-5 w-5 text-tennis-accent" />
+            Acceso Público (QR Copa 9 Games)
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col md:flex-row items-center gap-6">
+          <div className="bg-white p-3 rounded-xl shadow-lg">
+            <QRCodeSVG 
+              id="tournament-qr"
+              value={publicUrl}
+              size={180}
+              level="H"
+              includeMargin={true}
+              imageSettings={{
+                src: "https://mirankingtenis.com.ar/wp-content/uploads/2023/05/cropped-cropped-LOGOTENIS-171x172.png",
+                x: undefined,
+                y: undefined,
+                height: 40,
+                width: 40,
+                excavate: true,
+              }}
+            />
+          </div>
+          <div className="flex-1 space-y-4 text-center md:text-left">
+            <p className="text-sm text-muted-foreground">
+              Este código QR dirige directamente a la vista premium de la Copa. 
+              Ideal para imprimir y colocar en carteles o mesas del club.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-2 justify-center md:justify-start">
+              <Button variant="outline" size="sm" onClick={() => window.open(publicUrl, "_blank")}>
+                Probar enlace
+              </Button>
+              <Button size="sm" onClick={downloadQR} className="bg-tennis-accent text-black hover:bg-tennis-accent/90">
+                <Download className="h-4 w-4 mr-2" />
+                Descargar QR (.png)
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       <h3 className="text-lg font-semibold pt-6">Categorías</h3>
       {categoriesLoading ? (
