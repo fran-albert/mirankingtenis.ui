@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Camera } from "lucide-react";
 import {
   TeamEventSeries,
   TeamEventMatch,
@@ -39,6 +39,7 @@ import { useTeamEventTeams } from "@/hooks/Team-Event/useTeamEventTeams";
 import { useSeriesMutations } from "@/hooks/Team-Event/useTeamEventMutations";
 import { getSeries } from "@/api/Team-Event/series";
 import { SeriesCard } from "../SeriesCard";
+import { StoryPreviewDialog } from "./StoryPreviewDialog";
 
 interface ResultsTabProps {
   eventId: number;
@@ -162,6 +163,7 @@ export function ResultsTab({
   } = useSeriesMutations(eventId, categoryId);
 
   const [selectedSeries, setSelectedSeries] = useState<TeamEventSeries | null>(null);
+  const [storyPreviewSeries, setStoryPreviewSeries] = useState<TeamEventSeries | null>(null);
   const matchTypes = buildMatchTypes(singlesPerSeries, doublesPerSeries);
 
   // Lineup mode state
@@ -753,6 +755,15 @@ export function ResultsTab({
         })}
 
         <Button
+          variant="outline"
+          className="w-full"
+          onClick={() => setStoryPreviewSeries(selectedSeries)}
+        >
+          <Camera className="h-4 w-4 mr-2" />
+          Exportar Instagram Story
+        </Button>
+
+        <Button
           className="w-full"
           onClick={handleUpdateSubmit}
           disabled={updateResultMutation.isPending || !isFullFormValid()}
@@ -849,6 +860,11 @@ export function ResultsTab({
           {selectedSeries && dialogMode === "view" && renderViewDialog()}
         </DialogContent>
       </Dialog>
+
+      <StoryPreviewDialog
+        series={storyPreviewSeries}
+        onClose={() => setStoryPreviewSeries(null)}
+      />
     </div>
   );
 }
