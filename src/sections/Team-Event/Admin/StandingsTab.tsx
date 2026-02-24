@@ -130,7 +130,7 @@ export function StandingsTab({ event, categoryId }: StandingsTabProps) {
         {statsLoading ? (
           <p className="text-muted-foreground">Cargando estadísticas...</p>
         ) : (
-          <PlayerStatsTable stats={playerStats} />
+          <PlayerStatsTable stats={playerStats} teams={teams} />
         )}
       </div>
     </div>
