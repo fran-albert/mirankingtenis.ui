@@ -59,19 +59,16 @@ function getPlayerInitials(player: TeamEventPlayer): string {
 function PlayerAvatar({
   player,
   isWinner,
-  size = "tiny",
 }: {
   player: TeamEventPlayer;
   isWinner: boolean;
-  size?: "tiny" | "small";
 }) {
-  const sizeClass = size === "tiny" ? "h-6 w-6" : "h-7 w-7";
   return (
     <OptimizedAvatar
       src={player.player.photo}
       alt={`${player.player.name} ${player.player.lastname}`}
       size="thumbnail"
-      className={`${sizeClass} ${isWinner ? "ring-1 ring-emerald-500" : "ring-1 ring-white/10"}`}
+      className={`h-10 w-10 ${isWinner ? "ring-2 ring-emerald-500" : "ring-1 ring-white/10"}`}
       fallbackText={getPlayerInitials(player)}
     />
   );
@@ -84,42 +81,42 @@ function MatchLine({ match }: { match: TeamEventMatch }) {
   const awayWon = match.winningSide === TeamEventMatchSide.away;
 
   return (
-    <div className="flex items-center gap-2 py-1.5">
+    <div className="flex items-center gap-2 py-2.5">
       {/* Match type badge */}
-      <span className="text-[10px] font-bold text-gray-500 w-5 shrink-0 text-center">
+      <span className="text-[10px] font-bold text-gray-500 w-5 shrink-0 text-center self-center">
         {matchTypeShort[match.matchType]}
       </span>
 
       {/* Home players */}
-      <div className="flex items-center gap-1.5 flex-1 min-w-0 justify-end">
-        <span
-          className={`text-[11px] truncate ${homeWon ? "text-emerald-400 font-semibold" : "text-gray-300"}`}
-        >
-          {match.homePlayer1.player.lastname}
-          {isDoubles && match.homePlayer2
-            ? `/${match.homePlayer2.player.lastname}`
-            : ""}
-        </span>
-        <div className="flex -space-x-1">
+      <div className="flex flex-col items-end gap-1 flex-1 min-w-0">
+        <div className="flex -space-x-1.5">
           <PlayerAvatar player={match.homePlayer1} isWinner={homeWon} />
           {isDoubles && match.homePlayer2 && (
             <PlayerAvatar player={match.homePlayer2} isWinner={homeWon} />
           )}
         </div>
+        <span
+          className={`text-[11px] leading-tight truncate max-w-full ${homeWon ? "text-emerald-400 font-semibold" : "text-gray-300"}`}
+        >
+          {match.homePlayer1.player.lastname}
+          {isDoubles && match.homePlayer2
+            ? ` / ${match.homePlayer2.player.lastname}`
+            : ""}
+        </span>
       </div>
 
       {/* Score */}
-      <div className="flex items-center gap-1 min-w-[50px] justify-center shrink-0">
+      <div className="flex items-center gap-1 min-w-[50px] justify-center shrink-0 self-center">
         {isPlayed ? (
           <>
             <span
-              className={`text-xs font-mono font-bold ${homeWon ? "text-emerald-400" : "text-gray-500"}`}
+              className={`text-sm font-mono font-bold ${homeWon ? "text-emerald-400" : "text-gray-500"}`}
             >
               {match.homeGames}
             </span>
             <span className="text-[10px] text-gray-600">-</span>
             <span
-              className={`text-xs font-mono font-bold ${awayWon ? "text-emerald-400" : "text-gray-500"}`}
+              className={`text-sm font-mono font-bold ${awayWon ? "text-emerald-400" : "text-gray-500"}`}
             >
               {match.awayGames}
             </span>
@@ -135,19 +132,19 @@ function MatchLine({ match }: { match: TeamEventMatch }) {
       </div>
 
       {/* Away players */}
-      <div className="flex items-center gap-1.5 flex-1 min-w-0">
-        <div className="flex -space-x-1">
+      <div className="flex flex-col items-start gap-1 flex-1 min-w-0">
+        <div className="flex -space-x-1.5">
           <PlayerAvatar player={match.awayPlayer1} isWinner={awayWon} />
           {isDoubles && match.awayPlayer2 && (
             <PlayerAvatar player={match.awayPlayer2} isWinner={awayWon} />
           )}
         </div>
         <span
-          className={`text-[11px] truncate ${awayWon ? "text-emerald-400 font-semibold" : "text-gray-300"}`}
+          className={`text-[11px] leading-tight truncate max-w-full ${awayWon ? "text-emerald-400 font-semibold" : "text-gray-300"}`}
         >
           {match.awayPlayer1.player.lastname}
           {isDoubles && match.awayPlayer2
-            ? `/${match.awayPlayer2.player.lastname}`
+            ? ` / ${match.awayPlayer2.player.lastname}`
             : ""}
         </span>
       </div>
