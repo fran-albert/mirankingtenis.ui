@@ -107,14 +107,14 @@ export function TeamEventPublicDetail({ isPublicView = false }: TeamEventPublicD
                 variant="ghost"
                 size="sm"
                 onClick={() => setActiveTab("bracket")}
-                className={`text-[10px] sm:text-xs font-semibold ${activeTab === 'bracket' ? 'text-tennis-accent' : 'text-gray-400 hover:text-white'}`}
+                className={`text-xs sm:text-sm font-semibold ${activeTab === 'bracket' ? 'text-tennis-accent' : 'text-gray-400 hover:text-white'}`}
              >
                 Ver Cuadro
              </Button>
              <Button
                 size="sm"
                 onClick={() => setActiveTab("fixture")}
-                className="bg-tennis-accent hover:bg-tennis-accent/90 text-black font-bold text-[10px] sm:text-xs h-8 sm:h-9"
+                className="bg-tennis-accent hover:bg-tennis-accent/90 text-black font-bold text-xs sm:text-sm h-8 sm:h-9 px-3"
              >
                 {isPublicView ? "Partidos" : "Partidos de Hoy"}
              </Button>
@@ -123,7 +123,7 @@ export function TeamEventPublicDetail({ isPublicView = false }: TeamEventPublicD
 
         {/* Filters Bar */}
         <div className="border-t border-white/10 bg-tennis-card/50 overflow-x-auto no-scrollbar">
-          <div className="max-w-7xl mx-auto px-4 h-12 flex items-center gap-6 whitespace-nowrap text-[10px] sm:text-xs font-bold uppercase tracking-widest text-gray-400">
+          <div className="max-w-7xl mx-auto px-4 h-12 flex items-center gap-6 whitespace-nowrap text-xs sm:text-sm font-bold uppercase tracking-wider text-gray-400">
              <button 
                 onClick={() => setActiveTab("fixture")}
                 className={`h-full px-1 transition-all ${activeTab === "fixture" ? "text-white border-b-2 border-tennis-accent" : "hover:text-white"}`}
