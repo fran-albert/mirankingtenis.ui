@@ -114,7 +114,7 @@ export function TeamEventPublicDetail({ isPublicView = false }: TeamEventPublicD
              <Button
                 size="sm"
                 onClick={() => setActiveTab("fixture")}
-                className="bg-tennis-accent hover:bg-tennis-accent/90 text-black font-bold text-xs sm:text-sm h-8 sm:h-9 px-3"
+                className="bg-tennis-accent hover:bg-tennis-accent/90 text-white font-bold text-xs sm:text-sm h-8 sm:h-9 px-3"
              >
                 {isPublicView ? "Partidos" : "Partidos de Hoy"}
              </Button>
