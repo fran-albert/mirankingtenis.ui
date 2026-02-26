@@ -98,9 +98,9 @@ function MatchLine({ match }: { match: TeamEventMatch }) {
         <span
           className={`text-[11px] leading-tight truncate max-w-full ${homeWon ? "text-emerald-400 font-semibold" : "text-gray-300"}`}
         >
-          {match.homePlayer1.player.lastname}
+          {`${match.homePlayer1.player.name[0]}. ${match.homePlayer1.player.lastname}`}
           {isDoubles && match.homePlayer2
-            ? ` / ${match.homePlayer2.player.lastname}`
+            ? ` / ${match.homePlayer2.player.name[0]}. ${match.homePlayer2.player.lastname}`
             : ""}
         </span>
       </div>
@@ -142,9 +142,9 @@ function MatchLine({ match }: { match: TeamEventMatch }) {
         <span
           className={`text-[11px] leading-tight truncate max-w-full ${awayWon ? "text-emerald-400 font-semibold" : "text-gray-300"}`}
         >
-          {match.awayPlayer1.player.lastname}
+          {`${match.awayPlayer1.player.name[0]}. ${match.awayPlayer1.player.lastname}`}
           {isDoubles && match.awayPlayer2
-            ? ` / ${match.awayPlayer2.player.lastname}`
+            ? ` / ${match.awayPlayer2.player.name[0]}. ${match.awayPlayer2.player.lastname}`
             : ""}
         </span>
       </div>
