@@ -165,7 +165,7 @@ export function SeriesMatchCard({ series, onClick }: SeriesMatchCardProps) {
   return (
     <div
       onClick={onClick}
-      className={`bg-white/[0.03] hover:bg-white/[0.06] transition-all rounded-xl border border-white/5 border-l-2 ${status.border} ${onClick ? "cursor-pointer" : ""} overflow-hidden`}
+      className={`bg-white/[0.06] hover:bg-white/[0.10] transition-all rounded-xl border border-white/10 border-l-2 ${status.border} ${onClick ? "cursor-pointer" : ""} overflow-hidden`}
     >
       {/* Header: Team names + score + status */}
       <div className="flex items-center justify-between p-3 gap-2">
@@ -220,7 +220,7 @@ export function SeriesMatchCard({ series, onClick }: SeriesMatchCardProps) {
 
       {/* Match details with player avatars */}
       {hasMatches && (
-        <div className="border-t border-white/5 px-3 py-1 space-y-0">
+        <div className="border-t border-white/10 px-3 py-1 space-y-0">
           {series.matches.map((match) => (
             <MatchLine key={match.id} match={match} />
           ))}

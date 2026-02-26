@@ -67,9 +67,9 @@ export function TeamEventPublicDetail({ isPublicView = false }: TeamEventPublicD
   const displayFeatured = [...activeSeries, ...pendingSeries].slice(0, 2);
 
   return (
-    <div className={`dark min-h-screen bg-[#040B1D] text-white font-sans selection:bg-tennis-accent selection:text-black ${isPublicView ? 'overflow-x-hidden' : ''}`}>
+    <div className={`dark min-h-screen bg-[#0F1D32] text-white font-sans selection:bg-tennis-accent selection:text-black ${isPublicView ? 'overflow-x-hidden' : ''}`}>
       {/* Top Navbar */}
-      <div className="border-b border-white/5 bg-[#040B1D]/80 backdrop-blur-md sticky top-0 z-50">
+      <div className="border-b border-white/10 bg-[#0F1D32]/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <Trophy className="text-tennis-accent w-6 h-6" />
@@ -95,7 +95,7 @@ export function TeamEventPublicDetail({ isPublicView = false }: TeamEventPublicD
                    className="appearance-none bg-white/5 border border-white/10 rounded-md text-[10px] sm:text-xs font-bold text-gray-300 hover:text-white transition-colors pl-2 pr-6 h-8 sm:h-9 cursor-pointer focus:outline-none focus:ring-1 focus:ring-tennis-accent"
                  >
                    {categories.map((c) => (
-                     <option key={c.id} value={c.id} className="bg-[#040B1D] text-white">
+                     <option key={c.id} value={c.id} className="bg-[#0F1D32] text-white">
                        {c.name}
                      </option>
                    ))}
@@ -122,7 +122,7 @@ export function TeamEventPublicDetail({ isPublicView = false }: TeamEventPublicD
         </div>
 
         {/* Filters Bar */}
-        <div className="border-t border-white/5 bg-tennis-card/50 overflow-x-auto no-scrollbar">
+        <div className="border-t border-white/10 bg-tennis-card/50 overflow-x-auto no-scrollbar">
           <div className="max-w-7xl mx-auto px-4 h-12 flex items-center gap-6 whitespace-nowrap text-[10px] sm:text-xs font-bold uppercase tracking-widest text-gray-400">
              <button 
                 onClick={() => setActiveTab("fixture")}
@@ -200,7 +200,7 @@ export function TeamEventPublicDetail({ isPublicView = false }: TeamEventPublicD
             </h2>
           </div>
 
-          <div className="bg-tennis-card rounded-2xl border border-white/5 p-4 sm:p-6 shadow-2xl min-h-[400px]">
+          <div className="bg-tennis-card rounded-2xl border border-white/10 p-4 sm:p-6 shadow-2xl min-h-[400px]">
               {activeTab === "fixture" && (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                   {series.map((s) => (
@@ -236,7 +236,7 @@ export function TeamEventPublicDetail({ isPublicView = false }: TeamEventPublicD
                   {teams.map((team: TeamEventTeam) => {
                     const activePlayers = team.players.filter((p: TeamEventPlayer) => !p.leftAt);
                     return (
-                      <Card key={team.id} className="bg-white/[0.03] border-white/5 text-white shadow-none">
+                      <Card key={team.id} className="bg-white/[0.06] border-white/10 text-white shadow-none">
                         <CardHeader className="pb-3">
                           <div className="flex items-center gap-2">
                             <div className="w-8 h-8 rounded-lg bg-tennis-accent/10 flex items-center justify-center">
