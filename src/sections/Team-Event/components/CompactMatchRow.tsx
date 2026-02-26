@@ -221,9 +221,18 @@ export function SeriesMatchCard({ series, onClick }: SeriesMatchCardProps) {
       {/* Match details with player avatars */}
       {hasMatches && (
         <div className="border-t border-white/10 px-3 py-1 space-y-0">
-          {series.matches.map((match) => (
-            <MatchLine key={match.id} match={match} />
-          ))}
+          {[...series.matches]
+            .sort((a, b) => {
+              const order: Record<string, number> = {
+                [TeamEventMatchType.singles1]: 0,
+                [TeamEventMatchType.singles2]: 1,
+                [TeamEventMatchType.doubles]: 2,
+              };
+              return (order[a.matchType] ?? 3) - (order[b.matchType] ?? 3);
+            })
+            .map((match) => (
+              <MatchLine key={match.id} match={match} />
+            ))}
         </div>
       )}
     </div>
