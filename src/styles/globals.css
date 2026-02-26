@@ -35,8 +35,8 @@
     --radius: 0.5rem;
 
     /* Custom Tennis UI Vars (Global) */
-    --tennis-dark: 225 66% 6%;
-    --tennis-card: 225 66% 9%;
+    --tennis-dark: 225 50% 10%;
+    --tennis-card: 225 45% 14%;
     --tennis-accent: 45 93% 47%;
     --tennis-live: 0 84% 60%;
   }

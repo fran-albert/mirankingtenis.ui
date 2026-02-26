@@ -19,7 +19,7 @@ const BracketMatch: React.FC<BracketMatchProps> = ({ series }) => {
   return (
     <div className="relative flex flex-col w-48 sm:w-56 bg-white/5 border border-white/10 rounded-lg overflow-hidden shadow-lg transition-transform hover:scale-[1.02]">
       {/* Home Team */}
-      <div className={`flex items-center justify-between p-3 border-b border-white/5 ${homeWinner ? 'bg-tennis-accent/10' : ''}`}>
+      <div className={`flex items-center justify-between p-3 border-b border-white/10 ${homeWinner ? 'bg-tennis-accent/10' : ''}`}>
         <div className="flex items-center gap-2 overflow-hidden">
           <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
           <span className={`text-xs font-bold truncate ${homeWinner ? 'text-tennis-accent' : 'text-gray-300'}`}>
