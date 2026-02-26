@@ -89,7 +89,7 @@ export const RichScoreCard: React.FC<RichScoreCardProps> = ({
         </div>
 
         <div className="hidden md:block w-32 h-32 relative opacity-80 pointer-events-none">
-           <div className="w-full h-full bg-gray-800/20 rounded-full flex items-center justify-center border border-white/5 overflow-hidden">
+           <div className="w-full h-full bg-gray-800/20 rounded-full flex items-center justify-center border border-white/10 overflow-hidden">
                {player1.image ? (
                  <Image src={player1.image} alt={player1.lastname} layout="fill" objectFit="cover" />
                ) : (
@@ -99,7 +99,7 @@ export const RichScoreCard: React.FC<RichScoreCardProps> = ({
         </div>
       </div>
 
-      <div className="mt-4 pt-2 border-t border-white/5 flex items-center justify-center">
+      <div className="mt-4 pt-2 border-t border-white/10 flex items-center justify-center">
          <span className="text-[10px] text-tennis-live font-bold tracking-[0.2em] uppercase">
             {status === "LIVE" ? "EN VIVO" : ""}
          </span>
