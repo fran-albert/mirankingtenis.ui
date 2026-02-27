@@ -1,6 +1,7 @@
 import axiosInstance from "@/services/axiosConfig";
 import {
   TeamEventSeries,
+  CreateSeriesRequest,
   LoadSeriesResultRequest,
   SetLineupRequest,
   LoadMatchScoreRequest,
@@ -90,4 +91,35 @@ export const loadMatchScore = async (
     data
   );
   return response.data as TeamEventMatch;
+};
+
+export const createSeries = async (
+  eventId: number,
+  categoryId: number,
+  data: CreateSeriesRequest
+): Promise<TeamEventSeries> => {
+  const response = await axiosInstance.post(
+    basePath(eventId, categoryId),
+    data
+  );
+  return response.data as TeamEventSeries;
+};
+
+export const deleteSeries = async (
+  eventId: number,
+  categoryId: number,
+  seriesId: number
+): Promise<void> => {
+  await axiosInstance.delete(
+    `${basePath(eventId, categoryId)}/${seriesId}`
+  );
+};
+
+export const deleteFixture = async (
+  eventId: number,
+  categoryId: number
+): Promise<void> => {
+  await axiosInstance.delete(
+    `${basePath(eventId, categoryId)}/fixture`
+  );
 };

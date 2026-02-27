@@ -219,3 +219,10 @@ export interface LoadMatchScoreRequest {
   homeTiebreakScore?: number;
   awayTiebreakScore?: number;
 }
+
+export interface CreateSeriesRequest {
+  homeTeamId: number;
+  awayTeamId: number;
+  matchday: number;
+  phase?: TeamEventSeriesPhase;
+}

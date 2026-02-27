@@ -6,9 +6,10 @@ import { SeriesCard } from "./SeriesCard";
 interface FixtureViewProps {
   series: TeamEventSeries[];
   onSeriesClick?: (series: TeamEventSeries) => void;
+  onDeleteSeries?: (seriesId: number) => void;
 }
 
-export function FixtureView({ series, onSeriesClick }: FixtureViewProps) {
+export function FixtureView({ series, onSeriesClick, onDeleteSeries }: FixtureViewProps) {
   if (series.length === 0) {
     return (
       <p className="text-muted-foreground text-center py-8">
@@ -63,6 +64,7 @@ export function FixtureView({ series, onSeriesClick }: FixtureViewProps) {
                         onClick={
                           onSeriesClick ? () => onSeriesClick(s) : undefined
                         }
+                        onDelete={onDeleteSeries}
                       />
                     ))}
                   </div>
@@ -83,6 +85,7 @@ export function FixtureView({ series, onSeriesClick }: FixtureViewProps) {
                 onClick={
                   onSeriesClick ? () => onSeriesClick(s) : undefined
                 }
+                onDelete={onDeleteSeries}
               />
             ))}
           </div>

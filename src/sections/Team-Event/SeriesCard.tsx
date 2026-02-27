@@ -1,7 +1,8 @@
 "use client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { CheckCircle2, Trash2 } from "lucide-react";
 import { TeamEventSeries, TeamEventMatch, TeamEventPlayer } from "@/types/Team-Event/TeamEvent";
 import {
   TeamEventSeriesStatus,
@@ -14,6 +15,7 @@ import {
 interface SeriesCardProps {
   series: TeamEventSeries;
   onClick?: () => void;
+  onDelete?: (seriesId: number) => void;
 }
 
 const statusLabels: Record<TeamEventSeriesStatus, string> = {
@@ -89,7 +91,7 @@ function renderMatchLine(match: TeamEventMatch) {
   );
 }
 
-export function SeriesCard({ series, onClick }: SeriesCardProps) {
+export function SeriesCard({ series, onClick, onDelete }: SeriesCardProps) {
   const isCompleted =
     series.status === TeamEventSeriesStatus.completed ||
     series.status === TeamEventSeriesStatus.walkover;
@@ -105,7 +107,7 @@ export function SeriesCard({ series, onClick }: SeriesCardProps) {
     >
       <CardContent className="p-4">
         <div className="flex items-center justify-between mb-2">
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
             {series.phase === TeamEventSeriesPhase.final && (
               <Badge variant="destructive">FINAL</Badge>
             )}
@@ -113,12 +115,27 @@ export function SeriesCard({ series, onClick }: SeriesCardProps) {
               {statusLabels[series.status]}
             </Badge>
           </div>
-          {series.phase === TeamEventSeriesPhase.regular && (
-            <span className="text-xs text-muted-foreground">
-              Jornada {series.matchday}
-              {series.roundNumber > 1 ? " (Vuelta)" : " (Ida)"}
-            </span>
-          )}
+          <div className="flex items-center gap-2">
+            {series.phase === TeamEventSeriesPhase.regular && (
+              <span className="text-xs text-muted-foreground">
+                Jornada {series.matchday}
+                {series.roundNumber > 1 ? " (Vuelta)" : " (Ida)"}
+              </span>
+            )}
+            {onDelete && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete(series.id);
+                }}
+              >
+                <Trash2 className="h-3.5 w-3.5 text-destructive" />
+              </Button>
+            )}
+          </div>
         </div>
 
         <div className="flex items-center justify-between gap-4">

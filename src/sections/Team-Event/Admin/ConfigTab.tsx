@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,8 +19,10 @@ import {
   CreateTeamEventRequest,
 } from "@/types/Team-Event/TeamEvent";
 import { TeamEventStatus } from "@/common/enum/team-event.enum";
+import { useQueryClient } from "@tanstack/react-query";
 import { useEventMutations, useCategoryMutations } from "@/hooks/Team-Event/useTeamEventMutations";
 import { useTeamEventCategories } from "@/hooks/Team-Event/useTeamEventCategories";
+import { teamEventKeys } from "@/hooks/Team-Event/teamEventKeys";
 import { Trash2, Plus, QrCode, Download } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 
@@ -35,7 +38,9 @@ const statusLabels: Record<TeamEventStatus, string> = {
 };
 
 export function ConfigTab({ event }: ConfigTabProps) {
-  const { updateEventMutation } = useEventMutations();
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const { updateEventMutation, deleteEventMutation } = useEventMutations();
   const { categories, isLoading: categoriesLoading } = useTeamEventCategories(event.id);
   const {
     createCategoryMutation,
@@ -405,6 +410,47 @@ export function ConfigTab({ event }: ConfigTabProps) {
           </div>
         </div>
       )}
+
+      <Card className="mt-8 border-destructive/30 bg-destructive/5">
+        <CardHeader>
+          <CardTitle className="text-lg text-destructive">
+            Zona de peligro
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground mb-4">
+            Esta acción eliminará el torneo y todos sus datos (categorías, equipos, series y resultados). No se puede deshacer.
+          </p>
+          <Button
+            variant="destructive"
+            disabled={deleteEventMutation.isPending}
+            onClick={() => {
+              if (
+                !confirm(
+                  `¿Estás seguro de eliminar "${event.name}"? Se perderán TODOS los datos del torneo. Esta acción no se puede deshacer.`
+                )
+              )
+                return;
+              deleteEventMutation.mutate(event.id, {
+                onSuccess: () => {
+                  queryClient.removeQueries({
+                    queryKey: teamEventKeys.detail(event.id),
+                  });
+                  toast.success("Torneo eliminado");
+                  router.push("/admin/torneo-equipos");
+                },
+                onError: () =>
+                  toast.error("Error al eliminar el torneo"),
+              });
+            }}
+          >
+            <Trash2 className="h-4 w-4 mr-2" />
+            {deleteEventMutation.isPending
+              ? "Eliminando..."
+              : "Eliminar torneo"}
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   );
 }

@@ -20,6 +20,9 @@ import {
 } from "@/api/Team-Event/teams";
 import {
   generateFixture,
+  createSeries,
+  deleteSeries,
+  deleteFixture,
   loadSeriesResult,
   updateSeriesResult,
   setLineup,
@@ -34,6 +37,7 @@ import {
   CreateTeamRequest,
   AddPlayerRequest,
   ReplacePlayerRequest,
+  CreateSeriesRequest,
   LoadSeriesResultRequest,
   FinalizeEventRequest,
   SetLineupRequest,
@@ -214,14 +218,24 @@ export const useSeriesMutations = (eventId: number, categoryId: number) => {
 
   const generateFixtureMutation = useMutation({
     mutationFn: () => generateFixture(eventId, categoryId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: teamEventKeys.series(eventId, categoryId),
-      });
-      queryClient.invalidateQueries({
-        queryKey: teamEventKeys.detail(eventId),
-      });
-    },
+    onSuccess: invalidate,
+  });
+
+  const createSeriesMutation = useMutation({
+    mutationFn: (data: CreateSeriesRequest) =>
+      createSeries(eventId, categoryId, data),
+    onSuccess: invalidate,
+  });
+
+  const deleteSeriesMutation = useMutation({
+    mutationFn: (seriesId: number) =>
+      deleteSeries(eventId, categoryId, seriesId),
+    onSuccess: invalidate,
+  });
+
+  const deleteFixtureMutation = useMutation({
+    mutationFn: () => deleteFixture(eventId, categoryId),
+    onSuccess: invalidate,
   });
 
   const loadResultMutation = useMutation({
@@ -272,6 +286,9 @@ export const useSeriesMutations = (eventId: number, categoryId: number) => {
 
   return {
     generateFixtureMutation,
+    createSeriesMutation,
+    deleteSeriesMutation,
+    deleteFixtureMutation,
     loadResultMutation,
     updateResultMutation,
     setLineupMutation,
