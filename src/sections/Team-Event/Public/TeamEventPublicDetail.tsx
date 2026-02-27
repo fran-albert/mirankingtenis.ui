@@ -9,11 +9,10 @@ import { useTeamEventPlayerStats } from "@/hooks/Team-Event/useTeamEventPlayerSt
 import { useTeamEventTeams } from "@/hooks/Team-Event/useTeamEventTeams";
 import Loading from "@/components/Loading/loading";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TeamEventStatus, TeamEventSeriesStatus } from "@/common/enum/team-event.enum";
+import { TeamEventStatus } from "@/common/enum/team-event.enum";
 import { TeamEventTeam, TeamEventPlayer } from "@/types/Team-Event/TeamEvent";
 import { StandingsTable } from "../StandingsTable";
 import { PlayerStatsTable } from "../PlayerStatsTable";
-import { RichScoreCard } from "../components/RichScoreCard";
 import { SeriesMatchCard } from "../components/CompactMatchRow";
 import { BracketView } from "../components/BracketView";
 import { OptimizedAvatar } from "@/components/ui/optimized-avatar";
@@ -60,11 +59,6 @@ export function TeamEventPublicDetail({ isPublicView = false }: TeamEventPublicD
       </div>
     );
   }
-
-  // Dinamizar series destacadas
-  const activeSeries = series.filter(s => s.status === TeamEventSeriesStatus.inProgress);
-  const pendingSeries = series.filter(s => s.status === TeamEventSeriesStatus.pending);
-  const displayFeatured = [...activeSeries, ...pendingSeries].slice(0, 2);
 
   return (
     <div className={`dark min-h-screen bg-[#0F1D32] text-white font-sans selection:bg-tennis-accent selection:text-black ${isPublicView ? 'overflow-x-hidden' : ''}`}>
@@ -124,23 +118,23 @@ export function TeamEventPublicDetail({ isPublicView = false }: TeamEventPublicD
         {/* Filters Bar */}
         <div className="border-t border-white/10 bg-tennis-card/50 overflow-x-auto no-scrollbar">
           <div className="max-w-7xl mx-auto px-4 h-12 flex items-center gap-6 whitespace-nowrap text-xs sm:text-sm font-bold uppercase tracking-wider text-gray-400">
-             <button 
+             <button
                 onClick={() => setActiveTab("fixture")}
                 className={`h-full px-1 transition-all ${activeTab === "fixture" ? "text-white border-b-2 border-tennis-accent" : "hover:text-white"}`}
              >
                 Enfrentamientos
              </button>
-             <button 
-                onClick={() => setActiveTab("bracket")}
-                className={`h-full px-1 transition-all ${activeTab === "bracket" ? "text-white border-b-2 border-tennis-accent" : "hover:text-white"}`}
-             >
-                Cuadro
-             </button>
-             <button 
+             <button
                 onClick={() => setActiveTab("standings")}
                 className={`h-full px-1 transition-all ${activeTab === "standings" ? "text-white border-b-2 border-tennis-accent" : "hover:text-white"}`}
              >
                 Posiciones
+             </button>
+             <button
+                onClick={() => setActiveTab("bracket")}
+                className={`h-full px-1 transition-all ${activeTab === "bracket" ? "text-white border-b-2 border-tennis-accent" : "hover:text-white"}`}
+             >
+                Cuadro
              </button>
              <button 
                 onClick={() => setActiveTab("teams")}
@@ -160,38 +154,6 @@ export function TeamEventPublicDetail({ isPublicView = false }: TeamEventPublicD
       </div>
 
       <main className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-12">
-        {activeTab !== "bracket" && (
-          <section>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-sm font-bold uppercase tracking-[0.3em] text-tennis-accent flex items-center gap-2">
-                <span className="w-8 h-[2px] bg-tennis-accent" />
-                Partidos Destacados
-              </h2>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {displayFeatured.length > 0 ? (
-                displayFeatured.map((s) => (
-                  <RichScoreCard 
-                    key={s.id}
-                    status={s.status === TeamEventSeriesStatus.inProgress ? "LIVE" : "PRÓXIMO"}
-                    time={s.scheduledWeekStart ? new Date(s.scheduledWeekStart).toLocaleDateString() : undefined}
-                    matchInfo={`Copa Equipos • Jornada ${s.matchday}`}
-                    player1={{ lastname: s.homeTeam?.name || "TBD" }}
-                    player2={{ lastname: s.awayTeam?.name || "TBD" }}
-                    score1={[s.homeMatchesWon]}
-                    score2={[s.awayMatchesWon]}
-                  />
-                ))
-              ) : (
-                <div className="col-span-2 py-12 text-center text-gray-500 border border-dashed border-white/10 rounded-xl">
-                   No hay partidos destacados para mostrar.
-                </div>
-              )}
-            </div>
-          </section>
-        )}
-
         <section>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-sm font-bold uppercase tracking-[0.3em] text-white flex items-center gap-2">
