@@ -178,6 +178,7 @@ export function FixtureTab({ event, categoryId, onSeriesClick }: FixtureTabProps
 
       <FixtureView
         series={series}
+        teams={teams}
         onSeriesClick={onSeriesClick ? (s) => onSeriesClick(s.id) : undefined}
         onDeleteSeries={!isFinished ? handleDeleteSeries : undefined}
       />

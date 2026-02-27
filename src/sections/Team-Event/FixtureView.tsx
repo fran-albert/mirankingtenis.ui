@@ -1,15 +1,16 @@
 "use client";
-import { TeamEventSeries } from "@/types/Team-Event/TeamEvent";
+import { TeamEventSeries, TeamEventTeam } from "@/types/Team-Event/TeamEvent";
 import { TeamEventSeriesPhase } from "@/common/enum/team-event.enum";
 import { SeriesCard } from "./SeriesCard";
 
 interface FixtureViewProps {
   series: TeamEventSeries[];
+  teams?: TeamEventTeam[];
   onSeriesClick?: (series: TeamEventSeries) => void;
   onDeleteSeries?: (seriesId: number) => void;
 }
 
-export function FixtureView({ series, onSeriesClick, onDeleteSeries }: FixtureViewProps) {
+export function FixtureView({ series, teams, onSeriesClick, onDeleteSeries }: FixtureViewProps) {
   if (series.length === 0) {
     return (
       <p className="text-muted-foreground text-center py-8">
@@ -41,6 +42,18 @@ export function FixtureView({ series, onSeriesClick, onDeleteSeries }: FixtureVi
     return [...grouped.entries()].sort(([a], [b]) => a - b);
   };
 
+  const getFreeTeams = (mdSeries: TeamEventSeries[]): string[] => {
+    if (!teams || teams.length === 0) return [];
+    const usedIds = new Set<number>();
+    for (const s of mdSeries) {
+      usedIds.add(s.homeTeamId);
+      usedIds.add(s.awayTeamId);
+    }
+    return teams
+      .filter((t) => !usedIds.has(t.id))
+      .map((t) => t.name);
+  };
+
   return (
     <div className="space-y-8">
       {[...rounds.entries()]
@@ -68,6 +81,15 @@ export function FixtureView({ series, onSeriesClick, onDeleteSeries }: FixtureVi
                       />
                     ))}
                   </div>
+                  {(() => {
+                    const free = getFreeTeams(mdSeries);
+                    if (free.length === 0) return null;
+                    return (
+                      <p className="text-sm text-muted-foreground mt-2 italic">
+                        Libre: {free.join(", ")}
+                      </p>
+                    );
+                  })()}
                 </div>
               ))}
             </div>
