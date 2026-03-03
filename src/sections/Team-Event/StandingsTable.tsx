@@ -23,6 +23,7 @@ export function StandingsTable({ standings }: StandingsTableProps) {
   }
 
   return (
+    <div className="space-y-2">
     <Table>
       <TableHeader>
         <TableRow>
@@ -61,5 +62,9 @@ export function StandingsTable({ standings }: StandingsTableProps) {
         ))}
       </TableBody>
     </Table>
+    <p className="text-[10px] text-muted-foreground px-2">
+      PJ: Partidos Jugados · PG: Partidos Ganados · PP: Partidos Perdidos · Dif: Diferencia de Partidos · GF: Games a Favor · GC: Games en Contra · DG: Diferencia de Games · SG: Series Ganadas · SP: Series Perdidas
+    </p>
+    </div>
   );
 }

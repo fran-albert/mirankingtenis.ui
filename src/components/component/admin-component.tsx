@@ -27,6 +27,7 @@ const menuItems = [
   { href: "/admin/jugadores", label: "Jugadores", icon: FaUsers },
   { href: "/admin/torneos", label: "Torneos", icon: GiTrophyCup },
   { href: "/admin/torneo-dobles", label: "Torneo Dobles", icon: IoMdTennisball },
+  { href: "/admin/torneo-equipos", label: "Torneo Equipos", icon: FaUsers },
   { href: "/admin/configuracion", label: "Configuracion", icon: FaCog },
 ];
 

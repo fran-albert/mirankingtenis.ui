@@ -44,6 +44,7 @@ export function PlayerStatsTable({ stats, teams = [] }: PlayerStatsTableProps) {
   }
 
   return (
+    <div className="space-y-2">
     <Table>
       <TableHeader>
         <TableRow>
@@ -96,5 +97,9 @@ export function PlayerStatsTable({ stats, teams = [] }: PlayerStatsTableProps) {
         })}
       </TableBody>
     </Table>
+    <p className="text-[10px] text-muted-foreground px-2">
+      PJ: Partidos Jugados · S: Singles · D: Dobles · PG: Partidos Ganados · PP: Partidos Perdidos · GF: Games a Favor · GC: Games en Contra · Desc.: Descansados
+    </p>
+    </div>
   );
 }
