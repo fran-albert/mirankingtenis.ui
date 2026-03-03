@@ -875,7 +875,7 @@ export function ResultsTab({
           if (!open) setSelectedSeries(null);
         }}
       >
-        <DialogContent className="w-full max-w-2xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="w-full max-w-2xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{getDialogTitle()}</DialogTitle>
           </DialogHeader>

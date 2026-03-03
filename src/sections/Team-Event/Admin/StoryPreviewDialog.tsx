@@ -51,7 +51,7 @@ export function StoryPreviewDialog({
 
   return (
     <Dialog open={!!series} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-[500px]">
+      <DialogContent className="max-w-[500px] max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Vista previa — Instagram Story</DialogTitle>
         </DialogHeader>

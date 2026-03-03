@@ -240,7 +240,7 @@ export function TeamsTab({ eventId, categoryId, maxPlayersPerTeam, allUsers }: T
           if (!open) setSearchTerm("");
         }}
       >
-        <DialogContent>
+        <DialogContent className="max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Agregar jugador</DialogTitle>
           </DialogHeader>
@@ -275,7 +275,7 @@ export function TeamsTab({ eventId, categoryId, maxPlayersPerTeam, allUsers }: T
           if (!open) setSearchTerm("");
         }}
       >
-        <DialogContent>
+        <DialogContent className="max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               Reemplazar a {replacePlayerDialog.playerName}

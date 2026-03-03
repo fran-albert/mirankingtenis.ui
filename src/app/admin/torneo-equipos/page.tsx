@@ -77,7 +77,7 @@ export default function TeamEventsListPage() {
           <DialogTrigger asChild>
             <Button>Crear Torneo</Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="max-h-[85vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Nuevo Torneo por Equipos</DialogTitle>
             </DialogHeader>
