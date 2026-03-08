@@ -250,7 +250,7 @@ function MatchRow({ match }: { match: TeamEventMatch }) {
 
   const homeName = home2 ? `${home1}/${home2}` : home1;
   const awayName = away2 ? `${away1}/${away2}` : away1;
-  const avatarSize = isDoubles ? 72 : 90;
+  const avatarSize = 80;
 
   return (
     <div style={{ marginBottom: 12 }}>
@@ -283,6 +283,7 @@ function MatchRow({ match }: { match: TeamEventMatch }) {
           background: "rgba(255,255,255,0.06)",
           border: "1px solid rgba(255,255,255,0.14)",
           borderRadius: 16,
+          minHeight: 130,
           padding: "14px 18px",
           margin: "0 16px",
         }}
@@ -311,6 +312,9 @@ function MatchRow({ match }: { match: TeamEventMatch }) {
                 color: homeWon ? "#F8E18A" : "#FFFFFF",
                 fontFamily: headingFont,
                 letterSpacing: 0.5,
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
               }}
             >
               {homeName}
@@ -376,6 +380,9 @@ function MatchRow({ match }: { match: TeamEventMatch }) {
                 fontFamily: headingFont,
                 letterSpacing: 0.5,
                 textAlign: "right",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
               }}
             >
               {awayName}
