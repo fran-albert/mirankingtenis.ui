@@ -47,6 +47,9 @@ interface ResultsTabProps {
   singlesPerSeries: number;
   doublesPerSeries: number;
   gamesPerMatch: number;
+  eventName: string;
+  eventDescription?: string | null;
+  categoryName?: string;
 }
 
 interface LineupForm {
@@ -152,6 +155,9 @@ export function ResultsTab({
   singlesPerSeries,
   doublesPerSeries,
   gamesPerMatch,
+  eventName,
+  eventDescription,
+  categoryName,
 }: ResultsTabProps) {
   const { series, isLoading: seriesLoading } = useTeamEventSeries(eventId, categoryId);
   const { teams } = useTeamEventTeams(eventId, categoryId);
@@ -888,6 +894,9 @@ export function ResultsTab({
 
       <StoryPreviewDialog
         series={storyPreviewSeries}
+        eventName={eventName}
+        eventDescription={eventDescription}
+        categoryName={categoryName}
         onClose={() => setStoryPreviewSeries(null)}
       />
     </div>
