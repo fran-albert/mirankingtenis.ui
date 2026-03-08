@@ -164,6 +164,9 @@ export default function TeamEventManagePage() {
                   singlesPerSeries={event.singlesPerSeries}
                   doublesPerSeries={event.doublesPerSeries}
                   gamesPerMatch={event.gamesPerMatch}
+                  eventName={event.name}
+                  eventDescription={event.description}
+                  categoryName={selectedCategory?.name}
                 />
               )}
             </TabsContent>

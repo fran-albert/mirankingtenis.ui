@@ -15,11 +15,17 @@ import { MatchStoryCard } from "./MatchStoryCard";
 
 interface StoryPreviewDialogProps {
   series: TeamEventSeries | null;
+  eventName: string;
+  eventDescription?: string | null;
+  categoryName?: string;
   onClose: () => void;
 }
 
 export function StoryPreviewDialog({
   series,
+  eventName,
+  eventDescription,
+  categoryName,
   onClose,
 }: StoryPreviewDialogProps) {
   const storyRef = useRef<HTMLDivElement>(null);
@@ -77,7 +83,13 @@ export function StoryPreviewDialog({
                   marginLeft: -540,
                 }}
               >
-                <MatchStoryCard ref={storyRef} series={series} />
+                <MatchStoryCard
+                  ref={storyRef}
+                  series={series}
+                  eventName={eventName}
+                  eventDescription={eventDescription}
+                  categoryName={categoryName}
+                />
               </div>
             </div>
 
