@@ -33,3 +33,8 @@ export enum TeamEventMatchSide {
   home = "home",
   away = "away",
 }
+
+export enum TeamEventMatchScoreFormat {
+  legacyGames = "legacy_games",
+  setsSuperTiebreak = "sets_super_tb",
+}

@@ -1,4 +1,5 @@
 "use client";
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,7 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { CheckCircle2, Camera } from "lucide-react";
+import { Camera, CheckCircle2, Lock } from "lucide-react";
 import {
   TeamEventSeries,
   TeamEventMatch,
@@ -30,9 +31,10 @@ import {
   LoadMatchScoreRequest,
 } from "@/types/Team-Event/TeamEvent";
 import {
-  TeamEventSeriesStatus,
-  TeamEventMatchType,
+  TeamEventMatchScoreFormat,
   TeamEventMatchStatus,
+  TeamEventMatchType,
+  TeamEventSeriesStatus,
 } from "@/common/enum/team-event.enum";
 import { useTeamEventSeries } from "@/hooks/Team-Event/useTeamEventSeries";
 import { useTeamEventTeams } from "@/hooks/Team-Event/useTeamEventTeams";
@@ -40,6 +42,7 @@ import { useSeriesMutations } from "@/hooks/Team-Event/useTeamEventMutations";
 import { getSeries } from "@/api/Team-Event/series";
 import { SeriesCard } from "../SeriesCard";
 import { StoryPreviewDialog } from "./StoryPreviewDialog";
+import { buildScoreRequest, formatMatchScore, isSetsDoublesMatch } from "../score-format";
 
 interface ResultsTabProps {
   eventId: number;
@@ -60,25 +63,27 @@ interface LineupForm {
   awayPlayer2Id: string;
 }
 
-interface ScoreForm {
+interface ScoreFields {
   homeGames: string;
   awayGames: string;
   hasTiebreak: boolean;
   homeTiebreakScore: string;
   awayTiebreakScore: string;
+  homeSet1Games: string;
+  awaySet1Games: string;
+  homeSet2Games: string;
+  awaySet2Games: string;
+  homeSuperTiebreakScore: string;
+  awaySuperTiebreakScore: string;
 }
 
-interface MatchForm {
+interface MatchForm extends ScoreFields {
   matchType: TeamEventMatchType;
+  scoreFormat: TeamEventMatchScoreFormat;
   homePlayer1Id: string;
   homePlayer2Id: string;
   awayPlayer1Id: string;
   awayPlayer2Id: string;
-  homeGames: string;
-  awayGames: string;
-  hasTiebreak: boolean;
-  homeTiebreakScore: string;
-  awayTiebreakScore: string;
 }
 
 type DialogMode = "lineup" | "score" | "view";
@@ -99,18 +104,34 @@ function emptyLineupForm(matchType: TeamEventMatchType): LineupForm {
   };
 }
 
-function emptyMatchForm(matchType: TeamEventMatchType): MatchForm {
+function emptyScoreFields(): ScoreFields {
   return {
-    matchType,
-    homePlayer1Id: "",
-    homePlayer2Id: "",
-    awayPlayer1Id: "",
-    awayPlayer2Id: "",
     homeGames: "",
     awayGames: "",
     hasTiebreak: false,
     homeTiebreakScore: "",
     awayTiebreakScore: "",
+    homeSet1Games: "",
+    awaySet1Games: "",
+    homeSet2Games: "",
+    awaySet2Games: "",
+    homeSuperTiebreakScore: "",
+    awaySuperTiebreakScore: "",
+  };
+}
+
+function emptyMatchForm(matchType: TeamEventMatchType): MatchForm {
+  return {
+    matchType,
+    scoreFormat:
+      matchType === TeamEventMatchType.doubles
+        ? TeamEventMatchScoreFormat.setsSuperTiebreak
+        : TeamEventMatchScoreFormat.legacyGames,
+    homePlayer1Id: "",
+    homePlayer2Id: "",
+    awayPlayer1Id: "",
+    awayPlayer2Id: "",
+    ...emptyScoreFields(),
   };
 }
 
@@ -149,116 +170,221 @@ function getPlayerName(player: TeamEventPlayer): string {
   return `${player.player.name} ${player.player.lastname}`;
 }
 
+function buildMatchFormFromMatch(match: TeamEventMatch): MatchForm {
+  return {
+    matchType: match.matchType,
+    scoreFormat: match.scoreFormat,
+    homePlayer1Id: String(match.homePlayer1Id),
+    homePlayer2Id: match.homePlayer2Id ? String(match.homePlayer2Id) : "",
+    awayPlayer1Id: String(match.awayPlayer1Id),
+    awayPlayer2Id: match.awayPlayer2Id ? String(match.awayPlayer2Id) : "",
+    homeGames: String(match.homeGames),
+    awayGames: String(match.awayGames),
+    hasTiebreak: match.hasTiebreak,
+    homeTiebreakScore: match.homeTiebreakScore ? String(match.homeTiebreakScore) : "",
+    awayTiebreakScore: match.awayTiebreakScore ? String(match.awayTiebreakScore) : "",
+    homeSet1Games: match.homeSet1Games != null ? String(match.homeSet1Games) : "",
+    awaySet1Games: match.awaySet1Games != null ? String(match.awaySet1Games) : "",
+    homeSet2Games: match.homeSet2Games != null ? String(match.homeSet2Games) : "",
+    awaySet2Games: match.awaySet2Games != null ? String(match.awaySet2Games) : "",
+    homeSuperTiebreakScore:
+      match.homeSuperTiebreakScore != null ? String(match.homeSuperTiebreakScore) : "",
+    awaySuperTiebreakScore:
+      match.awaySuperTiebreakScore != null ? String(match.awaySuperTiebreakScore) : "",
+  };
+}
+
+function getSetWinner(home: string, away: string): "home" | "away" | null {
+  const homeValue = Number(home);
+  const awayValue = Number(away);
+  if (Number.isNaN(homeValue) || Number.isNaN(awayValue) || home === "" || away === "") {
+    return null;
+  }
+  if (homeValue === awayValue) return null;
+  return homeValue > awayValue ? "home" : "away";
+}
+
+function needsSuperTiebreak(fields: Pick<
+  ScoreFields,
+  "homeSet1Games" | "awaySet1Games" | "homeSet2Games" | "awaySet2Games"
+>): boolean {
+  const set1 = getSetWinner(fields.homeSet1Games, fields.awaySet1Games);
+  const set2 = getSetWinner(fields.homeSet2Games, fields.awaySet2Games);
+  return !!set1 && !!set2 && set1 !== set2;
+}
+
+function isLegacyReadonlyMatch(match: {
+  matchType: TeamEventMatchType;
+  scoreFormat: TeamEventMatchScoreFormat;
+}): boolean {
+  return (
+    match.matchType === TeamEventMatchType.doubles &&
+    match.scoreFormat === TeamEventMatchScoreFormat.legacyGames
+  );
+}
+
 export function ResultsTab({
   eventId,
   categoryId,
   singlesPerSeries,
   doublesPerSeries,
-  gamesPerMatch,
   eventName,
   eventDescription,
   categoryName,
 }: ResultsTabProps) {
   const { series, isLoading: seriesLoading } = useTeamEventSeries(eventId, categoryId);
   const { teams } = useTeamEventTeams(eventId, categoryId);
-  const {
-    loadResultMutation,
-    updateResultMutation,
-    setLineupMutation,
-    loadMatchScoreMutation,
-  } = useSeriesMutations(eventId, categoryId);
+  const { updateResultMutation, setLineupMutation, loadMatchScoreMutation } =
+    useSeriesMutations(eventId, categoryId);
 
   const [selectedSeries, setSelectedSeries] = useState<TeamEventSeries | null>(null);
   const [storyPreviewSeries, setStoryPreviewSeries] = useState<TeamEventSeries | null>(null);
-  const matchTypes = buildMatchTypes(singlesPerSeries, doublesPerSeries);
-
-  // Lineup mode state
   const [lineupForms, setLineupForms] = useState<LineupForm[]>([]);
-
-  // Score mode state
   const [editingMatchId, setEditingMatchId] = useState<number | null>(null);
-  const [scoreForm, setScoreForm] = useState<ScoreForm>({
-    homeGames: "",
-    awayGames: "",
-    hasTiebreak: false,
-    homeTiebreakScore: "",
-    awayTiebreakScore: "",
-  });
-
-  // View/update mode state (existing full form for "Actualizar resultado")
+  const [scoreForm, setScoreForm] = useState<ScoreFields>(emptyScoreFields());
   const [matchForms, setMatchForms] = useState<MatchForm[]>([]);
 
+  const matchTypes = buildMatchTypes(singlesPerSeries, doublesPerSeries);
   const dialogMode = selectedSeries ? getDialogMode(selectedSeries) : null;
 
-  const openResultDialog = (s: TeamEventSeries) => {
-    setSelectedSeries(s);
-    const mode = getDialogMode(s);
+  const openResultDialog = (seriesItem: TeamEventSeries) => {
+    setSelectedSeries(seriesItem);
+    const mode = getDialogMode(seriesItem);
 
     if (mode === "lineup") {
-      setLineupForms(matchTypes.map((mt) => emptyLineupForm(mt)));
-    } else if (mode === "score") {
+      setLineupForms(matchTypes.map((matchType) => emptyLineupForm(matchType)));
+      return;
+    }
+
+    if (mode === "score") {
       setEditingMatchId(null);
-      setScoreForm({
-        homeGames: "",
-        awayGames: "",
-        hasTiebreak: false,
-        homeTiebreakScore: "",
-        awayTiebreakScore: "",
-      });
+      setScoreForm(emptyScoreFields());
+      return;
+    }
+
+    if (seriesItem.matches.length > 0) {
+      setMatchForms(seriesItem.matches.map(buildMatchFormFromMatch));
     } else {
-      // view mode - prepare full forms for possible update
-      if (s.matches && s.matches.length > 0) {
-        setMatchForms(
-          s.matches.map((m) => ({
-            matchType: m.matchType,
-            homePlayer1Id: String(m.homePlayer1Id),
-            homePlayer2Id: m.homePlayer2Id ? String(m.homePlayer2Id) : "",
-            awayPlayer1Id: String(m.awayPlayer1Id),
-            awayPlayer2Id: m.awayPlayer2Id ? String(m.awayPlayer2Id) : "",
-            homeGames: String(m.homeGames),
-            awayGames: String(m.awayGames),
-            hasTiebreak: m.hasTiebreak,
-            homeTiebreakScore: m.homeTiebreakScore ? String(m.homeTiebreakScore) : "",
-            awayTiebreakScore: m.awayTiebreakScore ? String(m.awayTiebreakScore) : "",
-          }))
-        );
-      } else {
-        setMatchForms(matchTypes.map((mt) => emptyMatchForm(mt)));
-      }
+      setMatchForms(matchTypes.map((matchType) => emptyMatchForm(matchType)));
     }
   };
 
   const getActivePlayers = (teamId: number): TeamEventPlayer[] => {
-    const team = teams.find((t) => t.id === teamId);
+    const team = teams.find((teamItem) => teamItem.id === teamId);
     if (!team) return [];
-    return team.players.filter((p: TeamEventPlayer) => !p.leftAt);
+    return team.players.filter((player) => !player.leftAt);
   };
 
-  // --- Lineup helpers ---
-
   const updateLineupForm = (index: number, field: keyof LineupForm, value: string) => {
-    setLineupForms((prev) => {
-      const copy = [...prev];
-      copy[index] = { ...copy[index], [field]: value };
-      return copy;
+    setLineupForms((current) => {
+      const next = [...current];
+      next[index] = { ...next[index], [field]: value };
+      return next;
     });
   };
 
-  const isLineupValid = (): boolean => {
-    return lineupForms.every((f) => {
-      const isDoubles = f.matchType === TeamEventMatchType.doubles;
-      const hp1 = parseInt(f.homePlayer1Id, 10);
-      const ap1 = parseInt(f.awayPlayer1Id, 10);
-      if (isNaN(hp1) || hp1 <= 0) return false;
-      if (isNaN(ap1) || ap1 <= 0) return false;
-      if (isDoubles) {
-        const hp2 = parseInt(f.homePlayer2Id, 10);
-        const ap2 = parseInt(f.awayPlayer2Id, 10);
-        if (isNaN(hp2) || hp2 <= 0) return false;
-        if (isNaN(ap2) || ap2 <= 0) return false;
+  const updateScoreField = (field: keyof ScoreFields, value: string | boolean) => {
+    setScoreForm((current) => ({ ...current, [field]: value }));
+  };
+
+  const updateMatchForm = (
+    index: number,
+    field: keyof MatchForm,
+    value: string | boolean
+  ) => {
+    setMatchForms((current) => {
+      const next = [...current];
+      next[index] = { ...next[index], [field]: value };
+      return next;
+    });
+  };
+
+  const isLineupValid = (): boolean =>
+    lineupForms.every((form) => {
+      const home1 = Number(form.homePlayer1Id);
+      const away1 = Number(form.awayPlayer1Id);
+      if (!home1 || !away1) return false;
+      if (form.matchType === TeamEventMatchType.doubles) {
+        const home2 = Number(form.homePlayer2Id);
+        const away2 = Number(form.awayPlayer2Id);
+        if (!home2 || !away2) return false;
       }
       return true;
     });
+
+  const isScoreFieldsValid = (
+    fields: ScoreFields,
+    matchType: TeamEventMatchType,
+    scoreFormat: TeamEventMatchScoreFormat
+  ): boolean => {
+    if (
+      matchType === TeamEventMatchType.doubles &&
+      scoreFormat === TeamEventMatchScoreFormat.setsSuperTiebreak
+    ) {
+      const requiredValues = [
+        fields.homeSet1Games,
+        fields.awaySet1Games,
+        fields.homeSet2Games,
+        fields.awaySet2Games,
+      ];
+      if (requiredValues.some((value) => value === "" || Number.isNaN(Number(value)))) {
+        return false;
+      }
+
+      if (needsSuperTiebreak(fields)) {
+        return (
+          fields.homeSuperTiebreakScore !== "" &&
+          fields.awaySuperTiebreakScore !== "" &&
+          !Number.isNaN(Number(fields.homeSuperTiebreakScore)) &&
+          !Number.isNaN(Number(fields.awaySuperTiebreakScore))
+        );
+      }
+
+      return true;
+    }
+
+    if (
+      fields.homeGames === "" ||
+      fields.awayGames === "" ||
+      Number.isNaN(Number(fields.homeGames)) ||
+      Number.isNaN(Number(fields.awayGames))
+    ) {
+      return false;
+    }
+
+    if (fields.hasTiebreak) {
+      return (
+        fields.homeTiebreakScore !== "" &&
+        fields.awayTiebreakScore !== "" &&
+        !Number.isNaN(Number(fields.homeTiebreakScore)) &&
+        !Number.isNaN(Number(fields.awayTiebreakScore))
+      );
+    }
+
+    return true;
+  };
+
+  const buildMatchResultPayload = (form: MatchForm): MatchResultRequest => {
+    const payload = buildScoreRequest(form.matchType, {
+      ...form,
+      hasSuperTiebreak: needsSuperTiebreak(form),
+    });
+    const { matchType: _payloadMatchType, ...scorePayload } = payload;
+
+    return {
+      matchType: form.matchType,
+      homePlayer1Id: Number(form.homePlayer1Id),
+      homePlayer2Id:
+        form.matchType === TeamEventMatchType.doubles
+          ? Number(form.homePlayer2Id)
+          : undefined,
+      awayPlayer1Id: Number(form.awayPlayer1Id),
+      awayPlayer2Id:
+        form.matchType === TeamEventMatchType.doubles
+          ? Number(form.awayPlayer2Id)
+          : undefined,
+      ...scorePayload,
+    };
   };
 
   const handleLineupSubmit = () => {
@@ -268,16 +394,19 @@ export function ResultsTab({
       return;
     }
 
-    const matches: SetLineupMatchRequest[] = lineupForms.map((f) => {
-      const isDoubles = f.matchType === TeamEventMatchType.doubles;
-      return {
-        matchType: f.matchType,
-        homePlayer1Id: parseInt(f.homePlayer1Id, 10),
-        homePlayer2Id: isDoubles ? parseInt(f.homePlayer2Id, 10) : undefined,
-        awayPlayer1Id: parseInt(f.awayPlayer1Id, 10),
-        awayPlayer2Id: isDoubles ? parseInt(f.awayPlayer2Id, 10) : undefined,
-      };
-    });
+    const matches: SetLineupMatchRequest[] = lineupForms.map((form) => ({
+      matchType: form.matchType,
+      homePlayer1Id: Number(form.homePlayer1Id),
+      homePlayer2Id:
+        form.matchType === TeamEventMatchType.doubles
+          ? Number(form.homePlayer2Id)
+          : undefined,
+      awayPlayer1Id: Number(form.awayPlayer1Id),
+      awayPlayer2Id:
+        form.matchType === TeamEventMatchType.doubles
+          ? Number(form.awayPlayer2Id)
+          : undefined,
+    }));
 
     const data: SetLineupRequest = { matches };
 
@@ -293,81 +422,58 @@ export function ResultsTab({
     );
   };
 
-  // --- Score helpers ---
-
   const startEditingScore = (match: TeamEventMatch) => {
+    if (isLegacyReadonlyMatch(match)) return;
+
     setEditingMatchId(match.id);
     setScoreForm({
       homeGames: match.status === TeamEventMatchStatus.played ? String(match.homeGames) : "",
       awayGames: match.status === TeamEventMatchStatus.played ? String(match.awayGames) : "",
       hasTiebreak: match.hasTiebreak,
-      homeTiebreakScore: match.homeTiebreakScore ? String(match.homeTiebreakScore) : "",
-      awayTiebreakScore: match.awayTiebreakScore ? String(match.awayTiebreakScore) : "",
+      homeTiebreakScore: match.homeTiebreakScore != null ? String(match.homeTiebreakScore) : "",
+      awayTiebreakScore: match.awayTiebreakScore != null ? String(match.awayTiebreakScore) : "",
+      homeSet1Games: match.homeSet1Games != null ? String(match.homeSet1Games) : "",
+      awaySet1Games: match.awaySet1Games != null ? String(match.awaySet1Games) : "",
+      homeSet2Games: match.homeSet2Games != null ? String(match.homeSet2Games) : "",
+      awaySet2Games: match.awaySet2Games != null ? String(match.awaySet2Games) : "",
+      homeSuperTiebreakScore:
+        match.homeSuperTiebreakScore != null ? String(match.homeSuperTiebreakScore) : "",
+      awaySuperTiebreakScore:
+        match.awaySuperTiebreakScore != null ? String(match.awaySuperTiebreakScore) : "",
     });
   };
 
-  const isScoreValid = (): boolean => {
-    const hg = parseInt(scoreForm.homeGames, 10);
-    const ag = parseInt(scoreForm.awayGames, 10);
-    if (isNaN(hg) || hg < 0) return false;
-    if (isNaN(ag) || ag < 0) return false;
-    if (scoreForm.hasTiebreak) {
-      const htb = parseInt(scoreForm.homeTiebreakScore, 10);
-      const atb = parseInt(scoreForm.awayTiebreakScore, 10);
-      if (isNaN(htb) || htb < 0) return false;
-      if (isNaN(atb) || atb < 0) return false;
-    }
-    return true;
-  };
-
-  const handleScoreSubmit = (matchId: number) => {
+  const handleScoreSubmit = (match: TeamEventMatch) => {
     if (!selectedSeries) return;
-    if (!isScoreValid()) {
+    if (!isScoreFieldsValid(scoreForm, match.matchType, match.scoreFormat)) {
       toast.error("Completá el score correctamente");
       return;
     }
 
-    const data: LoadMatchScoreRequest = {
-      homeGames: parseInt(scoreForm.homeGames, 10),
-      awayGames: parseInt(scoreForm.awayGames, 10),
-      hasTiebreak: scoreForm.hasTiebreak || undefined,
-      homeTiebreakScore: scoreForm.hasTiebreak
-        ? parseInt(scoreForm.homeTiebreakScore, 10)
-        : undefined,
-      awayTiebreakScore: scoreForm.hasTiebreak
-        ? parseInt(scoreForm.awayTiebreakScore, 10)
-        : undefined,
+    const payload = buildScoreRequest(match.matchType, {
+      ...scoreForm,
+      hasSuperTiebreak: needsSuperTiebreak(scoreForm),
+    });
+
+    const { matchType: _unusedMatchType, ...data } = payload as LoadMatchScoreRequest & {
+      matchType: TeamEventMatchType;
     };
 
     loadMatchScoreMutation.mutate(
-      { seriesId: selectedSeries.id, matchId, data },
+      { seriesId: selectedSeries.id, matchId: match.id, data },
       {
         onSuccess: async () => {
           toast.success("Score guardado");
           setEditingMatchId(null);
           try {
             const updated = await getSeries(eventId, categoryId, selectedSeries.id);
-            // Si la serie se auto-completó, preparar matchForms para el modo view
+            setSelectedSeries(updated);
             if (
               updated.status === TeamEventSeriesStatus.completed ||
               updated.status === TeamEventSeriesStatus.walkover
             ) {
-              setMatchForms(
-                updated.matches.map((m) => ({
-                  matchType: m.matchType,
-                  homePlayer1Id: String(m.homePlayer1Id),
-                  homePlayer2Id: m.homePlayer2Id ? String(m.homePlayer2Id) : "",
-                  awayPlayer1Id: String(m.awayPlayer1Id),
-                  awayPlayer2Id: m.awayPlayer2Id ? String(m.awayPlayer2Id) : "",
-                  homeGames: String(m.homeGames),
-                  awayGames: String(m.awayGames),
-                  hasTiebreak: m.hasTiebreak,
-                  homeTiebreakScore: m.homeTiebreakScore ? String(m.homeTiebreakScore) : "",
-                  awayTiebreakScore: m.awayTiebreakScore ? String(m.awayTiebreakScore) : "",
-                }))
-              );
+              setMatchForms(updated.matches.map(buildMatchFormFromMatch));
             }
-            setSelectedSeries(updated);
           } catch {
             setSelectedSeries(null);
           }
@@ -377,66 +483,19 @@ export function ResultsTab({
     );
   };
 
-  // --- View/Update helpers (existing logic) ---
-
-  const updateMatchForm = (index: number, field: keyof MatchForm, value: string | boolean) => {
-    setMatchForms((prev) => {
-      const copy = [...prev];
-      copy[index] = { ...copy[index], [field]: value };
-      return copy;
-    });
-  };
-
-  const isFullFormValid = (): boolean => {
-    return matchForms.every((f) => {
-      const isDoubles = f.matchType === TeamEventMatchType.doubles;
-      const hp1 = parseInt(f.homePlayer1Id, 10);
-      const ap1 = parseInt(f.awayPlayer1Id, 10);
-      const hg = parseInt(f.homeGames, 10);
-      const ag = parseInt(f.awayGames, 10);
-      if (isNaN(hp1) || hp1 <= 0) return false;
-      if (isNaN(ap1) || ap1 <= 0) return false;
-      if (isNaN(hg) || hg < 0) return false;
-      if (isNaN(ag) || ag < 0) return false;
-      if (isDoubles) {
-        const hp2 = parseInt(f.homePlayer2Id, 10);
-        const ap2 = parseInt(f.awayPlayer2Id, 10);
-        if (isNaN(hp2) || hp2 <= 0) return false;
-        if (isNaN(ap2) || ap2 <= 0) return false;
-      }
-      if (f.hasTiebreak) {
-        const htb = parseInt(f.homeTiebreakScore, 10);
-        const atb = parseInt(f.awayTiebreakScore, 10);
-        if (isNaN(htb) || htb < 0) return false;
-        if (isNaN(atb) || atb < 0) return false;
-      }
-      return true;
-    });
-  };
-
   const handleUpdateSubmit = () => {
     if (!selectedSeries) return;
-    if (!isFullFormValid()) {
-      toast.error("Completá todos los campos correctamente");
+    if (
+      matchForms.some((form) => isLegacyReadonlyMatch(form)) ||
+      !matchForms.every((form) =>
+        isScoreFieldsValid(form, form.matchType, form.scoreFormat)
+      )
+    ) {
+      toast.error("Hay partidos que no se pueden editar o tienen datos incompletos");
       return;
     }
 
-    const matches: MatchResultRequest[] = matchForms.map((f) => {
-      const isDoubles = f.matchType === TeamEventMatchType.doubles;
-      return {
-        matchType: f.matchType,
-        homePlayer1Id: parseInt(f.homePlayer1Id, 10),
-        homePlayer2Id: isDoubles ? parseInt(f.homePlayer2Id, 10) : undefined,
-        awayPlayer1Id: parseInt(f.awayPlayer1Id, 10),
-        awayPlayer2Id: isDoubles ? parseInt(f.awayPlayer2Id, 10) : undefined,
-        homeGames: parseInt(f.homeGames, 10),
-        awayGames: parseInt(f.awayGames, 10),
-        hasTiebreak: f.hasTiebreak || undefined,
-        homeTiebreakScore: f.hasTiebreak ? parseInt(f.homeTiebreakScore, 10) : undefined,
-        awayTiebreakScore: f.hasTiebreak ? parseInt(f.awayTiebreakScore, 10) : undefined,
-      };
-    });
-
+    const matches = matchForms.map(buildMatchResultPayload);
     const data: LoadSeriesResultRequest = { matches };
 
     updateResultMutation.mutate(
@@ -451,12 +510,10 @@ export function ResultsTab({
     );
   };
 
-  // --- Render helpers ---
-
   const renderPlayerSelect = (
     players: TeamEventPlayer[],
     value: string,
-    onChange: (v: string) => void,
+    onChange: (value: string) => void,
     placeholder: string
   ) => (
     <Select value={value} onValueChange={onChange}>
@@ -464,18 +521,18 @@ export function ResultsTab({
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent>
-        {players.map((p) => (
-          <SelectItem key={p.id} value={String(p.id)}>
-            {p.player.name} {p.player.lastname}
+        {players.map((player) => (
+          <SelectItem key={player.id} value={String(player.id)}>
+            {player.player.name} {player.player.lastname}
           </SelectItem>
         ))}
       </SelectContent>
     </Select>
   );
 
-  const renderScoreInputs = (
-    form: ScoreForm,
-    onUpdate: (field: keyof ScoreForm, value: string | boolean) => void,
+  const renderLegacyScoreInputs = (
+    fields: ScoreFields,
+    onUpdate: (field: keyof ScoreFields, value: string | boolean) => void,
     prefix: string
   ) => (
     <>
@@ -485,7 +542,7 @@ export function ResultsTab({
           <Input
             type="number"
             min={0}
-            value={form.homeGames}
+            value={fields.homeGames}
             onChange={(e) => onUpdate("homeGames", e.target.value)}
           />
         </div>
@@ -494,7 +551,7 @@ export function ResultsTab({
           <Input
             type="number"
             min={0}
-            value={form.awayGames}
+            value={fields.awayGames}
             onChange={(e) => onUpdate("awayGames", e.target.value)}
           />
         </div>
@@ -502,25 +559,25 @@ export function ResultsTab({
 
       <div className="flex items-center gap-2">
         <input
+          id={`legacy-tb-${prefix}`}
           type="checkbox"
-          id={`tiebreak-${prefix}`}
-          checked={form.hasTiebreak}
+          checked={fields.hasTiebreak}
           onChange={(e) => onUpdate("hasTiebreak", e.target.checked)}
           className="h-4 w-4"
         />
-        <Label htmlFor={`tiebreak-${prefix}`} className="text-xs">
+        <Label htmlFor={`legacy-tb-${prefix}`} className="text-xs">
           Supertiebreak
         </Label>
       </div>
 
-      {form.hasTiebreak && (
+      {fields.hasTiebreak && (
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1">
             <Label className="text-xs">TB local</Label>
             <Input
               type="number"
               min={0}
-              value={form.homeTiebreakScore}
+              value={fields.homeTiebreakScore}
               onChange={(e) => onUpdate("homeTiebreakScore", e.target.value)}
             />
           </div>
@@ -529,7 +586,7 @@ export function ResultsTab({
             <Input
               type="number"
               min={0}
-              value={form.awayTiebreakScore}
+              value={fields.awayTiebreakScore}
               onChange={(e) => onUpdate("awayTiebreakScore", e.target.value)}
             />
           </div>
@@ -538,21 +595,114 @@ export function ResultsTab({
     </>
   );
 
+  const renderSetsScoreInputs = (
+    fields: ScoreFields,
+    onUpdate: (field: keyof ScoreFields, value: string | boolean) => void
+  ) => {
+    const showSuper = needsSuperTiebreak(fields);
+
+    return (
+      <>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-1">
+            <Label className="text-xs">Set 1 local</Label>
+            <Input
+              type="number"
+              min={0}
+              value={fields.homeSet1Games}
+              onChange={(e) => onUpdate("homeSet1Games", e.target.value)}
+            />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-xs">Set 1 visitante</Label>
+            <Input
+              type="number"
+              min={0}
+              value={fields.awaySet1Games}
+              onChange={(e) => onUpdate("awaySet1Games", e.target.value)}
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-1">
+            <Label className="text-xs">Set 2 local</Label>
+            <Input
+              type="number"
+              min={0}
+              value={fields.homeSet2Games}
+              onChange={(e) => onUpdate("homeSet2Games", e.target.value)}
+            />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-xs">Set 2 visitante</Label>
+            <Input
+              type="number"
+              min={0}
+              value={fields.awaySet2Games}
+              onChange={(e) => onUpdate("awaySet2Games", e.target.value)}
+            />
+          </div>
+        </div>
+
+        {showSuper && (
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <Label className="text-xs">Super TB local</Label>
+              <Input
+                type="number"
+                min={0}
+                value={fields.homeSuperTiebreakScore}
+                onChange={(e) => onUpdate("homeSuperTiebreakScore", e.target.value)}
+              />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Super TB visitante</Label>
+              <Input
+                type="number"
+                min={0}
+                value={fields.awaySuperTiebreakScore}
+                onChange={(e) => onUpdate("awaySuperTiebreakScore", e.target.value)}
+              />
+            </div>
+          </div>
+        )}
+      </>
+    );
+  };
+
+  const renderScoreFields = (
+    matchType: TeamEventMatchType,
+    scoreFormat: TeamEventMatchScoreFormat,
+    fields: ScoreFields,
+    onUpdate: (field: keyof ScoreFields, value: string | boolean) => void,
+    prefix: string
+  ) => {
+    if (
+      matchType === TeamEventMatchType.doubles &&
+      scoreFormat === TeamEventMatchScoreFormat.setsSuperTiebreak
+    ) {
+      return renderSetsScoreInputs(fields, onUpdate);
+    }
+
+    return renderLegacyScoreInputs(fields, onUpdate, prefix);
+  };
+
   const renderLineupDialog = () => {
     if (!selectedSeries) return null;
+
     const homePlayers = getActivePlayers(selectedSeries.homeTeamId);
     const awayPlayers = getActivePlayers(selectedSeries.awayTeamId);
 
     return (
       <div className="space-y-6">
-        {lineupForms.map((form, idx) => {
+        {lineupForms.map((form, index) => {
           const isDoubles = form.matchType === TeamEventMatchType.doubles;
+
           return (
-            <Card key={idx}>
+            <Card key={`${form.matchType}-${index}`}>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm">
-                  {matchTypeLabels[form.matchType]}
-                </CardTitle>
+                <CardTitle className="text-sm">{matchTypeLabels[form.matchType]}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -563,14 +713,14 @@ export function ResultsTab({
                     {renderPlayerSelect(
                       homePlayers,
                       form.homePlayer1Id,
-                      (v) => updateLineupForm(idx, "homePlayer1Id", v),
+                      (value) => updateLineupForm(index, "homePlayer1Id", value),
                       "Jugador 1"
                     )}
                     {isDoubles &&
                       renderPlayerSelect(
                         homePlayers,
                         form.homePlayer2Id,
-                        (v) => updateLineupForm(idx, "homePlayer2Id", v),
+                        (value) => updateLineupForm(index, "homePlayer2Id", value),
                         "Jugador 2"
                       )}
                   </div>
@@ -581,14 +731,14 @@ export function ResultsTab({
                     {renderPlayerSelect(
                       awayPlayers,
                       form.awayPlayer1Id,
-                      (v) => updateLineupForm(idx, "awayPlayer1Id", v),
+                      (value) => updateLineupForm(index, "awayPlayer1Id", value),
                       "Jugador 1"
                     )}
                     {isDoubles &&
                       renderPlayerSelect(
                         awayPlayers,
                         form.awayPlayer2Id,
-                        (v) => updateLineupForm(idx, "awayPlayer2Id", v),
+                        (value) => updateLineupForm(index, "awayPlayer2Id", value),
                         "Jugador 2"
                       )}
                   </div>
@@ -615,8 +765,9 @@ export function ResultsTab({
     return (
       <div className="space-y-4">
         {selectedSeries.matches.map((match) => {
-          const isPlayed = match.status === TeamEventMatchStatus.played;
           const isEditing = editingMatchId === match.id;
+          const isPlayed = match.status === TeamEventMatchStatus.played;
+          const readOnly = isLegacyReadonlyMatch(match);
           const isDoubles = match.matchType === TeamEventMatchType.doubles;
 
           const homeP1 = getPlayerName(match.homePlayer1);
@@ -624,82 +775,75 @@ export function ResultsTab({
           const homeP2 = isDoubles && match.homePlayer2 ? getPlayerName(match.homePlayer2) : null;
           const awayP2 = isDoubles && match.awayPlayer2 ? getPlayerName(match.awayPlayer2) : null;
 
-          const homeName = homeP2 ? `${homeP1} / ${homeP2}` : homeP1;
-          const awayName = awayP2 ? `${awayP1} / ${awayP2}` : awayP1;
-
           return (
             <Card key={match.id}>
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-sm">
-                    {matchTypeLabels[match.matchType]}
-                  </CardTitle>
-                  {isPlayed && (
-                    <CheckCircle2 className="h-4 w-4 text-green-600" />
-                  )}
+                  <CardTitle className="text-sm">{matchTypeLabels[match.matchType]}</CardTitle>
+                  {isPlayed && <CheckCircle2 className="h-4 w-4 text-green-600" />}
                 </div>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
                     <span className="text-muted-foreground text-xs">Local</span>
-                    <p className="font-medium">{homeName}</p>
+                    <p className="font-medium">
+                      {homeP2 ? `${homeP1} / ${homeP2}` : homeP1}
+                    </p>
                   </div>
                   <div>
                     <span className="text-muted-foreground text-xs">Visitante</span>
-                    <p className="font-medium">{awayName}</p>
+                    <p className="font-medium">
+                      {awayP2 ? `${awayP1} / ${awayP2}` : awayP1}
+                    </p>
                   </div>
                 </div>
 
                 {isPlayed && !isEditing && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-lg font-bold">
-                      {match.homeGames} - {match.awayGames}
-                      {match.hasTiebreak &&
-                        ` (TB: ${match.homeTiebreakScore}-${match.awayTiebreakScore})`}
-                    </span>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => startEditingScore(match)}
-                    >
-                      Editar
-                    </Button>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-sm font-semibold">{formatMatchScore(match)}</span>
+                    {!readOnly && (
+                      <Button variant="outline" size="sm" onClick={() => startEditingScore(match)}>
+                        Editar
+                      </Button>
+                    )}
                   </div>
                 )}
 
-                {!isPlayed && !isEditing && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => startEditingScore(match)}
-                  >
+                {!isPlayed && !isEditing && !readOnly && (
+                  <Button variant="outline" size="sm" onClick={() => startEditingScore(match)}>
                     Cargar score
                   </Button>
                 )}
 
+                {readOnly && (
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Lock className="h-3.5 w-3.5" />
+                    Doble cargado con formato anterior. Solo lectura.
+                  </div>
+                )}
+
                 {isEditing && (
                   <div className="space-y-3 border-t pt-3">
-                    {renderScoreInputs(
+                    {renderScoreFields(
+                      match.matchType,
+                      match.scoreFormat,
                       scoreForm,
-                      (field, value) => {
-                        setScoreForm((prev) => ({ ...prev, [field]: value }));
-                      },
+                      updateScoreField,
                       `score-${match.id}`
                     )}
                     <div className="flex gap-2">
                       <Button
                         size="sm"
-                        onClick={() => handleScoreSubmit(match.id)}
-                        disabled={loadMatchScoreMutation.isPending || !isScoreValid()}
+                        onClick={() => handleScoreSubmit(match)}
+                        disabled={
+                          loadMatchScoreMutation.isPending ||
+                          !isScoreFieldsValid(scoreForm, match.matchType, match.scoreFormat)
+                        }
                       >
                         {loadMatchScoreMutation.isPending ? "Guardando..." : "Guardar score"}
                       </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setEditingMatchId(null)}
-                      >
+                      <Button variant="ghost" size="sm" onClick={() => setEditingMatchId(null)}>
                         Cancelar
                       </Button>
                     </div>
@@ -713,21 +857,63 @@ export function ResultsTab({
     );
   };
 
-  const renderViewDialog = () => {
+  const renderReadonlyCompletedDialog = () => {
     if (!selectedSeries) return null;
+
+    return (
+      <div className="space-y-4">
+        {selectedSeries.matches.map((match) => {
+          const isDoubles = match.matchType === TeamEventMatchType.doubles;
+          const homeP1 = getPlayerName(match.homePlayer1);
+          const awayP1 = getPlayerName(match.awayPlayer1);
+          const homeP2 = isDoubles && match.homePlayer2 ? getPlayerName(match.homePlayer2) : null;
+          const awayP2 = isDoubles && match.awayPlayer2 ? getPlayerName(match.awayPlayer2) : null;
+
+          return (
+            <Card key={match.id}>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm">{matchTypeLabels[match.matchType]}</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="text-muted-foreground text-xs">Local</span>
+                    <p className="font-medium">{homeP2 ? `${homeP1} / ${homeP2}` : homeP1}</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground text-xs">Visitante</span>
+                    <p className="font-medium">{awayP2 ? `${awayP1} / ${awayP2}` : awayP1}</p>
+                  </div>
+                </div>
+                <p className="text-sm font-semibold">{formatMatchScore(match)}</p>
+              </CardContent>
+            </Card>
+          );
+        })}
+
+        <Button variant="outline" className="w-full" onClick={() => setStoryPreviewSeries(selectedSeries)}>
+          <Camera className="h-4 w-4 mr-2" />
+          Exportar Instagram Story
+        </Button>
+      </div>
+    );
+  };
+
+  const renderEditableCompletedDialog = () => {
+    if (!selectedSeries) return null;
+
     const homePlayers = getActivePlayers(selectedSeries.homeTeamId);
     const awayPlayers = getActivePlayers(selectedSeries.awayTeamId);
 
     return (
       <div className="space-y-6">
-        {matchForms.map((form, idx) => {
+        {matchForms.map((form, index) => {
           const isDoubles = form.matchType === TeamEventMatchType.doubles;
+
           return (
-            <Card key={idx}>
+            <Card key={`${form.matchType}-${index}`}>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm">
-                  {matchTypeLabels[form.matchType]}
-                </CardTitle>
+                <CardTitle className="text-sm">{matchTypeLabels[form.matchType]}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -738,14 +924,14 @@ export function ResultsTab({
                     {renderPlayerSelect(
                       homePlayers,
                       form.homePlayer1Id,
-                      (v) => updateMatchForm(idx, "homePlayer1Id", v),
+                      (value) => updateMatchForm(index, "homePlayer1Id", value),
                       "Jugador 1"
                     )}
                     {isDoubles &&
                       renderPlayerSelect(
                         homePlayers,
                         form.homePlayer2Id,
-                        (v) => updateMatchForm(idx, "homePlayer2Id", v),
+                        (value) => updateMatchForm(index, "homePlayer2Id", value),
                         "Jugador 2"
                       )}
                   </div>
@@ -756,40 +942,32 @@ export function ResultsTab({
                     {renderPlayerSelect(
                       awayPlayers,
                       form.awayPlayer1Id,
-                      (v) => updateMatchForm(idx, "awayPlayer1Id", v),
+                      (value) => updateMatchForm(index, "awayPlayer1Id", value),
                       "Jugador 1"
                     )}
                     {isDoubles &&
                       renderPlayerSelect(
                         awayPlayers,
                         form.awayPlayer2Id,
-                        (v) => updateMatchForm(idx, "awayPlayer2Id", v),
+                        (value) => updateMatchForm(index, "awayPlayer2Id", value),
                         "Jugador 2"
                       )}
                   </div>
                 </div>
 
-                {renderScoreInputs(
-                  {
-                    homeGames: form.homeGames,
-                    awayGames: form.awayGames,
-                    hasTiebreak: form.hasTiebreak,
-                    homeTiebreakScore: form.homeTiebreakScore,
-                    awayTiebreakScore: form.awayTiebreakScore,
-                  },
-                  (field, value) => updateMatchForm(idx, field, value),
-                  `view-${idx}`
+                {renderScoreFields(
+                  form.matchType,
+                  form.scoreFormat,
+                  form,
+                  (field, value) => updateMatchForm(index, field, value),
+                  `view-${index}`
                 )}
               </CardContent>
             </Card>
           );
         })}
 
-        <Button
-          variant="outline"
-          className="w-full"
-          onClick={() => setStoryPreviewSeries(selectedSeries)}
-        >
+        <Button variant="outline" className="w-full" onClick={() => setStoryPreviewSeries(selectedSeries)}>
           <Camera className="h-4 w-4 mr-2" />
           Exportar Instagram Story
         </Button>
@@ -797,7 +975,7 @@ export function ResultsTab({
         <Button
           className="w-full"
           onClick={handleUpdateSubmit}
-          disabled={updateResultMutation.isPending || !isFullFormValid()}
+          disabled={updateResultMutation.isPending}
         >
           {updateResultMutation.isPending ? "Guardando..." : "Actualizar resultado"}
         </Button>
@@ -806,20 +984,13 @@ export function ResultsTab({
   };
 
   const getDialogTitle = (): string => {
-    if (!selectedSeries) return "Cargar resultado";
+    if (!selectedSeries) return "Resultados";
     const home = selectedSeries.homeTeam?.name ?? "Local";
     const away = selectedSeries.awayTeam?.name ?? "Visitante";
 
-    switch (dialogMode) {
-      case "lineup":
-        return `Armar formación — ${home} vs ${away}`;
-      case "score":
-        return `${home} vs ${away} — En curso`;
-      case "view":
-        return `${home} vs ${away} — Completada`;
-      default:
-        return "Cargar resultado";
-    }
+    if (dialogMode === "lineup") return `Armar formación — ${home} vs ${away}`;
+    if (dialogMode === "score") return `${home} vs ${away} — En curso`;
+    return `${home} vs ${away} — Completada`;
   };
 
   if (seriesLoading) {
@@ -827,15 +998,18 @@ export function ResultsTab({
   }
 
   const pendingSeries = series.filter(
-    (s) =>
-      s.status === TeamEventSeriesStatus.pending ||
-      s.status === TeamEventSeriesStatus.inProgress
+    (seriesItem) =>
+      seriesItem.status === TeamEventSeriesStatus.pending ||
+      seriesItem.status === TeamEventSeriesStatus.inProgress
   );
   const completedSeries = series.filter(
-    (s) =>
-      s.status === TeamEventSeriesStatus.completed ||
-      s.status === TeamEventSeriesStatus.walkover
+    (seriesItem) =>
+      seriesItem.status === TeamEventSeriesStatus.completed ||
+      seriesItem.status === TeamEventSeriesStatus.walkover
   );
+  const isReadonlyCompletedSeries =
+    !!selectedSeries &&
+    selectedSeries.matches.some((match) => isLegacyReadonlyMatch(match));
 
   return (
     <div className="space-y-6">
@@ -843,11 +1017,11 @@ export function ResultsTab({
         <div>
           <h3 className="text-lg font-semibold mb-3">Pendientes de resultado</h3>
           <div className="grid gap-3 md:grid-cols-2">
-            {pendingSeries.map((s) => (
+            {pendingSeries.map((seriesItem) => (
               <SeriesCard
-                key={s.id}
-                series={s}
-                onClick={() => openResultDialog(s)}
+                key={seriesItem.id}
+                series={seriesItem}
+                onClick={() => openResultDialog(seriesItem)}
               />
             ))}
           </div>
@@ -858,11 +1032,11 @@ export function ResultsTab({
         <div>
           <h3 className="text-lg font-semibold mb-3">Completadas</h3>
           <div className="grid gap-3 md:grid-cols-2">
-            {completedSeries.map((s) => (
+            {completedSeries.map((seriesItem) => (
               <SeriesCard
-                key={s.id}
-                series={s}
-                onClick={() => openResultDialog(s)}
+                key={seriesItem.id}
+                series={seriesItem}
+                onClick={() => openResultDialog(seriesItem)}
               />
             ))}
           </div>
@@ -875,12 +1049,7 @@ export function ResultsTab({
         </p>
       )}
 
-      <Dialog
-        open={!!selectedSeries}
-        onOpenChange={(open) => {
-          if (!open) setSelectedSeries(null);
-        }}
-      >
+      <Dialog open={!!selectedSeries} onOpenChange={(open) => !open && setSelectedSeries(null)}>
         <DialogContent className="w-full max-w-2xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{getDialogTitle()}</DialogTitle>
@@ -888,7 +1057,11 @@ export function ResultsTab({
 
           {selectedSeries && dialogMode === "lineup" && renderLineupDialog()}
           {selectedSeries && dialogMode === "score" && renderScoreDialog()}
-          {selectedSeries && dialogMode === "view" && renderViewDialog()}
+          {selectedSeries &&
+            dialogMode === "view" &&
+            (isReadonlyCompletedSeries
+              ? renderReadonlyCompletedDialog()
+              : renderEditableCompletedDialog())}
         </DialogContent>
       </Dialog>
 

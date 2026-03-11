@@ -5,6 +5,7 @@ import {
   TeamEventMatchType,
   TeamEventMatchStatus,
   TeamEventMatchSide,
+  TeamEventMatchScoreFormat,
 } from "@/common/enum/team-event.enum";
 
 // --- Entities ---
@@ -49,11 +50,19 @@ export interface TeamEventMatch {
   awayPlayer1Id: number;
   awayPlayer2: TeamEventPlayer | null;
   awayPlayer2Id: number | null;
+  scoreFormat: TeamEventMatchScoreFormat;
   homeGames: number;
   awayGames: number;
   hasTiebreak: boolean;
   homeTiebreakScore: number | null;
   awayTiebreakScore: number | null;
+  homeSet1Games: number | null;
+  awaySet1Games: number | null;
+  homeSet2Games: number | null;
+  awaySet2Games: number | null;
+  hasSuperTiebreak: boolean;
+  homeSuperTiebreakScore: number | null;
+  awaySuperTiebreakScore: number | null;
   winningSide: TeamEventMatchSide | null;
   status: TeamEventMatchStatus;
 }
@@ -186,9 +195,17 @@ export interface MatchResultRequest {
   awayPlayer2Id?: number;
   homeGames: number;
   awayGames: number;
+  scoreFormat?: TeamEventMatchScoreFormat;
   hasTiebreak?: boolean;
   homeTiebreakScore?: number;
   awayTiebreakScore?: number;
+  homeSet1Games?: number;
+  awaySet1Games?: number;
+  homeSet2Games?: number;
+  awaySet2Games?: number;
+  hasSuperTiebreak?: boolean;
+  homeSuperTiebreakScore?: number;
+  awaySuperTiebreakScore?: number;
 }
 
 export interface LoadSeriesResultRequest {
@@ -215,9 +232,17 @@ export interface SetLineupRequest {
 export interface LoadMatchScoreRequest {
   homeGames: number;
   awayGames: number;
+  scoreFormat?: TeamEventMatchScoreFormat;
   hasTiebreak?: boolean;
   homeTiebreakScore?: number;
   awayTiebreakScore?: number;
+  homeSet1Games?: number;
+  awaySet1Games?: number;
+  homeSet2Games?: number;
+  awaySet2Games?: number;
+  hasSuperTiebreak?: boolean;
+  homeSuperTiebreakScore?: number;
+  awaySuperTiebreakScore?: number;
 }
 
 export interface CreateSeriesRequest {

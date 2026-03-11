@@ -14,6 +14,7 @@ import {
 } from "@/common/enum/team-event.enum";
 import { OptimizedAvatar } from "@/components/ui/optimized-avatar";
 import { CheckCircle2 } from "lucide-react";
+import { formatMatchScore } from "../score-format";
 
 interface SeriesMatchCardProps {
   series: TeamEventSeries;
@@ -110,21 +111,10 @@ function MatchLine({ match }: { match: TeamEventMatch }) {
         {isPlayed ? (
           <>
             <span
-              className={`text-sm font-mono font-bold ${homeWon ? "text-emerald-400" : "text-gray-500"}`}
+              className={`text-[11px] font-mono font-bold ${homeWon || awayWon ? "text-gray-300" : "text-gray-500"}`}
             >
-              {match.homeGames}
+              {formatMatchScore(match)}
             </span>
-            <span className="text-[10px] text-gray-600">-</span>
-            <span
-              className={`text-sm font-mono font-bold ${awayWon ? "text-emerald-400" : "text-gray-500"}`}
-            >
-              {match.awayGames}
-            </span>
-            {match.hasTiebreak && (
-              <span className="text-[9px] text-gray-500">
-                ({match.homeTiebreakScore}-{match.awayTiebreakScore})
-              </span>
-            )}
           </>
         ) : (
           <span className="text-[10px] text-gray-600">vs</span>
