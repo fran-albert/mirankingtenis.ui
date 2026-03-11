@@ -11,6 +11,7 @@ import {
   TeamEventMatchType,
   TeamEventMatchSide,
 } from "@/common/enum/team-event.enum";
+import { formatMatchScore } from "./score-format";
 
 interface SeriesCardProps {
   series: TeamEventSeries;
@@ -74,14 +75,11 @@ function renderMatchLine(match: TeamEventMatch) {
       )}
       {isPlayed ? (
         <span className="flex items-center gap-1 font-medium whitespace-nowrap">
-          <span className={homeWon ? "text-green-600" : "text-muted-foreground"}>{match.homeGames}</span>
-          <span className="text-muted-foreground">-</span>
-          <span className={awayWon ? "text-green-600" : "text-muted-foreground"}>{match.awayGames}</span>
-          {match.hasTiebreak && (
-            <span className="text-muted-foreground text-[10px]">
-              ({match.homeTiebreakScore}-{match.awayTiebreakScore})
-            </span>
-          )}
+          <span
+            className={homeWon || awayWon ? "text-muted-foreground" : "text-muted-foreground"}
+          >
+            {formatMatchScore(match)}
+          </span>
           <CheckCircle2 className="h-3 w-3 text-green-600" />
         </span>
       ) : (
