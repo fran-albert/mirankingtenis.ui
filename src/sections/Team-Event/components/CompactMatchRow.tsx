@@ -203,7 +203,7 @@ export function SeriesMatchCard({ series, onClick }: SeriesMatchCardProps) {
           )}
           {isCompleted && <CheckCircle2 className="w-3 h-3 text-emerald-500" />}
           <span className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${status.badge}`}>
-            {series.phase === TeamEventSeriesPhase.final ? "Final" : `J${series.matchday}`}
+            {series.phase === TeamEventSeriesPhase.final ? "Playoff" : `J${series.matchday}`}
           </span>
         </div>
       </div>

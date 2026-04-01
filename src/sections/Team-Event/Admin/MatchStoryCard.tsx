@@ -47,24 +47,6 @@ function transformCloudinaryUrl(url: string, width: number, height: number): str
     .replace(/\.\w+$/, ".png");
 }
 
-function pickFeaturedPlayers(series: TeamEventSeries): {
-  homePlayer: TeamEventPlayer | null;
-  awayPlayer: TeamEventPlayer | null;
-} {
-  const prioritized =
-    series.matches.find(
-      (match) =>
-        match.matchType !== TeamEventMatchType.doubles &&
-        !!match.homePlayer1 &&
-        !!match.awayPlayer1
-    ) ?? series.matches[0];
-
-  return {
-    homePlayer: prioritized?.homePlayer1 ?? null,
-    awayPlayer: prioritized?.awayPlayer1 ?? null,
-  };
-}
-
 function getStoryDescription(
   eventDescription: string | null | undefined,
   categoryName: string | undefined,
@@ -120,118 +102,6 @@ function PlayerAvatar({
       }}
     >
       {getPlayerInitials(player)}
-    </div>
-  );
-}
-
-function FeaturedPlayerCard({
-  player,
-  teamName,
-  teamWon,
-}: {
-  player: TeamEventPlayer | null;
-  teamName: string;
-  teamWon: boolean;
-}) {
-  const photo = player?.player.photo ?? null;
-  const playerLabel = player ? getShortName(player) : teamName.toUpperCase();
-
-  return (
-    <div
-      style={{
-        position: "relative",
-        height: 520,
-        borderRadius: 24,
-        overflow: "hidden",
-        border: "1px solid rgba(255,255,255,0.24)",
-        background:
-          "linear-gradient(160deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.02) 70%)",
-      }}
-    >
-      {photo ? (
-        <img
-          crossOrigin="anonymous"
-          src={transformCloudinaryUrl(photo, 1000, 1400)}
-          alt={playerLabel}
-          style={{
-            position: "absolute",
-            inset: 0,
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            objectPosition: "center top",
-          }}
-        />
-      ) : (
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            background:
-              "radial-gradient(circle at 40% 20%, rgba(255,255,255,0.24), rgba(22,33,62,0.95))",
-            color: "rgba(255,255,255,0.82)",
-            fontSize: 120,
-            fontFamily: headingFont,
-          }}
-        >
-          {player ? getPlayerInitials(player) : teamName.slice(0, 2).toUpperCase()}
-        </div>
-      )}
-
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          background:
-            "linear-gradient(180deg, rgba(6,11,28,0.04) 30%, rgba(6,11,28,0.68) 72%, rgba(6,11,28,0.98) 100%)",
-        }}
-      />
-
-      <div
-        style={{
-          position: "absolute",
-          top: 20,
-          left: 20,
-          background: teamWon
-            ? "linear-gradient(135deg, rgba(248,225,138,0.95), rgba(205,166,60,0.95))"
-            : "rgba(255,255,255,0.2)",
-          color: teamWon ? "#141A33" : "#FFFFFF",
-          borderRadius: 999,
-          padding: "8px 16px",
-          fontSize: 22,
-          letterSpacing: 1,
-          fontWeight: 800,
-          fontFamily: headingFont,
-          textTransform: "uppercase",
-        }}
-      >
-        {teamName}
-      </div>
-
-      <div
-        style={{
-          position: "absolute",
-          left: 20,
-          right: 20,
-          bottom: 20,
-          fontSize: 64,
-          lineHeight: 1,
-          letterSpacing: 1,
-          color: "#FFFFFF",
-          fontWeight: 900,
-          textTransform: "uppercase",
-          fontFamily: headingFont,
-          textShadow: "0 6px 16px rgba(0,0,0,0.55)",
-          whiteSpace: "nowrap",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-        }}
-      >
-        {playerLabel}
-      </div>
     </div>
   );
 }
@@ -412,7 +282,7 @@ export const MatchStoryCard = forwardRef<HTMLDivElement, MatchStoryCardProps>(
     const winnerName = series.winner?.name;
     const isFinal = series.phase === TeamEventSeriesPhase.final;
     const phaseLabel = isFinal
-      ? "FINAL"
+      ? "PLAYOFF"
       : `JORNADA ${series.matchday}${series.roundNumber > 1 ? " - VUELTA" : " - IDA"}`;
     const title = eventName?.trim() || "TORNEO POR EQUIPOS";
     const description = getStoryDescription(
@@ -420,7 +290,6 @@ export const MatchStoryCard = forwardRef<HTMLDivElement, MatchStoryCardProps>(
       categoryName,
       phaseLabel
     );
-    const { homePlayer, awayPlayer } = pickFeaturedPlayers(series);
 
     return (
       <div
@@ -547,31 +416,10 @@ export const MatchStoryCard = forwardRef<HTMLDivElement, MatchStoryCardProps>(
 
         <div
           style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: 18,
-            padding: "0 34px",
-            zIndex: 2,
-          }}
-        >
-          <FeaturedPlayerCard
-            player={homePlayer}
-            teamName={homeName}
-            teamWon={series.winnerId === series.homeTeamId}
-          />
-          <FeaturedPlayerCard
-            player={awayPlayer}
-            teamName={awayName}
-            teamWon={series.winnerId === series.awayTeamId}
-          />
-        </div>
-
-        <div
-          style={{
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            padding: "16px 40px 8px",
+            padding: "20px 40px 8px",
             zIndex: 2,
           }}
         >

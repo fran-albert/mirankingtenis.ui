@@ -2,6 +2,7 @@ import axiosInstance from "@/services/axiosConfig";
 import {
   TeamEventSeries,
   CreateSeriesRequest,
+  CreateTeamEventPlayoffBracketRequest,
   LoadSeriesResultRequest,
   SetLineupRequest,
   LoadMatchScoreRequest,
@@ -121,5 +122,26 @@ export const deleteFixture = async (
 ): Promise<void> => {
   await axiosInstance.delete(
     `${basePath(eventId, categoryId)}/fixture`
+  );
+};
+
+export const createPlayoffBracket = async (
+  eventId: number,
+  categoryId: number,
+  data: CreateTeamEventPlayoffBracketRequest
+): Promise<TeamEventSeries[]> => {
+  const response = await axiosInstance.post(
+    `${basePath(eventId, categoryId)}/playoff-bracket`,
+    data
+  );
+  return response.data as TeamEventSeries[];
+};
+
+export const deletePlayoffBracket = async (
+  eventId: number,
+  categoryId: number
+): Promise<void> => {
+  await axiosInstance.delete(
+    `${basePath(eventId, categoryId)}/playoff-bracket`
   );
 };

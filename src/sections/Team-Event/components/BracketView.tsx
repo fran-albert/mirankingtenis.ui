@@ -64,7 +64,7 @@ export const BracketView: React.FC<BracketViewProps> = ({ series }) => {
 
   const sortedRounds = Object.keys(rounds)
     .map(Number)
-    .sort((a, b) => b - a);
+    .sort((a, b) => a - b);
 
   const getRoundName = (count: number) => {
     if (count === 1) return "Final";
@@ -90,7 +90,7 @@ export const BracketView: React.FC<BracketViewProps> = ({ series }) => {
           <button 
             key={r}
             className={`px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest rounded-md transition-all ${
-              idx === sortedRounds.length - 1 ? 'bg-tennis-accent text-black shadow-lg shadow-tennis-accent/20' : 'text-gray-500 hover:text-white'
+              idx === 0 ? 'bg-tennis-accent text-black shadow-lg shadow-tennis-accent/20' : 'text-gray-500 hover:text-white'
             }`}
           >
             {getRoundName(rounds[r].length)}
@@ -100,13 +100,18 @@ export const BracketView: React.FC<BracketViewProps> = ({ series }) => {
 
       <div className="relative overflow-x-auto pb-8 no-scrollbar">
         <div className="flex items-center gap-12 min-w-max px-4">
-          {sortedRounds.reverse().map((roundKey, roundIdx) => (
+          {sortedRounds.map((roundKey, roundIdx) => (
             <div key={roundKey} className="flex flex-col justify-around gap-8 py-4">
               <h4 className="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] text-center mb-4">
                 {getRoundName(rounds[roundKey].length)}
               </h4>
               <div className="flex flex-col gap-16">
-                {rounds[roundKey].map((s) => (
+                {[...rounds[roundKey]]
+                  .sort(
+                    (a, b) =>
+                      (a.positionInBracket ?? 0) - (b.positionInBracket ?? 0),
+                  )
+                  .map((s) => (
                   <div key={s.id} className="relative flex items-center">
                     <BracketMatch series={s} />
                     {roundIdx < sortedRounds.length - 1 && (

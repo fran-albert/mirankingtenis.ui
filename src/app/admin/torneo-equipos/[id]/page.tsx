@@ -19,6 +19,7 @@ import { TeamEventStatus } from "@/common/enum/team-event.enum";
 import { ConfigTab } from "@/sections/Team-Event/Admin/ConfigTab";
 import { TeamsTab } from "@/sections/Team-Event/Admin/TeamsTab";
 import { FixtureTab } from "@/sections/Team-Event/Admin/FixtureTab";
+import { PlayoffsTab } from "@/sections/Team-Event/Admin/PlayoffsTab";
 import { ResultsTab } from "@/sections/Team-Event/Admin/ResultsTab";
 import { StandingsTab } from "@/sections/Team-Event/Admin/StandingsTab";
 
@@ -59,7 +60,7 @@ export default function TeamEventManagePage() {
   const selectedCategory = categories.find((c) => c.id === selectedCategoryId);
   const showCategorySelector = categories.length > 1;
   const hasCategorySelected = selectedCategoryId !== null && selectedCategory !== undefined;
-  const needsCategoryTabs = ["teams", "fixture", "results", "standings"];
+  const needsCategoryTabs = ["teams", "fixture", "playoffs", "results", "standings"];
 
   return (
     <div className="px-2 sm:px-4 md:px-6 py-4 sm:py-6">
@@ -111,6 +112,9 @@ export default function TeamEventManagePage() {
           <TabsTrigger value="fixture" className="text-xs sm:text-sm px-2 sm:px-3">
             Fixture
           </TabsTrigger>
+          <TabsTrigger value="playoffs" className="text-xs sm:text-sm px-2 sm:px-3">
+            Playoffs
+          </TabsTrigger>
           <TabsTrigger value="results" className="text-xs sm:text-sm px-2 sm:px-3">
             Resultados
           </TabsTrigger>
@@ -152,6 +156,15 @@ export default function TeamEventManagePage() {
                   onSeriesClick={() => {
                     setActiveTab("results");
                   }}
+                />
+              )}
+            </TabsContent>
+
+            <TabsContent value="playoffs">
+              {hasCategorySelected && (
+                <PlayoffsTab
+                  eventId={event.id}
+                  categoryId={selectedCategoryId!}
                 />
               )}
             </TabsContent>

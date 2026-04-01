@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Tournament } from "@/types/Tournament/Tournament";
 import CategoriesCard from "../Fixture/card";
 import PlayersTournamentTable from "../Players/Table/table";
 import { TournamentCategory } from "@/types/Tournament-Category/TournamentCategory";
 import AddCategoriesForTournamentDialog from "../Categories/Add/dialog";
+import ConfigureTournamentCategoryDialog from "../Categories/Configure/dialog";
 import { useTournamentCategoryMutations } from "@/hooks/Tournament-Category/useTournamentCategory";
 import { useAllCategories } from "@/hooks/Category";
-import MasterCategoriesCard from "../Fixture/master-card";
-import Loading from "@/components/Loading/loading";
-import PlayOffCategoriesCard from "../Fixture/playoff-card";
+import DirectPlayoffCard from "../Fixture/direct-playoff-card";
+import DirectPlayoffRegistration from "../Players/DirectPlayoffRegistration";
 function LeagueTournamentDetail({
   tournament,
   categories: initialCategories,
@@ -29,9 +29,27 @@ function LeagueTournamentDetail({
     setCategories([...categories, ...newCategories]);
   };
 
+  const handleCategoryUpdated = (updatedCategory: TournamentCategory) => {
+    setCategories((currentCategories) =>
+      currentCategories.map((category) =>
+        category.id === updatedCategory.id ? updatedCategory : category
+      )
+    );
+  };
+
   // Crear función wrapper para el mutation
-  const createCategoryForTournament = async (idTournament: number, idCategory: number[]): Promise<TournamentCategory[]> => {
-    return await createCategoryForTournamentMutation.mutateAsync({ idTournament, idCategory });
+  const createCategoryForTournament = async (
+    idTournament: number,
+    idCategory: number[],
+    skipGroupStage?: boolean,
+    startingPlayoffRound?: TournamentCategory["startingPlayoffRound"]
+  ): Promise<TournamentCategory[]> => {
+    return await createCategoryForTournamentMutation.mutateAsync({
+      idTournament,
+      idCategory,
+      skipGroupStage,
+      startingPlayoffRound,
+    });
   };
 
   const existingCategoryIds = categories.map((category) => category.id);
@@ -54,9 +72,32 @@ function LeagueTournamentDetail({
       </h1>
       <div className="m-4">
         {categories?.map((category) => (
-          <li className="font-bold" key={category.id}>
-            Categoría {category.name}
-          </li>
+          <div
+            className="flex items-center justify-between gap-3 py-1"
+            key={category.id}
+          >
+            <div className="font-bold">
+              Categoría {category.name}
+              {category.skipGroupStage && (
+                <span className="ml-2 text-sm font-medium text-purple-700">
+                  • Directo a {category.startingPlayoffRound === "RoundOf16"
+                    ? "Octavos"
+                    : category.startingPlayoffRound === "QuarterFinals"
+                      ? "Cuartos"
+                      : category.startingPlayoffRound === "SemiFinals"
+                        ? "Semifinales"
+                        : "Final"}
+                </span>
+              )}
+            </div>
+            {tournament?.status === "pending" && (
+              <ConfigureTournamentCategoryDialog
+                tournamentId={tournament.id}
+                category={category}
+                onUpdated={handleCategoryUpdated}
+              />
+            )}
+          </div>
         ))}
         {tournament?.status === "pending" && hasAvailableCategories && (
           <div className="m-4">
@@ -65,30 +106,70 @@ function LeagueTournamentDetail({
               existingCategories={existingCategoryIds}
               createCategoryForTournament={createCategoryForTournament}
               onClose={handleCategoryAdded}
+              enableDirectPlayoffConfiguration={true}
             />
           </div>
         )}
       </div>
 
-      <h1 className="text-lg font-bold m-4 text-orange-700">Fixture</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {tournament?.type === "league" && (
-          <>
-            {categories?.map((category) => (
-              <CategoriesCard
-                key={category.id}
-                idTournament={tournament.id}
-                category={category}
-                nextMatchDay={categoryDates[category.id]}
-              />
-            ))}
-          </>
-        )}
-      </div>
+      {categories.some((category) => category.skipGroupStage) && (
+        <>
+          <h1 className="text-lg font-bold m-4 text-orange-700">
+            Categorías - Directo a Playoffs
+          </h1>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 m-4">
+            {categories
+              .filter((category) => category.skipGroupStage)
+              .map((category) => (
+                <DirectPlayoffCard
+                  key={category.id}
+                  category={category}
+                  idTournament={tournament.id}
+                />
+              ))}
+          </div>
+        </>
+      )}
+
+      {categories.some((category) => !category.skipGroupStage) && (
+        <>
+          <h1 className="text-lg font-bold m-4 text-orange-700">Fixture</h1>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 m-4">
+            {tournament?.type === "league" &&
+              categories
+                ?.filter((category) => !category.skipGroupStage)
+                .map((category) => (
+                  <CategoriesCard
+                    key={category.id}
+                    idTournament={tournament.id}
+                    category={category}
+                    nextMatchDay={categoryDates[category.id]}
+                  />
+                ))}
+          </div>
+        </>
+      )}
+
+      {categories.some((category) => category.skipGroupStage) && (
+        <>
+          <h1 className="text-lg font-bold m-4 text-orange-700">
+            Inscripción Rápida - Playoffs Directos
+          </h1>
+          <div className="m-4 mb-8">
+            <DirectPlayoffRegistration
+              tournamentId={tournament.id}
+              categories={categories}
+            />
+          </div>
+        </>
+      )}
 
       <h1 className="text-lg font-bold m-4 text-orange-700">Jugadores</h1>
       <div className="gap-4">
-        <PlayersTournamentTable idTournament={tournament.id} />
+        <PlayersTournamentTable
+          idTournament={tournament.id}
+          categories={categories}
+        />
       </div>
     </div>
   );
