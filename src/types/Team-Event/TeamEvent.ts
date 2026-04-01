@@ -72,10 +72,10 @@ export interface TeamEventSeries {
   categoryId: number;
   roundNumber: number;
   matchday: number;
-  homeTeam: TeamEventTeam;
-  homeTeamId: number;
-  awayTeam: TeamEventTeam;
-  awayTeamId: number;
+  homeTeam: TeamEventTeam | null;
+  homeTeamId: number | null;
+  awayTeam: TeamEventTeam | null;
+  awayTeamId: number | null;
   phase: TeamEventSeriesPhase;
   scheduledWeekStart: string | null;
   scheduledWeekEnd: string | null;
@@ -84,6 +84,7 @@ export interface TeamEventSeries {
   awayMatchesWon: number;
   winner: TeamEventTeam | null;
   winnerId: number | null;
+  positionInBracket: number | null;
   matches: TeamEventMatch[];
 }
 
@@ -250,4 +251,14 @@ export interface CreateSeriesRequest {
   awayTeamId: number;
   matchday: number;
   phase?: TeamEventSeriesPhase;
+}
+
+export interface TeamEventPlayoffMatchup {
+  positionInBracket: number;
+  homeTeamId: number;
+  awayTeamId: number;
+}
+
+export interface CreateTeamEventPlayoffBracketRequest {
+  matchups: TeamEventPlayoffMatchup[];
 }

@@ -14,6 +14,13 @@ export interface CreateTournamentCategoryRequest {
     startingPlayoffRound?: PlayoffRound;
 }
 
+export interface UpdateTournamentCategoryConfigRequest {
+    tournamentId: number;
+    categoryId: number;
+    skipGroupStage: boolean;
+    startingPlayoffRound?: PlayoffRound | null;
+}
+
 export interface ManualBracketMatchup {
     positionInBracket: number;
     user1Id: number;

@@ -1,15 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Tournament } from "@/types/Tournament/Tournament";
-import CategoriesCard from "../Fixture/card";
 import PlayersTournamentTable from "../Players/Table/table";
 import { TournamentCategory } from "@/types/Tournament-Category/TournamentCategory";
 import AddCategoriesForTournamentDialog from "../Categories/Add/dialog";
+import ConfigureTournamentCategoryDialog from "../Categories/Configure/dialog";
 import { useTournamentCategoryMutations } from "@/hooks/Tournament-Category/useTournamentCategory";
 import MasterCategoriesCard from "../Fixture/master-card";
 import { isGroupStageFixturesCreated } from "@/api/Fixture/is-group-stage-fixtures-created";
 import { useQuery } from "@tanstack/react-query";
 import Loading from "@/components/Loading/loading";
-import PlayOffCategoriesCard from "../Fixture/playoff-card";
 import { RelatedTournamentsCard, LinkTournamentDialog } from "@/components/Tournament";
 import { useAllTournaments } from "@/hooks/Tournament/useTournaments";
 import { TournamentType } from "@/common/enum/tournament.enum";
@@ -94,6 +93,14 @@ function MasterTournamentDetail({
     setCategories([...categories, ...newCategories]);
   };
 
+  const handleCategoryUpdated = (updatedCategory: TournamentCategory) => {
+    setCategories((currentCategories) =>
+      currentCategories.map((category) =>
+        category.id === updatedCategory.id ? updatedCategory : category
+      )
+    );
+  };
+
   const existingCategoryIds = categories.map((category) => category.id);
 
   if (isLoadingFixture) {
@@ -118,9 +125,32 @@ function MasterTournamentDetail({
       </h1>
       <div className="m-4">
         {categories.map((category) => (
-          <li className="font-bold" key={category.id}>
-            Categoría {category.name}
-          </li>
+          <div
+            className="flex items-center justify-between gap-3 py-1"
+            key={category.id}
+          >
+            <div className="font-bold">
+              Categoría {category.name}
+              {category.skipGroupStage && (
+                <span className="ml-2 text-sm font-medium text-purple-700">
+                  • Directo a {category.startingPlayoffRound === "RoundOf16"
+                    ? "Octavos"
+                    : category.startingPlayoffRound === "QuarterFinals"
+                      ? "Cuartos"
+                      : category.startingPlayoffRound === "SemiFinals"
+                        ? "Semifinales"
+                        : "Final"}
+                </span>
+              )}
+            </div>
+            {tournament.status === "pending" && (
+              <ConfigureTournamentCategoryDialog
+                tournamentId={tournament.id}
+                category={category}
+                onUpdated={handleCategoryUpdated}
+              />
+            )}
+          </div>
         ))}
         {tournament.status === "pending" && (
           <div className="m-4">
@@ -129,7 +159,7 @@ function MasterTournamentDetail({
               existingCategories={existingCategoryIds}
               createCategoryForTournament={createCategoryForTournament}
               onClose={handleCategoryAdded}
-              isMasterTournament={true}
+              enableDirectPlayoffConfiguration={true}
             />
           </div>
         )}

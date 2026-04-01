@@ -34,7 +34,7 @@ interface AddCategoriesForTournamentDialogProps {
   idTournament: number;
   onClose: (createdCategories: TournamentCategory[]) => void;
   existingCategories: number[];
-  isMasterTournament?: boolean;
+  enableDirectPlayoffConfiguration?: boolean;
 }
 interface Inputs {
   tournamentId: number;
@@ -48,7 +48,7 @@ export default function AddCategoriesForTournamentDialog({
   idTournament,
   onClose,
   existingCategories,
-  isMasterTournament = false,
+  enableDirectPlayoffConfiguration = false,
 }: AddCategoriesForTournamentDialogProps) {
   const { categories } = useAllCategories();
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -148,7 +148,7 @@ export default function AddCategoriesForTournamentDialog({
               ))}
             </div>
 
-            {isMasterTournament && (
+            {enableDirectPlayoffConfiguration && (
               <div className="border-t pt-4 mt-2">
                 <div className="space-y-4">
                   <div className="flex items-center space-x-2">

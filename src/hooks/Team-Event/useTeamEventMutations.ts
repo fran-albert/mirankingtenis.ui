@@ -21,8 +21,10 @@ import {
 import {
   generateFixture,
   createSeries,
+  createPlayoffBracket,
   deleteSeries,
   deleteFixture,
+  deletePlayoffBracket,
   loadSeriesResult,
   updateSeriesResult,
   setLineup,
@@ -38,6 +40,7 @@ import {
   AddPlayerRequest,
   ReplacePlayerRequest,
   CreateSeriesRequest,
+  CreateTeamEventPlayoffBracketRequest,
   LoadSeriesResultRequest,
   FinalizeEventRequest,
   SetLineupRequest,
@@ -238,6 +241,17 @@ export const useSeriesMutations = (eventId: number, categoryId: number) => {
     onSuccess: invalidate,
   });
 
+  const createPlayoffBracketMutation = useMutation({
+    mutationFn: (data: CreateTeamEventPlayoffBracketRequest) =>
+      createPlayoffBracket(eventId, categoryId, data),
+    onSuccess: invalidate,
+  });
+
+  const deletePlayoffBracketMutation = useMutation({
+    mutationFn: () => deletePlayoffBracket(eventId, categoryId),
+    onSuccess: invalidate,
+  });
+
   const loadResultMutation = useMutation({
     mutationFn: ({
       seriesId,
@@ -289,6 +303,8 @@ export const useSeriesMutations = (eventId: number, categoryId: number) => {
     createSeriesMutation,
     deleteSeriesMutation,
     deleteFixtureMutation,
+    createPlayoffBracketMutation,
+    deletePlayoffBracketMutation,
     loadResultMutation,
     updateResultMutation,
     setLineupMutation,

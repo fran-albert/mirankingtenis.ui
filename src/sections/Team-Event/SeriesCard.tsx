@@ -96,6 +96,10 @@ export function SeriesCard({ series, onClick, onDelete }: SeriesCardProps) {
 
   const hasMatches = series.matches && series.matches.length > 0;
 
+  const isPlayoffSeries = series.phase === TeamEventSeriesPhase.final;
+  const phaseBadgeLabel =
+    isPlayoffSeries && series.positionInBracket != null ? "PLAYOFF" : "FINAL";
+
   return (
     <Card
       className={`cursor-pointer hover:shadow-md transition-shadow ${
@@ -106,8 +110,8 @@ export function SeriesCard({ series, onClick, onDelete }: SeriesCardProps) {
       <CardContent className="p-4">
         <div className="flex items-center justify-between mb-2">
           <div className="flex gap-2 items-center">
-            {series.phase === TeamEventSeriesPhase.final && (
-              <Badge variant="destructive">FINAL</Badge>
+            {isPlayoffSeries && (
+              <Badge variant="destructive">{phaseBadgeLabel}</Badge>
             )}
             <Badge className={statusColors[series.status]}>
               {statusLabels[series.status]}
@@ -118,6 +122,11 @@ export function SeriesCard({ series, onClick, onDelete }: SeriesCardProps) {
               <span className="text-xs text-muted-foreground">
                 Jornada {series.matchday}
                 {series.roundNumber > 1 ? " (Vuelta)" : " (Ida)"}
+              </span>
+            )}
+            {isPlayoffSeries && series.positionInBracket != null && (
+              <span className="text-xs text-muted-foreground">
+                Llave {series.positionInBracket}
               </span>
             )}
             {onDelete && (

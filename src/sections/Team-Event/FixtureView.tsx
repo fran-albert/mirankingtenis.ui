@@ -46,12 +46,30 @@ export function FixtureView({ series, teams, onSeriesClick, onDeleteSeries }: Fi
     if (!teams || teams.length === 0) return [];
     const usedIds = new Set<number>();
     for (const s of mdSeries) {
-      usedIds.add(s.homeTeamId);
-      usedIds.add(s.awayTeamId);
+      if (s.homeTeamId != null) {
+        usedIds.add(s.homeTeamId);
+      }
+      if (s.awayTeamId != null) {
+        usedIds.add(s.awayTeamId);
+      }
     }
     return teams
       .filter((t) => !usedIds.has(t.id))
       .map((t) => t.name);
+  };
+
+  const playoffRounds = new Map<number, TeamEventSeries[]>();
+  for (const s of finalSeries) {
+    const key = s.roundNumber;
+    if (!playoffRounds.has(key)) playoffRounds.set(key, []);
+    playoffRounds.get(key)!.push(s);
+  }
+
+  const getPlayoffRoundLabel = (seriesList: TeamEventSeries[]): string => {
+    if (seriesList.length === 1) return "Final";
+    if (seriesList.length === 2) return "Semifinales";
+    if (seriesList.length === 4) return "Cuartos de Final";
+    return "Playoffs";
   };
 
   return (
@@ -98,18 +116,34 @@ export function FixtureView({ series, teams, onSeriesClick, onDeleteSeries }: Fi
 
       {finalSeries.length > 0 && (
         <div>
-          <h3 className="text-lg font-semibold mb-4">Final</h3>
-          <div className="grid gap-3 md:grid-cols-2">
-            {finalSeries.map((s) => (
-              <SeriesCard
-                key={s.id}
-                series={s}
-                onClick={
-                  onSeriesClick ? () => onSeriesClick(s) : undefined
-                }
-                onDelete={onDeleteSeries}
-              />
-            ))}
+          <h3 className="text-lg font-semibold mb-4">Playoffs</h3>
+          <div className="space-y-6">
+            {[...playoffRounds.entries()]
+              .sort(([a], [b]) => a - b)
+              .map(([, roundSeries]) => (
+                <div key={roundSeries[0].roundNumber}>
+                  <h4 className="text-sm font-medium text-muted-foreground mb-2">
+                    {getPlayoffRoundLabel(roundSeries)}
+                  </h4>
+                  <div className="grid gap-3 md:grid-cols-2">
+                    {[...roundSeries]
+                      .sort(
+                        (a, b) =>
+                          (a.positionInBracket ?? 0) - (b.positionInBracket ?? 0),
+                      )
+                      .map((s) => (
+                        <SeriesCard
+                          key={s.id}
+                          series={s}
+                          onClick={
+                            onSeriesClick ? () => onSeriesClick(s) : undefined
+                          }
+                          onDelete={onDeleteSeries}
+                        />
+                      ))}
+                  </div>
+                </div>
+              ))}
           </div>
         </div>
       )}

@@ -269,7 +269,8 @@ export function ResultsTab({
     }
   };
 
-  const getActivePlayers = (teamId: number): TeamEventPlayer[] => {
+  const getActivePlayers = (teamId: number | null): TeamEventPlayer[] => {
+    if (teamId == null) return [];
     const team = teams.find((teamItem) => teamItem.id === teamId);
     if (!team) return [];
     return team.players.filter((player) => !player.leftAt);
@@ -997,12 +998,16 @@ export function ResultsTab({
     return <p className="text-muted-foreground">Cargando series...</p>;
   }
 
-  const pendingSeries = series.filter(
+  const playableSeries = series.filter(
+    (seriesItem) =>
+      seriesItem.homeTeamId != null && seriesItem.awayTeamId != null
+  );
+  const pendingSeries = playableSeries.filter(
     (seriesItem) =>
       seriesItem.status === TeamEventSeriesStatus.pending ||
       seriesItem.status === TeamEventSeriesStatus.inProgress
   );
-  const completedSeries = series.filter(
+  const completedSeries = playableSeries.filter(
     (seriesItem) =>
       seriesItem.status === TeamEventSeriesStatus.completed ||
       seriesItem.status === TeamEventSeriesStatus.walkover
@@ -1048,6 +1053,14 @@ export function ResultsTab({
           Primero generá el fixture en la pestaña correspondiente.
         </p>
       )}
+
+      {series.length > 0 &&
+        pendingSeries.length === 0 &&
+        completedSeries.length === 0 && (
+          <p className="text-muted-foreground text-center py-8">
+            Aún no hay cruces con ambos equipos definidos para cargar resultados.
+          </p>
+        )}
 
       <Dialog open={!!selectedSeries} onOpenChange={(open) => !open && setSelectedSeries(null)}>
         <DialogContent className="w-full max-w-2xl max-h-[85vh] overflow-y-auto">

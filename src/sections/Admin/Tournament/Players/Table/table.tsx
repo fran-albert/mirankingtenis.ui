@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React from "react";
 import { DataTable } from "@/components/Table/dataTable";
 import { getColumns } from "./columns";
 import useRoles from "@/hooks/useRoles";
@@ -18,13 +18,14 @@ interface PlayersTournamentTableProps {
 
 function PlayersTournamentTable({ idTournament, categories = [] }: PlayersTournamentTableProps) {
   // Usar React Query hooks
-  const { data: tournamentParticipants = [], isLoading: loading } = usePlayersByTournament(idTournament, !!idTournament);
+  const { data: tournamentParticipants = [] } = usePlayersByTournament(idTournament, !!idTournament);
   const desactivatePlayerMutation = useDesactivatePlayer();
   
   const { isAdmin } = useRoles();
   const { session } = useCustomSession();
   const canAddUser = !!session && isAdmin;
 
+  const hasDirectPlayoffCategories = categories.some((cat) => cat.skipGroupStage);
   // Detectar si todas las categorías son skipGroupStage (direct to playoffs)
   const allCategoriesAreDirectPlayoffs = categories.length > 0 && categories.every(cat => cat.skipGroupStage);
 
@@ -43,15 +44,27 @@ function PlayersTournamentTable({ idTournament, categories = [] }: PlayersTourna
 
   return (
     <div className="space-y-4">
-      {allCategoriesAreDirectPlayoffs && canAddUser && (
+      {hasDirectPlayoffCategories && canAddUser && (
         <Alert className="bg-blue-50 border-blue-200">
           <Info className="h-4 w-4 text-blue-600" />
           <AlertDescription className="text-blue-900">
             <strong>Inscripción de Jugadores para Playoffs Directos</strong>
             <p className="mt-1 text-sm">
-              Este torneo tiene categorías que van directamente a playoffs.
-              Usa la sección <strong>&quot;Inscripción Rápida - Playoffs Directos&quot;</strong> arriba
-              para inscribir jugadores con validación automática del número correcto de participantes.
+              {allCategoriesAreDirectPlayoffs
+                ? (
+                  <>
+                    Este torneo tiene categorías que van directamente a playoffs.
+                    Usa la sección <strong>&quot;Inscripción Rápida - Playoffs Directos&quot;</strong> arriba
+                    para inscribir jugadores con validación automática del número correcto de participantes.
+                  </>
+                )
+                : (
+                  <>
+                    Este torneo mezcla categorías normales con categorías que van directamente a playoffs.
+                    Para estas últimas, usa la sección <strong>&quot;Inscripción Rápida - Playoffs Directos&quot;</strong>;
+                    para el resto, puedes seguir usando la inscripción manual.
+                  </>
+                )}
             </p>
           </AlertDescription>
         </Alert>
