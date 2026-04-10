@@ -74,10 +74,10 @@ export interface DoublesTurn {
   turnNumber: number;
   startTime: string;
   endTime: string;
-  venue: string;
-  courtName: string;
+  venue: string | null;
+  courtName: string | null;
   isMixed: boolean;
-  matches: DoublesMatch[];
+  matches?: DoublesMatch[];
 }
 
 export interface TeamStanding {
@@ -120,7 +120,6 @@ export interface ScheduleSlot {
   venue: string;
   courtName: string;
   hasTurn: boolean;
-  isMixed: boolean | null;
   match: ScheduleMatch | null;
 }
 
@@ -128,6 +127,7 @@ export interface ScheduleTurn {
   turnNumber: number;
   startTime: string | null;
   endTime: string | null;
+  isMixed: boolean | null;
   matchesCount: number;
   slots: ScheduleSlot[];
 }
@@ -190,8 +190,6 @@ export interface CreateDoublesTurnRequest {
   turnNumber: number;
   startTime: string;
   endTime: string;
-  venue: string;
-  courtName: string;
   isMixed?: boolean;
 }
 
