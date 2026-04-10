@@ -22,10 +22,16 @@ import {
   deleteDoublesMatch,
 } from "@/api/Doubles-Event/matches";
 import {
+  createDoublesTurn,
+  updateDoublesTurn,
+  deleteDoublesTurn,
+} from "@/api/Doubles-Event/turns";
+import {
   CreateDoublesEventRequest,
   CreateDoublesCategoryRequest,
   CreateDoublesTeamRequest,
   CreateDoublesMatchRequest,
+  CreateDoublesTurnRequest,
   UpdateDoublesMatchResultRequest,
 } from "@/types/Doubles-Event/DoublesEvent";
 
@@ -136,6 +142,44 @@ export const useDoublesEventMutations = () => {
     },
   });
 
+  // --- Turns ---
+  const createTurnMutation = useMutation({
+    mutationFn: ({
+      eventId,
+      data,
+    }: {
+      eventId: number;
+      data: CreateDoublesTurnRequest;
+    }) => createDoublesTurn(eventId, data),
+    onSuccess: (_, { eventId }) => {
+      queryClient.invalidateQueries({ queryKey: ["doubles-turns", eventId] });
+      queryClient.invalidateQueries({ queryKey: ["doubles-schedule"] });
+    },
+  });
+
+  const updateTurnMutation = useMutation({
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: number;
+      data: Partial<CreateDoublesTurnRequest>;
+    }) => updateDoublesTurn(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["doubles-turns"] });
+      queryClient.invalidateQueries({ queryKey: ["doubles-matches"] });
+      queryClient.invalidateQueries({ queryKey: ["doubles-schedule"] });
+    },
+  });
+
+  const deleteTurnMutation = useMutation({
+    mutationFn: (id: number) => deleteDoublesTurn(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["doubles-turns"] });
+      queryClient.invalidateQueries({ queryKey: ["doubles-schedule"] });
+    },
+  });
+
   // --- Matches ---
   const createMatchMutation = useMutation({
     mutationFn: ({
@@ -197,6 +241,9 @@ export const useDoublesEventMutations = () => {
     createTeamMutation,
     updateTeamMutation,
     deleteTeamMutation,
+    createTurnMutation,
+    updateTurnMutation,
+    deleteTurnMutation,
     createMatchMutation,
     updateMatchMutation,
     updateMatchResultMutation,

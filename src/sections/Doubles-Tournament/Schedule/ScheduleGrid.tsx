@@ -175,7 +175,6 @@ function DayTable({
                 <div>T{turn.turnNumber}</div>
                 <div className="text-gray-500 text-[9px] sm:text-[10px]">
                   {formatTime(turn.startTime)}
-                  {turn.endTime && ` - ${formatTime(turn.endTime)}`}
                 </div>
               </td>
               {turn.slots.map((slot, i) => {
@@ -189,7 +188,9 @@ function DayTable({
                     className={`border border-gray-300 p-0.5 sm:p-1 text-center ${
                       slot.match
                         ? getCategoryColor(slot.match.categoryName)
-                        : "bg-white"
+                        : slot.hasTurn
+                          ? "bg-slate-50"
+                          : "bg-white"
                     } ${isHighlighted ? "ring-2 ring-yellow-400 ring-inset" : ""}`}
                   >
                     {slot.match ? (
@@ -233,6 +234,15 @@ function DayTable({
                             ? `${getPlayoffRoundLabel(slot.match.round)} · ${slot.match.categoryName}`
                             : slot.match.categoryName}
                         </div>
+                        {slot.hasTurn && slot.isMixed && (
+                          <div className="text-[8px] sm:text-[9px] text-gray-500">
+                            Mixto
+                          </div>
+                        )}
+                      </div>
+                    ) : slot.hasTurn && slot.isMixed ? (
+                      <div className="py-3 text-[9px] sm:text-[10px] text-gray-500">
+                        Mixto
                       </div>
                     ) : null}
                   </td>
