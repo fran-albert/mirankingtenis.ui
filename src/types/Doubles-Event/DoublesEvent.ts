@@ -53,6 +53,8 @@ export interface DoublesMatch {
   team2: DoublesTeam | null;
   winner: DoublesTeam | null;
   winnerId: number | null;
+  turn: DoublesTurn | null;
+  turnId: number | null;
   status: DoublesMatchStatus;
   phase: DoublesMatchPhase;
   venue: string | null;
@@ -64,6 +66,18 @@ export interface DoublesMatch {
   round: string | null;
   positionInBracket: number | null;
   sets: DoublesMatchSet[];
+}
+
+export interface DoublesTurn {
+  id: number;
+  eventId: number;
+  turnNumber: number;
+  startTime: string;
+  endTime: string;
+  venue: string;
+  courtName: string;
+  isMixed: boolean;
+  matches: DoublesMatch[];
 }
 
 export interface TeamStanding {
@@ -102,8 +116,11 @@ export interface ScheduleMatch {
 }
 
 export interface ScheduleSlot {
+  turnId: number | null;
   venue: string;
   courtName: string;
+  hasTurn: boolean;
+  isMixed: boolean | null;
   match: ScheduleMatch | null;
 }
 
@@ -155,6 +172,7 @@ export interface CreateDoublesTeamRequest {
 }
 
 export interface CreateDoublesMatchRequest {
+  turnId?: number;
   team1Id: number;
   team2Id?: number;
   phase: DoublesMatchPhase;
@@ -166,6 +184,15 @@ export interface CreateDoublesMatchRequest {
   zoneName?: string;
   round?: string;
   positionInBracket?: number;
+}
+
+export interface CreateDoublesTurnRequest {
+  turnNumber: number;
+  startTime: string;
+  endTime: string;
+  venue: string;
+  courtName: string;
+  isMixed?: boolean;
 }
 
 export interface UpdateDoublesMatchResultRequest {
