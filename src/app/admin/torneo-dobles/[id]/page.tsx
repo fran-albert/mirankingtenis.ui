@@ -220,7 +220,7 @@ function formatTurnOption(
 ) {
   const dayLabel = getEventDayLabel(eventDays, turn.startTime);
   const startTime = getArgentinaTimeValue(turn.startTime);
-  return `${dayLabel ? `${dayLabel} · ` : ""}T${turn.turnNumber} · ${startTime} · ${turn.venue} ${turn.courtName} · ${turn.isMixed ? "Mixto" : "No mixto"}`;
+  return `${dayLabel ? `${dayLabel} · ` : ""}T${turn.turnNumber}${turn.isMixed ? " - Mixto" : ""} · ${startTime}`;
 }
 
 function suggestTurnNumberForSlot(
@@ -822,33 +822,25 @@ function TurnsTab({
   );
   const [open, setOpen] = useState(false);
   const [editingTurn, setEditingTurn] = useState<DoublesTurn | null>(null);
-  const [selectedVenueId, setSelectedVenueId] = useState("");
   const [selectedDay, setSelectedDay] = useState(eventDays[0]?.date || "");
   const [turnNumberTouched, setTurnNumberTouched] = useState(false);
   const [form, setForm] = useState({
     turnNumber: 1,
     startHour: "08:30",
     endHour: "10:00",
-    venue: "",
-    courtName: "",
     isMixed: false,
   });
 
-  const selectedVenue = DOUBLES_VENUES.find((venue) => venue.id === selectedVenueId);
-  const availableCourts = selectedVenue?.courts || [];
   const isEditing = !!editingTurn;
 
   const resetForm = () => {
     setEditingTurn(null);
-    setSelectedVenueId("");
     setSelectedDay(eventDays[0]?.date || "");
     setTurnNumberTouched(false);
     setForm({
       turnNumber: 1,
       startHour: "08:30",
       endHour: "10:00",
-      venue: "",
-      courtName: "",
       isMixed: false,
     });
   };
@@ -862,27 +854,13 @@ function TurnsTab({
     setEditingTurn(turn);
     setTurnNumberTouched(true);
     setSelectedDay(getArgentinaDateParts(turn.startTime).dateKey);
-    const venue = DOUBLES_VENUES.find((item) => item.name === turn.venue);
-    setSelectedVenueId(venue?.id || "");
     setForm({
       turnNumber: turn.turnNumber,
       startHour: getArgentinaTimeValue(turn.startTime),
       endHour: getArgentinaTimeValue(turn.endTime),
-      venue: turn.venue,
-      courtName: turn.courtName,
       isMixed: turn.isMixed,
     });
     setOpen(true);
-  };
-
-  const handleVenueChange = (venueId: string) => {
-    const venue = DOUBLES_VENUES.find((item) => item.id === venueId);
-    setSelectedVenueId(venueId);
-    setForm((current) => ({
-      ...current,
-      venue: venue?.name || "",
-      courtName: "",
-    }));
   };
 
   const handleSave = async () => {
@@ -890,8 +868,6 @@ function TurnsTab({
       turnNumber: Number(form.turnNumber),
       startTime: buildDateTime(selectedDay, form.startHour),
       endTime: buildDateTime(selectedDay, form.endHour),
-      venue: form.venue,
-      courtName: form.courtName,
       isMixed: form.isMixed,
     };
 
@@ -959,9 +935,11 @@ function TurnsTab({
     );
   }, [turns, selectedDay, form.startHour, turnNumberTouched, editingTurn?.id]);
 
-  const sortedTurns = [...turns].sort(
-    (a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
-  );
+  const sortedTurns = [...turns].sort((a, b) => {
+    const diff = new Date(a.startTime).getTime() - new Date(b.startTime).getTime();
+    if (diff !== 0) return diff;
+    return a.turnNumber - b.turnNumber;
+  });
 
   return (
     <div>
@@ -969,7 +947,7 @@ function TurnsTab({
         <div>
           <h2 className="text-lg font-semibold">Turnos Digitalizados</h2>
           <p className="text-sm text-gray-500">
-            Administrá día, horario, cancha y si el turno es mixto o no.
+            Administrá día, horario y si el turno es mixto o no.
           </p>
         </div>
         <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -1050,46 +1028,6 @@ function TurnsTab({
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <Label>Sede</Label>
-                  <Select value={selectedVenueId} onValueChange={handleVenueChange}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Seleccionar sede" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {DOUBLES_VENUES.map((venue) => (
-                        <SelectItem key={venue.id} value={venue.id}>
-                          {venue.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label>Cancha</Label>
-                  <Select
-                    value={form.courtName}
-                    onValueChange={(value) =>
-                      setForm((current) => ({ ...current, courtName: value }))
-                    }
-                    disabled={!selectedVenueId}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Seleccionar cancha" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {availableCourts.map((court) => (
-                        <SelectItem key={court} value={court}>
-                          {court}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
               <div className="flex items-center gap-3 rounded-md border p-3">
                 <Checkbox
                   id="isMixed"
@@ -1112,9 +1050,7 @@ function TurnsTab({
               <Button
                 onClick={handleSave}
                 className="w-full"
-                disabled={
-                  !selectedDay || !form.startHour || !form.endHour || !form.venue || !form.courtName
-                }
+                disabled={!selectedDay || !form.startHour || !form.endHour}
               >
                 {isEditing ? "Guardar Cambios" : "Crear Turno"}
               </Button>
@@ -1131,14 +1067,11 @@ function TurnsTab({
               <TableHead>Turno</TableHead>
               <TableHead>Horario</TableHead>
               <TableHead>Mixto</TableHead>
-              <TableHead>Sede/Cancha</TableHead>
-              <TableHead>Partido Asignado</TableHead>
               <TableHead>Acciones</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {sortedTurns.map((turn) => {
-              const assignedMatch = turn.matches?.[0];
               return (
                 <TableRow key={turn.id}>
                   <TableCell className="text-xs sm:text-sm">
@@ -1149,17 +1082,11 @@ function TurnsTab({
                     {getArgentinaTimeValue(turn.startTime)} - {getArgentinaTimeValue(turn.endTime)}
                   </TableCell>
                   <TableCell>
-                    <Badge variant={turn.isMixed ? "default" : "secondary"}>
-                      {turn.isMixed ? "Mixto" : "No mixto"}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-xs sm:text-sm">
-                    {turn.venue} {turn.courtName}
-                  </TableCell>
-                  <TableCell className="text-xs sm:text-sm">
-                    {assignedMatch
-                      ? `${assignedMatch.team1?.teamName || "TBD"} vs ${assignedMatch.team2?.teamName || "TBD"}`
-                      : <span className="text-gray-400">Sin partido</span>}
+                    {turn.isMixed ? (
+                      <Badge variant="default">Mixto</Badge>
+                    ) : (
+                      <span className="text-xs text-gray-400">-</span>
+                    )}
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-2">
@@ -1170,7 +1097,6 @@ function TurnsTab({
                         variant="destructive"
                         size="sm"
                         onClick={() => handleDelete(turn)}
-                        disabled={(turn.matches || []).length > 0}
                       >
                         Eliminar
                       </Button>
@@ -1181,7 +1107,7 @@ function TurnsTab({
             })}
             {sortedTurns.length === 0 && (
               <TableRow>
-                <TableCell colSpan={7} className="text-center text-gray-500 py-6">
+                <TableCell colSpan={5} className="text-center text-gray-500 py-6">
                   No hay turnos digitalizados todavía
                 </TableCell>
               </TableRow>
@@ -1215,6 +1141,7 @@ function MatchesTab({
   const [open, setOpen] = useState(false);
   const [editingMatch, setEditingMatch] = useState<DoublesMatch | null>(null);
   const [phase, setPhase] = useState<DoublesMatchPhase>(DoublesMatchPhase.zone);
+  const [selectedVenueId, setSelectedVenueId] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [form, setForm] = useState<CreateDoublesMatchRequest>({
@@ -1244,12 +1171,11 @@ function MatchesTab({
     );
   });
 
-  const availableTurns = [...turns]
-    .filter((turn) => {
-      const assignedMatch = turn.matches?.[0];
-      return !assignedMatch || assignedMatch.id === editingMatch?.id;
-    })
-    .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
+  const availableTurns = [...turns].sort(
+    (a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
+  );
+  const selectedVenue = DOUBLES_VENUES.find((venue) => venue.id === selectedVenueId);
+  const availableCourts = selectedVenue?.courts || [];
 
   const resetForm = () => {
     setForm({
@@ -1265,6 +1191,7 @@ function MatchesTab({
       round: "",
       positionInBracket: undefined,
     });
+    setSelectedVenueId("");
     setEditingMatch(null);
   };
 
@@ -1276,6 +1203,8 @@ function MatchesTab({
   const handleOpenEdit = (match: DoublesMatch) => {
     setEditingMatch(match);
     setPhase(match.phase);
+    const venue = DOUBLES_VENUES.find((item) => item.name === match.venue);
+    setSelectedVenueId(venue?.id || "");
     setForm({
       team1Id: match.team1?.id || 0,
       team2Id: match.team2?.id,
@@ -1307,11 +1236,19 @@ function MatchesTab({
     setForm((current) => ({
       ...current,
       turnId: selectedTurn?.id,
-      venue: selectedTurn?.venue || "",
-      courtName: selectedTurn?.courtName || "",
       turnNumber: selectedTurn?.turnNumber,
       startTime: selectedTurn?.startTime || "",
       endTime: selectedTurn?.endTime || "",
+    }));
+  };
+
+  const handleVenueChange = (venueId: string) => {
+    const venue = DOUBLES_VENUES.find((item) => item.id === venueId);
+    setSelectedVenueId(venueId);
+    setForm((current) => ({
+      ...current,
+      venue: venue?.name || "",
+      courtName: "",
     }));
   };
 
@@ -1545,15 +1482,52 @@ function MatchesTab({
                   <div className="font-medium mb-1">Detalle del turno seleccionado</div>
                   <div>{getEventDayLabel(eventDays, form.startTime || null)}</div>
                   <div>
-                    T{form.turnNumber} · {getArgentinaTimeValue(form.startTime || null)} · {form.venue} {form.courtName}
-                  </div>
-                  <div className="text-gray-600">
-                    {turns.find((turn) => turn.id === form.turnId)?.isMixed ? "Mixto" : "No mixto"}
+                    {`T${form.turnNumber}${turns.find((turn) => turn.id === form.turnId)?.isMixed ? " - Mixto" : ""}`} · {getArgentinaTimeValue(form.startTime || null)}
                   </div>
                 </div>
               )}
 
-              <Button onClick={handleSave} disabled={!form.team1Id || !form.turnId} className="w-full">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <Label>Sede</Label>
+                  <Select value={selectedVenueId} onValueChange={handleVenueChange}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccionar sede" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {DOUBLES_VENUES.map((venue) => (
+                        <SelectItem key={venue.id} value={venue.id}>
+                          {venue.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label>Cancha</Label>
+                  <Select
+                    value={form.courtName || ""}
+                    onValueChange={(value) =>
+                      setForm((current) => ({ ...current, courtName: value }))
+                    }
+                    disabled={!selectedVenueId}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccionar cancha" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableCourts.map((court) => (
+                        <SelectItem key={court} value={court}>
+                          {court}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <Button onClick={handleSave} disabled={!form.team1Id || !form.turnId || !form.venue || !form.courtName} className="w-full">
                 {isEditing ? "Guardar Cambios" : "Crear Partido"}
               </Button>
             </div>
@@ -1613,17 +1587,12 @@ function MatchesTab({
                     {matchTurn?.turnNumber ? `T${matchTurn.turnNumber}` : match.turnNumber ? `T${match.turnNumber}` : "-"}
                     {matchTurn?.startTime && (
                       <span className="text-xs text-gray-500 ml-1">
-                        ({getArgentinaTimeValue(matchTurn.startTime)})
+                        ({`${getArgentinaTimeValue(matchTurn.startTime)}${matchTurn.isMixed ? " · Mixto" : ""}`})
                       </span>
                     )}
                   </TableCell>
                   <TableCell className="hidden sm:table-cell text-xs sm:text-sm">
-                    <div>{matchTurn?.venue || match.venue} {matchTurn?.courtName || match.courtName}</div>
-                    {matchTurn && (
-                      <Badge variant={matchTurn.isMixed ? "default" : "secondary"} className="mt-1">
-                        {matchTurn.isMixed ? "Mixto" : "No mixto"}
-                      </Badge>
-                    )}
+                    <div>{match.venue} {match.courtName}</div>
                   </TableCell>
                   <TableCell>
                     <Badge

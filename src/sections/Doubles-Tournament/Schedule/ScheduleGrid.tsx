@@ -170,9 +170,9 @@ function DayTable({
         </thead>
         <tbody>
           {turns.map((turn) => (
-            <tr key={turn.turnNumber}>
+            <tr key={`${turn.turnNumber}-${turn.startTime || "sin-hora"}`}>
               <td className="border border-gray-300 p-1 sm:p-2 bg-gray-50 font-medium">
-                <div>T{turn.turnNumber}</div>
+                <div>{`T${turn.turnNumber}${turn.isMixed ? " - Mixto" : ""}`}</div>
                 <div className="text-gray-500 text-[9px] sm:text-[10px]">
                   {formatTime(turn.startTime)}
                 </div>
@@ -234,15 +234,6 @@ function DayTable({
                             ? `${getPlayoffRoundLabel(slot.match.round)} · ${slot.match.categoryName}`
                             : slot.match.categoryName}
                         </div>
-                        {slot.hasTurn && slot.isMixed && (
-                          <div className="text-[8px] sm:text-[9px] text-gray-500">
-                            Mixto
-                          </div>
-                        )}
-                      </div>
-                    ) : slot.hasTurn && slot.isMixed ? (
-                      <div className="py-3 text-[9px] sm:text-[10px] text-gray-500">
-                        Mixto
                       </div>
                     ) : null}
                   </td>
