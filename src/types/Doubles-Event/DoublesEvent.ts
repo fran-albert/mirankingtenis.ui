@@ -105,6 +105,7 @@ export interface ZoneStanding {
 
 export interface ScheduleMatch {
   id: number;
+  categoryId: number;
   team1Name: string;
   team2Name: string;
   categoryName: string;
@@ -196,4 +197,9 @@ export interface CreateDoublesTurnRequest {
 export interface UpdateDoublesMatchResultRequest {
   sets: { setNumber: number; team1Score: number; team2Score: number }[];
   winnerId?: number;
+}
+
+export interface ReplaceDoublesMatchResponse {
+  sourceMatch: DoublesMatch;
+  replacementMatch: DoublesMatch;
 }

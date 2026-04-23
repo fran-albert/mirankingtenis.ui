@@ -1,13 +1,15 @@
 "use client";
 import React, { useState } from "react";
+import { DoublesMatchStatus } from "@/common/enum/doubles-event.enum";
 import { DoublesSchedule, ScheduleMatch, ScheduleTurn } from "@/types/Doubles-Event/DoublesEvent";
 import { getPlayoffRoundLabel } from "@/common/constants/doubles-event.constants";
 
 interface ScheduleGridProps {
   schedule: DoublesSchedule;
+  onMatchClick?: (match: ScheduleMatch) => void;
 }
 
-export function ScheduleGrid({ schedule }: ScheduleGridProps) {
+export function ScheduleGrid({ schedule, onMatchClick }: ScheduleGridProps) {
   const [searchQuery, setSearchQuery] = useState("");
 
   if (!schedule || (schedule.days.length === 0 && schedule.turns.length === 0)) {
@@ -40,9 +42,19 @@ export function ScheduleGrid({ schedule }: ScheduleGridProps) {
         />
       </div>
       {isMultiDay ? (
-        <MultiDayGrid courts={courts} days={effectiveDays} searchQuery={searchQuery} />
+        <MultiDayGrid
+          courts={courts}
+          days={effectiveDays}
+          searchQuery={searchQuery}
+          onMatchClick={onMatchClick}
+        />
       ) : (
-        <DayTable courts={courts} turns={effectiveDays[0].turns} searchQuery={searchQuery} />
+        <DayTable
+          courts={courts}
+          turns={effectiveDays[0].turns}
+          searchQuery={searchQuery}
+          onMatchClick={onMatchClick}
+        />
       )}
     </div>
   );
@@ -52,10 +64,12 @@ function MultiDayGrid({
   courts,
   days,
   searchQuery,
+  onMatchClick,
 }: {
   courts: { venue: string; name: string }[];
   days: { date: string; label: string; turns: ScheduleTurn[] }[];
   searchQuery: string;
+  onMatchClick?: (match: ScheduleMatch) => void;
 }) {
   const [selectedDayIdx, setSelectedDayIdx] = useState(0);
   const currentDay = days[selectedDayIdx];
@@ -77,7 +91,12 @@ function MultiDayGrid({
           </button>
         ))}
       </div>
-      <DayTable courts={courts} turns={currentDay.turns} searchQuery={searchQuery} />
+      <DayTable
+        courts={courts}
+        turns={currentDay.turns}
+        searchQuery={searchQuery}
+        onMatchClick={onMatchClick}
+      />
     </div>
   );
 }
@@ -95,10 +114,12 @@ function DayTable({
   courts,
   turns,
   searchQuery,
+  onMatchClick,
 }: {
   courts: { venue: string; name: string }[];
   turns: ScheduleTurn[];
   searchQuery: string;
+  onMatchClick?: (match: ScheduleMatch) => void;
 }) {
   const formatTime = (iso: string | null) => {
     if (!iso) return "";
@@ -181,6 +202,67 @@ function DayTable({
                 const isHighlighted =
                   !!searchQuery && !!slot.match && matchesSearch(slot.match, searchQuery);
                 const hasWinner = !!slot.match?.winnerTeamNumber;
+                const isClickable =
+                  !!slot.match &&
+                  slot.match.status === DoublesMatchStatus.pending &&
+                  !!onMatchClick;
+
+                const content = slot.match ? (
+                  <div className={`space-y-0.5 ${isClickable ? "relative min-h-[78px] sm:min-h-[86px]" : ""}`}>
+                    {isClickable && (
+                      <div className="flex justify-end mb-1">
+                        <span className="inline-flex items-center gap-1 rounded-full border border-slate-600 bg-white/80 px-1.5 py-0.5 text-[8px] sm:text-[9px] font-semibold uppercase tracking-wide text-slate-700 shadow-sm">
+                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                          Editable
+                        </span>
+                      </div>
+                    )}
+                    {hasWinner ? (
+                      <>
+                        <div className={`text-[10px] sm:text-[11px] leading-tight ${
+                          slot.match.winnerTeamNumber === 1
+                            ? "text-green-700 font-bold"
+                            : "text-gray-400"
+                        }`}>
+                          <TeamName name={slot.match.team1Name} />
+                          {slot.match.winnerTeamNumber === 1 && slot.match.score && (
+                            <span className="ml-1 text-[9px] sm:text-[10px]">{slot.match.score}</span>
+                          )}
+                        </div>
+                        <div className={`text-[10px] sm:text-[11px] leading-tight ${
+                          slot.match.winnerTeamNumber === 2
+                            ? "text-green-700 font-bold"
+                            : "text-gray-400"
+                        }`}>
+                          <TeamName name={slot.match.team2Name} />
+                          {slot.match.winnerTeamNumber === 2 && slot.match.score && (
+                            <span className="ml-1 text-[9px] sm:text-[10px]">{slot.match.score}</span>
+                          )}
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="text-[10px] sm:text-[11px] leading-tight font-medium">
+                          <TeamName name={slot.match.team1Name} />
+                        </div>
+                        <div className="text-gray-400 text-[9px] sm:text-[10px]">vs</div>
+                        <div className="text-[10px] sm:text-[11px] leading-tight font-medium">
+                          <TeamName name={slot.match.team2Name} />
+                        </div>
+                      </>
+                    )}
+                    <div className="text-[8px] sm:text-[9px] text-gray-400">
+                      {slot.match.phase === "playoff" && slot.match.round
+                        ? `${getPlayoffRoundLabel(slot.match.round)} · ${slot.match.categoryName}`
+                        : slot.match.categoryName}
+                    </div>
+                    {isClickable && (
+                      <div className="text-[8px] sm:text-[9px] font-medium text-slate-600">
+                        Click para editar
+                      </div>
+                    )}
+                  </div>
+                ) : null;
 
                 return (
                   <td
@@ -191,51 +273,23 @@ function DayTable({
                         : slot.hasTurn
                           ? "bg-slate-50"
                           : "bg-white"
-                    } ${isHighlighted ? "ring-2 ring-yellow-400 ring-inset" : ""}`}
+                    } ${isHighlighted ? "ring-2 ring-yellow-400 ring-inset" : ""} ${
+                      isClickable
+                        ? "cursor-pointer ring-2 ring-slate-500/60 ring-inset shadow-[inset_0_0_0_1px_rgba(255,255,255,0.65)] hover:bg-slate-100"
+                        : ""
+                    }`}
                   >
-                    {slot.match ? (
-                      <div className="space-y-0.5">
-                        {hasWinner ? (
-                          <>
-                            <div className={`text-[10px] sm:text-[11px] leading-tight ${
-                              slot.match.winnerTeamNumber === 1
-                                ? "text-green-700 font-bold"
-                                : "text-gray-400"
-                            }`}>
-                              <TeamName name={slot.match.team1Name} />
-                              {slot.match.winnerTeamNumber === 1 && slot.match.score && (
-                                <span className="ml-1 text-[9px] sm:text-[10px]">{slot.match.score}</span>
-                              )}
-                            </div>
-                            <div className={`text-[10px] sm:text-[11px] leading-tight ${
-                              slot.match.winnerTeamNumber === 2
-                                ? "text-green-700 font-bold"
-                                : "text-gray-400"
-                            }`}>
-                              <TeamName name={slot.match.team2Name} />
-                              {slot.match.winnerTeamNumber === 2 && slot.match.score && (
-                                <span className="ml-1 text-[9px] sm:text-[10px]">{slot.match.score}</span>
-                              )}
-                            </div>
-                          </>
-                        ) : (
-                          <>
-                            <div className="text-[10px] sm:text-[11px] leading-tight font-medium">
-                              <TeamName name={slot.match.team1Name} />
-                            </div>
-                            <div className="text-gray-400 text-[9px] sm:text-[10px]">vs</div>
-                            <div className="text-[10px] sm:text-[11px] leading-tight font-medium">
-                              <TeamName name={slot.match.team2Name} />
-                            </div>
-                          </>
-                        )}
-                        <div className="text-[8px] sm:text-[9px] text-gray-400">
-                          {slot.match.phase === "playoff" && slot.match.round
-                            ? `${getPlayoffRoundLabel(slot.match.round)} · ${slot.match.categoryName}`
-                            : slot.match.categoryName}
-                        </div>
-                      </div>
-                    ) : null}
+                    {isClickable && slot.match ? (
+                      <button
+                        type="button"
+                        className="w-full h-full text-inherit"
+                        onClick={() => onMatchClick?.(slot.match!)}
+                      >
+                        {content}
+                      </button>
+                    ) : (
+                      content
+                    )}
                   </td>
                 );
               })}
