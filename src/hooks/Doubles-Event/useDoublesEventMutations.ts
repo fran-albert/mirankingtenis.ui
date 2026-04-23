@@ -18,6 +18,7 @@ import {
 import {
   createDoublesMatch,
   updateDoublesMatch,
+  replaceDoublesMatch,
   updateDoublesMatchResult,
   deleteDoublesMatch,
 } from "@/api/Doubles-Event/matches";
@@ -169,6 +170,7 @@ export const useDoublesEventMutations = () => {
       queryClient.invalidateQueries({ queryKey: ["doubles-turns"] });
       queryClient.invalidateQueries({ queryKey: ["doubles-matches"] });
       queryClient.invalidateQueries({ queryKey: ["doubles-schedule"] });
+      queryClient.invalidateQueries({ queryKey: ["doubles-event-matches"] });
     },
   });
 
@@ -177,6 +179,7 @@ export const useDoublesEventMutations = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["doubles-turns"] });
       queryClient.invalidateQueries({ queryKey: ["doubles-schedule"] });
+      queryClient.invalidateQueries({ queryKey: ["doubles-event-matches"] });
     },
   });
 
@@ -194,6 +197,7 @@ export const useDoublesEventMutations = () => {
         queryKey: ["doubles-matches", categoryId],
       });
       queryClient.invalidateQueries({ queryKey: ["doubles-schedule"] });
+      queryClient.invalidateQueries({ queryKey: ["doubles-event-matches"] });
     },
   });
 
@@ -208,6 +212,24 @@ export const useDoublesEventMutations = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["doubles-matches"] });
       queryClient.invalidateQueries({ queryKey: ["doubles-schedule"] });
+      queryClient.invalidateQueries({ queryKey: ["doubles-event-matches"] });
+    },
+  });
+
+  const replaceMatchMutation = useMutation({
+    mutationFn: ({
+      id,
+      replacementMatchId,
+    }: {
+      id: number;
+      replacementMatchId: number;
+    }) => replaceDoublesMatch(id, replacementMatchId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["doubles-matches"] });
+      queryClient.invalidateQueries({ queryKey: ["doubles-event-matches"] });
+      queryClient.invalidateQueries({ queryKey: ["doubles-schedule"] });
+      queryClient.invalidateQueries({ queryKey: ["doubles-standings"] });
+      queryClient.invalidateQueries({ queryKey: ["doubles-turns"] });
     },
   });
 
@@ -228,6 +250,7 @@ export const useDoublesEventMutations = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["doubles-matches"] });
       queryClient.invalidateQueries({ queryKey: ["doubles-schedule"] });
+      queryClient.invalidateQueries({ queryKey: ["doubles-event-matches"] });
     },
   });
 
@@ -246,6 +269,7 @@ export const useDoublesEventMutations = () => {
     deleteTurnMutation,
     createMatchMutation,
     updateMatchMutation,
+    replaceMatchMutation,
     updateMatchResultMutation,
     deleteMatchMutation,
   };

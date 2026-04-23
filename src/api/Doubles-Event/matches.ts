@@ -2,6 +2,7 @@ import axiosInstance from "@/services/axiosConfig";
 import {
   DoublesMatch,
   CreateDoublesMatchRequest,
+  ReplaceDoublesMatchResponse,
   UpdateDoublesMatchResultRequest,
 } from "@/types/Doubles-Event/DoublesEvent";
 
@@ -60,6 +61,16 @@ export const updateDoublesMatchResult = async (
     data
   );
   return response.data as DoublesMatch;
+};
+
+export const replaceDoublesMatch = async (
+  id: number,
+  replacementMatchId: number
+): Promise<ReplaceDoublesMatchResponse> => {
+  const response = await axiosInstance.post(`doubles-matches/${id}/replace`, {
+    replacementMatchId,
+  });
+  return response.data as ReplaceDoublesMatchResponse;
 };
 
 export const deleteDoublesMatch = async (id: number): Promise<void> => {
