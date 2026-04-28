@@ -14,13 +14,19 @@ import { ScheduleGrid } from "@/sections/Doubles-Tournament/Schedule/ScheduleGri
 import { ZoneView } from "@/sections/Doubles-Tournament/Zones/ZoneView";
 import { PlayoffBracket } from "@/sections/Doubles-Tournament/Playoffs/PlayoffBracket";
 
-export default function ClientDoublesTournamentComponent() {
+interface ClientDoublesTournamentComponentProps {
+  eventId?: number;
+}
+
+export default function ClientDoublesTournamentComponent({
+  eventId: eventIdProp,
+}: ClientDoublesTournamentComponentProps) {
   const { events, isLoading: eventsLoading } = useDoublesEvents();
 
   // Pick the first active event, or the most recent one
   const activeEvent =
     events.find((e) => e.status === "active") || events[0];
-  const eventId = activeEvent?.id || 0;
+  const eventId = eventIdProp ?? activeEvent?.id ?? 0;
 
   const { event, isLoading: eventLoading } = useDoublesEvent(eventId, !!eventId);
   const { categories } = useDoublesCategories(eventId, !!eventId);
@@ -41,13 +47,15 @@ export default function ClientDoublesTournamentComponent() {
     (m) => m.phase === DoublesMatchPhase.playoff
   );
 
-  if (eventsLoading || eventLoading) return <Loading isLoading={true} />;
+  if ((!eventIdProp && eventsLoading) || eventLoading) {
+    return <Loading isLoading={true} />;
+  }
 
-  if (!activeEvent) {
+  if (!event) {
     return (
       <div className="max-w-5xl mx-auto py-12 px-4 text-center">
         <h1 className="text-2xl font-bold mb-4">Torneo Dobles</h1>
-        <p className="text-gray-500">No hay eventos disponibles</p>
+        <p className="text-gray-500">Torneo no encontrado</p>
       </div>
     );
   }
@@ -55,21 +63,21 @@ export default function ClientDoublesTournamentComponent() {
   return (
     <div className="max-w-6xl mx-auto py-4 sm:py-8 px-2 sm:px-4">
       <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-center mb-2">
-        {activeEvent.name}
+        {event.name}
       </h1>
-      {activeEvent.description && (
+      {event.description && (
         <p className="text-gray-500 text-center text-sm sm:text-base mb-4">
-          {activeEvent.description}
+          {event.description}
         </p>
       )}
       <p className="text-xs sm:text-sm text-gray-400 text-center mb-4 sm:mb-6">
-        {new Date(activeEvent.startDate).toLocaleDateString("es-AR", {
+        {new Date(event.startDate).toLocaleDateString("es-AR", {
           day: "numeric",
           month: "long",
           year: "numeric",
         })}
-        {activeEvent.endDate &&
-          ` - ${new Date(activeEvent.endDate).toLocaleDateString("es-AR", {
+        {event.endDate &&
+          ` - ${new Date(event.endDate).toLocaleDateString("es-AR", {
             day: "numeric",
             month: "long",
             year: "numeric",
