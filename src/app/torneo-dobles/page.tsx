@@ -1,5 +1,5 @@
 import React from "react";
-import ClientDoublesTournamentComponent from "@/components/Client/Doubles-Tournament";
+import { DoublesEventsPublicList } from "@/sections/Doubles-Tournament/Public/DoublesEventsPublicList";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -7,7 +7,7 @@ export const metadata: Metadata = {
 };
 
 const DoublesTournamentPage = () => {
-  return <ClientDoublesTournamentComponent />;
+  return <DoublesEventsPublicList />;
 };
 
 export default DoublesTournamentPage;
