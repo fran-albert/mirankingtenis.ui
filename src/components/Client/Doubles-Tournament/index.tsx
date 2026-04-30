@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import Image from "next/image";
 import { useDoublesEvents } from "@/hooks/Doubles-Event/useDoublesEvents";
 import { useDoublesEvent } from "@/hooks/Doubles-Event/useDoublesEvents";
 import { useDoublesCategories } from "@/hooks/Doubles-Event/useDoublesCategories";
@@ -64,6 +65,16 @@ export default function ClientDoublesTournamentComponent({
     <div className="min-h-screen bg-gray-50 text-slate-900">
       <div className="border-b bg-white">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
+          <div className="mb-3 flex justify-center sm:mb-4">
+            <Image
+              src="/firmat-open-2.png"
+              alt="Firmat Open 2"
+              width={220}
+              height={330}
+              priority
+              className="h-28 w-auto sm:h-36"
+            />
+          </div>
           <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-center mb-2">
             {event.name}
           </h1>
