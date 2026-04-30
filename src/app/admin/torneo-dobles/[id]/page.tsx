@@ -82,7 +82,7 @@ export default function DoublesEventManagePage() {
     phase: DoublesMatchPhase.zone,
     match: null,
   });
-  const [printMode, setPrintMode] = useState<"current" | "all" | "full">("current");
+  const [printMode, setPrintMode] = useState<"current" | "all" | "full" | "sheets">("current");
   const mutations = useDoublesEventMutations();
 
   const activeCategoryId = selectedCategoryId || categories[0]?.id || 0;
@@ -145,7 +145,7 @@ export default function DoublesEventManagePage() {
     openEditMatchDialog(selectedMatch);
   };
 
-  const handlePrint = (mode: "current" | "all" | "full") => {
+  const handlePrint = (mode: "current" | "all" | "full" | "sheets") => {
     setPrintMode(mode);
     window.setTimeout(() => window.print(), 0);
   };
@@ -282,6 +282,16 @@ export default function DoublesEventManagePage() {
                   <Printer className="h-4 w-4 mr-2" />
                   Grilla completa
                 </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePrint("sheets")}
+                  className="w-full sm:w-auto"
+                >
+                  <Printer className="h-4 w-4 mr-2" />
+                  Planillas por categoría
+                </Button>
               </div>
               {schedule && (
                 <ScheduleGrid
@@ -327,6 +337,108 @@ export default function DoublesEventManagePage() {
                 <div className="text-sm font-semibold">Grilla completa</div>
               </div>
               {schedule && <ScheduleGrid schedule={schedule} />}
+            </div>
+            <div className="hidden doubles-print-area doubles-print-sheets">
+              {categories.map((category) => {
+                const categoryStandings =
+                  allStandings.find((item) => item.categoryId === category.id)?.zones || [];
+                const categoryMatches = eventMatches
+                  .filter((match) => match.categoryId === category.id)
+                  .filter((match) => match.phase === DoublesMatchPhase.zone)
+                  .sort((a, b) => {
+                    const zoneCompare = (a.zoneName || "").localeCompare(b.zoneName || "");
+                    if (zoneCompare !== 0) return zoneCompare;
+                    return a.id - b.id;
+                  });
+
+                return (
+                  <section key={`sheet-${category.id}`} className="doubles-print-category-page">
+                    <div className="doubles-print-title">
+                      <div className="text-lg font-bold">{event.name}</div>
+                      <div className="text-sm font-semibold">{category.name}</div>
+                    </div>
+                    {(categoryStandings.length > 0
+                      ? categoryStandings
+                      : [{ zoneName: "Sin zona", standings: [] }]
+                    ).map((zone) => {
+                      const zoneMatches = categoryMatches.filter(
+                        (match) => (match.zoneName || "Sin zona") === zone.zoneName
+                      );
+
+                      return (
+                        <div key={`sheet-${category.id}-${zone.zoneName}`} className="doubles-zone-sheet">
+                          <div className="doubles-zone-title">{zone.zoneName}</div>
+                          <div className="doubles-print-section-title">Posiciones</div>
+                          <table className="doubles-sheet-table doubles-standings-sheet">
+                            <thead>
+                              <tr>
+                                <th>Pos</th>
+                                <th>Equipo</th>
+                                <th>PJ</th>
+                                <th>PG</th>
+                                <th>PP</th>
+                                <th>Sets</th>
+                                <th>Games</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {zone.standings.length > 0 ? (
+                                zone.standings.map((standing) => (
+                                  <tr key={standing.team.id}>
+                                    <td>{standing.position}</td>
+                                    <td>{standing.team.teamName}</td>
+                                    <td>{standing.played}</td>
+                                    <td>{standing.won}</td>
+                                    <td>{standing.lost}</td>
+                                    <td>{standing.setsWon}-{standing.setsLost}</td>
+                                    <td>{standing.gamesWon}-{standing.gamesLost}</td>
+                                  </tr>
+                                ))
+                              ) : (
+                                <tr>
+                                  <td colSpan={7}>Sin posiciones disponibles</td>
+                                </tr>
+                              )}
+                            </tbody>
+                          </table>
+
+                          <div className="doubles-print-section-title">Enfrentamientos</div>
+                          <table className="doubles-sheet-table doubles-match-sheet">
+                            <thead>
+                              <tr>
+                                <th>Equipo 1</th>
+                                <th>Equipo 2</th>
+                                <th>Fecha</th>
+                                <th>Hora</th>
+                                <th>Cancha</th>
+                                <th>Turno</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {zoneMatches.length > 0 ? (
+                                zoneMatches.map((match) => (
+                                  <tr key={match.id}>
+                                    <td>{match.team1?.teamName || ""}</td>
+                                    <td>{match.team2?.teamName || ""}</td>
+                                    <td />
+                                    <td />
+                                    <td />
+                                    <td />
+                                  </tr>
+                                ))
+                              ) : (
+                                <tr>
+                                  <td colSpan={6}>Sin enfrentamientos cargados</td>
+                                </tr>
+                              )}
+                            </tbody>
+                          </table>
+                        </div>
+                      );
+                    })}
+                  </section>
+                );
+              })}
             </div>
             <div className="doubles-print-hidden">
               <h3 className="text-lg font-semibold mb-4">Posiciones</h3>
@@ -399,16 +511,23 @@ export default function DoublesEventManagePage() {
 
           .print-mode-current .doubles-print-all,
           .print-mode-current .doubles-print-full,
+          .print-mode-current .doubles-print-sheets,
           .print-mode-all .doubles-print-current,
           .print-mode-all .doubles-print-full,
+          .print-mode-all .doubles-print-sheets,
           .print-mode-full .doubles-print-current,
-          .print-mode-full .doubles-print-all {
+          .print-mode-full .doubles-print-all,
+          .print-mode-full .doubles-print-sheets,
+          .print-mode-sheets .doubles-print-current,
+          .print-mode-sheets .doubles-print-all,
+          .print-mode-sheets .doubles-print-full {
             display: none !important;
             visibility: hidden !important;
           }
 
           .print-mode-all .doubles-print-all,
-          .print-mode-full .doubles-print-full {
+          .print-mode-full .doubles-print-full,
+          .print-mode-sheets .doubles-print-sheets {
             display: block !important;
           }
 
@@ -442,6 +561,64 @@ export default function DoublesEventManagePage() {
             font-weight: 700 !important;
             color: #111827 !important;
             break-after: avoid !important;
+          }
+
+          .doubles-zone-sheet {
+            margin-bottom: 5mm !important;
+            break-inside: avoid !important;
+            page-break-inside: avoid !important;
+          }
+
+          .doubles-zone-title {
+            display: block !important;
+            margin: 2mm 0 1.5mm !important;
+            padding: 1.2mm 2mm !important;
+            background: #f3f4f6 !important;
+            border: 0.25mm solid #9ca3af !important;
+            font-size: 9pt !important;
+            font-weight: 700 !important;
+            color: #111827 !important;
+            break-after: avoid !important;
+          }
+
+          .doubles-sheet-table {
+            width: 100% !important;
+            border-collapse: collapse !important;
+            table-layout: fixed !important;
+            font-size: 7.4pt !important;
+            line-height: 1.15 !important;
+            margin-bottom: 3mm !important;
+          }
+
+          .doubles-sheet-table th,
+          .doubles-sheet-table td {
+            border: 0.25mm solid #9ca3af !important;
+            padding: 1.6mm 1.2mm !important;
+            min-height: 7mm !important;
+            color: #111827 !important;
+            vertical-align: middle !important;
+          }
+
+          .doubles-sheet-table th {
+            background: #e5e7eb !important;
+            font-weight: 700 !important;
+          }
+
+          .doubles-standings-sheet th:nth-child(1),
+          .doubles-standings-sheet td:nth-child(1) {
+            width: 10mm !important;
+            text-align: center !important;
+          }
+
+          .doubles-standings-sheet th:nth-child(n + 3),
+          .doubles-standings-sheet td:nth-child(n + 3) {
+            width: 15mm !important;
+            text-align: center !important;
+          }
+
+          .doubles-match-sheet th:nth-child(n + 3),
+          .doubles-match-sheet td:nth-child(n + 3) {
+            width: 24mm !important;
           }
 
           .doubles-print-standings {
