@@ -82,7 +82,7 @@ export default function DoublesEventManagePage() {
     phase: DoublesMatchPhase.zone,
     match: null,
   });
-  const [printMode, setPrintMode] = useState<"current" | "all">("current");
+  const [printMode, setPrintMode] = useState<"current" | "all" | "full">("current");
   const mutations = useDoublesEventMutations();
 
   const activeCategoryId = selectedCategoryId || categories[0]?.id || 0;
@@ -145,7 +145,7 @@ export default function DoublesEventManagePage() {
     openEditMatchDialog(selectedMatch);
   };
 
-  const handlePrint = (mode: "current" | "all") => {
+  const handlePrint = (mode: "current" | "all" | "full") => {
     setPrintMode(mode);
     window.setTimeout(() => window.print(), 0);
   };
@@ -272,6 +272,16 @@ export default function DoublesEventManagePage() {
                   <Printer className="h-4 w-4 mr-2" />
                   PDF por categorías
                 </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePrint("full")}
+                  className="w-full sm:w-auto"
+                >
+                  <Printer className="h-4 w-4 mr-2" />
+                  Grilla completa
+                </Button>
               </div>
               {schedule && (
                 <ScheduleGrid
@@ -310,6 +320,13 @@ export default function DoublesEventManagePage() {
                   </section>
                 );
               })}
+            </div>
+            <div className="hidden doubles-print-area doubles-print-full">
+              <div className="doubles-print-title">
+                <div className="text-lg font-bold">{event.name}</div>
+                <div className="text-sm font-semibold">Grilla completa</div>
+              </div>
+              {schedule && <ScheduleGrid schedule={schedule} />}
             </div>
             <div className="doubles-print-hidden">
               <h3 className="text-lg font-semibold mb-4">Posiciones</h3>
@@ -381,12 +398,17 @@ export default function DoublesEventManagePage() {
           }
 
           .print-mode-current .doubles-print-all,
-          .print-mode-all .doubles-print-current {
+          .print-mode-current .doubles-print-full,
+          .print-mode-all .doubles-print-current,
+          .print-mode-all .doubles-print-full,
+          .print-mode-full .doubles-print-current,
+          .print-mode-full .doubles-print-all {
             display: none !important;
             visibility: hidden !important;
           }
 
-          .print-mode-all .doubles-print-all {
+          .print-mode-all .doubles-print-all,
+          .print-mode-full .doubles-print-full {
             display: block !important;
           }
 
@@ -497,6 +519,21 @@ export default function DoublesEventManagePage() {
           .doubles-schedule-table .min-h-\\[78px\\],
           .doubles-schedule-table .sm\\:min-h-\\[86px\\] {
             min-height: 0 !important;
+          }
+
+          .print-mode-full .doubles-schedule-table {
+            font-size: 5.6pt !important;
+            line-height: 1.02 !important;
+          }
+
+          .print-mode-full .doubles-schedule-table th,
+          .print-mode-full .doubles-schedule-table td {
+            padding: 1mm 0.55mm !important;
+          }
+
+          .print-mode-full .doubles-schedule-table th:first-child,
+          .print-mode-full .doubles-schedule-table td:first-child {
+            width: 14mm !important;
           }
         }
       `}</style>
