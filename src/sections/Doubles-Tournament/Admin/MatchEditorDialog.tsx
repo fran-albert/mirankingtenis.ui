@@ -112,6 +112,35 @@ function formatTeamLabel(team: DoublesTeam) {
   return `${team.teamName} · ${team.player1Name} / ${team.player2Name}`;
 }
 
+function normalizeTeamOptionKey(team: DoublesTeam) {
+  return [
+    team.teamName,
+    team.player1Name,
+    team.player2Name,
+    team.zoneName || "",
+  ]
+    .join("|")
+    .trim()
+    .toLowerCase();
+}
+
+function getUniqueTeams(teams: DoublesTeam[]) {
+  const seenIds = new Set<number>();
+  const seenLabels = new Set<string>();
+
+  return teams.filter((team) => {
+    const labelKey = normalizeTeamOptionKey(team);
+
+    if (seenIds.has(team.id) || seenLabels.has(labelKey)) {
+      return false;
+    }
+
+    seenIds.add(team.id);
+    seenLabels.add(labelKey);
+    return true;
+  });
+}
+
 function getMatchAssignmentLabel(match: DoublesMatch) {
   const turnNumber = match.turn?.turnNumber ?? match.turnNumber;
   const startTime = match.turn?.startTime ?? match.startTime;
@@ -178,11 +207,12 @@ export function MatchEditorDialog({
   const selectedVenue = DOUBLES_VENUES.find((venue) => venue.id === selectedVenueId);
   const availableCourts = selectedVenue?.courts || [];
   const categoryName = categories.find((category) => category.id === categoryId)?.name;
+  const uniqueTeams = useMemo(() => getUniqueTeams(teams), [teams]);
 
   const zoneFilteredTeams =
     phase === DoublesMatchPhase.zone && form.zoneName
-      ? teams.filter((team) => team.zoneName === form.zoneName)
-      : teams;
+      ? uniqueTeams.filter((team) => team.zoneName === form.zoneName)
+      : uniqueTeams;
 
   const team1Options = zoneFilteredTeams.filter(
     (team) => !form.team2Id || team.id !== form.team2Id
@@ -275,7 +305,7 @@ export function MatchEditorDialog({
 
   const handleTeam1Change = (value: string) => {
     const nextTeamId = Number(value);
-    const selectedTeam = teams.find((team) => team.id === nextTeamId);
+    const selectedTeam = uniqueTeams.find((team) => team.id === nextTeamId);
 
     setForm((current) => {
       if (phase !== DoublesMatchPhase.zone) {
@@ -283,7 +313,7 @@ export function MatchEditorDialog({
       }
 
       const nextZone = selectedTeam?.zoneName || "";
-      const currentTeam2 = teams.find((team) => team.id === current.team2Id);
+      const currentTeam2 = uniqueTeams.find((team) => team.id === current.team2Id);
 
       return {
         ...current,
@@ -299,7 +329,7 @@ export function MatchEditorDialog({
 
   const handleTeam2Change = (value: string) => {
     const nextTeamId = Number(value);
-    const selectedTeam = teams.find((team) => team.id === nextTeamId);
+    const selectedTeam = uniqueTeams.find((team) => team.id === nextTeamId);
 
     setForm((current) => {
       if (phase !== DoublesMatchPhase.zone) {
@@ -307,7 +337,7 @@ export function MatchEditorDialog({
       }
 
       const nextZone = selectedTeam?.zoneName || "";
-      const currentTeam1 = teams.find((team) => team.id === current.team1Id);
+      const currentTeam1 = uniqueTeams.find((team) => team.id === current.team1Id);
 
       return {
         ...current,
