@@ -406,24 +406,6 @@ export function MatchEditorDialog({
         </DialogHeader>
 
         <div className="space-y-4">
-          {phase === DoublesMatchPhase.zone && (
-            <div>
-              <Label>Zona</Label>
-              <Select value={form.zoneName || ""} onValueChange={handleZoneChange}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Filtrar por zona" />
-                </SelectTrigger>
-                <SelectContent>
-                  {DOUBLES_ZONES.map((zone) => (
-                    <SelectItem key={zone.id} value={zone.name}>
-                      {zone.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
-
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <Label>Equipo 1</Label>
@@ -463,6 +445,27 @@ export function MatchEditorDialog({
               </Select>
             </div>
           </div>
+
+          {phase === DoublesMatchPhase.zone && (
+            <div>
+              <Label>Zona</Label>
+              <Select value={form.zoneName || ""} onValueChange={handleZoneChange}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Se completa al elegir un equipo" />
+                </SelectTrigger>
+                <SelectContent>
+                  {DOUBLES_ZONES.map((zone) => (
+                    <SelectItem key={zone.id} value={zone.name}>
+                      {zone.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground mt-1">
+                Elegí primero los equipos. La zona se completa automáticamente y filtra el segundo equipo.
+              </p>
+            </div>
+          )}
 
           {phase === DoublesMatchPhase.playoff && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

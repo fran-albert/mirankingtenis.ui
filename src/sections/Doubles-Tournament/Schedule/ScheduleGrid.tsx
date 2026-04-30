@@ -1,6 +1,5 @@
 "use client";
 import React, { useState } from "react";
-import { DoublesMatchStatus } from "@/common/enum/doubles-event.enum";
 import { DoublesSchedule, ScheduleMatch, ScheduleTurn } from "@/types/Doubles-Event/DoublesEvent";
 import { getPlayoffRoundLabel } from "@/common/constants/doubles-event.constants";
 
@@ -241,7 +240,6 @@ function DayTable({
                 const hasWinner = !!slot.match?.winnerTeamNumber;
                 const isClickable =
                   !!slot.match &&
-                  slot.match.status === DoublesMatchStatus.pending &&
                   !!onMatchClick;
 
                 const content = slot.match ? (
