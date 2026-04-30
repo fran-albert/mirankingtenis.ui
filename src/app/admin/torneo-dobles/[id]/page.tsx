@@ -6,7 +6,7 @@ import { useDoublesEvent } from "@/hooks/Doubles-Event/useDoublesEvents";
 import { useDoublesCategories } from "@/hooks/Doubles-Event/useDoublesCategories";
 import { useDoublesTeams } from "@/hooks/Doubles-Event/useDoublesTeams";
 import { useDoublesMatches } from "@/hooks/Doubles-Event/useDoublesMatches";
-import { useDoublesStandings } from "@/hooks/Doubles-Event/useDoublesStandings";
+import { useDoublesEventStandings, useDoublesStandings } from "@/hooks/Doubles-Event/useDoublesStandings";
 import { useDoublesSchedule } from "@/hooks/Doubles-Event/useDoublesSchedule";
 import { useDoublesTurns } from "@/hooks/Doubles-Event/useDoublesTurns";
 import { useDoublesEventMatches } from "@/hooks/Doubles-Event/useDoublesEventMatches";
@@ -82,13 +82,16 @@ export default function DoublesEventManagePage() {
     phase: DoublesMatchPhase.zone,
     match: null,
   });
+  const [printMode, setPrintMode] = useState<"current" | "all">("current");
   const mutations = useDoublesEventMutations();
 
   const activeCategoryId = selectedCategoryId || categories[0]?.id || 0;
+  const activeCategory = categories.find((category) => category.id === activeCategoryId);
   const { teams } = useDoublesTeams(activeCategoryId, !!activeCategoryId);
   const { matches } = useDoublesMatches(activeCategoryId, !!activeCategoryId);
   const { matches: eventMatches } = useDoublesEventMatches(eventId, !!eventId);
   const { standings } = useDoublesStandings(activeCategoryId, !!activeCategoryId);
+  const { allStandings } = useDoublesEventStandings(eventId, !!eventId);
   const { schedule } = useDoublesSchedule(eventId);
   const { turns } = useDoublesTurns(eventId);
   const dialogCategoryId =
@@ -142,8 +145,13 @@ export default function DoublesEventManagePage() {
     openEditMatchDialog(selectedMatch);
   };
 
+  const handlePrint = (mode: "current" | "all") => {
+    setPrintMode(mode);
+    window.setTimeout(() => window.print(), 0);
+  };
+
   return (
-    <div className="px-2 sm:px-4 md:px-6 py-4 sm:py-6">
+    <div className={`px-2 sm:px-4 md:px-6 py-4 sm:py-6 doubles-print-root print-mode-${printMode}`}>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0 mb-6">
         <div>
           <h1 className="text-lg sm:text-2xl font-bold">{event.name}</h1>
@@ -235,10 +243,12 @@ export default function DoublesEventManagePage() {
 
         <TabsContent value="preview">
           <div className="space-y-8">
-            <div className="doubles-print-area">
+            <div className="doubles-print-area doubles-print-current">
               <div className="hidden doubles-print-title">
                 <div className="text-lg font-bold">{event.name}</div>
-                <div className="text-sm">Grilla de horarios</div>
+                <div className="text-sm font-semibold">
+                  {activeCategory?.name || "Grilla de horarios"}
+                </div>
               </div>
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4 doubles-print-hidden">
                 <h3 className="text-lg font-semibold">Grilla de Horarios</h3>
@@ -246,19 +256,60 @@ export default function DoublesEventManagePage() {
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() => window.print()}
+                  onClick={() => handlePrint("current")}
                   className="w-full sm:w-auto"
                 >
                   <Printer className="h-4 w-4 mr-2" />
                   Imprimir A4 horizontal
                 </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePrint("all")}
+                  className="w-full sm:w-auto"
+                >
+                  <Printer className="h-4 w-4 mr-2" />
+                  PDF por categorías
+                </Button>
               </div>
               {schedule && (
                 <ScheduleGrid
                   schedule={schedule}
+                  categoryId={activeCategoryId}
                   onMatchClick={handlePreviewMatchClick}
                 />
               )}
+            </div>
+            <div className="hidden doubles-print-area doubles-print-all">
+              {categories.map((category) => {
+                const categoryStandings =
+                  allStandings.find((item) => item.categoryId === category.id)?.zones || [];
+
+                return (
+                  <section key={category.id} className="doubles-print-category-page">
+                    <div className="doubles-print-title">
+                      <div className="text-lg font-bold">{event.name}</div>
+                      <div className="text-sm font-semibold">{category.name}</div>
+                    </div>
+                    <div className="doubles-print-section-title">Posiciones</div>
+                    <div className="doubles-print-standings">
+                      {categoryStandings.length > 0 ? (
+                        categoryStandings.map((zone) => (
+                          <div key={`${category.id}-${zone.zoneName}`} className="mb-3">
+                            <h4 className="font-medium mb-1">{zone.zoneName}</h4>
+                            <ZoneStandingsTable standings={zone.standings} />
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-sm text-gray-500">No hay posiciones disponibles.</p>
+                      )}
+                    </div>
+                    <div className="doubles-print-section-title">Partidos</div>
+                    {schedule && <ScheduleGrid schedule={schedule} categoryId={category.id} />}
+                  </section>
+                );
+              })}
             </div>
             <div className="doubles-print-hidden">
               <h3 className="text-lg font-semibold mb-4">Posiciones</h3>
@@ -329,6 +380,16 @@ export default function DoublesEventManagePage() {
             color: #111827 !important;
           }
 
+          .print-mode-current .doubles-print-all,
+          .print-mode-all .doubles-print-current {
+            display: none !important;
+            visibility: hidden !important;
+          }
+
+          .print-mode-all .doubles-print-all {
+            display: block !important;
+          }
+
           .doubles-print-hidden {
             display: none !important;
           }
@@ -339,6 +400,43 @@ export default function DoublesEventManagePage() {
             padding: 0 !important;
             color: #111827 !important;
             break-after: avoid !important;
+          }
+
+          .doubles-print-category-page {
+            display: block !important;
+            break-after: page !important;
+            page-break-after: always !important;
+          }
+
+          .doubles-print-category-page:last-child {
+            break-after: auto !important;
+            page-break-after: auto !important;
+          }
+
+          .doubles-print-section-title {
+            display: block !important;
+            margin: 3mm 0 1.5mm !important;
+            font-size: 9pt !important;
+            font-weight: 700 !important;
+            color: #111827 !important;
+            break-after: avoid !important;
+          }
+
+          .doubles-print-standings {
+            break-inside: avoid !important;
+            page-break-inside: avoid !important;
+          }
+
+          .doubles-print-standings table {
+            width: 100% !important;
+            font-size: 6.8pt !important;
+            line-height: 1.1 !important;
+          }
+
+          .doubles-print-standings th,
+          .doubles-print-standings td {
+            padding: 1.2mm !important;
+            border-color: #d1d5db !important;
           }
 
           .doubles-schedule-table-wrapper {
@@ -353,17 +451,32 @@ export default function DoublesEventManagePage() {
             min-width: 0 !important;
             table-layout: fixed !important;
             border-collapse: collapse !important;
-            font-size: 6.8pt !important;
-            line-height: 1.08 !important;
-            page-break-inside: avoid !important;
+            font-size: 7.2pt !important;
+            line-height: 1.12 !important;
           }
 
           .doubles-schedule-table th,
           .doubles-schedule-table td {
-            padding: 1.6mm 1mm !important;
+            padding: 2mm 1.2mm !important;
             border: 0.25mm solid #9ca3af !important;
             min-width: 0 !important;
             box-shadow: none !important;
+            vertical-align: middle !important;
+            break-inside: avoid !important;
+            page-break-inside: avoid !important;
+          }
+
+          .doubles-schedule-table tr {
+            break-inside: avoid !important;
+            page-break-inside: avoid !important;
+          }
+
+          .doubles-schedule-table thead {
+            display: table-header-group !important;
+          }
+
+          .doubles-schedule-table tbody {
+            display: table-row-group !important;
           }
 
           .doubles-schedule-table th:first-child,

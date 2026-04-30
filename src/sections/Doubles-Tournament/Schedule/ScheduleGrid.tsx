@@ -6,9 +6,10 @@ import { getPlayoffRoundLabel } from "@/common/constants/doubles-event.constants
 interface ScheduleGridProps {
   schedule: DoublesSchedule;
   onMatchClick?: (match: ScheduleMatch) => void;
+  categoryId?: number;
 }
 
-export function ScheduleGrid({ schedule, onMatchClick }: ScheduleGridProps) {
+export function ScheduleGrid({ schedule, onMatchClick, categoryId }: ScheduleGridProps) {
   const [searchQuery, setSearchQuery] = useState("");
 
   if (!schedule || (schedule.days.length === 0 && schedule.turns.length === 0)) {
@@ -19,13 +20,16 @@ export function ScheduleGrid({ schedule, onMatchClick }: ScheduleGridProps) {
     );
   }
 
-  const { courts, days } = schedule;
+  const filteredSchedule = categoryId
+    ? filterScheduleByCategory(schedule, categoryId)
+    : schedule;
+  const { courts, days } = filteredSchedule;
 
   // Fallback: if backend hasn't grouped by days yet, use turns directly
   const effectiveDays =
     days && days.length > 0
       ? days
-      : [{ date: "", label: "", turns: schedule.turns }];
+      : [{ date: "", label: "", turns: filteredSchedule.turns }];
 
   const isMultiDay = effectiveDays.length > 1;
 
@@ -57,6 +61,70 @@ export function ScheduleGrid({ schedule, onMatchClick }: ScheduleGridProps) {
       )}
     </div>
   );
+}
+
+function filterScheduleByCategory(
+  schedule: DoublesSchedule,
+  categoryId: number
+): DoublesSchedule {
+  const filterSlotMatches = (slot: DoublesSchedule["turns"][number]["slots"][number]) => {
+    const slotMatches =
+      slot.matches && slot.matches.length > 0
+        ? slot.matches
+        : slot.match
+          ? [slot.match]
+          : [];
+    const matches = slotMatches.filter((match) => match.categoryId === categoryId);
+
+    return {
+      ...slot,
+      match: matches[0] ?? null,
+      matches,
+    };
+  };
+
+  const filterTurn = (turn: ScheduleTurn): ScheduleTurn => ({
+    ...turn,
+    slots: turn.slots.map(filterSlotMatches),
+    matchesCount: turn.slots.reduce((total, slot) => {
+      const slotMatches =
+        slot.matches && slot.matches.length > 0
+          ? slot.matches
+          : slot.match
+            ? [slot.match]
+            : [];
+      return total + slotMatches.filter((match) => match.categoryId === categoryId).length;
+    }, 0),
+  });
+
+  const turns = schedule.turns
+    .map(filterTurn)
+    .filter((turn) => turn.matchesCount > 0);
+  const days = schedule.days
+    .map((day) => ({
+      ...day,
+      turns: day.turns
+        .map(filterTurn)
+        .filter((turn) => turn.matchesCount > 0),
+    }))
+    .filter((day) => day.turns.length > 0);
+
+  const usedCourtKeys = new Set<string>();
+  const sourceTurns = days.length > 0 ? days.flatMap((day) => day.turns) : turns;
+  sourceTurns.forEach((turn) => {
+    turn.slots.forEach((slot) => {
+      if ((slot.matches?.length || 0) > 0 || slot.match) {
+        usedCourtKeys.add(`${slot.venue}||${slot.courtName}`);
+      }
+    });
+  });
+
+  const courts = schedule.courts.filter((court) =>
+    usedCourtKeys.has(`${court.venue}||${court.name}`)
+  );
+  const venues = Array.from(new Set(courts.map((court) => court.venue))).sort();
+
+  return { ...schedule, venues, courts, turns, days };
 }
 
 function MultiDayGrid({
