@@ -124,6 +124,20 @@ function getMatchAssignmentLabel(match: DoublesMatch) {
   return `T${turnNumber}${timeLabel ? ` · ${timeLabel}` : ""} · ${match.venue} ${match.courtName}`;
 }
 
+function getApiErrorMessage(error: any, fallback: string) {
+  const message = error?.response?.data?.message;
+
+  if (Array.isArray(message)) {
+    return message.join(". ");
+  }
+
+  if (typeof message === "string" && message.trim()) {
+    return message;
+  }
+
+  return fallback;
+}
+
 export function MatchEditorDialog({
   open,
   onOpenChange,
@@ -362,10 +376,13 @@ export function MatchEditorDialog({
 
       onOpenChange(false);
     } catch (error: any) {
-      toast.error(
-        error?.response?.data?.message ||
-          (isEditing ? "Error al actualizar partido" : "Error al crear partido")
-      );
+      toast.error("No se pudo guardar el partido", {
+        description: getApiErrorMessage(
+          error,
+          isEditing ? "Error al actualizar partido" : "Error al crear partido"
+        ),
+        duration: 6000,
+      });
     } finally {
       setIsSaving(false);
     }
@@ -383,7 +400,10 @@ export function MatchEditorDialog({
       toast.success("Partido reemplazado");
       onOpenChange(false);
     } catch (error: any) {
-      toast.error(error?.response?.data?.message || "Error al reemplazar partido");
+      toast.error("No se pudo reemplazar el partido", {
+        description: getApiErrorMessage(error, "Error al reemplazar partido"),
+        duration: 6000,
+      });
     } finally {
       setIsReplacing(false);
     }
