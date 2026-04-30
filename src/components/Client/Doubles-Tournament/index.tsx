@@ -62,28 +62,25 @@ export default function ClientDoublesTournamentComponent({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 text-slate-900">
-      <div className="border-b bg-white">
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-100 text-slate-900">
+      <div className="border-b border-slate-200 bg-gradient-to-r from-red-50 via-white to-blue-50 shadow-sm">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-5 sm:py-8">
           <div className="mb-3 flex justify-center sm:mb-4">
             <Image
               src="/firmat-open-2.png"
               alt="Firmat Open 2"
-              width={220}
-              height={330}
+              width={320}
+              height={480}
               priority
-              className="h-28 w-auto sm:h-36"
+              className="h-40 w-auto sm:h-52"
             />
           </div>
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-center mb-2">
-            {event.name}
-          </h1>
           {event.description && (
-            <p className="text-gray-500 text-center text-sm sm:text-base mb-3">
+            <p className="text-slate-600 text-center text-sm sm:text-base mb-2">
               {event.description}
             </p>
           )}
-          <p className="text-xs sm:text-sm text-gray-400 text-center">
+          <p className="text-xs sm:text-sm text-slate-500 text-center">
             {new Date(event.startDate).toLocaleDateString("es-AR", {
               day: "numeric",
               month: "long",
@@ -101,7 +98,7 @@ export default function ClientDoublesTournamentComponent({
 
       <main className="max-w-7xl mx-auto py-4 sm:py-6 px-2 sm:px-4">
         {categories.length > 0 && (
-          <div className="mb-4 sm:mb-6 rounded-lg border bg-white p-3 sm:p-4">
+          <div className="mb-4 sm:mb-6 rounded-xl border border-slate-200 bg-white p-3 sm:p-4 shadow-sm">
             <CategorySelector
               categories={categories}
               selectedId={activeCategoryId}
@@ -111,21 +108,30 @@ export default function ClientDoublesTournamentComponent({
         )}
 
         <Tabs defaultValue="schedule">
-          <TabsList className="mb-4 w-full justify-center overflow-x-auto bg-white border">
-            <TabsTrigger value="schedule" className="text-xs sm:text-sm">
+          <TabsList className="mb-4 w-full justify-center overflow-x-auto bg-slate-100 border border-slate-200 shadow-sm">
+            <TabsTrigger
+              value="schedule"
+              className="text-xs sm:text-sm data-[state=active]:bg-slate-800 data-[state=active]:text-white data-[state=active]:shadow-md"
+            >
               Grilla
             </TabsTrigger>
-            <TabsTrigger value="zones" className="text-xs sm:text-sm">
+            <TabsTrigger
+              value="zones"
+              className="text-xs sm:text-sm data-[state=active]:bg-slate-800 data-[state=active]:text-white data-[state=active]:shadow-md"
+            >
               <span className="sm:hidden">Zonas</span>
               <span className="hidden sm:inline">Zonas y Posiciones</span>
             </TabsTrigger>
-            <TabsTrigger value="playoffs" className="text-xs sm:text-sm">
+            <TabsTrigger
+              value="playoffs"
+              className="text-xs sm:text-sm data-[state=active]:bg-slate-800 data-[state=active]:text-white data-[state=active]:shadow-md"
+            >
               Llaves
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="schedule">
-            <div className="rounded-lg border bg-white p-2 sm:p-4">
+            <div className="rounded-xl border border-slate-200 bg-white p-2 sm:p-4 shadow-sm">
               {schedule ? (
                 <ScheduleGrid schedule={schedule} />
               ) : (
@@ -137,13 +143,13 @@ export default function ClientDoublesTournamentComponent({
           </TabsContent>
 
           <TabsContent value="zones">
-            <div className="rounded-lg border bg-white p-3 sm:p-4">
+            <div className="rounded-xl border border-slate-200 bg-white p-3 sm:p-4 shadow-sm">
               <ZoneView standings={standings} matches={matches} />
             </div>
           </TabsContent>
 
           <TabsContent value="playoffs">
-            <div className="rounded-lg border bg-white p-3 sm:p-4">
+            <div className="rounded-xl border border-slate-200 bg-white p-3 sm:p-4 shadow-sm">
               <PlayoffBracket matches={playoffMatches} />
             </div>
           </TabsContent>
