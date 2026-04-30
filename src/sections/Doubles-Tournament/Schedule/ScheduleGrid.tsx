@@ -120,7 +120,10 @@ function getVenueHeaderClass(venue: string): string {
     return "bg-red-600 text-white";
   }
 
-  if (normalized.includes("villa deportiva")) {
+  if (
+    normalized.includes("villa deportiva") ||
+    normalized.includes("la villa tenis club")
+  ) {
     return "bg-blue-600 text-white";
   }
 
@@ -135,7 +138,8 @@ function getVenueSubtextClass(venue: string): string {
 
   if (
     normalized.includes("firmat") ||
-    normalized.includes("villa deportiva")
+    normalized.includes("villa deportiva") ||
+    normalized.includes("la villa tenis club")
   ) {
     return "text-white/80";
   }
