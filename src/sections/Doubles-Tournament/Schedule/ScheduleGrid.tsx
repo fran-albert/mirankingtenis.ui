@@ -235,76 +235,24 @@ function DayTable({
                 </div>
               </td>
               {turn.slots.map((slot, i) => {
+                const slotMatches =
+                  slot.matches && slot.matches.length > 0
+                    ? slot.matches
+                    : slot.match
+                      ? [slot.match]
+                      : [];
+                const primaryMatch = slotMatches[0] ?? null;
                 const isHighlighted =
-                  !!searchQuery && !!slot.match && matchesSearch(slot.match, searchQuery);
-                const hasWinner = !!slot.match?.winnerTeamNumber;
-                const isClickable =
-                  !!slot.match &&
-                  !!onMatchClick;
-
-                const content = slot.match ? (
-                  <div className={`space-y-0.5 ${isClickable ? "relative min-h-[78px] sm:min-h-[86px]" : ""}`}>
-                    {isClickable && (
-                      <div className="flex justify-end mb-1">
-                        <span className="inline-flex items-center gap-1 rounded-full border border-slate-600 bg-white/80 px-1.5 py-0.5 text-[8px] sm:text-[9px] font-semibold uppercase tracking-wide text-slate-700 shadow-sm">
-                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                          Editable
-                        </span>
-                      </div>
-                    )}
-                    {hasWinner ? (
-                      <>
-                        <div className={`text-[10px] sm:text-[11px] leading-tight ${
-                          slot.match.winnerTeamNumber === 1
-                            ? "text-green-700 font-bold"
-                            : "text-gray-400"
-                        }`}>
-                          <TeamName name={slot.match.team1Name} />
-                          {slot.match.winnerTeamNumber === 1 && slot.match.score && (
-                            <span className="ml-1 text-[9px] sm:text-[10px]">{slot.match.score}</span>
-                          )}
-                        </div>
-                        <div className={`text-[10px] sm:text-[11px] leading-tight ${
-                          slot.match.winnerTeamNumber === 2
-                            ? "text-green-700 font-bold"
-                            : "text-gray-400"
-                        }`}>
-                          <TeamName name={slot.match.team2Name} />
-                          {slot.match.winnerTeamNumber === 2 && slot.match.score && (
-                            <span className="ml-1 text-[9px] sm:text-[10px]">{slot.match.score}</span>
-                          )}
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <div className="text-[10px] sm:text-[11px] leading-tight font-medium">
-                          <TeamName name={slot.match.team1Name} />
-                        </div>
-                        <div className="text-gray-400 text-[9px] sm:text-[10px]">vs</div>
-                        <div className="text-[10px] sm:text-[11px] leading-tight font-medium">
-                          <TeamName name={slot.match.team2Name} />
-                        </div>
-                      </>
-                    )}
-                    <div className="text-[8px] sm:text-[9px] text-gray-400">
-                      {slot.match.phase === "playoff" && slot.match.round
-                        ? `${getPlayoffRoundLabel(slot.match.round)} · ${slot.match.categoryName}`
-                        : slot.match.categoryName}
-                    </div>
-                    {isClickable && (
-                      <div className="text-[8px] sm:text-[9px] font-medium text-slate-600">
-                        Click para editar
-                      </div>
-                    )}
-                  </div>
-                ) : null;
+                  !!searchQuery &&
+                  slotMatches.some((match) => matchesSearch(match, searchQuery));
+                const isClickable = !!onMatchClick;
 
                 return (
                   <td
                     key={i}
                     className={`border border-gray-300 p-0.5 sm:p-1 text-center ${
-                      slot.match
-                        ? getCategoryColor(slot.match.categoryName)
+                      primaryMatch
+                        ? getCategoryColor(primaryMatch.categoryName)
                         : slot.hasTurn
                           ? "bg-slate-50"
                           : "bg-white"
@@ -314,17 +262,84 @@ function DayTable({
                         : ""
                     }`}
                   >
-                    {isClickable && slot.match ? (
-                      <button
-                        type="button"
-                        className="w-full h-full text-inherit"
-                        onClick={() => onMatchClick?.(slot.match!)}
-                      >
-                        {content}
-                      </button>
-                    ) : (
-                      content
-                    )}
+                    {slotMatches.length > 0 ? (
+                      <div className="space-y-1">
+                        {slotMatches.map((match) => {
+                          const hasWinner = !!match.winnerTeamNumber;
+                          const matchContent = (
+                            <div className={`space-y-0.5 ${isClickable ? "relative min-h-[78px] sm:min-h-[86px]" : ""}`}>
+                              {isClickable && (
+                                <div className="flex justify-end mb-1">
+                                  <span className="inline-flex items-center gap-1 rounded-full border border-slate-600 bg-white/80 px-1.5 py-0.5 text-[8px] sm:text-[9px] font-semibold uppercase tracking-wide text-slate-700 shadow-sm">
+                                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                                    Editable
+                                  </span>
+                                </div>
+                              )}
+                              {hasWinner ? (
+                                <>
+                                  <div className={`text-[10px] sm:text-[11px] leading-tight ${
+                                    match.winnerTeamNumber === 1
+                                      ? "text-green-700 font-bold"
+                                      : "text-gray-400"
+                                  }`}>
+                                    <TeamName name={match.team1Name} />
+                                    {match.winnerTeamNumber === 1 && match.score && (
+                                      <span className="ml-1 text-[9px] sm:text-[10px]">{match.score}</span>
+                                    )}
+                                  </div>
+                                  <div className={`text-[10px] sm:text-[11px] leading-tight ${
+                                    match.winnerTeamNumber === 2
+                                      ? "text-green-700 font-bold"
+                                      : "text-gray-400"
+                                  }`}>
+                                    <TeamName name={match.team2Name} />
+                                    {match.winnerTeamNumber === 2 && match.score && (
+                                      <span className="ml-1 text-[9px] sm:text-[10px]">{match.score}</span>
+                                    )}
+                                  </div>
+                                </>
+                              ) : (
+                                <>
+                                  <div className="text-[10px] sm:text-[11px] leading-tight font-medium">
+                                    <TeamName name={match.team1Name} />
+                                  </div>
+                                  <div className="text-gray-400 text-[9px] sm:text-[10px]">vs</div>
+                                  <div className="text-[10px] sm:text-[11px] leading-tight font-medium">
+                                    <TeamName name={match.team2Name} />
+                                  </div>
+                                </>
+                              )}
+                              <div className="text-[8px] sm:text-[9px] text-gray-400">
+                                {match.phase === "playoff" && match.round
+                                  ? `${getPlayoffRoundLabel(match.round)} · ${match.categoryName}`
+                                  : match.categoryName}
+                              </div>
+                              {isClickable && (
+                                <div className="text-[8px] sm:text-[9px] font-medium text-slate-600">
+                                  Click para editar
+                                </div>
+                              )}
+                            </div>
+                          );
+
+                          return isClickable ? (
+                            <button
+                              key={match.id}
+                              type="button"
+                              className={`w-full h-full text-inherit rounded-sm ${
+                                slotMatches.length > 1 ? "border border-white/70 p-1" : ""
+                              }`}
+                              onClick={() => onMatchClick?.(match)}
+                            >
+                              {matchContent}
+                            </button>
+                          ) : (
+                            <div key={match.id}>{matchContent}</div>
+                          );
+                        })}
+                      </div>
+                    ) : null}
                   </td>
                 );
               })}

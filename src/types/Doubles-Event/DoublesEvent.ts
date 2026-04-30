@@ -122,6 +122,7 @@ export interface ScheduleSlot {
   courtName: string;
   hasTurn: boolean;
   match: ScheduleMatch | null;
+  matches?: ScheduleMatch[];
 }
 
 export interface ScheduleTurn {
