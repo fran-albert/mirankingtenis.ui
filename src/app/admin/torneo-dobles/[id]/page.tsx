@@ -104,6 +104,8 @@ export default function DoublesEventManagePage() {
   if (eventLoading) return <Loading isLoading={true} />;
   if (!event) return <div className="p-6">Evento no encontrado</div>;
 
+  const eventDays = getEventDays(event.startDate, event.endDate);
+
   const closeMatchDialog = () => {
     setMatchDialog({
       open: false,
@@ -403,36 +405,49 @@ export default function DoublesEventManagePage() {
                           </table>
 
                           <div className="doubles-print-section-title">Enfrentamientos</div>
-                          <table className="doubles-sheet-table doubles-match-sheet">
-                            <thead>
-                              <tr>
-                                <th>Equipo 1</th>
-                                <th>Equipo 2</th>
-                                <th>Fecha</th>
-                                <th>Hora</th>
-                                <th>Cancha</th>
-                                <th>Turno</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {zoneMatches.length > 0 ? (
-                                zoneMatches.map((match) => (
-                                  <tr key={match.id}>
-                                    <td>{match.team1?.teamName || ""}</td>
-                                    <td>{match.team2?.teamName || ""}</td>
-                                    <td />
-                                    <td />
-                                    <td />
-                                    <td />
-                                  </tr>
-                                ))
-                              ) : (
-                                <tr>
-                                  <td colSpan={6}>Sin enfrentamientos cargados</td>
-                                </tr>
-                              )}
-                            </tbody>
-                          </table>
+                          {zoneMatches.length > 0 ? (
+                            <div className="doubles-match-sheet-list">
+                              {zoneMatches.map((match) => (
+                                <div key={match.id} className="doubles-match-card">
+                                  <div className="doubles-match-meta">
+                                    <span>Fecha: {formatPrintMatchDate(match, eventDays)}</span>
+                                    <span>Hora: {formatPrintMatchTime(match)}</span>
+                                    <span>Cancha: {formatPrintMatchCourt(match)}</span>
+                                    <span>Turno: {formatPrintMatchTurn(match)}</span>
+                                  </div>
+                                  <table className="doubles-score-table">
+                                    <thead>
+                                      <tr>
+                                        <th>Equipo</th>
+                                        <th>Set 1</th>
+                                        <th>Set 2</th>
+                                        <th>STB</th>
+                                        <th>Ganador</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      <tr>
+                                        <td>{match.team1?.teamName || ""}</td>
+                                        <td />
+                                        <td />
+                                        <td />
+                                        <td />
+                                      </tr>
+                                      <tr>
+                                        <td>{match.team2?.teamName || ""}</td>
+                                        <td />
+                                        <td />
+                                        <td />
+                                        <td />
+                                      </tr>
+                                    </tbody>
+                                  </table>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="doubles-empty-sheet">Sin enfrentamientos cargados</div>
+                          )}
                         </div>
                       );
                     })}
@@ -616,9 +631,97 @@ export default function DoublesEventManagePage() {
             text-align: center !important;
           }
 
-          .doubles-match-sheet th:nth-child(n + 3),
-          .doubles-match-sheet td:nth-child(n + 3) {
-            width: 24mm !important;
+          .doubles-match-sheet-list {
+            display: grid !important;
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            gap: 3mm !important;
+          }
+
+          .doubles-match-card {
+            border: 0.35mm solid #111827 !important;
+            break-inside: avoid !important;
+            page-break-inside: avoid !important;
+            background: #ffffff !important;
+          }
+
+          .doubles-match-meta {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr 1fr 1fr !important;
+            gap: 0 !important;
+            border-bottom: 0.3mm solid #111827 !important;
+            background: #f9fafb !important;
+            font-size: 7.2pt !important;
+            font-weight: 700 !important;
+            color: #111827 !important;
+          }
+
+          .doubles-match-meta span {
+            display: block !important;
+            min-height: 7mm !important;
+            padding: 1.5mm 1.2mm !important;
+            border-right: 0.25mm solid #9ca3af !important;
+          }
+
+          .doubles-match-meta span:last-child {
+            border-right: 0 !important;
+          }
+
+          .doubles-score-table {
+            width: 100% !important;
+            border-collapse: collapse !important;
+            table-layout: fixed !important;
+            font-size: 7.4pt !important;
+            line-height: 1.1 !important;
+          }
+
+          .doubles-score-table th,
+          .doubles-score-table td {
+            border-right: 0.25mm solid #9ca3af !important;
+            border-bottom: 0.25mm solid #9ca3af !important;
+            color: #111827 !important;
+          }
+
+          .doubles-score-table th {
+            height: 5.5mm !important;
+            background: #e5e7eb !important;
+            font-weight: 700 !important;
+            text-align: center !important;
+          }
+
+          .doubles-score-table td {
+            height: 9mm !important;
+            padding: 1.2mm !important;
+            vertical-align: middle !important;
+          }
+
+          .doubles-score-table th:first-child,
+          .doubles-score-table td:first-child {
+            width: auto !important;
+            font-weight: 700 !important;
+            text-align: left !important;
+          }
+
+          .doubles-score-table th:nth-child(n + 2),
+          .doubles-score-table td:nth-child(n + 2) {
+            width: 16mm !important;
+            text-align: center !important;
+          }
+
+          .doubles-score-table th:last-child,
+          .doubles-score-table td:last-child {
+            width: 18mm !important;
+            border-right: 0 !important;
+          }
+
+          .doubles-score-table tr:last-child td {
+            border-bottom: 0 !important;
+          }
+
+          .doubles-empty-sheet {
+            border: 0.25mm solid #9ca3af !important;
+            padding: 3mm !important;
+            font-size: 8pt !important;
+            color: #4b5563 !important;
           }
 
           .doubles-print-standings {
@@ -745,6 +848,44 @@ function getEventDayLabel(eventDays: { date: string; label: string }[], iso: str
   if (!iso) return "";
   const { dateKey } = getArgentinaDateParts(iso);
   return eventDays.find((day) => day.date === dateKey)?.label || "";
+}
+
+function getMatchStartTime(match: DoublesMatch) {
+  return match.turn?.startTime || match.startTime || null;
+}
+
+function formatPrintMatchDate(
+  match: DoublesMatch,
+  eventDays: { date: string; label: string }[]
+) {
+  const startTime = getMatchStartTime(match);
+  const dayLabel = getEventDayLabel(eventDays, startTime);
+
+  if (dayLabel) return dayLabel;
+  if (!startTime) return "";
+
+  const { dd, mm } = getArgentinaDateParts(startTime);
+  return `${dd}/${mm}`;
+}
+
+function formatPrintMatchTime(match: DoublesMatch) {
+  return getArgentinaTimeValue(getMatchStartTime(match));
+}
+
+function formatPrintMatchCourt(match: DoublesMatch) {
+  const venue = match.venue || match.turn?.venue || "";
+  const courtName = match.courtName || match.turn?.courtName || "";
+
+  return [venue, courtName].filter(Boolean).join(" · ");
+}
+
+function formatPrintMatchTurn(match: DoublesMatch) {
+  const turnNumber = match.turn?.turnNumber ?? match.turnNumber;
+  const isMixed = match.turn?.isMixed;
+
+  if (!turnNumber) return "";
+
+  return `T${turnNumber}${isMixed ? " - Mixto" : ""}`;
 }
 
 function formatTurnOption(
