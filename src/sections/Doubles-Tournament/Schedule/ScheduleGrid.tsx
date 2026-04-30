@@ -31,7 +31,7 @@ export function ScheduleGrid({ schedule, onMatchClick }: ScheduleGridProps) {
 
   return (
     <div>
-      <div className="mb-3">
+      <div className="mb-3 doubles-print-hidden">
         <input
           type="text"
           placeholder="Buscar equipo..."
@@ -75,7 +75,7 @@ function MultiDayGrid({
 
   return (
     <div>
-      <div className="flex gap-1 sm:gap-2 mb-4 overflow-x-auto">
+      <div className="flex gap-1 sm:gap-2 mb-4 overflow-x-auto doubles-print-hidden">
         {days.map((day, idx) => (
           <button
             key={day.date}
@@ -207,8 +207,8 @@ function DayTable({
   }
 
   return (
-    <div className="overflow-x-auto -mx-2 px-2">
-      <table className="min-w-full border-collapse border border-gray-300 text-[10px] sm:text-xs">
+    <div className="overflow-x-auto -mx-2 px-2 doubles-schedule-table-wrapper">
+      <table className="min-w-full border-collapse border border-gray-300 text-[10px] sm:text-xs doubles-schedule-table">
         <thead>
           <tr className="bg-gray-100">
             <th className="border border-gray-300 p-1 sm:p-2 text-left min-w-[70px] sm:min-w-[100px]">
@@ -270,7 +270,7 @@ function DayTable({
                             <div className={`space-y-0.5 ${isClickable ? "relative min-h-[78px] sm:min-h-[86px]" : ""}`}>
                               {isClickable && (
                                 <div className="flex justify-end mb-1">
-                                  <span className="inline-flex items-center gap-1 rounded-full border border-slate-600 bg-white/80 px-1.5 py-0.5 text-[8px] sm:text-[9px] font-semibold uppercase tracking-wide text-slate-700 shadow-sm">
+                                  <span className="inline-flex items-center gap-1 rounded-full border border-slate-600 bg-white/80 px-1.5 py-0.5 text-[8px] sm:text-[9px] font-semibold uppercase tracking-wide text-slate-700 shadow-sm doubles-print-hidden">
                                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                                     Editable
                                   </span>
@@ -316,7 +316,7 @@ function DayTable({
                                   : match.categoryName}
                               </div>
                               {isClickable && (
-                                <div className="text-[8px] sm:text-[9px] font-medium text-slate-600">
+                                <div className="text-[8px] sm:text-[9px] font-medium text-slate-600 doubles-print-hidden">
                                   Click para editar
                                 </div>
                               )}

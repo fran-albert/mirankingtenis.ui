@@ -56,7 +56,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { QRCodeSVG } from "qrcode.react";
-import { Copy, Download, ExternalLink, QrCode } from "lucide-react";
+import { Copy, Download, ExternalLink, Printer, QrCode } from "lucide-react";
 import { ScheduleGrid } from "@/sections/Doubles-Tournament/Schedule/ScheduleGrid";
 import { ZoneStandingsTable } from "@/sections/Doubles-Tournament/Zones/ZoneStandingsTable";
 import { MatchEditorDialog } from "@/sections/Doubles-Tournament/Admin/MatchEditorDialog";
@@ -235,8 +235,24 @@ export default function DoublesEventManagePage() {
 
         <TabsContent value="preview">
           <div className="space-y-8">
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Grilla de Horarios</h3>
+            <div className="doubles-print-area">
+              <div className="hidden doubles-print-title">
+                <div className="text-lg font-bold">{event.name}</div>
+                <div className="text-sm">Grilla de horarios</div>
+              </div>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4 doubles-print-hidden">
+                <h3 className="text-lg font-semibold">Grilla de Horarios</h3>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => window.print()}
+                  className="w-full sm:w-auto"
+                >
+                  <Printer className="h-4 w-4 mr-2" />
+                  Imprimir A4 horizontal
+                </Button>
+              </div>
               {schedule && (
                 <ScheduleGrid
                   schedule={schedule}
@@ -244,7 +260,7 @@ export default function DoublesEventManagePage() {
                 />
               )}
             </div>
-            <div>
+            <div className="doubles-print-hidden">
               <h3 className="text-lg font-semibold mb-4">Posiciones</h3>
               {standings.map((zone) => (
                 <div key={zone.zoneName} className="mb-6">
@@ -280,6 +296,97 @@ export default function DoublesEventManagePage() {
         eventStartDate={event.startDate}
         eventEndDate={event.endDate}
       />
+      <style jsx global>{`
+        @media print {
+          @page {
+            size: A4 landscape;
+            margin: 7mm;
+          }
+
+          html,
+          body {
+            width: 297mm;
+            min-height: 210mm;
+            background: #ffffff !important;
+          }
+
+          body * {
+            visibility: hidden !important;
+          }
+
+          .doubles-print-area,
+          .doubles-print-area * {
+            visibility: visible !important;
+          }
+
+          .doubles-print-area {
+            position: absolute !important;
+            inset: 0 auto auto 0 !important;
+            width: 100% !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            background: #ffffff !important;
+            color: #111827 !important;
+          }
+
+          .doubles-print-hidden {
+            display: none !important;
+          }
+
+          .doubles-print-title {
+            display: block !important;
+            margin: 0 0 4mm 0 !important;
+            padding: 0 !important;
+            color: #111827 !important;
+            break-after: avoid !important;
+          }
+
+          .doubles-schedule-table-wrapper {
+            overflow: visible !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+          }
+
+          .doubles-schedule-table {
+            width: 100% !important;
+            min-width: 0 !important;
+            table-layout: fixed !important;
+            border-collapse: collapse !important;
+            font-size: 6.8pt !important;
+            line-height: 1.08 !important;
+            page-break-inside: avoid !important;
+          }
+
+          .doubles-schedule-table th,
+          .doubles-schedule-table td {
+            padding: 1.6mm 1mm !important;
+            border: 0.25mm solid #9ca3af !important;
+            min-width: 0 !important;
+            box-shadow: none !important;
+          }
+
+          .doubles-schedule-table th:first-child,
+          .doubles-schedule-table td:first-child {
+            width: 18mm !important;
+          }
+
+          .doubles-schedule-table button {
+            min-height: 0 !important;
+            height: auto !important;
+            padding: 0 !important;
+            border: 0 !important;
+            box-shadow: none !important;
+            background: transparent !important;
+            color: inherit !important;
+          }
+
+          .doubles-schedule-table .min-h-\\[78px\\],
+          .doubles-schedule-table .sm\\:min-h-\\[86px\\] {
+            min-height: 0 !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }
