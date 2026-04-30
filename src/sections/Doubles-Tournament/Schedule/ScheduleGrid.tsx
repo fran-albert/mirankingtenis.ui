@@ -110,6 +110,39 @@ function matchesSearch(match: ScheduleMatch, query: string): boolean {
   );
 }
 
+function getVenueHeaderClass(venue: string): string {
+  const normalized = venue
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+
+  if (normalized.includes("firmat")) {
+    return "bg-red-600 text-white";
+  }
+
+  if (normalized.includes("villa deportiva")) {
+    return "bg-blue-600 text-white";
+  }
+
+  return "bg-gray-100";
+}
+
+function getVenueSubtextClass(venue: string): string {
+  const normalized = venue
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+
+  if (
+    normalized.includes("firmat") ||
+    normalized.includes("villa deportiva")
+  ) {
+    return "text-white/80";
+  }
+
+  return "text-gray-500";
+}
+
 function DayTable({
   courts,
   turns,
@@ -181,10 +214,10 @@ function DayTable({
             {courts.map((court, i) => (
               <th
                 key={i}
-                className="border border-gray-300 p-1 sm:p-2 text-center min-w-[110px] sm:min-w-[140px]"
+                className={`border border-gray-300 p-1 sm:p-2 text-center min-w-[110px] sm:min-w-[140px] ${getVenueHeaderClass(court.venue)}`}
               >
                 <div className="font-bold text-[10px] sm:text-xs">{court.venue}</div>
-                <div className="text-gray-500 text-[9px] sm:text-[11px]">{court.name}</div>
+                <div className={`text-[9px] sm:text-[11px] ${getVenueSubtextClass(court.venue)}`}>{court.name}</div>
               </th>
             ))}
           </tr>
