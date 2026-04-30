@@ -507,7 +507,7 @@ export function MatchEditorDialog({
           )}
 
           <div>
-            <Label>Turno Digitalizado</Label>
+            <Label>Turno</Label>
             <Select
               value={String(form.turnId || "")}
               onValueChange={(value) => handleTurnChange(Number(value))}
