@@ -30,6 +30,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Table,
@@ -54,6 +55,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
+import { QRCodeSVG } from "qrcode.react";
+import { Copy, Download, ExternalLink, QrCode } from "lucide-react";
 import { ScheduleGrid } from "@/sections/Doubles-Tournament/Schedule/ScheduleGrid";
 import { ZoneStandingsTable } from "@/sections/Doubles-Tournament/Zones/ZoneStandingsTable";
 import { MatchEditorDialog } from "@/sections/Doubles-Tournament/Admin/MatchEditorDialog";
@@ -165,6 +168,7 @@ export default function DoublesEventManagePage() {
           <TabsTrigger value="matches" className="text-xs sm:text-sm px-2 sm:px-3">Partidos</TabsTrigger>
           <TabsTrigger value="results" className="text-xs sm:text-sm px-2 sm:px-3">Resultados</TabsTrigger>
           <TabsTrigger value="preview" className="text-xs sm:text-sm px-2 sm:px-3">Vista Previa</TabsTrigger>
+          <TabsTrigger value="public-access" className="text-xs sm:text-sm px-2 sm:px-3">Acceso Público</TabsTrigger>
         </TabsList>
 
         <TabsContent value="categories">
@@ -250,6 +254,10 @@ export default function DoublesEventManagePage() {
               ))}
             </div>
           </div>
+        </TabsContent>
+
+        <TabsContent value="public-access">
+          <PublicAccessTab eventId={eventId} eventName={event.name} />
         </TabsContent>
       </Tabs>
 
@@ -386,6 +394,112 @@ function StatusToggle({
             : "Finalizado"}
       </Badge>
     </div>
+  );
+}
+
+function PublicAccessTab({
+  eventId,
+  eventName,
+}: {
+  eventId: number;
+  eventName: string;
+}) {
+  const publicUrl =
+    typeof window !== "undefined"
+      ? `${window.location.origin}/torneo-dobles/${eventId}`
+      : "";
+  const qrId = `doubles-tournament-qr-${eventId}`;
+
+  const copyPublicUrl = async () => {
+    try {
+      await navigator.clipboard.writeText(publicUrl);
+      toast.success("Link copiado");
+    } catch {
+      toast.error("No se pudo copiar el link");
+    }
+  };
+
+  const downloadQR = () => {
+    const svg = document.getElementById(qrId);
+    if (!svg) return;
+
+    const svgData = new XMLSerializer().serializeToString(svg);
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    const img = new Image();
+
+    img.onload = () => {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx?.drawImage(img, 0, 0);
+
+      const downloadLink = document.createElement("a");
+      downloadLink.download = `QR-${eventName}.png`;
+      downloadLink.href = canvas.toDataURL("image/png");
+      downloadLink.click();
+    };
+
+    img.src = `data:image/svg+xml;base64,${btoa(svgData)}`;
+  };
+
+  return (
+    <Card className="max-w-3xl border-tennis-accent/20 bg-tennis-accent/5">
+      <CardHeader>
+        <CardTitle className="text-lg flex items-center gap-2">
+          <QrCode className="h-5 w-5 text-tennis-accent" />
+          Acceso Público
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="flex flex-col md:flex-row items-center gap-6">
+        <div className="bg-white p-3 rounded-xl shadow-lg">
+          <QRCodeSVG
+            id={qrId}
+            value={publicUrl}
+            size={180}
+            level="H"
+            includeMargin={true}
+            imageSettings={{
+              src: "https://mirankingtenis.com.ar/wp-content/uploads/2023/05/cropped-cropped-LOGOTENIS-171x172.png",
+              x: undefined,
+              y: undefined,
+              height: 40,
+              width: 40,
+              excavate: true,
+            }}
+          />
+        </div>
+
+        <div className="flex-1 space-y-4 w-full text-center md:text-left">
+          <div>
+            <Label>Link público del torneo</Label>
+            <Input value={publicUrl} readOnly className="mt-2 bg-background" />
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-2 justify-center md:justify-start">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => window.open(publicUrl, "_blank")}
+            >
+              <ExternalLink className="h-4 w-4 mr-2" />
+              Probar enlace
+            </Button>
+            <Button variant="outline" size="sm" onClick={copyPublicUrl}>
+              <Copy className="h-4 w-4 mr-2" />
+              Copiar link
+            </Button>
+            <Button
+              size="sm"
+              onClick={downloadQR}
+              className="bg-tennis-accent text-black hover:bg-tennis-accent/90"
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Descargar QR
+            </Button>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 
