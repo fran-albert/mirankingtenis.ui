@@ -249,6 +249,7 @@ export default function DoublesEventManagePage() {
           <div className="space-y-8">
             <div className="doubles-print-area doubles-print-current">
               <div className="hidden doubles-print-title">
+                <img src="/firmat-open-2.png" alt="Firmat Open 2" className="doubles-print-logo" />
                 <div className="text-lg font-bold">{event.name}</div>
                 <div className="text-sm font-semibold">
                   {activeCategory?.name || "Grilla de horarios"}
@@ -323,6 +324,7 @@ export default function DoublesEventManagePage() {
                 return (
                   <section key={category.id} className="doubles-print-category-page">
                     <div className="doubles-print-title">
+                      <img src="/firmat-open-2.png" alt="Firmat Open 2" className="doubles-print-logo" />
                       <div className="text-lg font-bold">{event.name}</div>
                       <div className="text-sm font-semibold">{category.name}</div>
                     </div>
@@ -347,6 +349,7 @@ export default function DoublesEventManagePage() {
             </div>
             <div className="hidden doubles-print-area doubles-print-full">
               <div className="doubles-print-title">
+                <img src="/firmat-open-2.png" alt="Firmat Open 2" className="doubles-print-logo" />
                 <div className="text-lg font-bold">{event.name}</div>
                 <div className="text-sm font-semibold">Grilla completa</div>
               </div>
@@ -368,6 +371,7 @@ export default function DoublesEventManagePage() {
                 return (
                   <section key={`sheet-${category.id}`} className="doubles-print-category-page">
                     <div className="doubles-print-title">
+                      <img src="/firmat-open-2.png" alt="Firmat Open 2" className="doubles-print-logo" />
                       <div className="text-lg font-bold">{event.name}</div>
                       <div className="text-sm font-semibold">{category.name}</div>
                     </div>
@@ -483,6 +487,7 @@ export default function DoublesEventManagePage() {
                 return (
                   <section key={`mobile-zone-${category.id}`} className="doubles-mobile-page">
                     <div className="doubles-mobile-header">
+                      <img src="/firmat-open-2.png" alt="Firmat Open 2" className="doubles-mobile-logo" />
                       <div className="doubles-mobile-event">{event.name}</div>
                       <div className="doubles-mobile-category">{category.name}</div>
                     </div>
@@ -678,6 +683,15 @@ export default function DoublesEventManagePage() {
             padding: 0 !important;
             color: #111827 !important;
             break-after: avoid !important;
+            text-align: center !important;
+          }
+
+          .doubles-print-logo {
+            display: block !important;
+            width: auto !important;
+            height: 18mm !important;
+            margin: 0 auto 1.5mm !important;
+            object-fit: contain !important;
           }
 
           .doubles-print-category-page {
@@ -865,6 +879,14 @@ export default function DoublesEventManagePage() {
             margin-bottom: 4mm !important;
             padding-bottom: 3mm !important;
             border-bottom: 0.3mm solid #cbd5e1 !important;
+          }
+
+          .doubles-mobile-logo {
+            display: block !important;
+            width: auto !important;
+            height: 22mm !important;
+            margin: 0 auto 1.5mm !important;
+            object-fit: contain !important;
           }
 
           .doubles-mobile-event {
