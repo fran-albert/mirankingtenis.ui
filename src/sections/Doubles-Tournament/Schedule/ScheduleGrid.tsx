@@ -12,7 +12,7 @@ interface ScheduleGridProps {
 function formatScoreFromWinnerPerspective(match: ScheduleMatch): string {
   if (!match.score) return "";
 
-  if (match.winnerTeamNumber !== 2) {
+  if (Number(match.winnerTeamNumber) !== 2) {
     return match.score;
   }
 
