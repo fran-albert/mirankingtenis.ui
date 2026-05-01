@@ -507,20 +507,21 @@ export default function DoublesEventManagePage() {
                     return a.id - b.id;
                   });
 
-                return categoryStandings.flatMap((zone) => {
-                      const zoneMatches = categoryMatches.filter(
-                        (match) => (match.zoneName || "Sin zona") === zone.zoneName
-                      );
-                  const zonePages = paginatePrintContent(
-                    zone.standings,
-                    zoneMatches,
-                    mobileStandingsPerPage,
-                    mobileMatchesPerPage
-                  );
+                const printableZonePages = buildMobileZonePages(
+                  categoryStandings.map((zone) => ({
+                    zoneName: zone.zoneName,
+                    standings: zone.standings,
+                    matches: categoryMatches.filter(
+                      (match) => (match.zoneName || "Sin zona") === zone.zoneName
+                    ),
+                  })),
+                  mobileStandingsPerPage,
+                  mobileMatchesPerPage
+                );
 
-                  return zonePages.map((zonePage) => (
+                return printableZonePages.map((page, pageIndex) => (
                     <section
-                      key={`mobile-zone-${category.id}-${zone.zoneName}-${zonePage.pageNumber}`}
+                      key={`mobile-zone-${category.id}-${pageIndex}`}
                       className="doubles-mobile-page"
                     >
                       <div className="doubles-mobile-header">
@@ -529,7 +530,8 @@ export default function DoublesEventManagePage() {
                         <div className="doubles-mobile-category">{category.name}</div>
                       </div>
 
-                      <div className="doubles-mobile-zone">
+                      {page.zones.map((zone) => (
+                        <div key={`${zone.zoneName}-${zone.pageNumber}`} className="doubles-mobile-zone">
                           <h3>{zone.zoneName}</h3>
                           <div className="doubles-mobile-standing-card">
                             <div className="doubles-mobile-standing-head">
@@ -539,7 +541,7 @@ export default function DoublesEventManagePage() {
                               <span>PG</span>
                               <span>Sets</span>
                             </div>
-                            {zonePage.standings.map((standing) => (
+                            {zone.standings.map((standing) => (
                               <div key={standing.team.id} className="doubles-mobile-standing-row">
                                 <span>{standing.position}</span>
                                 <span>{standing.team.teamName}</span>
@@ -551,8 +553,8 @@ export default function DoublesEventManagePage() {
                           </div>
 
                           <div className="doubles-mobile-match-list">
-                            {zonePage.matches.length > 0 ? (
-                              zonePage.matches.map((match) => (
+                            {zone.matches.length > 0 ? (
+                              zone.matches.map((match) => (
                                 <div key={match.id} className="doubles-mobile-match-card">
                                   <span>{match.team1?.teamName || ""}</span>
                                   <span className="doubles-mobile-match-pill">
@@ -565,10 +567,10 @@ export default function DoublesEventManagePage() {
                               <div className="doubles-mobile-empty">No hay partidos en esta zona</div>
                             )}
                           </div>
-                      </div>
+                        </div>
+                      ))}
                     </section>
-                  ));
-                });
+                ));
               })}
             </div>
             <div className="doubles-print-hidden">
@@ -1248,6 +1250,67 @@ function paginatePrintContent(
         : standings.slice(index * standingsPerPage, (index + 1) * standingsPerPage),
     matches: matches.slice(index * matchesPerPage, (index + 1) * matchesPerPage),
   }));
+}
+
+type MobileZonePrintSource = {
+  zoneName: string;
+  standings: TeamStanding[];
+  matches: DoublesMatch[];
+};
+
+type MobileZonePrintBlock = MobileZonePrintSource & {
+  pageNumber: number;
+};
+
+function buildMobileZonePages(
+  zones: MobileZonePrintSource[],
+  standingsPerPage: number,
+  matchesPerPage: number
+) {
+  const maxPageUnits = 18;
+  const pages: { zones: MobileZonePrintBlock[] }[] = [];
+  let currentPage: { zones: MobileZonePrintBlock[]; units: number } = {
+    zones: [],
+    units: 0,
+  };
+
+  const pushCurrentPage = () => {
+    if (currentPage.zones.length === 0) return;
+    pages.push({ zones: currentPage.zones });
+    currentPage = { zones: [], units: 0 };
+  };
+
+  zones.forEach((zone) => {
+    const zonePages = paginatePrintContent(
+      zone.standings,
+      zone.matches,
+      standingsPerPage,
+      matchesPerPage
+    );
+
+    zonePages.forEach((zonePage) => {
+      const block: MobileZonePrintBlock = {
+        zoneName: zone.zoneName,
+        standings: zonePage.standings,
+        matches: zonePage.matches,
+        pageNumber: zonePage.pageNumber,
+      };
+      const blockUnits = 4 + block.standings.length + block.matches.length * 2;
+
+      if (
+        currentPage.zones.length > 0 &&
+        currentPage.units + blockUnits > maxPageUnits
+      ) {
+        pushCurrentPage();
+      }
+
+      currentPage.zones.push(block);
+      currentPage.units += blockUnits;
+    });
+  });
+
+  pushCurrentPage();
+  return pages;
 }
 
 function formatTurnOption(
