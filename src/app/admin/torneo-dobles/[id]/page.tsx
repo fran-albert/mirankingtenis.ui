@@ -624,24 +624,14 @@ export default function DoublesEventManagePage() {
       <style jsx global>{`
         @media print {
           @page {
-            size: A4 landscape;
-            margin: 7mm;
-          }
-
-          @page doubles-mobile-zones {
-            size: A4 landscape;
-            margin: 8mm;
-          }
-
-          @page doubles-mobile-zones-portrait {
-            size: A4 portrait;
-            margin: 8mm;
+            size: ${printMode === "mobile-zones-portrait" ? "A4 portrait" : "A4 landscape"};
+            margin: ${printMode === "mobile-zones-portrait" ? "8mm" : "7mm"};
           }
 
           html,
           body {
-            width: 297mm;
-            min-height: 210mm;
+            width: ${printMode === "mobile-zones-portrait" ? "210mm" : "297mm"};
+            min-height: ${printMode === "mobile-zones-portrait" ? "297mm" : "210mm"};
             background: #ffffff !important;
           }
 
