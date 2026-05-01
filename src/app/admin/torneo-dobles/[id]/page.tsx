@@ -20,6 +20,7 @@ import {
   CreateDoublesTeamRequest,
   CreateDoublesTurnRequest,
   ScheduleMatch,
+  TeamStanding,
   UpdateDoublesMatchResultRequest,
 } from "@/types/Doubles-Event/DoublesEvent";
 import { DoublesMatchPhase, DoublesMatchStatus, DoublesEventStatus } from "@/common/enum/doubles-event.enum";
@@ -107,6 +108,10 @@ export default function DoublesEventManagePage() {
   if (!event) return <div className="p-6">Evento no encontrado</div>;
 
   const eventDays = getEventDays(event.startDate, event.endDate);
+  const sheetStandingsPerPage = 6;
+  const sheetMatchesPerPage = 4;
+  const mobileStandingsPerPage = 6;
+  const mobileMatchesPerPage = 5;
 
   const closeMatchDialog = () => {
     setMatchDialog({
@@ -367,24 +372,33 @@ export default function DoublesEventManagePage() {
                     if (zoneCompare !== 0) return zoneCompare;
                     return a.id - b.id;
                   });
+                const printableZones =
+                  categoryStandings.length > 0
+                    ? categoryStandings
+                    : [{ zoneName: "Sin zona", standings: [] }];
 
-                return (
-                  <section key={`sheet-${category.id}`} className="doubles-print-category-page">
-                    <div className="doubles-print-title">
-                      <img src="/firmat-open-2.png" alt="Firmat Open 2" className="doubles-print-logo" />
-                      <div className="text-lg font-bold">{event.name}</div>
-                      <div className="text-sm font-semibold">{category.name}</div>
-                    </div>
-                    {(categoryStandings.length > 0
-                      ? categoryStandings
-                      : [{ zoneName: "Sin zona", standings: [] }]
-                    ).map((zone) => {
+                return printableZones.flatMap((zone) => {
                       const zoneMatches = categoryMatches.filter(
                         (match) => (match.zoneName || "Sin zona") === zone.zoneName
                       );
+                  const zonePages = paginatePrintContent(
+                    zone.standings,
+                    zoneMatches,
+                    sheetStandingsPerPage,
+                    sheetMatchesPerPage
+                  );
 
-                      return (
-                        <div key={`sheet-${category.id}-${zone.zoneName}`} className="doubles-zone-sheet">
+                  return zonePages.map((zonePage) => (
+                    <section
+                      key={`sheet-${category.id}-${zone.zoneName}-${zonePage.pageNumber}`}
+                      className="doubles-print-category-page"
+                    >
+                      <div className="doubles-print-title">
+                        <img src="/firmat-open-2.png" alt="Firmat Open 2" className="doubles-print-logo" />
+                        <div className="text-lg font-bold">{event.name}</div>
+                        <div className="text-sm font-semibold">{category.name}</div>
+                      </div>
+                      <div className="doubles-zone-sheet">
                           <div className="doubles-zone-title">{zone.zoneName}</div>
                           <div className="doubles-print-section-title">Posiciones</div>
                           <table className="doubles-sheet-table doubles-standings-sheet">
@@ -400,8 +414,8 @@ export default function DoublesEventManagePage() {
                               </tr>
                             </thead>
                             <tbody>
-                              {zone.standings.length > 0 ? (
-                                zone.standings.map((standing) => (
+                              {zonePage.standings.length > 0 ? (
+                                zonePage.standings.map((standing) => (
                                   <tr key={standing.team.id}>
                                     <td>{standing.position}</td>
                                     <td>{standing.team.teamName}</td>
@@ -421,9 +435,9 @@ export default function DoublesEventManagePage() {
                           </table>
 
                           <div className="doubles-print-section-title">Enfrentamientos</div>
-                          {zoneMatches.length > 0 ? (
+                          {zonePage.matches.length > 0 ? (
                             <div className="doubles-match-sheet-list">
-                              {zoneMatches.map((match) => (
+                              {zonePage.matches.map((match) => (
                                 <div key={match.id} className="doubles-match-card">
                                   <div className="doubles-match-meta">
                                     <span>Fecha: {formatPrintMatchDate(match, eventDays)}</span>
@@ -464,11 +478,10 @@ export default function DoublesEventManagePage() {
                           ) : (
                             <div className="doubles-empty-sheet">Sin enfrentamientos cargados</div>
                           )}
-                        </div>
-                      );
-                    })}
-                  </section>
-                );
+                      </div>
+                    </section>
+                  ));
+                });
               })}
             </div>
             <div className="hidden doubles-print-area doubles-print-mobile-zones">
@@ -484,21 +497,29 @@ export default function DoublesEventManagePage() {
                     return a.id - b.id;
                   });
 
-                return (
-                  <section key={`mobile-zone-${category.id}`} className="doubles-mobile-page">
-                    <div className="doubles-mobile-header">
-                      <img src="/firmat-open-2.png" alt="Firmat Open 2" className="doubles-mobile-logo" />
-                      <div className="doubles-mobile-event">{event.name}</div>
-                      <div className="doubles-mobile-category">{category.name}</div>
-                    </div>
-
-                    {categoryStandings.map((zone) => {
+                return categoryStandings.flatMap((zone) => {
                       const zoneMatches = categoryMatches.filter(
                         (match) => (match.zoneName || "Sin zona") === zone.zoneName
                       );
+                  const zonePages = paginatePrintContent(
+                    zone.standings,
+                    zoneMatches,
+                    mobileStandingsPerPage,
+                    mobileMatchesPerPage
+                  );
 
-                      return (
-                        <div key={`mobile-zone-${category.id}-${zone.zoneName}`} className="doubles-mobile-zone">
+                  return zonePages.map((zonePage) => (
+                    <section
+                      key={`mobile-zone-${category.id}-${zone.zoneName}-${zonePage.pageNumber}`}
+                      className="doubles-mobile-page"
+                    >
+                      <div className="doubles-mobile-header">
+                        <img src="/firmat-open-2.png" alt="Firmat Open 2" className="doubles-mobile-logo" />
+                        <div className="doubles-mobile-event">{event.name}</div>
+                        <div className="doubles-mobile-category">{category.name}</div>
+                      </div>
+
+                      <div className="doubles-mobile-zone">
                           <h3>{zone.zoneName}</h3>
                           <div className="doubles-mobile-standing-card">
                             <div className="doubles-mobile-standing-head">
@@ -508,7 +529,7 @@ export default function DoublesEventManagePage() {
                               <span>PG</span>
                               <span>Sets</span>
                             </div>
-                            {zone.standings.map((standing) => (
+                            {zonePage.standings.map((standing) => (
                               <div key={standing.team.id} className="doubles-mobile-standing-row">
                                 <span>{standing.position}</span>
                                 <span>{standing.team.teamName}</span>
@@ -520,8 +541,8 @@ export default function DoublesEventManagePage() {
                           </div>
 
                           <div className="doubles-mobile-match-list">
-                            {zoneMatches.length > 0 ? (
-                              zoneMatches.map((match) => (
+                            {zonePage.matches.length > 0 ? (
+                              zonePage.matches.map((match) => (
                                 <div key={match.id} className="doubles-mobile-match-card">
                                   <div className="doubles-mobile-match-meta">
                                     <span>{formatPrintMatchDate(match, eventDays)}</span>
@@ -553,11 +574,10 @@ export default function DoublesEventManagePage() {
                               <div className="doubles-mobile-empty">No hay partidos en esta zona</div>
                             )}
                           </div>
-                        </div>
-                      );
-                    })}
-                  </section>
-                );
+                      </div>
+                    </section>
+                  ));
+                });
               })}
             </div>
             <div className="doubles-print-hidden">
@@ -1217,6 +1237,28 @@ function getPrintSetScore(match: DoublesMatch, setNumber: number, teamNumber: 1 
   if (!set) return "";
 
   return teamNumber === 1 ? set.team1Score : set.team2Score;
+}
+
+function paginatePrintContent(
+  standings: TeamStanding[],
+  matches: DoublesMatch[],
+  standingsPerPage: number,
+  matchesPerPage: number
+) {
+  const totalPages = Math.max(
+    1,
+    Math.ceil(standings.length / standingsPerPage),
+    Math.ceil(matches.length / matchesPerPage)
+  );
+
+  return Array.from({ length: totalPages }, (_, index) => ({
+    pageNumber: index + 1,
+    standings:
+      standings.length <= standingsPerPage
+        ? standings
+        : standings.slice(index * standingsPerPage, (index + 1) * standingsPerPage),
+    matches: matches.slice(index * matchesPerPage, (index + 1) * matchesPerPage),
+  }));
 }
 
 function formatTurnOption(
