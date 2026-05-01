@@ -185,6 +185,7 @@ export default function DoublesEventManagePage() {
           <TabsTrigger value="matches" className="text-xs sm:text-sm px-2 sm:px-3">Partidos</TabsTrigger>
           <TabsTrigger value="results" className="text-xs sm:text-sm px-2 sm:px-3">Resultados</TabsTrigger>
           <TabsTrigger value="preview" className="text-xs sm:text-sm px-2 sm:px-3">Vista Previa</TabsTrigger>
+          <TabsTrigger value="print" className="text-xs sm:text-sm px-2 sm:px-3">Impresión</TabsTrigger>
           <TabsTrigger value="public-access" className="text-xs sm:text-sm px-2 sm:px-3">Acceso Público</TabsTrigger>
         </TabsList>
 
@@ -250,7 +251,7 @@ export default function DoublesEventManagePage() {
           />
         </TabsContent>
 
-        <TabsContent value="preview">
+        <TabsContent value="preview" className="doubles-preview-tab">
           <div className="space-y-8">
             <div className="doubles-print-area doubles-print-current">
               <div className="hidden doubles-print-title">
@@ -262,6 +263,22 @@ export default function DoublesEventManagePage() {
               </div>
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4 doubles-print-hidden">
                 <h3 className="text-lg font-semibold">Grilla de Horarios</h3>
+              </div>
+              {schedule && (
+                <ScheduleGrid
+                  schedule={schedule}
+                  onMatchClick={handlePreviewMatchClick}
+                />
+              )}
+            </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="print">
+          <div className="space-y-8">
+            <div className="doubles-print-hidden">
+              <h3 className="text-lg font-semibold mb-2">Impresión</h3>
+              <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                 <Button
                   type="button"
                   variant="outline"
@@ -310,16 +327,9 @@ export default function DoublesEventManagePage() {
                   className="w-full sm:w-auto"
                 >
                   <Printer className="h-4 w-4 mr-2" />
-                  PDF mobile zonas
+                  PDF zonas y posiciones
                 </Button>
               </div>
-              {schedule && (
-                <ScheduleGrid
-                  schedule={schedule}
-                  categoryId={activeCategoryId}
-                  onMatchClick={handlePreviewMatchClick}
-                />
-              )}
             </div>
             <div className="hidden doubles-print-area doubles-print-all">
               {categories.map((category) => {
@@ -605,7 +615,7 @@ export default function DoublesEventManagePage() {
           }
 
           @page doubles-mobile-zones {
-            size: A4 portrait;
+            size: A4 landscape;
             margin: 8mm;
           }
 
@@ -668,10 +678,15 @@ export default function DoublesEventManagePage() {
 
           .print-mode-mobile-zones .doubles-print-mobile-zones {
             page: doubles-mobile-zones !important;
-            max-width: 108mm !important;
-            left: 50% !important;
-            transform: translateX(-50%) !important;
+            max-width: none !important;
+            width: 100% !important;
+            left: 0 !important;
+            transform: none !important;
             font-family: Arial, sans-serif !important;
+          }
+
+          .doubles-preview-tab {
+            display: block !important;
           }
 
           .doubles-print-hidden {
