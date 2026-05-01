@@ -9,6 +9,16 @@ interface ScheduleGridProps {
   categoryId?: number;
 }
 
+function formatScoreFromWinnerPerspective(match: ScheduleMatch): string {
+  if (!match.score) return "";
+
+  if (match.winnerTeamNumber !== 2) {
+    return match.score;
+  }
+
+  return match.score.replace(/\b(\d+)-(\d+)\b/g, "$2-$1");
+}
+
 export function ScheduleGrid({ schedule, onMatchClick, categoryId }: ScheduleGridProps) {
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -334,6 +344,7 @@ function DayTable({
                       <div className="space-y-1">
                         {slotMatches.map((match) => {
                           const hasWinner = !!match.winnerTeamNumber;
+                          const winnerScore = formatScoreFromWinnerPerspective(match);
                           const matchContent = (
                             <div className={`space-y-0.5 ${isClickable ? "relative min-h-[78px] sm:min-h-[86px]" : ""}`}>
                               {isClickable && (
@@ -352,8 +363,8 @@ function DayTable({
                                       : "text-gray-400"
                                   }`}>
                                     <TeamName name={match.team1Name} />
-                                    {match.winnerTeamNumber === 1 && match.score && (
-                                      <span className="ml-1 text-[9px] sm:text-[10px]">{match.score}</span>
+                                    {match.winnerTeamNumber === 1 && winnerScore && (
+                                      <span className="ml-1 text-[9px] sm:text-[10px]">{winnerScore}</span>
                                     )}
                                   </div>
                                   <div className={`text-[10px] sm:text-[11px] leading-tight ${
@@ -362,8 +373,8 @@ function DayTable({
                                       : "text-gray-400"
                                   }`}>
                                     <TeamName name={match.team2Name} />
-                                    {match.winnerTeamNumber === 2 && match.score && (
-                                      <span className="ml-1 text-[9px] sm:text-[10px]">{match.score}</span>
+                                    {match.winnerTeamNumber === 2 && winnerScore && (
+                                      <span className="ml-1 text-[9px] sm:text-[10px]">{winnerScore}</span>
                                     )}
                                   </div>
                                 </>
