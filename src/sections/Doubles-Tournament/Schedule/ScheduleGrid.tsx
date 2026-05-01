@@ -343,7 +343,8 @@ function DayTable({
                     {slotMatches.length > 0 ? (
                       <div className="space-y-1">
                         {slotMatches.map((match) => {
-                          const hasWinner = !!match.winnerTeamNumber;
+                          const winnerTeamNumber = Number(match.winnerTeamNumber);
+                          const hasWinner = winnerTeamNumber === 1 || winnerTeamNumber === 2;
                           const winnerScore = formatScoreFromWinnerPerspective(match);
                           const matchContent = (
                             <div className={`space-y-0.5 ${isClickable ? "relative min-h-[78px] sm:min-h-[86px]" : ""}`}>
@@ -358,22 +359,22 @@ function DayTable({
                               {hasWinner ? (
                                 <>
                                   <div className={`text-[10px] sm:text-[11px] leading-tight ${
-                                    match.winnerTeamNumber === 1
+                                    winnerTeamNumber === 1
                                       ? "text-green-700 font-bold"
                                       : "text-gray-400"
                                   }`}>
                                     <TeamName name={match.team1Name} />
-                                    {match.winnerTeamNumber === 1 && winnerScore && (
+                                    {winnerTeamNumber === 1 && winnerScore && (
                                       <span className="ml-1 text-[9px] sm:text-[10px]">{winnerScore}</span>
                                     )}
                                   </div>
                                   <div className={`text-[10px] sm:text-[11px] leading-tight ${
-                                    match.winnerTeamNumber === 2
+                                    winnerTeamNumber === 2
                                       ? "text-green-700 font-bold"
                                       : "text-gray-400"
                                   }`}>
                                     <TeamName name={match.team2Name} />
-                                    {match.winnerTeamNumber === 2 && winnerScore && (
+                                    {winnerTeamNumber === 2 && winnerScore && (
                                       <span className="ml-1 text-[9px] sm:text-[10px]">{winnerScore}</span>
                                     )}
                                   </div>
