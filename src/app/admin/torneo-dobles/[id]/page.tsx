@@ -528,7 +528,8 @@ export default function DoublesEventManagePage() {
                     ),
                   })),
                   mobileStandingsPerPage,
-                  mobileMatchesPerPage
+                  mobileMatchesPerPage,
+                  printMode === "mobile-zones-portrait" ? 24 : 18
                 );
 
                 return printableZonePages.map((page, pageIndex) => (
@@ -1329,9 +1330,9 @@ type MobileZonePrintBlock = MobileZonePrintSource & {
 function buildMobileZonePages(
   zones: MobileZonePrintSource[],
   standingsPerPage: number,
-  matchesPerPage: number
+  matchesPerPage: number,
+  maxPageUnits: number
 ) {
-  const maxPageUnits = 18;
   const pages: { zones: MobileZonePrintBlock[] }[] = [];
   let currentPage: { zones: MobileZonePrintBlock[]; units: number } = {
     zones: [],
@@ -1359,7 +1360,7 @@ function buildMobileZonePages(
         matches: zonePage.matches,
         pageNumber: zonePage.pageNumber,
       };
-      const blockUnits = 4 + block.standings.length + block.matches.length * 2;
+      const blockUnits = 6 + block.standings.length + block.matches.length;
 
       if (
         currentPage.zones.length > 0 &&
