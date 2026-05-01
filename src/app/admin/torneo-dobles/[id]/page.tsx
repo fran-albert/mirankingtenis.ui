@@ -84,7 +84,7 @@ export default function DoublesEventManagePage() {
     match: null,
   });
   const [printMode, setPrintMode] = useState<
-    "current" | "all" | "full" | "sheets" | "mobile-zones"
+    "current" | "all" | "full" | "sheets" | "mobile-zones" | "mobile-zones-portrait"
   >("current");
   const mutations = useDoublesEventMutations();
 
@@ -154,7 +154,9 @@ export default function DoublesEventManagePage() {
     openEditMatchDialog(selectedMatch);
   };
 
-  const handlePrint = (mode: "current" | "all" | "full" | "sheets" | "mobile-zones") => {
+  const handlePrint = (
+    mode: "current" | "all" | "full" | "sheets" | "mobile-zones" | "mobile-zones-portrait"
+  ) => {
     setPrintMode(mode);
     window.setTimeout(() => window.print(), 0);
   };
@@ -328,6 +330,16 @@ export default function DoublesEventManagePage() {
                 >
                   <Printer className="h-4 w-4 mr-2" />
                   PDF zonas y posiciones
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePrint("mobile-zones-portrait")}
+                  className="w-full sm:w-auto"
+                >
+                  <Printer className="h-4 w-4 mr-2" />
+                  PDF zonas mobile vertical
                 </Button>
               </div>
             </div>
@@ -621,6 +633,11 @@ export default function DoublesEventManagePage() {
             margin: 8mm;
           }
 
+          @page doubles-mobile-zones-portrait {
+            size: A4 portrait;
+            margin: 8mm;
+          }
+
           html,
           body {
             width: 297mm;
@@ -651,22 +668,30 @@ export default function DoublesEventManagePage() {
           .print-mode-current .doubles-print-full,
           .print-mode-current .doubles-print-sheets,
           .print-mode-current .doubles-print-mobile-zones,
+          .print-mode-current .doubles-print-mobile-zones-portrait,
           .print-mode-all .doubles-print-current,
           .print-mode-all .doubles-print-full,
           .print-mode-all .doubles-print-sheets,
           .print-mode-all .doubles-print-mobile-zones,
+          .print-mode-all .doubles-print-mobile-zones-portrait,
           .print-mode-full .doubles-print-current,
           .print-mode-full .doubles-print-all,
           .print-mode-full .doubles-print-sheets,
           .print-mode-full .doubles-print-mobile-zones,
+          .print-mode-full .doubles-print-mobile-zones-portrait,
           .print-mode-sheets .doubles-print-current,
           .print-mode-sheets .doubles-print-all,
           .print-mode-sheets .doubles-print-full,
           .print-mode-sheets .doubles-print-mobile-zones,
+          .print-mode-sheets .doubles-print-mobile-zones-portrait,
           .print-mode-mobile-zones .doubles-print-current,
           .print-mode-mobile-zones .doubles-print-all,
           .print-mode-mobile-zones .doubles-print-full,
-          .print-mode-mobile-zones .doubles-print-sheets {
+          .print-mode-mobile-zones .doubles-print-sheets,
+          .print-mode-mobile-zones-portrait .doubles-print-current,
+          .print-mode-mobile-zones-portrait .doubles-print-all,
+          .print-mode-mobile-zones-portrait .doubles-print-full,
+          .print-mode-mobile-zones-portrait .doubles-print-sheets {
             display: none !important;
             visibility: hidden !important;
           }
@@ -674,6 +699,7 @@ export default function DoublesEventManagePage() {
           .print-mode-all .doubles-print-all,
           .print-mode-full .doubles-print-full,
           .print-mode-sheets .doubles-print-sheets,
+          .print-mode-mobile-zones-portrait .doubles-print-mobile-zones,
           .print-mode-mobile-zones .doubles-print-mobile-zones {
             display: block !important;
           }
@@ -684,6 +710,15 @@ export default function DoublesEventManagePage() {
             width: 100% !important;
             left: 0 !important;
             transform: none !important;
+            font-family: Arial, sans-serif !important;
+          }
+
+          .print-mode-mobile-zones-portrait .doubles-print-mobile-zones {
+            page: doubles-mobile-zones-portrait !important;
+            max-width: 108mm !important;
+            width: 108mm !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
             font-family: Arial, sans-serif !important;
           }
 
