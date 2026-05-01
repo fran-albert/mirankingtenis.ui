@@ -82,7 +82,9 @@ export default function DoublesEventManagePage() {
     phase: DoublesMatchPhase.zone,
     match: null,
   });
-  const [printMode, setPrintMode] = useState<"current" | "all" | "full" | "sheets">("current");
+  const [printMode, setPrintMode] = useState<
+    "current" | "all" | "full" | "sheets" | "mobile-zones"
+  >("current");
   const mutations = useDoublesEventMutations();
 
   const activeCategoryId = selectedCategoryId || categories[0]?.id || 0;
@@ -147,7 +149,7 @@ export default function DoublesEventManagePage() {
     openEditMatchDialog(selectedMatch);
   };
 
-  const handlePrint = (mode: "current" | "all" | "full" | "sheets") => {
+  const handlePrint = (mode: "current" | "all" | "full" | "sheets" | "mobile-zones") => {
     setPrintMode(mode);
     window.setTimeout(() => window.print(), 0);
   };
@@ -293,6 +295,16 @@ export default function DoublesEventManagePage() {
                 >
                   <Printer className="h-4 w-4 mr-2" />
                   Planillas por categoría
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePrint("mobile-zones")}
+                  className="w-full sm:w-auto"
+                >
+                  <Printer className="h-4 w-4 mr-2" />
+                  PDF mobile zonas
                 </Button>
               </div>
               {schedule && (
@@ -455,6 +467,94 @@ export default function DoublesEventManagePage() {
                 );
               })}
             </div>
+            <div className="hidden doubles-print-area doubles-print-mobile-zones">
+              {categories.map((category) => {
+                const categoryStandings =
+                  allStandings.find((item) => item.categoryId === category.id)?.zones || [];
+                const categoryMatches = eventMatches
+                  .filter((match) => match.categoryId === category.id)
+                  .filter((match) => match.phase === DoublesMatchPhase.zone)
+                  .sort((a, b) => {
+                    const zoneCompare = (a.zoneName || "").localeCompare(b.zoneName || "");
+                    if (zoneCompare !== 0) return zoneCompare;
+                    return a.id - b.id;
+                  });
+
+                return (
+                  <section key={`mobile-zone-${category.id}`} className="doubles-mobile-page">
+                    <div className="doubles-mobile-header">
+                      <div className="doubles-mobile-event">{event.name}</div>
+                      <div className="doubles-mobile-category">{category.name}</div>
+                    </div>
+
+                    {categoryStandings.map((zone) => {
+                      const zoneMatches = categoryMatches.filter(
+                        (match) => (match.zoneName || "Sin zona") === zone.zoneName
+                      );
+
+                      return (
+                        <div key={`mobile-zone-${category.id}-${zone.zoneName}`} className="doubles-mobile-zone">
+                          <h3>{zone.zoneName}</h3>
+                          <div className="doubles-mobile-standing-card">
+                            <div className="doubles-mobile-standing-head">
+                              <span>Pos</span>
+                              <span>Equipo</span>
+                              <span>PJ</span>
+                              <span>PG</span>
+                              <span>Sets</span>
+                            </div>
+                            {zone.standings.map((standing) => (
+                              <div key={standing.team.id} className="doubles-mobile-standing-row">
+                                <span>{standing.position}</span>
+                                <span>{standing.team.teamName}</span>
+                                <span>{standing.played}</span>
+                                <span>{standing.won}</span>
+                                <span>{standing.setsWon}-{standing.setsLost}</span>
+                              </div>
+                            ))}
+                          </div>
+
+                          <div className="doubles-mobile-match-list">
+                            {zoneMatches.length > 0 ? (
+                              zoneMatches.map((match) => (
+                                <div key={match.id} className="doubles-mobile-match-card">
+                                  <div className="doubles-mobile-match-meta">
+                                    <span>{formatPrintMatchDate(match, eventDays)}</span>
+                                    <span>{formatPrintMatchTime(match)}</span>
+                                    <span>{formatPrintMatchCourt(match)}</span>
+                                    <span>{formatPrintMatchTurn(match)}</span>
+                                  </div>
+                                  <div className="doubles-mobile-score-grid">
+                                    <div />
+                                    <div>S1</div>
+                                    <div>S2</div>
+                                    <div>STB</div>
+                                    <div className={match.winnerId === match.team1?.id ? "winner" : ""}>
+                                      {match.team1?.teamName || ""}
+                                    </div>
+                                    <div>{getPrintSetScore(match, 1, 1)}</div>
+                                    <div>{getPrintSetScore(match, 2, 1)}</div>
+                                    <div>{getPrintSetScore(match, 3, 1)}</div>
+                                    <div className={match.winnerId === match.team2?.id ? "winner" : ""}>
+                                      {match.team2?.teamName || "BYE"}
+                                    </div>
+                                    <div>{getPrintSetScore(match, 1, 2)}</div>
+                                    <div>{getPrintSetScore(match, 2, 2)}</div>
+                                    <div>{getPrintSetScore(match, 3, 2)}</div>
+                                  </div>
+                                </div>
+                              ))
+                            ) : (
+                              <div className="doubles-mobile-empty">No hay partidos en esta zona</div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </section>
+                );
+              })}
+            </div>
             <div className="doubles-print-hidden">
               <h3 className="text-lg font-semibold mb-4">Posiciones</h3>
               {standings.map((zone) => (
@@ -498,6 +598,11 @@ export default function DoublesEventManagePage() {
             margin: 7mm;
           }
 
+          @page doubles-mobile-zones {
+            size: A4 portrait;
+            margin: 8mm;
+          }
+
           html,
           body {
             width: 297mm;
@@ -527,23 +632,40 @@ export default function DoublesEventManagePage() {
           .print-mode-current .doubles-print-all,
           .print-mode-current .doubles-print-full,
           .print-mode-current .doubles-print-sheets,
+          .print-mode-current .doubles-print-mobile-zones,
           .print-mode-all .doubles-print-current,
           .print-mode-all .doubles-print-full,
           .print-mode-all .doubles-print-sheets,
+          .print-mode-all .doubles-print-mobile-zones,
           .print-mode-full .doubles-print-current,
           .print-mode-full .doubles-print-all,
           .print-mode-full .doubles-print-sheets,
+          .print-mode-full .doubles-print-mobile-zones,
           .print-mode-sheets .doubles-print-current,
           .print-mode-sheets .doubles-print-all,
-          .print-mode-sheets .doubles-print-full {
+          .print-mode-sheets .doubles-print-full,
+          .print-mode-sheets .doubles-print-mobile-zones,
+          .print-mode-mobile-zones .doubles-print-current,
+          .print-mode-mobile-zones .doubles-print-all,
+          .print-mode-mobile-zones .doubles-print-full,
+          .print-mode-mobile-zones .doubles-print-sheets {
             display: none !important;
             visibility: hidden !important;
           }
 
           .print-mode-all .doubles-print-all,
           .print-mode-full .doubles-print-full,
-          .print-mode-sheets .doubles-print-sheets {
+          .print-mode-sheets .doubles-print-sheets,
+          .print-mode-mobile-zones .doubles-print-mobile-zones {
             display: block !important;
+          }
+
+          .print-mode-mobile-zones .doubles-print-mobile-zones {
+            page: doubles-mobile-zones !important;
+            max-width: 108mm !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            font-family: Arial, sans-serif !important;
           }
 
           .doubles-print-hidden {
@@ -724,6 +846,185 @@ export default function DoublesEventManagePage() {
             color: #4b5563 !important;
           }
 
+          .doubles-mobile-page {
+            display: block !important;
+            break-after: page !important;
+            page-break-after: always !important;
+            background: #f8fafc !important;
+            color: #0f172a !important;
+            padding: 4mm !important;
+          }
+
+          .doubles-mobile-page:last-child {
+            break-after: auto !important;
+            page-break-after: auto !important;
+          }
+
+          .doubles-mobile-header {
+            text-align: center !important;
+            margin-bottom: 4mm !important;
+            padding-bottom: 3mm !important;
+            border-bottom: 0.3mm solid #cbd5e1 !important;
+          }
+
+          .doubles-mobile-event {
+            font-size: 13pt !important;
+            font-weight: 800 !important;
+          }
+
+          .doubles-mobile-category {
+            margin-top: 1mm !important;
+            font-size: 9pt !important;
+            font-weight: 700 !important;
+            color: #475569 !important;
+          }
+
+          .doubles-mobile-zone {
+            margin-bottom: 5mm !important;
+            break-inside: avoid !important;
+            page-break-inside: avoid !important;
+          }
+
+          .doubles-mobile-zone h3 {
+            margin: 0 0 2mm !important;
+            font-size: 10.5pt !important;
+            font-weight: 800 !important;
+          }
+
+          .doubles-mobile-standing-card,
+          .doubles-mobile-match-card {
+            overflow: hidden !important;
+            border: 0.25mm solid #cbd5e1 !important;
+            border-radius: 2.4mm !important;
+            background: #ffffff !important;
+            box-shadow: none !important;
+          }
+
+          .doubles-mobile-standing-card {
+            margin-bottom: 3mm !important;
+          }
+
+          .doubles-mobile-standing-head,
+          .doubles-mobile-standing-row {
+            display: grid !important;
+            grid-template-columns: 9mm 1fr 9mm 9mm 16mm !important;
+            align-items: center !important;
+            gap: 0 !important;
+          }
+
+          .doubles-mobile-standing-head {
+            min-height: 6mm !important;
+            background: #e2e8f0 !important;
+            color: #334155 !important;
+            font-size: 6.6pt !important;
+            font-weight: 800 !important;
+            text-transform: uppercase !important;
+          }
+
+          .doubles-mobile-standing-row {
+            min-height: 8mm !important;
+            border-top: 0.25mm solid #e2e8f0 !important;
+            font-size: 7.2pt !important;
+          }
+
+          .doubles-mobile-standing-head span,
+          .doubles-mobile-standing-row span {
+            padding: 1.2mm !important;
+            min-width: 0 !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+            white-space: nowrap !important;
+          }
+
+          .doubles-mobile-standing-head span:not(:nth-child(2)),
+          .doubles-mobile-standing-row span:not(:nth-child(2)) {
+            text-align: center !important;
+          }
+
+          .doubles-mobile-standing-row span:first-child,
+          .doubles-mobile-standing-row span:nth-child(4) {
+            font-weight: 800 !important;
+          }
+
+          .doubles-mobile-match-list {
+            display: grid !important;
+            gap: 2mm !important;
+          }
+
+          .doubles-mobile-match-card {
+            break-inside: avoid !important;
+            page-break-inside: avoid !important;
+          }
+
+          .doubles-mobile-match-meta {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr 1.5fr 1fr !important;
+            background: #f1f5f9 !important;
+            border-bottom: 0.25mm solid #cbd5e1 !important;
+            color: #334155 !important;
+            font-size: 6.5pt !important;
+            font-weight: 800 !important;
+          }
+
+          .doubles-mobile-match-meta span {
+            min-width: 0 !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+            white-space: nowrap !important;
+            padding: 1.2mm !important;
+            border-right: 0.25mm solid #cbd5e1 !important;
+          }
+
+          .doubles-mobile-match-meta span:last-child {
+            border-right: 0 !important;
+          }
+
+          .doubles-mobile-score-grid {
+            display: grid !important;
+            grid-template-columns: 1fr 9mm 9mm 10mm !important;
+            font-size: 7.1pt !important;
+          }
+
+          .doubles-mobile-score-grid > div {
+            min-height: 7.2mm !important;
+            padding: 1.2mm !important;
+            border-right: 0.25mm solid #e2e8f0 !important;
+            border-top: 0.25mm solid #e2e8f0 !important;
+            text-align: center !important;
+          }
+
+          .doubles-mobile-score-grid > div:nth-child(-n + 4) {
+            min-height: 5.5mm !important;
+            background: #f8fafc !important;
+            color: #64748b !important;
+            font-size: 6.2pt !important;
+            font-weight: 800 !important;
+            border-top: 0 !important;
+          }
+
+          .doubles-mobile-score-grid > div:nth-child(4n + 1) {
+            text-align: left !important;
+            font-weight: 700 !important;
+          }
+
+          .doubles-mobile-score-grid > div:nth-child(4n) {
+            border-right: 0 !important;
+          }
+
+          .doubles-mobile-score-grid .winner {
+            font-weight: 900 !important;
+          }
+
+          .doubles-mobile-empty {
+            border: 0.25mm solid #cbd5e1 !important;
+            border-radius: 2.4mm !important;
+            background: #ffffff !important;
+            padding: 3mm !important;
+            font-size: 7pt !important;
+            color: #64748b !important;
+            text-align: center !important;
+          }
+
           .doubles-print-standings {
             break-inside: avoid !important;
             page-break-inside: avoid !important;
@@ -886,6 +1187,14 @@ function formatPrintMatchTurn(match: DoublesMatch) {
   if (!turnNumber) return "";
 
   return `T${turnNumber}${isMixed ? " - Mixto" : ""}`;
+}
+
+function getPrintSetScore(match: DoublesMatch, setNumber: number, teamNumber: 1 | 2) {
+  const set = match.sets?.find((item) => item.setNumber === setNumber);
+
+  if (!set) return "";
+
+  return teamNumber === 1 ? set.team1Score : set.team2Score;
 }
 
 function formatTurnOption(
