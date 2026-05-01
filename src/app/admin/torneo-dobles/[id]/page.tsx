@@ -544,30 +544,11 @@ export default function DoublesEventManagePage() {
                             {zonePage.matches.length > 0 ? (
                               zonePage.matches.map((match) => (
                                 <div key={match.id} className="doubles-mobile-match-card">
-                                  <div className="doubles-mobile-match-meta">
-                                    <span>{formatPrintMatchDate(match, eventDays)}</span>
-                                    <span>{formatPrintMatchTime(match)}</span>
-                                    <span>{formatPrintMatchCourt(match)}</span>
-                                    <span>{formatPrintMatchTurn(match)}</span>
-                                  </div>
-                                  <div className="doubles-mobile-score-grid">
-                                    <div />
-                                    <div>S1</div>
-                                    <div>S2</div>
-                                    <div>STB</div>
-                                    <div className={match.winnerId === match.team1?.id ? "winner" : ""}>
-                                      {match.team1?.teamName || ""}
-                                    </div>
-                                    <div>{getPrintSetScore(match, 1, 1)}</div>
-                                    <div>{getPrintSetScore(match, 2, 1)}</div>
-                                    <div>{getPrintSetScore(match, 3, 1)}</div>
-                                    <div className={match.winnerId === match.team2?.id ? "winner" : ""}>
-                                      {match.team2?.teamName || "BYE"}
-                                    </div>
-                                    <div>{getPrintSetScore(match, 1, 2)}</div>
-                                    <div>{getPrintSetScore(match, 2, 2)}</div>
-                                    <div>{getPrintSetScore(match, 3, 2)}</div>
-                                  </div>
+                                  <span>{match.team1?.teamName || ""}</span>
+                                  <span className="doubles-mobile-match-pill">
+                                    {formatMobileMatchAssignment(match)}
+                                  </span>
+                                  <span>{match.team2?.teamName || "BYE"}</span>
                                 </div>
                               ))
                             ) : (
@@ -886,7 +867,7 @@ export default function DoublesEventManagePage() {
             page-break-after: always !important;
             background: #f8fafc !important;
             color: #0f172a !important;
-            padding: 4mm !important;
+            padding: 3mm !important;
           }
 
           .doubles-mobile-page:last-child {
@@ -896,15 +877,15 @@ export default function DoublesEventManagePage() {
 
           .doubles-mobile-header {
             text-align: center !important;
-            margin-bottom: 4mm !important;
-            padding-bottom: 3mm !important;
+            margin-bottom: 3mm !important;
+            padding-bottom: 2mm !important;
             border-bottom: 0.3mm solid #cbd5e1 !important;
           }
 
           .doubles-mobile-logo {
             display: block !important;
             width: auto !important;
-            height: 22mm !important;
+            height: 18mm !important;
             margin: 0 auto 1.5mm !important;
             object-fit: contain !important;
           }
@@ -922,7 +903,7 @@ export default function DoublesEventManagePage() {
           }
 
           .doubles-mobile-zone {
-            margin-bottom: 5mm !important;
+            margin-bottom: 3mm !important;
             break-inside: avoid !important;
             page-break-inside: avoid !important;
           }
@@ -964,7 +945,7 @@ export default function DoublesEventManagePage() {
           }
 
           .doubles-mobile-standing-row {
-            min-height: 8mm !important;
+            min-height: 7mm !important;
             border-top: 0.25mm solid #e2e8f0 !important;
             font-size: 7.2pt !important;
           }
@@ -994,67 +975,43 @@ export default function DoublesEventManagePage() {
           }
 
           .doubles-mobile-match-card {
+            display: grid !important;
+            grid-template-columns: 1fr 34mm 1fr !important;
+            align-items: center !important;
+            gap: 1.5mm !important;
+            min-height: 8.5mm !important;
+            padding: 1.4mm !important;
             break-inside: avoid !important;
             page-break-inside: avoid !important;
+            font-size: 6.8pt !important;
+            font-weight: 700 !important;
           }
 
-          .doubles-mobile-match-meta {
-            display: grid !important;
-            grid-template-columns: 1fr 1fr 1.5fr 1fr !important;
-            background: #f1f5f9 !important;
-            border-bottom: 0.25mm solid #cbd5e1 !important;
-            color: #334155 !important;
-            font-size: 6.5pt !important;
-            font-weight: 800 !important;
-          }
-
-          .doubles-mobile-match-meta span {
+          .doubles-mobile-match-card > span {
             min-width: 0 !important;
             overflow: hidden !important;
             text-overflow: ellipsis !important;
             white-space: nowrap !important;
-            padding: 1.2mm !important;
-            border-right: 0.25mm solid #cbd5e1 !important;
           }
 
-          .doubles-mobile-match-meta span:last-child {
-            border-right: 0 !important;
+          .doubles-mobile-match-card > span:last-child {
+            text-align: right !important;
           }
 
-          .doubles-mobile-score-grid {
-            display: grid !important;
-            grid-template-columns: 1fr 9mm 9mm 10mm !important;
-            font-size: 7.1pt !important;
-          }
-
-          .doubles-mobile-score-grid > div {
-            min-height: 7.2mm !important;
-            padding: 1.2mm !important;
-            border-right: 0.25mm solid #e2e8f0 !important;
-            border-top: 0.25mm solid #e2e8f0 !important;
-            text-align: center !important;
-          }
-
-          .doubles-mobile-score-grid > div:nth-child(-n + 4) {
-            min-height: 5.5mm !important;
+          .doubles-mobile-match-pill {
+            display: block !important;
+            min-width: 0 !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+            white-space: nowrap !important;
+            padding: 1.2mm 1.5mm !important;
+            border: 0.25mm solid #cbd5e1 !important;
+            border-radius: 1.6mm !important;
             background: #f8fafc !important;
-            color: #64748b !important;
-            font-size: 6.2pt !important;
+            color: #111827 !important;
+            text-align: center !important;
             font-weight: 800 !important;
-            border-top: 0 !important;
-          }
-
-          .doubles-mobile-score-grid > div:nth-child(4n + 1) {
-            text-align: left !important;
-            font-weight: 700 !important;
-          }
-
-          .doubles-mobile-score-grid > div:nth-child(4n) {
-            border-right: 0 !important;
-          }
-
-          .doubles-mobile-score-grid .winner {
-            font-weight: 900 !important;
+            font-size: 6.8pt !important;
           }
 
           .doubles-mobile-empty {
@@ -1229,6 +1186,23 @@ function formatPrintMatchTurn(match: DoublesMatch) {
   if (!turnNumber) return "";
 
   return `T${turnNumber}${isMixed ? " - Mixto" : ""}`;
+}
+
+function formatMobileMatchAssignment(match: DoublesMatch) {
+  return [
+    formatPrintMatchTime(match),
+    match.courtName || match.turn?.courtName || "",
+    formatCompactVenue(match.venue || match.turn?.venue || ""),
+    formatPrintMatchTurn(match),
+  ]
+    .filter(Boolean)
+    .join(" ");
+}
+
+function formatCompactVenue(venue: string) {
+  if (venue.toUpperCase().includes("VILLA")) return "LA VILLA";
+  if (venue.toUpperCase().includes("FIRMAT")) return "FIRMAT";
+  return venue;
 }
 
 function getPrintSetScore(match: DoublesMatch, setNumber: number, teamNumber: 1 | 2) {
