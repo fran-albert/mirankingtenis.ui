@@ -715,11 +715,50 @@ export default function DoublesEventManagePage() {
 
           .print-mode-mobile-zones-portrait .doubles-print-mobile-zones {
             page: doubles-mobile-zones-portrait !important;
-            max-width: 108mm !important;
-            width: 108mm !important;
-            left: 50% !important;
-            transform: translateX(-50%) !important;
+            max-width: none !important;
+            width: 100% !important;
+            left: 0 !important;
+            transform: none !important;
             font-family: Arial, sans-serif !important;
+          }
+
+          .print-mode-mobile-zones-portrait .doubles-mobile-page {
+            padding: 3mm 0 !important;
+          }
+
+          .print-mode-mobile-zones-portrait .doubles-mobile-logo {
+            height: 21mm !important;
+          }
+
+          .print-mode-mobile-zones-portrait .doubles-mobile-event {
+            font-size: 15pt !important;
+          }
+
+          .print-mode-mobile-zones-portrait .doubles-mobile-category {
+            font-size: 10.5pt !important;
+          }
+
+          .print-mode-mobile-zones-portrait .doubles-mobile-zone h3 {
+            font-size: 12pt !important;
+          }
+
+          .print-mode-mobile-zones-portrait .doubles-mobile-standing-head {
+            font-size: 8pt !important;
+          }
+
+          .print-mode-mobile-zones-portrait .doubles-mobile-standing-row {
+            min-height: 8.5mm !important;
+            font-size: 8.4pt !important;
+          }
+
+          .print-mode-mobile-zones-portrait .doubles-mobile-match-card {
+            grid-template-columns: 1fr 44mm 1fr !important;
+            min-height: 10mm !important;
+            font-size: 8.2pt !important;
+          }
+
+          .print-mode-mobile-zones-portrait .doubles-mobile-match-pill {
+            font-size: 8.2pt !important;
           }
 
           .doubles-preview-tab {
