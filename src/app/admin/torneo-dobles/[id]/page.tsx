@@ -111,7 +111,7 @@ export default function DoublesEventManagePage() {
   const sheetStandingsPerPage = 6;
   const sheetMatchesPerPage = 4;
   const mobileStandingsPerPage = 6;
-  const mobileMatchesPerPage = 5;
+  const mobileMatchesPerPage = 10;
 
   const closeMatchDialog = () => {
     setMatchDialog({
@@ -1019,10 +1019,10 @@ export default function DoublesEventManagePage() {
             overflow: hidden !important;
             text-overflow: ellipsis !important;
             white-space: nowrap !important;
-            padding: 1.2mm 1.5mm !important;
-            border: 0.25mm solid #cbd5e1 !important;
-            border-radius: 1.6mm !important;
-            background: #f8fafc !important;
+            padding: 0 !important;
+            border: 0 !important;
+            border-radius: 0 !important;
+            background: transparent !important;
             color: #111827 !important;
             text-align: center !important;
             font-weight: 800 !important;
