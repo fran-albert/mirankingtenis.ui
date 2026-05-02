@@ -41,7 +41,7 @@ export function PlayoffMatchCard({ match }: PlayoffMatchCardProps) {
             isTeam1Winner ? "bg-green-50 font-bold" : ""
           }`}
         >
-          <span><TeamName name={match.team1?.teamName || "TBD"} /></span>
+          <span><TeamName name={match.team1?.teamName || "Por definir"} /></span>
           {isTeam1Winner && <Badge className="text-[9px] px-1 py-0 leading-tight shrink-0">G</Badge>}
         </div>
         {sets.map((s) => (
@@ -67,7 +67,7 @@ export function PlayoffMatchCard({ match }: PlayoffMatchCardProps) {
               {isTeam2Winner && <Badge className="text-[9px] px-1 py-0 leading-tight shrink-0">G</Badge>}
             </>
           ) : (
-            <span className="text-gray-400 italic">BYE</span>
+            <span className="text-gray-400 italic">Libre</span>
           )}
         </div>
         {sets.map((s) => (

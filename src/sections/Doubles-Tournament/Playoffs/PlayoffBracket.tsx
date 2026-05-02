@@ -1,7 +1,7 @@
 "use client";
 import React, { useMemo } from "react";
 import { DoublesMatch } from "@/types/Doubles-Event/DoublesEvent";
-import { DOUBLES_PLAYOFF_ROUNDS } from "@/common/constants/doubles-event.constants";
+import { DOUBLES_PLAYOFF_ROUNDS, getPlayoffRoundLabel } from "@/common/constants/doubles-event.constants";
 import { PlayoffMatchCard } from "./PlayoffMatchCard";
 
 interface PlayoffBracketProps {
@@ -45,7 +45,7 @@ export function PlayoffBracket({ matches }: PlayoffBracketProps) {
       {roundGroups.map(([round, roundMatches]) => (
         <div key={round} className="flex flex-col gap-3 sm:gap-4 min-w-[180px] sm:min-w-[240px]">
           <h4 className="text-xs sm:text-sm font-bold text-center text-gray-600 uppercase">
-            {round}
+            {getPlayoffRoundLabel(round) || "Sin ronda"}
           </h4>
           <div className="flex flex-col gap-3 sm:gap-4 justify-around flex-1">
             {roundMatches.map((match) => (
