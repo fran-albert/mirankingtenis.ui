@@ -67,9 +67,9 @@ export default function ClientDoublesTournamentComponent({
         <div className="max-w-7xl mx-auto px-3 sm:px-4 py-5 sm:py-8">
           <div className="mb-3 flex justify-center sm:mb-4">
             <Image
-              src="/firmat-open-2.png"
-              alt="Firmat Open 2"
-              width={320}
+              src="/firmat-open-3.png"
+              alt="Firmat Open 3"
+              width={480}
               height={480}
               priority
               className="h-40 w-auto sm:h-52"
