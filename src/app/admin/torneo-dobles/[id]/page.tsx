@@ -516,7 +516,7 @@ export default function DoublesEventManagePage() {
                   .sort((a, b) => {
                     const zoneCompare = (a.zoneName || "").localeCompare(b.zoneName || "");
                     if (zoneCompare !== 0) return zoneCompare;
-                    return a.id - b.id;
+                    return compareMatchesBySchedule(a, b);
                   });
 
                 const printableZonePages = buildMobileZonePages(
@@ -571,7 +571,7 @@ export default function DoublesEventManagePage() {
                                 <div key={match.id} className="doubles-mobile-match-card">
                                   <span>{match.team1?.teamName || ""}</span>
                                   <span className="doubles-mobile-match-pill">
-                                    {formatMobileMatchAssignment(match)}
+                                    {formatMobileMatchAssignment(match, eventDays)}
                                   </span>
                                   <span>{match.team2?.teamName || "BYE"}</span>
                                 </div>
@@ -743,7 +743,7 @@ export default function DoublesEventManagePage() {
           }
 
           .print-mode-mobile-zones-portrait .doubles-mobile-match-card {
-            grid-template-columns: 1fr 44mm 1fr !important;
+            grid-template-columns: 1fr 48mm 1fr !important;
             min-height: 10mm !important;
             font-size: 8.2pt !important;
           }
@@ -1250,6 +1250,36 @@ function formatPrintMatchDate(
   return `${dd}/${mm}`;
 }
 
+function formatMobileMatchDay(
+  match: DoublesMatch,
+  eventDays: { date: string; label: string }[]
+) {
+  const startTime = getMatchStartTime(match);
+  const dayLabel = getEventDayLabel(eventDays, startTime);
+
+  if (dayLabel) return dayLabel.split(" ")[0].slice(0, 3).toUpperCase();
+  if (!startTime) return "";
+
+  const { dd, mm } = getArgentinaDateParts(startTime);
+  return `${dd}/${mm}`;
+}
+
+function compareMatchesBySchedule(a: DoublesMatch, b: DoublesMatch) {
+  const aTime = getMatchStartTime(a);
+  const bTime = getMatchStartTime(b);
+
+  if (aTime && bTime) {
+    const diff = new Date(aTime).getTime() - new Date(bTime).getTime();
+    if (diff !== 0) return diff;
+  } else if (aTime) {
+    return -1;
+  } else if (bTime) {
+    return 1;
+  }
+
+  return a.id - b.id;
+}
+
 function formatPrintMatchTime(match: DoublesMatch) {
   return getArgentinaTimeValue(getMatchStartTime(match));
 }
@@ -1270,8 +1300,12 @@ function formatPrintMatchTurn(match: DoublesMatch) {
   return `T${turnNumber}${isMixed ? " - Mixto" : ""}`;
 }
 
-function formatMobileMatchAssignment(match: DoublesMatch) {
+function formatMobileMatchAssignment(
+  match: DoublesMatch,
+  eventDays: { date: string; label: string }[]
+) {
   return [
+    formatMobileMatchDay(match, eventDays),
     formatPrintMatchTime(match),
     match.courtName || match.turn?.courtName || "",
     formatCompactVenue(match.venue || match.turn?.venue || ""),
