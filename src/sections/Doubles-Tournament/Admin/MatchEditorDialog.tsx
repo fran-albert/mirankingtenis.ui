@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/select";
 import { DoublesMatchPhase, DoublesMatchStatus } from "@/common/enum/doubles-event.enum";
 import {
-  DOUBLES_PLAYOFF_ROUNDS,
+  DOUBLES_PLAYOFF_ROUND_OPTIONS,
   DOUBLES_VENUES,
   DOUBLES_ZONES,
   getEventDays,
@@ -618,7 +618,7 @@ export function MatchEditorDialog({
                     <SelectValue placeholder="Seleccionar ronda" />
                   </SelectTrigger>
                   <SelectContent>
-                    {DOUBLES_PLAYOFF_ROUNDS.map((round) => (
+                    {DOUBLES_PLAYOFF_ROUND_OPTIONS.map((round) => (
                       <SelectItem key={round.id} value={round.value}>
                         {round.label}
                       </SelectItem>
