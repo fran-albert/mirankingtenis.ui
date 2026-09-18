@@ -41,7 +41,7 @@ Hoy la config `production` tiene `migrationsRun: true` pero ninguna migración r
 
 Al crear y al editar, validadas sobre el estado resultante (partido actual + cambios):
 
-1. Las etiquetas solo se aceptan en fase `playoff`. En fase `zone` se exigen `team1Id` y `team2Id` como hoy.
+1. Las etiquetas solo se aceptan en fase `playoff`. En fase `zone` se sigue exigiendo `team1Id`, como hoy.
 2. El lado 1 necesita `team1Id` o `team1Label`.
 3. Un partido de llave con algún lado por definir necesita `round` y `positionInBracket`.
 4. Las etiquetas se recortan (`trim`), tienen como máximo 60 caracteres y una etiqueta vacía se trata como ausente.
@@ -92,7 +92,7 @@ Nuevo modo previa, activo al crear desde `Llaves previa` o al editar un partido 
 
 - `Equipo 1` y `Equipo 2` son inputs de texto (placeholder `Ej: 1° Zona 1`). Si un lado ya está resuelto, se muestra el nombre de la pareja, no editable.
 - Ronda y posición en el bracket obligatorias.
-- Turno, sede y cancha sin cambios.
+- Turno, sede y cancha opcionales: el cuadro se puede armar primero y programar después.
 - `Crear Partido` habilitado con las dos etiquetas (o lados resueltos), ronda y posición.
 
 Modo normal desde `Llaves`, sobre un partido con lados por definir:
