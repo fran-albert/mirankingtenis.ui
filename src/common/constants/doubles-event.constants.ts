@@ -53,13 +53,19 @@ export interface DoublesPlayoffRoundOption {
 }
 
 export const DOUBLES_PLAYOFF_ROUNDS: DoublesPlayoffRoundOption[] = [
-  { id: "roundOf32", value: "roundOf32", label: "32avos de Final" },
-  { id: "roundOf16", value: "roundOf16", label: "16avos de Final" },
+  { id: "roundOf32", value: "roundOf32", label: "16avos de Final" },
+  { id: "roundOf16", value: "roundOf16", label: "8vos de Final" },
   { id: "quarterFinals", value: "quarterFinals", label: "Cuartos de Final" },
   { id: "semiFinals", value: "semiFinals", label: "Semifinales" },
   { id: "final", value: "final", label: "Final" },
   { id: "thirdPlace", value: "thirdPlace", label: "3er Puesto" },
 ];
+
+const SELECTABLE_PLAYOFF_ROUNDS = ["roundOf16", "quarterFinals", "semiFinals", "final"];
+
+export const DOUBLES_PLAYOFF_ROUND_OPTIONS = DOUBLES_PLAYOFF_ROUNDS.filter((round) =>
+  SELECTABLE_PLAYOFF_ROUNDS.includes(round.value)
+);
 
 export function getPlayoffRoundLabel(round: string | null): string {
   if (!round) return "";
