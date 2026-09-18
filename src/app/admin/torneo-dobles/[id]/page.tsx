@@ -788,6 +788,30 @@ export default function DoublesEventManagePage() {
             page-break-after: auto !important;
           }
 
+          .doubles-print-all-days {
+            display: block !important;
+          }
+
+          .doubles-print-day {
+            break-after: page !important;
+            page-break-after: always !important;
+          }
+
+          .doubles-print-day:last-child {
+            break-after: auto !important;
+            page-break-after: auto !important;
+          }
+
+          .doubles-print-day-label {
+            display: block !important;
+            margin: 0 0 2mm 0 !important;
+            text-align: center !important;
+            font-size: 11pt !important;
+            font-weight: 800 !important;
+            text-transform: capitalize !important;
+            break-after: avoid !important;
+          }
+
           .doubles-print-section-title {
             display: block !important;
             margin: 3mm 0 1.5mm !important;

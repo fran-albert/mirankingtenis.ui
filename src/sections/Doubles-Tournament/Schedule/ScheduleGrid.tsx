@@ -181,12 +181,22 @@ function MultiDayGrid({
           </button>
         ))}
       </div>
-      <DayTable
-        courts={courts}
-        turns={currentDay.turns}
-        searchQuery={searchQuery}
-        onMatchClick={onMatchClick}
-      />
+      <div className="doubles-print-hidden">
+        <DayTable
+          courts={courts}
+          turns={currentDay.turns}
+          searchQuery={searchQuery}
+          onMatchClick={onMatchClick}
+        />
+      </div>
+      <div className="hidden doubles-print-all-days">
+        {days.map((day) => (
+          <div key={day.date} className="doubles-print-day">
+            <div className="doubles-print-day-label">{day.label}</div>
+            <DayTable courts={courts} turns={day.turns} searchQuery={searchQuery} />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
