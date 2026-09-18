@@ -1,3 +1,5 @@
+import type { DoublesMatch } from "@/types/Doubles-Event/DoublesEvent";
+
 export interface DoublesShift {
   turnNumber: number;
   label: string;
@@ -98,4 +100,21 @@ export function buildDateTime(eventDate: string, time: string): string {
   // Build ISO string directly with the time (treating as Argentina time, UTC-3)
   // We add the timezone offset to ensure it's interpreted correctly
   return `${dateOnly}T${time}:00.000-03:00`;
+}
+
+type MatchSides = Pick<DoublesMatch, "team1" | "team2" | "team1Label" | "team2Label">;
+
+export function isMatchSidePending(match: MatchSides, side: 1 | 2): boolean {
+  if (side === 1) return !match.team1;
+  return !match.team2 && !!match.team2Label;
+}
+
+export function hasPendingSide(match: MatchSides): boolean {
+  return isMatchSidePending(match, 1) || isMatchSidePending(match, 2);
+}
+
+export function getMatchSideName(match: MatchSides, side: 1 | 2, fallback: string): string {
+  const team = side === 1 ? match.team1 : match.team2;
+  const label = side === 1 ? match.team1Label : match.team2Label;
+  return team?.teamName || label || fallback;
 }

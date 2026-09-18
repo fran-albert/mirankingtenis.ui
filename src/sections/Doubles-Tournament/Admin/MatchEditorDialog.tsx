@@ -24,6 +24,7 @@ import {
   DOUBLES_VENUES,
   DOUBLES_ZONES,
   getEventDays,
+  getMatchSideName,
   getPlayoffRoundLabel,
 } from "@/common/constants/doubles-event.constants";
 import {
@@ -51,12 +52,15 @@ interface MatchEditorDialogProps {
   mutations: ReturnType<typeof useDoublesEventMutations>;
   eventStartDate: string;
   eventEndDate: string | null;
+  isPreview?: boolean;
 }
 
 function createEmptyMatchForm(): CreateDoublesMatchRequest {
   return {
     team1Id: 0,
     team2Id: undefined,
+    team1Label: "",
+    team2Label: "",
     phase: DoublesMatchPhase.zone,
     turnId: undefined,
     venue: "",
@@ -181,6 +185,7 @@ export function MatchEditorDialog({
   mutations,
   eventStartDate,
   eventEndDate,
+  isPreview = false,
 }: MatchEditorDialogProps) {
   const eventDays = useMemo(
     () => getEventDays(eventStartDate, eventEndDate),
@@ -243,6 +248,8 @@ export function MatchEditorDialog({
           match.team2?.teamName,
           match.team2?.player1Name,
           match.team2?.player2Name,
+          match.team1Label,
+          match.team2Label,
           getMatchAssignmentLabel(match),
         ]
           .filter(Boolean)
@@ -268,6 +275,8 @@ export function MatchEditorDialog({
       setForm({
         team1Id: initialMatch.team1?.id || 0,
         team2Id: initialMatch.team2?.id,
+        team1Label: initialMatch.team1Label || "",
+        team2Label: initialMatch.team2Label || "",
         phase: initialMatch.phase,
         turnId: initialMatch.turnId || undefined,
         venue: initialMatch.venue || "",
@@ -375,16 +384,25 @@ export function MatchEditorDialog({
   const handleSave = async () => {
     if (isSaving || !categoryId) return;
 
+    const { team1Id, team2Id, team1Label, team2Label, ...formFields } = form;
     const payload: CreateDoublesMatchRequest = {
-      ...form,
+      ...formFields,
       phase,
       zoneName:
         phase === DoublesMatchPhase.zone
           ? form.zoneName ||
-            teams.find((team) => team.id === form.team1Id)?.zoneName ||
-            teams.find((team) => team.id === form.team2Id)?.zoneName ||
+            teams.find((team) => team.id === team1Id)?.zoneName ||
+            teams.find((team) => team.id === team2Id)?.zoneName ||
             ""
           : "",
+      ...(team1Id ? { team1Id } : {}),
+      ...(team2Id ? { team2Id } : {}),
+      ...(isPreview
+        ? {
+            team1Label: team1Label?.trim() || null,
+            team2Label: team2Label?.trim() || null,
+          }
+        : {}),
     };
 
     try {
@@ -444,57 +462,112 @@ export function MatchEditorDialog({
     initialMatch?.status === DoublesMatchStatus.pending &&
     replacementOptions.length > 0;
 
+  const pendingTeam1Label = isEditing && !initialMatch?.team1 ? initialMatch?.team1Label : null;
+  const pendingTeam2Label = isEditing && !initialMatch?.team2 ? initialMatch?.team2Label : null;
+  const hasTeam1 =
+    !!form.team1Id || (isPreview ? !!form.team1Label?.trim() : !!pendingTeam1Label);
+  const hasTeam2 = !!form.team2Id || !!form.team2Label?.trim();
+  const hasSchedule = !!form.turnId && !!form.venue && !!form.courtName;
+  const canSave = isPreview
+    ? hasTeam1 && hasTeam2 && !!form.round && !!form.positionInBracket
+    : hasTeam1 && hasSchedule;
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             {isEditing ? "Editar Partido" : "Nuevo Partido"} -{" "}
-            {phase === DoublesMatchPhase.zone ? "Zona" : "Llave"}
+            {phase === DoublesMatchPhase.zone ? "Zona" : isPreview ? "Llave previa" : "Llave"}
           </DialogTitle>
           {categoryName && <p className="text-sm text-muted-foreground">{categoryName}</p>}
         </DialogHeader>
 
         <div className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <Label>Equipo 1</Label>
-              <Select
-                value={String(form.team1Id || "")}
-                onValueChange={handleTeam1Change}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Seleccionar equipo" />
-                </SelectTrigger>
-                <SelectContent>
-                  {team1Options.map((team) => (
-                    <SelectItem key={team.id} value={String(team.id)}>
-                      {formatTeamLabel(team)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+          {isPreview ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="preview-team1">Equipo 1</Label>
+                <Input
+                  id="preview-team1"
+                  placeholder="Ej: 1° Zona 1"
+                  maxLength={60}
+                  value={initialMatch?.team1?.teamName ?? form.team1Label ?? ""}
+                  disabled={!!initialMatch?.team1}
+                  onChange={(e) =>
+                    setForm((current) => ({ ...current, team1Label: e.target.value }))
+                  }
+                />
+              </div>
 
-            <div>
-              <Label>Equipo 2</Label>
-              <Select
-                value={String(form.team2Id || "")}
-                onValueChange={handleTeam2Change}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Seleccionar equipo" />
-                </SelectTrigger>
-                <SelectContent>
-                  {team2Options.map((team) => (
-                    <SelectItem key={team.id} value={String(team.id)}>
-                      {formatTeamLabel(team)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div>
+                <Label htmlFor="preview-team2">Equipo 2</Label>
+                <Input
+                  id="preview-team2"
+                  placeholder="Ej: 2° Zona 2"
+                  maxLength={60}
+                  value={initialMatch?.team2?.teamName ?? form.team2Label ?? ""}
+                  disabled={!!initialMatch?.team2}
+                  onChange={(e) =>
+                    setForm((current) => ({ ...current, team2Label: e.target.value }))
+                  }
+                />
+              </div>
+
+              <p className="text-xs text-muted-foreground sm:col-span-2">
+                Escribí de dónde sale cada pareja. Turno, sede y cancha son opcionales: podés
+                programarlos ahora o más adelante.
+              </p>
             </div>
-          </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <Label>Equipo 1</Label>
+                <Select
+                  value={String(form.team1Id || "")}
+                  onValueChange={handleTeam1Change}
+                >
+                  <SelectTrigger>
+                    <SelectValue
+                      placeholder={
+                        pendingTeam1Label ? `${pendingTeam1Label} — elegir pareja` : "Seleccionar equipo"
+                      }
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {team1Options.map((team) => (
+                      <SelectItem key={team.id} value={String(team.id)}>
+                        {formatTeamLabel(team)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label>Equipo 2</Label>
+                <Select
+                  value={String(form.team2Id || "")}
+                  onValueChange={handleTeam2Change}
+                >
+                  <SelectTrigger>
+                    <SelectValue
+                      placeholder={
+                        pendingTeam2Label ? `${pendingTeam2Label} — elegir pareja` : "Seleccionar equipo"
+                      }
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {team2Options.map((team) => (
+                      <SelectItem key={team.id} value={String(team.id)}>
+                        {formatTeamLabel(team)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          )}
 
           {phase === DoublesMatchPhase.zone && (
             <div>
@@ -553,6 +626,13 @@ export function MatchEditorDialog({
                   }
                 />
               </div>
+
+              {isPreview && (
+                <p className="text-xs text-muted-foreground sm:col-span-2">
+                  La posición define a dónde pasa el ganador: las posiciones 1 y 2 van a la
+                  posición 1 de la ronda siguiente, 3 y 4 a la 2.
+                </p>
+              )}
             </div>
           )}
 
@@ -687,7 +767,7 @@ export function MatchEditorDialog({
                               {matchCategoryName} · {phaseLabel}
                             </div>
                             <div className="text-sm">
-                              {match.team1?.teamName || "TBD"} vs {match.team2?.teamName || "BYE"}
+                              {getMatchSideName(match, 1, "TBD")} vs {getMatchSideName(match, 2, "BYE")}
                             </div>
                             <div className="text-xs text-muted-foreground">
                               {getMatchAssignmentLabel(match)}
@@ -714,9 +794,7 @@ export function MatchEditorDialog({
 
           <Button
             onClick={handleSave}
-            disabled={
-              isSaving || !form.team1Id || !form.turnId || !form.venue || !form.courtName
-            }
+            disabled={isSaving || !canSave}
             className="w-full"
           >
             {isSaving

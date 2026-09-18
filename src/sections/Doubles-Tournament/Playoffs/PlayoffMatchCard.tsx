@@ -3,6 +3,7 @@ import React from "react";
 import { DoublesMatch } from "@/types/Doubles-Event/DoublesEvent";
 import { DoublesMatchStatus } from "@/common/enum/doubles-event.enum";
 import { Badge } from "@/components/ui/badge";
+import { getMatchSideName, isMatchSidePending } from "@/common/constants/doubles-event.constants";
 
 function TeamName({ name }: { name: string }) {
   const parts = name.split(" / ");
@@ -41,7 +42,9 @@ export function PlayoffMatchCard({ match }: PlayoffMatchCardProps) {
             isTeam1Winner ? "bg-green-50 font-bold" : ""
           }`}
         >
-          <span><TeamName name={match.team1?.teamName || "Por definir"} /></span>
+          <span className={isMatchSidePending(match, 1) ? "text-gray-400 italic" : undefined}>
+            <TeamName name={getMatchSideName(match, 1, "Por definir")} />
+          </span>
           {isTeam1Winner && <Badge className="text-[9px] px-1 py-0 leading-tight shrink-0">G</Badge>}
         </div>
         {sets.map((s) => (
@@ -61,9 +64,11 @@ export function PlayoffMatchCard({ match }: PlayoffMatchCardProps) {
             isTeam2Winner ? "bg-green-50 font-bold" : ""
           }`}
         >
-          {match.team2 ? (
+          {match.team2 || match.team2Label ? (
             <>
-              <span><TeamName name={match.team2.teamName} /></span>
+              <span className={isMatchSidePending(match, 2) ? "text-gray-400 italic" : undefined}>
+                <TeamName name={getMatchSideName(match, 2, "Por definir")} />
+              </span>
               {isTeam2Winner && <Badge className="text-[9px] px-1 py-0 leading-tight shrink-0">G</Badge>}
             </>
           ) : (

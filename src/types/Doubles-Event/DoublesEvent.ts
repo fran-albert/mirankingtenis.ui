@@ -49,8 +49,10 @@ export interface DoublesMatchSet {
 export interface DoublesMatch {
   id: number;
   categoryId: number;
-  team1: DoublesTeam;
+  team1: DoublesTeam | null;
   team2: DoublesTeam | null;
+  team1Label: string | null;
+  team2Label: string | null;
   winner: DoublesTeam | null;
   winnerId: number | null;
   turn: DoublesTurn | null;
@@ -175,8 +177,10 @@ export interface CreateDoublesTeamRequest {
 
 export interface CreateDoublesMatchRequest {
   turnId?: number;
-  team1Id: number;
+  team1Id?: number;
   team2Id?: number;
+  team1Label?: string | null;
+  team2Label?: string | null;
   phase: DoublesMatchPhase;
   venue?: string;
   courtName?: string;
