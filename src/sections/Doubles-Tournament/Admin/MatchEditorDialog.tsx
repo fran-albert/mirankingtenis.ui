@@ -384,9 +384,23 @@ export function MatchEditorDialog({
   const handleSave = async () => {
     if (isSaving || !categoryId) return;
 
-    const { team1Id, team2Id, team1Label, team2Label, ...formFields } = form;
+    const {
+      team1Id,
+      team2Id,
+      team1Label,
+      team2Label,
+      startTime,
+      endTime,
+      venue,
+      courtName,
+      ...formFields
+    } = form;
     const payload: CreateDoublesMatchRequest = {
       ...formFields,
+      ...(startTime ? { startTime } : {}),
+      ...(endTime ? { endTime } : {}),
+      ...(venue ? { venue } : {}),
+      ...(courtName ? { courtName } : {}),
       phase,
       zoneName:
         phase === DoublesMatchPhase.zone
